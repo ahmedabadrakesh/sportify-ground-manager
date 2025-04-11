@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from "react";
 import { useLocation, useSearchParams } from "react-router-dom";
 import MainLayout from "@/components/layouts/MainLayout";
@@ -174,7 +173,7 @@ const SearchGrounds: React.FC = () => {
                 <SelectValue placeholder="Sport" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">All Sports</SelectItem>
+                <SelectItem value="all-sports">All Sports</SelectItem>
                 {allSports.map((sport) => (
                   <SelectItem key={sport} value={sport}>{sport}</SelectItem>
                 ))}

@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { format } from "date-fns";
@@ -91,7 +90,6 @@ const GroundDetail: React.FC = () => {
 
   return (
     <MainLayout>
-      {/* Ground Header */}
       <div className="bg-white rounded-lg shadow-sm overflow-hidden mb-8">
         <div className="aspect-[3/1] overflow-hidden relative">
           <img
@@ -119,7 +117,6 @@ const GroundDetail: React.FC = () => {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
-        {/* Ground Details */}
         <div className="lg:col-span-2">
           <Tabs defaultValue="overview">
             <TabsList className="mb-6">
@@ -191,7 +188,6 @@ const GroundDetail: React.FC = () => {
           </Tabs>
         </div>
 
-        {/* Booking Card */}
         <div className="bg-white rounded-lg shadow-sm border p-6 h-fit sticky top-6">
           <h2 className="text-xl font-semibold mb-4">Book This Ground</h2>
           

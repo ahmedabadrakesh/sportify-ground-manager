@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { format, parseISO } from "date-fns";
 import { Calendar, Clock, User, Phone, CheckCircle, XCircle, Calendar as CalendarIcon } from "lucide-react";
@@ -78,7 +77,6 @@ const AdminBookings: React.FC = () => {
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
   const [isAddBookingOpen, setIsAddBookingOpen] = useState(false);
   
-  // New booking form state
   const [selectedGround, setSelectedGround] = useState<string>("");
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [customerName, setCustomerName] = useState("");
@@ -88,7 +86,6 @@ const AdminBookings: React.FC = () => {
   const currentUser = getCurrentUser();
   const isSuperAdmin = hasRole('super_admin');
   
-  // Filter bookings based on user role
   const userBookings = isSuperAdmin
     ? bookings
     : bookings.filter(booking => {
@@ -96,7 +93,6 @@ const AdminBookings: React.FC = () => {
         return ground?.ownerId === currentUser?.id;
       });
   
-  // Filter grounds based on user role
   const userGrounds = isSuperAdmin
     ? grounds
     : grounds.filter(ground => ground.ownerId === currentUser?.id);
@@ -361,7 +357,6 @@ const AdminBookings: React.FC = () => {
         </div>
       </div>
 
-      {/* Booking Details Dialog */}
       <Dialog open={isDetailsOpen} onOpenChange={setIsDetailsOpen}>
         {selectedBooking && (
           <DialogContent className="max-w-2xl">
