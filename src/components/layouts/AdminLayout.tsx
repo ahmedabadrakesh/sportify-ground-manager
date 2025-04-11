@@ -1,26 +1,17 @@
 
-import React, { useState } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
-import {
-  Home,
-  Users,
-  User,
-  Calendar,
-  Package,
-  Settings,
-  LogOut,
-  Menu,
-  X,
-  ChevronDown
+import React from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { 
+  Home, LogOut, Package, Calendar, Users, Map, 
+  LayoutDashboard, ChevronRight, ShoppingBag 
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { getCurrentUser, hasRole, logout } from "@/utils/auth";
+import { Separator } from "@/components/ui/separator";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { getCurrentUser, logout, hasRole } from "@/utils/auth";
+import { useLocation } from "react-router-dom";
 import { toast } from "sonner";
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "@/components/ui/collapsible";
 
 interface AdminLayoutProps {
   children: React.ReactNode;
@@ -30,209 +21,230 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
   const location = useLocation();
   const navigate = useNavigate();
   const currentUser = getCurrentUser();
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-  
   const isSuperAdmin = hasRole('super_admin');
-
+  
   const handleLogout = () => {
     logout();
     toast.success("Logged out successfully");
     navigate("/");
   };
 
+  const NavItems = () => (
+    <div className="space-y-1">
+      <Link
+        to="/admin"
+        className={`flex items-center px-3 py-2 text-sm rounded-md ${
+          location.pathname === "/admin"
+            ? "bg-primary/10 text-primary font-medium"
+            : "text-gray-700 hover:bg-gray-100"
+        }`}
+      >
+        <LayoutDashboard className="mr-2 h-4 w-4" />
+        Dashboard
+      </Link>
+      
+      {isSuperAdmin && (
+        <Link
+          to="/admin/ground-owners"
+          className={`flex items-center px-3 py-2 text-sm rounded-md ${
+            location.pathname === "/admin/ground-owners"
+              ? "bg-primary/10 text-primary font-medium"
+              : "text-gray-700 hover:bg-gray-100"
+          }`}
+        >
+          <Users className="mr-2 h-4 w-4" />
+          Ground Owners
+        </Link>
+      )}
+      
+      <Link
+        to="/admin/grounds"
+        className={`flex items-center px-3 py-2 text-sm rounded-md ${
+          location.pathname === "/admin/grounds"
+            ? "bg-primary/10 text-primary font-medium"
+            : "text-gray-700 hover:bg-gray-100"
+        }`}
+      >
+        <Map className="mr-2 h-4 w-4" />
+        Grounds
+      </Link>
+      
+      <Link
+        to="/admin/bookings"
+        className={`flex items-center px-3 py-2 text-sm rounded-md ${
+          location.pathname === "/admin/bookings"
+            ? "bg-primary/10 text-primary font-medium"
+            : "text-gray-700 hover:bg-gray-100"
+        }`}
+      >
+        <Calendar className="mr-2 h-4 w-4" />
+        Bookings
+      </Link>
+      
+      <Link
+        to="/admin/inventory"
+        className={`flex items-center px-3 py-2 text-sm rounded-md ${
+          location.pathname === "/admin/inventory" || location.pathname === "/admin/inventory/allocate"
+            ? "bg-primary/10 text-primary font-medium"
+            : "text-gray-700 hover:bg-gray-100"
+        }`}
+      >
+        <Package className="mr-2 h-4 w-4" />
+        Inventory
+      </Link>
+      
+      {isSuperAdmin && (
+        <Link
+          to="/admin/ecommerce"
+          className={`flex items-center px-3 py-2 text-sm rounded-md ${
+            location.pathname === "/admin/ecommerce"
+              ? "bg-primary/10 text-primary font-medium"
+              : "text-gray-700 hover:bg-gray-100"
+          }`}
+        >
+          <ShoppingBag className="mr-2 h-4 w-4" />
+          E-commerce
+        </Link>
+      )}
+    </div>
+  );
+
   if (!currentUser || (currentUser.role !== 'admin' && currentUser.role !== 'super_admin')) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-red-600 mb-4">Access Denied</h1>
-          <p className="text-gray-600 mb-6">You do not have permission to access this area.</p>
-          <Button onClick={() => navigate("/")}>Go to Homepage</Button>
-        </div>
-      </div>
-    );
+    navigate("/login");
+    return null;
   }
 
   return (
-    <div className="min-h-screen bg-gray-100">
-      {/* Mobile sidebar backdrop */}
-      {sidebarOpen && (
-        <div
-          className="fixed inset-0 bg-black/50 z-40 md:hidden"
-          onClick={() => setSidebarOpen(false)}
-        ></div>
-      )}
-
-      {/* Sidebar */}
-      <div
-        className={`fixed top-0 left-0 bottom-0 w-64 bg-white shadow-lg z-50 transform transition-transform duration-300 ease-in-out ${
-          sidebarOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"
-        }`}
-      >
-        <div className="flex items-center justify-between p-4 border-b">
-          <Link to="/admin" className="font-bold text-xl text-primary-800">
-            Admin Dashboard
-          </Link>
-          <button
-            className="md:hidden text-gray-500"
-            onClick={() => setSidebarOpen(false)}
-          >
-            <X size={24} />
-          </button>
-        </div>
-
-        <div className="p-4">
-          <div className="flex items-center space-x-3 mb-6">
-            <div className="w-10 h-10 rounded-full bg-primary-100 flex items-center justify-center">
-              <User size={20} className="text-primary-600" />
-            </div>
-            <div>
-              <p className="font-medium text-sm">{currentUser.name}</p>
-              <p className="text-xs text-gray-500">{currentUser.role === 'super_admin' ? 'Super Admin' : 'Ground Owner'}</p>
-            </div>
+    <div className="min-h-screen flex bg-gray-50">
+      {/* Sidebar for larger screens */}
+      <div className="hidden md:flex md:w-64 md:flex-col md:fixed md:inset-y-0">
+        <div className="flex flex-col flex-grow pt-5 overflow-y-auto border-r bg-white">
+          <div className="flex items-center flex-shrink-0 px-4 mb-5">
+            <Link to="/" className="flex items-center">
+              <span className="text-xl font-bold text-primary-800">SportifyGround</span>
+            </Link>
           </div>
-
-          <nav className="space-y-1">
-            <Link
-              to="/admin"
-              className={`flex items-center px-3 py-2 rounded-md text-sm ${
-                location.pathname === "/admin"
-                  ? "bg-primary-50 text-primary-700"
-                  : "text-gray-700 hover:bg-gray-100"
-              }`}
-            >
-              <Home size={18} className="mr-3" />
-              Dashboard
-            </Link>
-
-            {isSuperAdmin && (
-              <Link
-                to="/admin/ground-owners"
-                className={`flex items-center px-3 py-2 rounded-md text-sm ${
-                  location.pathname === "/admin/ground-owners"
-                    ? "bg-primary-50 text-primary-700"
-                    : "text-gray-700 hover:bg-gray-100"
-                }`}
-              >
-                <Users size={18} className="mr-3" />
-                Ground Owners
-              </Link>
-            )}
-
-            <Link
-              to="/admin/grounds"
-              className={`flex items-center px-3 py-2 rounded-md text-sm ${
-                location.pathname === "/admin/grounds"
-                  ? "bg-primary-50 text-primary-700"
-                  : "text-gray-700 hover:bg-gray-100"
-              }`}
-            >
-              <Home size={18} className="mr-3" />
-              Grounds
-            </Link>
-
-            <Link
-              to="/admin/bookings"
-              className={`flex items-center px-3 py-2 rounded-md text-sm ${
-                location.pathname === "/admin/bookings"
-                  ? "bg-primary-50 text-primary-700"
-                  : "text-gray-700 hover:bg-gray-100"
-              }`}
-            >
-              <Calendar size={18} className="mr-3" />
-              Bookings
-            </Link>
-
-            <Collapsible>
-              <CollapsibleTrigger className="flex items-center justify-between px-3 py-2 rounded-md text-sm w-full text-left text-gray-700 hover:bg-gray-100">
-                <div className="flex items-center">
-                  <Package size={18} className="mr-3" />
-                  Inventory
-                </div>
-                <ChevronDown size={16} />
-              </CollapsibleTrigger>
-              <CollapsibleContent>
-                <Link
-                  to="/admin/inventory"
-                  className={`flex items-center pl-9 pr-3 py-2 rounded-md text-sm ${
-                    location.pathname === "/admin/inventory"
-                      ? "bg-primary-50 text-primary-700"
-                      : "text-gray-700 hover:bg-gray-100"
-                  }`}
-                >
-                  Current Inventory
-                </Link>
-                {isSuperAdmin && (
-                  <Link
-                    to="/admin/inventory/allocate"
-                    className={`flex items-center pl-9 pr-3 py-2 rounded-md text-sm ${
-                      location.pathname === "/admin/inventory/allocate"
-                        ? "bg-primary-50 text-primary-700"
-                        : "text-gray-700 hover:bg-gray-100"
-                    }`}
-                  >
-                    Allocate Inventory
-                  </Link>
-                )}
-              </CollapsibleContent>
-            </Collapsible>
-
-            <Link
-              to="/admin/settings"
-              className={`flex items-center px-3 py-2 rounded-md text-sm ${
-                location.pathname === "/admin/settings"
-                  ? "bg-primary-50 text-primary-700"
-                  : "text-gray-700 hover:bg-gray-100"
-              }`}
-            >
-              <Settings size={18} className="mr-3" />
-              Settings
-            </Link>
-          </nav>
-        </div>
-
-        <div className="absolute bottom-0 left-0 right-0 p-4 border-t">
-          <Button
-            variant="outline"
-            className="w-full justify-start text-gray-700"
-            onClick={handleLogout}
-          >
-            <LogOut size={18} className="mr-3" />
-            Logout
-          </Button>
-        </div>
-      </div>
-
-      {/* Main content */}
-      <div className="md:ml-64 min-h-screen flex flex-col">
-        {/* Top navbar */}
-        <header className="bg-white shadow-sm p-4">
-          <div className="flex items-center justify-between">
-            <button
-              className="md:hidden text-gray-500"
-              onClick={() => setSidebarOpen(true)}
-            >
-              <Menu size={24} />
-            </button>
-
-            <div className="md:hidden font-semibold text-primary-800">
-              Admin Dashboard
+          
+          <ScrollArea className="flex-1 px-3">
+            <NavItems />
+          </ScrollArea>
+          
+          <div className="p-4 border-t">
+            <div className="flex items-center mb-2">
+              <div className="flex-shrink-0 h-8 w-8 rounded-full bg-gray-200 flex items-center justify-center">
+                <span className="font-medium text-gray-600">
+                  {currentUser?.name.charAt(0)}
+                </span>
+              </div>
+              <div className="ml-3">
+                <p className="text-sm font-medium text-gray-700">{currentUser?.name}</p>
+                <p className="text-xs text-gray-500 capitalize">{currentUser?.role.replace('_', ' ')}</p>
+              </div>
             </div>
-
-            <div className="flex items-center space-x-4">
-              <Button 
-                variant="outline" 
-                size="sm" 
-                className="text-gray-700"
+            
+            <div className="flex justify-between space-x-2 mt-3">
+              <Button
+                variant="outline"
+                size="sm"
+                className="w-full"
                 onClick={() => navigate("/")}
               >
-                View Website
+                <Home className="h-4 w-4 mr-2" /> Home
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                className="w-full"
+                onClick={handleLogout}
+              >
+                <LogOut className="h-4 w-4 mr-2" /> Logout
               </Button>
             </div>
           </div>
-        </header>
-
-        {/* Page content */}
-        <main className="flex-1 p-6">{children}</main>
+        </div>
+      </div>
+      
+      {/* Mobile header */}
+      <div className="md:hidden bg-white border-b">
+        <div className="flex items-center justify-between px-4 py-3">
+          <Link to="/" className="flex items-center">
+            <span className="text-xl font-bold text-primary-800">SportifyGround</span>
+          </Link>
+          
+          <div className="flex items-center">
+            <Sheet>
+              <SheetTrigger asChild>
+                <Button variant="ghost" size="sm">
+                  Menu <ChevronRight className="h-4 w-4 ml-1" />
+                </Button>
+              </SheetTrigger>
+              <SheetContent side="left" className="w-64 p-0">
+                <div className="flex flex-col h-full">
+                  <div className="p-4 border-b">
+                    <div className="flex items-center">
+                      <div className="flex-shrink-0 h-8 w-8 rounded-full bg-gray-200 flex items-center justify-center">
+                        <span className="font-medium text-gray-600">
+                          {currentUser?.name.charAt(0)}
+                        </span>
+                      </div>
+                      <div className="ml-3">
+                        <p className="text-sm font-medium text-gray-700">{currentUser?.name}</p>
+                        <p className="text-xs text-gray-500 capitalize">{currentUser?.role.replace('_', ' ')}</p>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <ScrollArea className="flex-1 p-4">
+                    <NavItems />
+                  </ScrollArea>
+                  
+                  <div className="p-4 border-t mt-auto">
+                    <div className="flex justify-between space-x-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="w-full"
+                        onClick={() => navigate("/")}
+                      >
+                        <Home className="h-4 w-4 mr-2" /> Home
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="w-full"
+                        onClick={handleLogout}
+                      >
+                        <LogOut className="h-4 w-4 mr-2" /> Logout
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              </SheetContent>
+            </Sheet>
+          </div>
+        </div>
+      </div>
+      
+      {/* Main content */}
+      <div className="flex flex-1 flex-col md:pl-64">
+        {/* Breadcrumbs for mobile */}
+        <div className="md:hidden bg-gray-50 px-4 py-2 text-sm">
+          <div className="flex items-center text-gray-600">
+            <Link to="/admin" className="hover:text-primary">Admin</Link>
+            {location.pathname !== "/admin" && (
+              <>
+                <ChevronRight className="h-3 w-3 mx-1" />
+                <span className="font-medium text-gray-900">
+                  {location.pathname.split("/").pop()?.replace("-", " ")}
+                </span>
+              </>
+            )}
+          </div>
+        </div>
+        
+        <main className="flex-1 p-6">
+          {children}
+        </main>
       </div>
     </div>
   );

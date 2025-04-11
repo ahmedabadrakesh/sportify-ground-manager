@@ -1,11 +1,12 @@
 
 import React from "react";
-import { Link, useLocation } from "react-router-dom";
-import { Home, Search, Calendar, User, LogOut } from "lucide-react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Home, Search, Calendar, User, LogOut, ShoppingBag, ShoppingCart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { getCurrentUser, logout } from "@/utils/auth";
-import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
+import { Badge } from "@/components/ui/badge";
+import { getCartItemsCount } from "@/utils/cart";
 
 interface MainLayoutProps {
   children: React.ReactNode;
@@ -15,6 +16,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
   const location = useLocation();
   const navigate = useNavigate();
   const currentUser = getCurrentUser();
+  const cartItemsCount = getCartItemsCount();
 
   const handleLogout = () => {
     logout();
@@ -31,6 +33,26 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
             <span className="text-2xl font-bold text-primary-800">SportifyGround</span>
           </Link>
           <div className="flex items-center gap-4">
+            <Link to="/shop" className="text-gray-700 hover:text-primary-600">
+              <div className="flex items-center">
+                <ShoppingBag className="h-5 w-5 mr-1" />
+                <span className="hidden md:inline">Shop</span>
+              </div>
+            </Link>
+            <Link to="/cart" className="text-gray-700 hover:text-primary-600 relative">
+              <div className="flex items-center">
+                <ShoppingCart className="h-5 w-5 mr-1" />
+                <span className="hidden md:inline">Cart</span>
+                {cartItemsCount > 0 && (
+                  <Badge 
+                    variant="destructive" 
+                    className="absolute -top-2 -right-2 h-5 w-5 flex items-center justify-center p-0 text-xs"
+                  >
+                    {cartItemsCount}
+                  </Badge>
+                )}
+              </div>
+            </Link>
             {currentUser ? (
               <>
                 <span className="text-sm text-gray-700">Hello, {currentUser.name}</span>
@@ -66,7 +88,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
 
       {/* Mobile bottom navigation */}
       <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white shadow-top border-t border-gray-200">
-        <div className="grid grid-cols-4 h-16">
+        <div className="grid grid-cols-5 h-16">
           <Link
             to="/"
             className={`flex flex-col items-center justify-center ${
@@ -95,13 +117,30 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
             <span className="text-xs mt-1">Bookings</span>
           </Link>
           <Link
-            to="/profile"
+            to="/shop"
             className={`flex flex-col items-center justify-center ${
-              location.pathname === "/profile" ? "text-primary-600" : "text-gray-500"
+              location.pathname === "/shop" ? "text-primary-600" : "text-gray-500"
             }`}
           >
-            <User size={20} />
-            <span className="text-xs mt-1">Profile</span>
+            <ShoppingBag size={20} />
+            <span className="text-xs mt-1">Shop</span>
+          </Link>
+          <Link
+            to="/cart"
+            className={`flex flex-col items-center justify-center relative ${
+              location.pathname === "/cart" ? "text-primary-600" : "text-gray-500"
+            }`}
+          >
+            <ShoppingCart size={20} />
+            {cartItemsCount > 0 && (
+              <Badge 
+                variant="destructive" 
+                className="absolute -top-1 right-1 h-4 w-4 flex items-center justify-center p-0 text-[10px]"
+              >
+                {cartItemsCount}
+              </Badge>
+            )}
+            <span className="text-xs mt-1">Cart</span>
           </Link>
         </div>
       </div>

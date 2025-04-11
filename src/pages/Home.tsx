@@ -1,19 +1,36 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import MainLayout from "@/components/layouts/MainLayout";
 import GroundCard from "@/components/grounds/GroundCard";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { getAvailableGrounds } from "@/utils/booking";
-import { Search, MapPin } from "lucide-react";
+import { Search, MapPin, Users, Calendar, Check, Star, ShoppingBag, Info, ArrowRight } from "lucide-react";
 import { Ground } from "@/types/models";
+import { Card, CardContent } from "@/components/ui/card";
+import { getBookingsCount, getRegisteredGroundsCount, getCitiesCovered } from "@/utils/stats";
+import { getClientReviews } from "@/utils/reviews";
 
 const Home: React.FC = () => {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredGrounds, setFilteredGrounds] = useState<Ground[]>([]);
   const [hasSearched, setHasSearched] = useState(false);
+  const [stats, setStats] = useState({
+    grounds: 0,
+    bookings: 0,
+    cities: 0
+  });
+
+  useEffect(() => {
+    // Get statistics for the ticker
+    setStats({
+      grounds: getRegisteredGroundsCount(),
+      bookings: getBookingsCount(),
+      cities: getCitiesCovered().length
+    });
+  }, []);
 
   const onSearch = () => {
     if (searchTerm.trim()) {
@@ -29,8 +46,39 @@ const Home: React.FC = () => {
     }
   };
 
+  const reviews = getClientReviews();
+
   return (
     <MainLayout>
+      {/* Stats Ticker */}
+      <div className="bg-primary-800 text-white py-3 mb-8 rounded-lg">
+        <div className="container mx-auto">
+          <div className="grid grid-cols-3 text-center">
+            <div className="flex flex-col items-center">
+              <div className="flex items-center">
+                <MapPin className="mr-2 h-5 w-5" />
+                <span className="text-2xl font-bold">{stats.grounds}</span>
+              </div>
+              <span className="text-sm mt-1">Grounds Registered</span>
+            </div>
+            <div className="flex flex-col items-center">
+              <div className="flex items-center">
+                <Calendar className="mr-2 h-5 w-5" />
+                <span className="text-2xl font-bold">{stats.bookings}</span>
+              </div>
+              <span className="text-sm mt-1">Bookings Completed</span>
+            </div>
+            <div className="flex flex-col items-center">
+              <div className="flex items-center">
+                <Users className="mr-2 h-5 w-5" />
+                <span className="text-2xl font-bold">{stats.cities}</span>
+              </div>
+              <span className="text-sm mt-1">Cities Covered</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* Hero Section */}
       <div className="relative mb-12 pb-8">
         <div className="bg-gradient-to-r from-primary-800 to-primary-600 rounded-3xl overflow-hidden">
@@ -154,6 +202,126 @@ const Home: React.FC = () => {
         </div>
       </div>
 
+      {/* How It Works Section */}
+      <div className="mb-16 py-12 bg-gray-50 rounded-xl">
+        <div className="container mx-auto px-4">
+          <h2 className="text-3xl font-bold text-center mb-12">How It Works</h2>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className="bg-white p-8 rounded-lg shadow-sm text-center">
+              <div className="w-12 h-12 bg-primary-100 text-primary-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Search className="h-6 w-6" />
+              </div>
+              <h3 className="text-xl font-semibold mb-3">1. Find a Ground</h3>
+              <p className="text-gray-600">
+                Search for sports grounds based on your location, preferred sport, or venue name.
+              </p>
+            </div>
+            
+            <div className="bg-white p-8 rounded-lg shadow-sm text-center">
+              <div className="w-12 h-12 bg-primary-100 text-primary-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Calendar className="h-6 w-6" />
+              </div>
+              <h3 className="text-xl font-semibold mb-3">2. Book a Slot</h3>
+              <p className="text-gray-600">
+                Choose from available time slots, select the date and duration that works for you.
+              </p>
+            </div>
+            
+            <div className="bg-white p-8 rounded-lg shadow-sm text-center">
+              <div className="w-12 h-12 bg-primary-100 text-primary-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Check className="h-6 w-6" />
+              </div>
+              <h3 className="text-xl font-semibold mb-3">3. Confirm & Play</h3>
+              <p className="text-gray-600">
+                Make the payment securely online and receive instant confirmation. Show up and play!
+              </p>
+            </div>
+          </div>
+          
+          <div className="text-center mt-10">
+            <Button onClick={() => navigate("/search")} className="px-8">
+              Book Now <ArrowRight className="ml-2 h-4 w-4" />
+            </Button>
+          </div>
+        </div>
+      </div>
+
+      {/* Client Reviews Section */}
+      <div className="mb-16">
+        <h2 className="text-2xl font-bold text-gray-900 mb-6">What Our Clients Say</h2>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {reviews.map((review) => (
+            <Card key={review.id} className="overflow-hidden border-0 shadow-md">
+              <CardContent className="p-6">
+                <div className="flex items-center mb-4">
+                  <div className="flex">
+                    {[...Array(5)].map((_, i) => (
+                      <Star 
+                        key={i} 
+                        className={`h-4 w-4 ${i < review.rating ? 'text-yellow-400 fill-yellow-400' : 'text-gray-300'}`} 
+                      />
+                    ))}
+                  </div>
+                  <span className="ml-2 text-sm text-gray-500">{review.rating}/5</span>
+                </div>
+                <p className="text-gray-700 mb-4 italic">"{review.comment}"</p>
+                <div className="flex items-center">
+                  <div className="h-10 w-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-700 font-bold">
+                    {review.name.charAt(0)}
+                  </div>
+                  <div className="ml-3">
+                    <p className="font-medium text-gray-900">{review.name}</p>
+                    <p className="text-sm text-gray-500">{review.location}</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      </div>
+
+      {/* E-commerce Teaser */}
+      <div className="mb-16 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-xl overflow-hidden text-white">
+        <div className="container mx-auto px-4 py-12 flex flex-col md:flex-row items-center">
+          <div className="md:w-3/5 mb-8 md:mb-0 md:pr-12">
+            <h2 className="text-3xl font-bold mb-4">Shop Premium Sports Equipment</h2>
+            <p className="text-lg opacity-90 mb-6">
+              Get high-quality sports equipment delivered right to your door. From balls to bats, we've got everything you need for your game.
+            </p>
+            <Button 
+              variant="secondary" 
+              size="lg"
+              className="bg-white text-indigo-700 hover:bg-gray-100"
+              onClick={() => navigate("/shop")}
+            >
+              <ShoppingBag className="mr-2 h-5 w-5" /> Shop Now
+            </Button>
+          </div>
+          <div className="md:w-2/5 flex justify-center">
+            <div className="grid grid-cols-2 gap-4">
+              <div className="bg-white/20 p-4 rounded-lg backdrop-blur-sm">
+                <div className="h-24 w-24 bg-white/10 rounded-full mx-auto mb-2"></div>
+                <p className="text-center font-medium">Cricket Bats</p>
+              </div>
+              <div className="bg-white/20 p-4 rounded-lg backdrop-blur-sm">
+                <div className="h-24 w-24 bg-white/10 rounded-full mx-auto mb-2"></div>
+                <p className="text-center font-medium">Footballs</p>
+              </div>
+              <div className="bg-white/20 p-4 rounded-lg backdrop-blur-sm">
+                <div className="h-24 w-24 bg-white/10 rounded-full mx-auto mb-2"></div>
+                <p className="text-center font-medium">Tennis Rackets</p>
+              </div>
+              <div className="bg-white/20 p-4 rounded-lg backdrop-blur-sm">
+                <div className="h-24 w-24 bg-white/10 rounded-full mx-auto mb-2"></div>
+                <p className="text-center font-medium">Sports Attire</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* Features Section */}
       <div className="mb-16">
         <h2 className="text-2xl font-bold text-gray-900 mb-8 text-center">
@@ -183,7 +351,7 @@ const Home: React.FC = () => {
 
           <div className="bg-white p-6 rounded-xl border shadow-sm text-center">
             <div className="w-12 h-12 bg-primary-100 text-primary-600 rounded-full flex items-center justify-center mx-auto mb-4">
-              <MapPin size={24} />
+              <Info size={24} />
             </div>
             <h3 className="text-lg font-semibold mb-2">Instant Booking</h3>
             <p className="text-gray-600">

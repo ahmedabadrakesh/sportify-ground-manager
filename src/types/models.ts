@@ -71,3 +71,40 @@ export interface GroundInventory {
   itemName: string;
   itemPrice: number;
 }
+
+// E-commerce Models
+export interface Product {
+  id: string;
+  name: string;
+  description: string;
+  price: number;
+  category: string;
+  images: string[];
+  stock: number;
+  featured: boolean;
+}
+
+export interface Order {
+  id: string;
+  userId: string;
+  userName: string;
+  userEmail: string;
+  userPhone: string;
+  products: {
+    productId: string;
+    productName: string;
+    quantity: number;
+    price: number;
+  }[];
+  totalAmount: number;
+  status: 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled';
+  shippingAddress: string;
+  paymentMethod: string;
+  paymentStatus: 'pending' | 'completed' | 'failed';
+  createdAt: string;
+}
+
+export interface CartItem {
+  productId: string;
+  quantity: number;
+}
