@@ -13,6 +13,8 @@ import Register from "./pages/Register";
 import NotFound from "./pages/NotFound";
 import Shop from "./pages/Shop";
 import Cart from "./pages/Cart";
+import Checkout from "./pages/Checkout";
+import OrderConfirmation from "./pages/OrderConfirmation";
 
 // Admin routes
 import AdminDashboard from "./pages/admin/AdminDashboard";
@@ -43,6 +45,8 @@ const App = () => {
             <Route path="/register" element={<Register />} />
             <Route path="/shop" element={<Shop />} />
             <Route path="/cart" element={<Cart />} />
+            <Route path="/checkout" element={<Checkout />} />
+            <Route path="/order-confirmation" element={<OrderConfirmation />} />
             
             {/* Admin Routes */}
             <Route path="/admin" element={<AdminDashboard />} />
