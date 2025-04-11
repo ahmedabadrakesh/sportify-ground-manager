@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
@@ -25,12 +26,30 @@ export default {
 				background: 'hsl(var(--background))',
 				foreground: 'hsl(var(--foreground))',
 				primary: {
-					DEFAULT: 'hsl(var(--primary))',
-					foreground: 'hsl(var(--primary-foreground))'
+					DEFAULT: '#2E7D32',
+					foreground: '#FFFFFF',
+					100: '#E8F5E9',
+					200: '#C8E6C9',
+					300: '#A5D6A7',
+					400: '#81C784',
+					500: '#4CAF50',
+					600: '#43A047',
+					700: '#388E3C',
+					800: '#2E7D32',
+					900: '#1B5E20',
 				},
 				secondary: {
-					DEFAULT: 'hsl(var(--secondary))',
-					foreground: 'hsl(var(--secondary-foreground))'
+					DEFAULT: '#1976D2',
+					foreground: '#FFFFFF',
+					100: '#E3F2FD',
+					200: '#BBDEFB',
+					300: '#90CAF9',
+					400: '#64B5F6',
+					500: '#42A5F5',
+					600: '#2196F3',
+					700: '#1E88E5',
+					800: '#1976D2',
+					900: '#1565C0',
 				},
 				destructive: {
 					DEFAULT: 'hsl(var(--destructive))',
@@ -69,26 +88,28 @@ export default {
 				sm: 'calc(var(--radius) - 4px)'
 			},
 			keyframes: {
-				'accordion-down': {
-					from: {
-						height: '0'
-					},
-					to: {
-						height: 'var(--radix-accordion-content-height)'
-					}
+				"accordion-down": {
+					from: { height: "0" },
+					to: { height: "var(--radix-accordion-content-height)" },
 				},
-				'accordion-up': {
-					from: {
-						height: 'var(--radix-accordion-content-height)'
-					},
-					to: {
-						height: '0'
-					}
+				"accordion-up": {
+					from: { height: "var(--radix-accordion-content-height)" },
+					to: { height: "0" },
+				},
+				"fade-in": {
+					"0%": { opacity: "0" },
+					"100%": { opacity: "1" },
+				},
+				"pulse-scale": {
+					"0%, 100%": { transform: "scale(1)" },
+					"50%": { transform: "scale(1.05)" },
 				}
 			},
 			animation: {
-				'accordion-down': 'accordion-down 0.2s ease-out',
-				'accordion-up': 'accordion-up 0.2s ease-out'
+				"accordion-down": "accordion-down 0.2s ease-out",
+				"accordion-up": "accordion-up 0.2s ease-out",
+				"fade-in": "fade-in 0.5s ease-out",
+				"pulse-scale": "pulse-scale 2s infinite",
 			}
 		}
 	},
