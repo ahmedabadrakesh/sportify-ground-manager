@@ -15,16 +15,6 @@ const TimeSlotPicker: React.FC<TimeSlotPickerProps> = ({
   selectedSlots,
   onSelectSlot,
 }) => {
-  // Group slots by hour
-  const groupedSlots: Record<string, TimeSlot[]> = {};
-  slots.forEach((slot) => {
-    const hour = slot.startTime.split(":")[0];
-    if (!groupedSlots[hour]) {
-      groupedSlots[hour] = [];
-    }
-    groupedSlots[hour].push(slot);
-  });
-
   // Format time for display
   const formatTime = (time: string) => {
     const [hour, minute] = time.split(":");
@@ -41,18 +31,40 @@ const TimeSlotPicker: React.FC<TimeSlotPickerProps> = ({
     }
   };
 
+  // Group slots by time of day (morning, afternoon, evening)
+  const groupedByTimeOfDay = {
+    morning: slots.filter(slot => {
+      const hour = parseInt(slot.startTime.split(":")[0]);
+      return hour >= 6 && hour < 12;
+    }),
+    afternoon: slots.filter(slot => {
+      const hour = parseInt(slot.startTime.split(":")[0]);
+      return hour >= 12 && hour < 17;
+    }),
+    evening: slots.filter(slot => {
+      const hour = parseInt(slot.startTime.split(":")[0]);
+      return hour >= 17 || hour < 6;
+    })
+  };
+
+  const timeOfDayLabels = {
+    morning: "Morning (6 AM - 12 PM)",
+    afternoon: "Afternoon (12 PM - 5 PM)",
+    evening: "Evening (5 PM - 6 AM)"
+  };
+
   return (
     <div className="space-y-6">
       <h3 className="text-lg font-medium text-gray-900">Available Time Slots</h3>
       
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {Object.entries(groupedSlots).map(([hour, hourSlots]) => (
-          <div key={hour} className="bg-white rounded-lg shadow-sm border p-4">
-            <h4 className="text-sm font-medium text-gray-700 mb-2">
-              {formatTime(`${hour}:00`)}
+      {Object.entries(groupedByTimeOfDay).map(([timeOfDay, timeSlots]) => (
+        timeSlots.length > 0 && (
+          <div key={timeOfDay} className="space-y-4">
+            <h4 className="font-medium text-gray-700 border-b pb-2">
+              {timeOfDayLabels[timeOfDay as keyof typeof timeOfDayLabels]}
             </h4>
-            <div className="grid grid-cols-1 gap-2">
-              {hourSlots.map((slot) => (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {timeSlots.map((slot) => (
                 <Button
                   key={slot.id}
                   variant="outline"
@@ -73,8 +85,8 @@ const TimeSlotPicker: React.FC<TimeSlotPickerProps> = ({
               ))}
             </div>
           </div>
-        ))}
-      </div>
+        )
+      ))}
 
       {slots.length === 0 && (
         <div className="text-center py-6">

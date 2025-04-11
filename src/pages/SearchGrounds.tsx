@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from "react";
 import { useLocation, useSearchParams } from "react-router-dom";
 import MainLayout from "@/components/layouts/MainLayout";
@@ -83,7 +84,7 @@ const SearchGrounds: React.FC = () => {
     }
     
     // Filter by sport
-    if (sport) {
+    if (sport && sport !== "all-sports") {
       filtered = filtered.filter((ground) =>
         ground.games.some((game) =>
           game.toLowerCase() === sport.toLowerCase()

@@ -2,6 +2,7 @@
 import { Booking, Ground, TimeSlot, User } from "@/types/models";
 import { bookings, grounds, timeSlots } from "@/data/mockData";
 import { getCurrentUser } from "./auth";
+import { useInventoryItems } from "./inventory";
 
 // Get available grounds
 export const getAvailableGrounds = (
@@ -58,7 +59,10 @@ export const createBooking = (
     slot => slotIds.includes(slot.id) && slot.groundId === groundId && slot.date === date && !slot.isBooked
   );
   
-  if (selectedSlots.length !== slotIds.length) return null; // Some slots are not available
+  if (selectedSlots.length !== slotIds.length) {
+    console.log("Some slots are not available for booking");
+    return null; // Some slots are not available
+  }
   
   const totalAmount = selectedSlots.reduce((sum, slot) => sum + slot.price, 0);
   
@@ -69,6 +73,10 @@ export const createBooking = (
       timeSlots[index] = { ...timeSlots[index], isBooked: true };
     }
   });
+  
+  // Use some inventory items for each booked slot (if needed)
+  const inventoryUsed = useInventoryItems(groundId, "item-1", 1); // Example inventory usage
+  console.log("Inventory used:", inventoryUsed);
   
   const newBooking: Booking = {
     id: `booking-${Date.now()}`,
@@ -87,6 +95,7 @@ export const createBooking = (
   
   // Add to bookings
   bookings.push(newBooking);
+  console.log("New booking created:", newBooking);
   
   return newBooking;
 };
@@ -134,5 +143,6 @@ export const cancelBooking = (bookingId: string): boolean => {
     bookingStatus: 'cancelled',
   };
   
+  console.log("Booking cancelled:", bookings[index]);
   return true;
 };
