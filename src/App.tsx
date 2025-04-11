@@ -20,37 +20,40 @@ import AdminBookings from "./pages/admin/AdminBookings";
 import AdminInventory from "./pages/admin/AdminInventory";
 import InventoryAllocate from "./pages/admin/InventoryAllocate";
 
-const queryClient = new QueryClient();
+const App = () => {
+  // Create a client inside the component
+  const queryClient = new QueryClient();
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <Routes>
-          {/* Public Routes */}
-          <Route path="/" element={<Home />} />
-          <Route path="/search" element={<SearchGrounds />} />
-          <Route path="/grounds/:id" element={<GroundDetail />} />
-          <Route path="/bookings" element={<Bookings />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-          
-          {/* Admin Routes */}
-          <Route path="/admin" element={<AdminDashboard />} />
-          <Route path="/admin/ground-owners" element={<GroundOwners />} />
-          <Route path="/admin/grounds" element={<AdminGrounds />} />
-          <Route path="/admin/bookings" element={<AdminBookings />} />
-          <Route path="/admin/inventory" element={<AdminInventory />} />
-          <Route path="/admin/inventory/allocate" element={<InventoryAllocate />} />
-          
-          {/* 404 Route */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
-);
+  return (
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <Routes>
+            {/* Public Routes */}
+            <Route path="/" element={<Home />} />
+            <Route path="/search" element={<SearchGrounds />} />
+            <Route path="/grounds/:id" element={<GroundDetail />} />
+            <Route path="/bookings" element={<Bookings />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+            
+            {/* Admin Routes */}
+            <Route path="/admin" element={<AdminDashboard />} />
+            <Route path="/admin/ground-owners" element={<GroundOwners />} />
+            <Route path="/admin/grounds" element={<AdminGrounds />} />
+            <Route path="/admin/bookings" element={<AdminBookings />} />
+            <Route path="/admin/inventory" element={<AdminInventory />} />
+            <Route path="/admin/inventory/allocate" element={<InventoryAllocate />} />
+            
+            {/* 404 Route */}
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </BrowserRouter>
+      </TooltipProvider>
+    </QueryClientProvider>
+  );
+};
 
 export default App;

@@ -7,7 +7,8 @@ const Index = () => {
 
   useEffect(() => {
     // Redirect to the Home page
-    navigate("/");
+    // We're using "/" as the path, not "/" which might cause a redirect loop
+    navigate("/home", { replace: true });
   }, [navigate]);
 
   return (
