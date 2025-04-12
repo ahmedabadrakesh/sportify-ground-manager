@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import MainLayout from "@/components/layouts/MainLayout";
@@ -24,7 +23,6 @@ const Home: React.FC = () => {
   });
 
   useEffect(() => {
-    // Get statistics for the ticker
     setStats({
       grounds: getRegisteredGroundsCount(),
       bookings: getBookingsCount(),
@@ -50,7 +48,6 @@ const Home: React.FC = () => {
 
   return (
     <MainLayout>
-      {/* Stats Ticker */}
       <div className="bg-primary-800 text-white py-3 mb-8 rounded-lg">
         <div className="container mx-auto">
           <div className="grid grid-cols-3 text-center">
@@ -79,10 +76,23 @@ const Home: React.FC = () => {
         </div>
       </div>
 
-      {/* Hero Section */}
       <div className="relative mb-12 pb-8">
         <div className="bg-gradient-to-r from-primary-800 to-primary-600 rounded-3xl overflow-hidden">
-          <div className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-24 text-white">
+          <div className="absolute inset-0 w-full h-full overflow-hidden rounded-3xl">
+            <div className="absolute inset-0 bg-black/50 z-10"></div>
+            <video 
+              className="w-full h-full object-cover"
+              autoPlay
+              muted
+              loop
+              playsInline
+            >
+              <source src="/videos/hero-background.mp4" type="video/mp4" />
+              Your browser does not support the video tag.
+            </video>
+          </div>
+          
+          <div className="relative z-20 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-24 text-white">
             <div className="max-w-xl">
               <h1 className="text-4xl md:text-5xl font-bold mb-6">
                 Find and Book Sports Grounds Near You
@@ -147,7 +157,6 @@ const Home: React.FC = () => {
         </div>
       </div>
 
-      {/* Search Results */}
       {hasSearched && (
         <div className="mb-16">
           <div className="flex items-center justify-between mb-6">
@@ -179,7 +188,6 @@ const Home: React.FC = () => {
         </div>
       )}
 
-      {/* Featured Grounds */}
       <div className="mb-16">
         <h2 className="text-2xl font-bold text-gray-900 mb-6">Featured Grounds</h2>
 
@@ -202,7 +210,6 @@ const Home: React.FC = () => {
         </div>
       </div>
 
-      {/* How It Works Section */}
       <div className="mb-16 py-12 bg-gray-50 rounded-xl">
         <div className="container mx-auto px-4">
           <h2 className="text-3xl font-bold text-center mb-12">How It Works</h2>
@@ -247,7 +254,6 @@ const Home: React.FC = () => {
         </div>
       </div>
 
-      {/* Client Reviews Section */}
       <div className="mb-16">
         <h2 className="text-2xl font-bold text-gray-900 mb-6">What Our Clients Say</h2>
         
@@ -282,7 +288,6 @@ const Home: React.FC = () => {
         </div>
       </div>
 
-      {/* E-commerce Teaser */}
       <div className="mb-16 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-xl overflow-hidden text-white">
         <div className="container mx-auto px-4 py-12 flex flex-col md:flex-row items-center">
           <div className="md:w-3/5 mb-8 md:mb-0 md:pr-12">
@@ -322,7 +327,6 @@ const Home: React.FC = () => {
         </div>
       </div>
 
-      {/* Features Section */}
       <div className="mb-16">
         <h2 className="text-2xl font-bold text-gray-900 mb-8 text-center">
           Why Choose SportifyGround?
