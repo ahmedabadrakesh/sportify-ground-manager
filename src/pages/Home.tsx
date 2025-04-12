@@ -10,6 +10,7 @@ import { Ground } from "@/types/models";
 import { Card, CardContent } from "@/components/ui/card";
 import { getBookingsCount, getRegisteredGroundsCount, getCitiesCovered } from "@/utils/stats";
 import { getClientReviews } from "@/utils/reviews";
+import CountUp from "react-countup";
 
 const Home: React.FC = () => {
   const navigate = useNavigate();
@@ -48,29 +49,50 @@ const Home: React.FC = () => {
 
   return (
     <MainLayout>
-      <div className="bg-primary-800 text-white py-3 mb-8 rounded-lg">
-        <div className="container mx-auto">
-          <div className="grid grid-cols-3 text-center">
-            <div className="flex flex-col items-center">
+      <div className="bg-primary-800 text-white py-6 mb-8 rounded-lg">
+        <div className="container mx-auto px-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="flex items-center justify-center">
               <div className="flex items-center">
-                <MapPin className="mr-2 h-5 w-5" />
-                <span className="text-2xl font-bold">{stats.grounds}</span>
+                <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center mr-3">
+                  <MapPin className="h-6 w-6" />
+                </div>
+                <div>
+                  <div className="text-2xl font-bold flex items-center">
+                    <CountUp end={stats.grounds} duration={2.5} />
+                    <span className="ml-1 text-sm px-2 py-1 bg-white/20 rounded-full">Grounds</span>
+                  </div>
+                  <span className="text-sm">Registered</span>
+                </div>
               </div>
-              <span className="text-sm mt-1">Grounds Registered</span>
             </div>
-            <div className="flex flex-col items-center">
+            <div className="flex items-center justify-center">
               <div className="flex items-center">
-                <Calendar className="mr-2 h-5 w-5" />
-                <span className="text-2xl font-bold">{stats.bookings}</span>
+                <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center mr-3">
+                  <Calendar className="h-6 w-6" />
+                </div>
+                <div>
+                  <div className="text-2xl font-bold flex items-center">
+                    <CountUp end={stats.bookings} duration={2.5} />
+                    <span className="ml-1 text-sm px-2 py-1 bg-white/20 rounded-full">Bookings</span>
+                  </div>
+                  <span className="text-sm">Completed</span>
+                </div>
               </div>
-              <span className="text-sm mt-1">Bookings Completed</span>
             </div>
-            <div className="flex flex-col items-center">
+            <div className="flex items-center justify-center">
               <div className="flex items-center">
-                <Users className="mr-2 h-5 w-5" />
-                <span className="text-2xl font-bold">{stats.cities}</span>
+                <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center mr-3">
+                  <Users className="h-6 w-6" />
+                </div>
+                <div>
+                  <div className="text-2xl font-bold flex items-center">
+                    <CountUp end={stats.cities} duration={2.5} />
+                    <span className="ml-1 text-sm px-2 py-1 bg-white/20 rounded-full">Cities</span>
+                  </div>
+                  <span className="text-sm">Covered</span>
+                </div>
               </div>
-              <span className="text-sm mt-1">Cities Covered</span>
             </div>
           </div>
         </div>

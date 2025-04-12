@@ -6,6 +6,7 @@ import AdminLayout from "@/components/layouts/AdminLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { bookings, grounds, inventoryItems } from "@/data/mockData";
 import { getCurrentUser, hasRole } from "@/utils/auth";
+import CountUp from "react-countup";
 
 const AdminDashboard: React.FC = () => {
   const currentUser = getCurrentUser();
@@ -69,9 +70,11 @@ const AdminDashboard: React.FC = () => {
             <Calendar className="h-4 w-4 text-gray-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{ownerBookings.length}</div>
+            <div className="text-2xl font-bold">
+              <CountUp end={ownerBookings.length} duration={2} />
+            </div>
             <p className="text-xs text-gray-500">
-              +{pendingBookings} pending bookings
+              +<CountUp end={pendingBookings} duration={1.5} /> pending bookings
             </p>
           </CardContent>
         </Card>
@@ -95,7 +98,7 @@ const AdminDashboard: React.FC = () => {
             </svg>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">₹{totalRevenue}</div>
+            <div className="text-2xl font-bold">₹<CountUp end={totalRevenue} duration={2.5} /></div>
             <p className="text-xs text-gray-500">
               For all completed bookings
             </p>
@@ -110,7 +113,9 @@ const AdminDashboard: React.FC = () => {
             <MapPin className="h-4 w-4 text-gray-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{userGrounds.length}</div>
+            <div className="text-2xl font-bold">
+              <CountUp end={userGrounds.length} duration={2} />
+            </div>
             <p className="text-xs text-gray-500">
               {isSuperAdmin ? 'Across all owners' : 'Under your management'}
             </p>
@@ -125,7 +130,9 @@ const AdminDashboard: React.FC = () => {
             <PackageIcon className="h-4 w-4 text-gray-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{inventoryItems.length}</div>
+            <div className="text-2xl font-bold">
+              <CountUp end={inventoryItems.length} duration={2} />
+            </div>
             <p className="text-xs text-gray-500">
               {isSuperAdmin ? 'Available for allocation' : 'Across your grounds'}
             </p>

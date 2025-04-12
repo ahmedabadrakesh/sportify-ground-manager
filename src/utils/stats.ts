@@ -19,3 +19,10 @@ export const getCitiesCovered = (): string[] => {
   // Return unique cities
   return [...new Set(cities)];
 };
+
+export const getAnimationDuration = (value: number): number => {
+  // Adjust duration based on number size for better visual effect
+  if (value < 10) return 1;
+  if (value < 100) return 2;
+  return 2.5;
+};

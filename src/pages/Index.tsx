@@ -1,6 +1,7 @@
 
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import CountUp from "react-countup";
 
 const Index = () => {
   const navigate = useNavigate();
@@ -29,7 +30,9 @@ const Index = () => {
       </div>
       
       <div className="text-center relative z-20">
-        <h1 className="text-4xl font-bold mb-4 text-white">Loading...</h1>
+        <h1 className="text-4xl font-bold mb-4 text-white">
+          <CountUp end={100} duration={2} />% Loading...
+        </h1>
         <p className="text-xl text-white/80">Please wait while we redirect you.</p>
       </div>
     </div>
