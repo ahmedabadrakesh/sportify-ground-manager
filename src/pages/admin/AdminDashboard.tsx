@@ -1,5 +1,5 @@
 
-import React from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import { Calendar, Users, MapPin, PackageIcon } from "lucide-react";
 import AdminLayout from "@/components/layouts/AdminLayout";
@@ -7,10 +7,13 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { bookings, grounds, inventoryItems } from "@/data/mockData";
 import { getCurrentUser, hasRole } from "@/utils/auth";
 import CountUp from "react-countup";
+import { getAnimationDuration } from "@/utils/stats";
 
 const AdminDashboard: React.FC = () => {
   const currentUser = getCurrentUser();
   const isSuperAdmin = hasRole('super_admin');
+  const [statsVisible, setStatsVisible] = useState(false);
+  const statsRef = useRef<HTMLDivElement>(null);
   
   // Filter bookings for ground owner
   const ownerBookings = isSuperAdmin 
@@ -34,6 +37,27 @@ const AdminDashboard: React.FC = () => {
   const pendingBookings = ownerBookings.filter(
     booking => booking.bookingStatus === 'pending'
   ).length;
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          setStatsVisible(true);
+        }
+      },
+      { threshold: 0.1 }
+    );
+
+    if (statsRef.current) {
+      observer.observe(statsRef.current);
+    }
+
+    return () => {
+      if (statsRef.current) {
+        observer.unobserve(statsRef.current);
+      }
+    };
+  }, []);
   
   // Prepare chart data - bookings by day
   const today = new Date();
@@ -61,81 +85,123 @@ const AdminDashboard: React.FC = () => {
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+      <div ref={statsRef} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-gray-500">
-              Total Bookings
-            </CardTitle>
-            <Calendar className="h-4 w-4 text-gray-500" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              <CountUp end={ownerBookings.length} duration={2} />
+          <CardContent className="p-6">
+            <div className="flex flex-col items-center text-center">
+              <div className="w-14 h-14 bg-primary-100 text-primary-600 rounded-full flex items-center justify-center mb-3">
+                <Calendar className="h-6 w-6" />
+              </div>
+              <div className="text-2xl font-bold mb-1">
+                {statsVisible ? (
+                  <CountUp 
+                    start={0} 
+                    end={ownerBookings.length} 
+                    duration={getAnimationDuration(ownerBookings.length)} 
+                  />
+                ) : (
+                  0
+                )}
+              </div>
+              <div className="text-sm px-3 py-0.5 bg-gray-100 rounded-full mb-1">Total Bookings</div>
+              <p className="text-xs text-gray-500">
+                +{statsVisible ? (
+                  <CountUp start={0} end={pendingBookings} duration={1.5} />
+                ) : (
+                  0
+                )} pending
+              </p>
             </div>
-            <p className="text-xs text-gray-500">
-              +<CountUp end={pendingBookings} duration={1.5} /> pending bookings
-            </p>
           </CardContent>
         </Card>
 
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-gray-500">
-              Total Revenue
-            </CardTitle>
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth="2"
-              className="h-4 w-4 text-gray-500"
-            >
-              <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
-            </svg>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">₹<CountUp end={totalRevenue} duration={2.5} /></div>
-            <p className="text-xs text-gray-500">
-              For all completed bookings
-            </p>
+          <CardContent className="p-6">
+            <div className="flex flex-col items-center text-center">
+              <div className="w-14 h-14 bg-primary-100 text-primary-600 rounded-full flex items-center justify-center mb-3">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  className="h-6 w-6"
+                >
+                  <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+                </svg>
+              </div>
+              <div className="text-2xl font-bold mb-1">
+                ₹{statsVisible ? (
+                  <CountUp 
+                    start={0} 
+                    end={totalRevenue} 
+                    duration={getAnimationDuration(totalRevenue)} 
+                  />
+                ) : (
+                  0
+                )}
+              </div>
+              <div className="text-sm px-3 py-0.5 bg-gray-100 rounded-full mb-1">Revenue</div>
+              <p className="text-xs text-gray-500">
+                Completed bookings
+              </p>
+            </div>
           </CardContent>
         </Card>
 
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-gray-500">
-              {isSuperAdmin ? 'Total Grounds' : 'Your Grounds'}
-            </CardTitle>
-            <MapPin className="h-4 w-4 text-gray-500" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              <CountUp end={userGrounds.length} duration={2} />
+          <CardContent className="p-6">
+            <div className="flex flex-col items-center text-center">
+              <div className="w-14 h-14 bg-primary-100 text-primary-600 rounded-full flex items-center justify-center mb-3">
+                <MapPin className="h-6 w-6" />
+              </div>
+              <div className="text-2xl font-bold mb-1">
+                {statsVisible ? (
+                  <CountUp 
+                    start={0} 
+                    end={userGrounds.length} 
+                    duration={getAnimationDuration(userGrounds.length)} 
+                  />
+                ) : (
+                  0
+                )}
+              </div>
+              <div className="text-sm px-3 py-0.5 bg-gray-100 rounded-full mb-1">
+                {isSuperAdmin ? 'Total Grounds' : 'Your Grounds'}
+              </div>
+              <p className="text-xs text-gray-500">
+                {isSuperAdmin ? 'All owners' : 'Your management'}
+              </p>
             </div>
-            <p className="text-xs text-gray-500">
-              {isSuperAdmin ? 'Across all owners' : 'Under your management'}
-            </p>
           </CardContent>
         </Card>
 
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-gray-500">
-              {isSuperAdmin ? 'Inventory Items' : 'Your Inventory'}
-            </CardTitle>
-            <PackageIcon className="h-4 w-4 text-gray-500" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              <CountUp end={inventoryItems.length} duration={2} />
+          <CardContent className="p-6">
+            <div className="flex flex-col items-center text-center">
+              <div className="w-14 h-14 bg-primary-100 text-primary-600 rounded-full flex items-center justify-center mb-3">
+                <PackageIcon className="h-6 w-6" />
+              </div>
+              <div className="text-2xl font-bold mb-1">
+                {statsVisible ? (
+                  <CountUp 
+                    start={0} 
+                    end={inventoryItems.length} 
+                    duration={getAnimationDuration(inventoryItems.length)} 
+                  />
+                ) : (
+                  0
+                )}
+              </div>
+              <div className="text-sm px-3 py-0.5 bg-gray-100 rounded-full mb-1">
+                {isSuperAdmin ? 'Inventory' : 'Your Inventory'}
+              </div>
+              <p className="text-xs text-gray-500">
+                {isSuperAdmin ? 'For allocation' : 'Across grounds'}
+              </p>
             </div>
-            <p className="text-xs text-gray-500">
-              {isSuperAdmin ? 'Available for allocation' : 'Across your grounds'}
-            </p>
           </CardContent>
         </Card>
       </div>

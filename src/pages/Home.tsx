@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import MainLayout from "@/components/layouts/MainLayout";
 import GroundCard from "@/components/grounds/GroundCard";
@@ -8,7 +8,7 @@ import { getAvailableGrounds } from "@/utils/booking";
 import { Search, MapPin, Users, Calendar, Check, Star, ShoppingBag, Info, ArrowRight } from "lucide-react";
 import { Ground } from "@/types/models";
 import { Card, CardContent } from "@/components/ui/card";
-import { getBookingsCount, getRegisteredGroundsCount, getCitiesCovered } from "@/utils/stats";
+import { getBookingsCount, getRegisteredGroundsCount, getCitiesCovered, getAnimationDuration } from "@/utils/stats";
 import { getClientReviews } from "@/utils/reviews";
 import CountUp from "react-countup";
 
@@ -22,6 +22,8 @@ const Home: React.FC = () => {
     bookings: 0,
     cities: 0
   });
+  const [statsVisible, setStatsVisible] = useState(false);
+  const statsRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     setStats({
@@ -29,6 +31,27 @@ const Home: React.FC = () => {
       bookings: getBookingsCount(),
       cities: getCitiesCovered().length
     });
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          setStatsVisible(true);
+        } else {
+          setStatsVisible(false);
+        }
+      },
+      { threshold: 0.1 }
+    );
+
+    if (statsRef.current) {
+      observer.observe(statsRef.current);
+    }
+
+    return () => {
+      if (statsRef.current) {
+        observer.unobserve(statsRef.current);
+      }
+    };
   }, []);
 
   const onSearch = () => {
@@ -49,49 +72,69 @@ const Home: React.FC = () => {
 
   return (
     <MainLayout>
-      <div className="bg-primary-800 text-white py-6 mb-8 rounded-lg">
+      <div ref={statsRef} className="bg-primary-800 text-white py-8 mb-8 rounded-lg">
         <div className="container mx-auto px-4">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div className="flex items-center justify-center">
-              <div className="flex items-center">
-                <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center mr-3">
-                  <MapPin className="h-6 w-6" />
+              <div className="flex flex-col items-center text-center">
+                <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mb-3">
+                  <MapPin className="h-8 w-8" />
                 </div>
-                <div>
-                  <div className="text-2xl font-bold flex items-center">
-                    <CountUp end={stats.grounds} duration={2.5} />
-                    <span className="ml-1 text-sm px-2 py-1 bg-white/20 rounded-full">Grounds</span>
-                  </div>
-                  <span className="text-sm">Registered</span>
+                <div className="text-3xl font-bold mb-1">
+                  {statsVisible ? (
+                    <CountUp 
+                      start={0} 
+                      end={stats.grounds} 
+                      duration={getAnimationDuration(stats.grounds)} 
+                    />
+                  ) : (
+                    0
+                  )}
                 </div>
+                <div className="text-sm px-3 py-1 bg-white/20 rounded-full mb-1">Grounds</div>
+                <span className="text-xs opacity-75">Registered</span>
               </div>
             </div>
+            
             <div className="flex items-center justify-center">
-              <div className="flex items-center">
-                <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center mr-3">
-                  <Calendar className="h-6 w-6" />
+              <div className="flex flex-col items-center text-center">
+                <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mb-3">
+                  <Calendar className="h-8 w-8" />
                 </div>
-                <div>
-                  <div className="text-2xl font-bold flex items-center">
-                    <CountUp end={stats.bookings} duration={2.5} />
-                    <span className="ml-1 text-sm px-2 py-1 bg-white/20 rounded-full">Bookings</span>
-                  </div>
-                  <span className="text-sm">Completed</span>
+                <div className="text-3xl font-bold mb-1">
+                  {statsVisible ? (
+                    <CountUp 
+                      start={0} 
+                      end={stats.bookings} 
+                      duration={getAnimationDuration(stats.bookings)} 
+                    />
+                  ) : (
+                    0
+                  )}
                 </div>
+                <div className="text-sm px-3 py-1 bg-white/20 rounded-full mb-1">Bookings</div>
+                <span className="text-xs opacity-75">Completed</span>
               </div>
             </div>
+            
             <div className="flex items-center justify-center">
-              <div className="flex items-center">
-                <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center mr-3">
-                  <Users className="h-6 w-6" />
+              <div className="flex flex-col items-center text-center">
+                <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mb-3">
+                  <Users className="h-8 w-8" />
                 </div>
-                <div>
-                  <div className="text-2xl font-bold flex items-center">
-                    <CountUp end={stats.cities} duration={2.5} />
-                    <span className="ml-1 text-sm px-2 py-1 bg-white/20 rounded-full">Cities</span>
-                  </div>
-                  <span className="text-sm">Covered</span>
+                <div className="text-3xl font-bold mb-1">
+                  {statsVisible ? (
+                    <CountUp 
+                      start={0} 
+                      end={stats.cities} 
+                      duration={getAnimationDuration(stats.cities)} 
+                    />
+                  ) : (
+                    0
+                  )}
                 </div>
+                <div className="text-sm px-3 py-1 bg-white/20 rounded-full mb-1">Cities</div>
+                <span className="text-xs opacity-75">Covered</span>
               </div>
             </div>
           </div>
