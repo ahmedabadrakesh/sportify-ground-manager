@@ -1,4 +1,3 @@
-
 import { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import CountUp from "react-countup";
@@ -27,19 +26,14 @@ const Index = () => {
 
   return (
     <div ref={containerRef} className="min-h-screen flex items-center justify-center bg-gray-100 relative overflow-hidden">
-      {/* Video Background */}
+      {/* Image Background */}
       <div className="absolute inset-0 w-full h-full overflow-hidden">
         <div className="absolute inset-0 bg-black/50 z-10"></div>
-        <video 
+        <img 
+          src="/lovable-uploads/abf3239e-af73-47ea-9adc-c6138959a349.png" 
+          alt="Sports Team Background" 
           className="w-full h-full object-cover"
-          autoPlay
-          muted
-          loop
-          playsInline
-        >
-          <source src="/videos/hero-background.mp4" type="video/mp4" />
-          Your browser does not support the video tag.
-        </video>
+        />
       </div>
       
       <div className="text-center relative z-20 flex flex-col items-center">
