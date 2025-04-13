@@ -1,6 +1,6 @@
 
 import React from "react";
-import { CountUp } from "react-countup";
+import CountUp from "react-countup"; // Change from { CountUp } to default import
 import { Card, CardContent } from "@/components/ui/card";
 import { getAnimationDuration } from "@/utils/stats";
 

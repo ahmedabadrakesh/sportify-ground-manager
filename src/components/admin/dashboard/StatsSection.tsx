@@ -1,9 +1,8 @@
-
 import React from "react";
 import { Calendar, Users, MapPin, PackageIcon } from "lucide-react";
 import StatCard from "./StatCard";
 import { Booking, Ground, InventoryItem } from "@/types/models";
-import { CountUp } from "react-countup";
+import CountUp from "react-countup";
 
 interface StatsSectionProps {
   bookings: Booking[];
