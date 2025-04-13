@@ -49,6 +49,11 @@ const AdminGrounds: React.FC = () => {
     setSelectedGroundId(null);
   };
 
+  // Function to get the correct image path for display
+  const getDisplayImagePath = (imagePath: string) => {
+    return imagePath.startsWith("public/") ? imagePath.substring(7) : imagePath;
+  };
+
   return (
     <AdminLayout>
       <div className="flex justify-between items-center mb-6">
@@ -100,7 +105,7 @@ const AdminGrounds: React.FC = () => {
                       <div className="flex items-center space-x-3">
                         <div className="w-10 h-10 bg-gray-200 rounded overflow-hidden">
                           <img
-                            src={ground.images[0] || "/placeholder.svg"}
+                            src={getDisplayImagePath(ground.images[0] || "/placeholder.svg")}
                             alt={ground.name}
                             className="w-full h-full object-cover"
                           />

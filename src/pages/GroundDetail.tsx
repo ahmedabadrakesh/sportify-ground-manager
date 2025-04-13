@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { format } from "date-fns";
@@ -42,6 +43,11 @@ const GroundDetail: React.FC = () => {
       </MainLayout>
     );
   }
+  
+  // Get the correct image path for display
+  const imagePath = ground.images[0] || "/placeholder.svg";
+  // Remove the "public/" prefix if it exists (for correct browser display)
+  const displayImagePath = imagePath.startsWith("public/") ? imagePath.substring(7) : imagePath;
   
   const formattedDate = date ? format(date, "yyyy-MM-dd") : "";
   const availableSlots = getAvailableTimeSlots(ground.id, formattedDate);
@@ -93,7 +99,7 @@ const GroundDetail: React.FC = () => {
       <div className="bg-white rounded-lg shadow-sm overflow-hidden mb-8">
         <div className="aspect-[3/1] overflow-hidden relative">
           <img
-            src={ground.images[0] || "/placeholder.svg"}
+            src={displayImagePath}
             alt={ground.name}
             className="w-full h-full object-cover"
           />
