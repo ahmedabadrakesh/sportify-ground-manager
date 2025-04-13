@@ -33,7 +33,7 @@ const HeroSection = () => {
             loop
             playsInline
           >
-            <source src="/videos/hero-background.mp4" type="video/mp4" />
+            <source src="https://techitree.s3.ap-south-1.amazonaws.com/header_videdo.mp4" type="video/mp4" />
             Your browser does not support the video tag.
           </video>
         </div>
