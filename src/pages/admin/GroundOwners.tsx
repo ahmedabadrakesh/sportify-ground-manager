@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { PlusCircle, Edit, Trash, User, Mail, Phone } from "lucide-react";
 import AdminLayout from "@/components/layouts/AdminLayout";
@@ -44,12 +45,14 @@ const GroundOwners: React.FC = () => {
       try {
         setLoading(true);
         
+        // Use a simpler query to avoid RLS recursion issues
         const { data, error } = await supabase
           .from('users')
-          .select('*')
+          .select('id, name, email, phone, role, created_at')
           .eq('role', 'admin');
           
         if (error) {
+          console.error("Error fetching ground owners:", error);
           throw error;
         }
         
@@ -59,6 +62,7 @@ const GroundOwners: React.FC = () => {
         console.error("Error fetching ground owners:", error);
         toast.error("Failed to load ground owners");
         
+        // Fallback to mock data if Supabase fails
         setTimeout(() => {
           import("@/data/mockData").then(({ users }) => {
             const groundOwners = users.filter(user => user.role === 'admin');
