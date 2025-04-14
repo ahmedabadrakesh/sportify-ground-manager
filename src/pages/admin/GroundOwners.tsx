@@ -24,6 +24,12 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { hasRole } from "@/utils/auth";
 import { toast } from "sonner";
+import { createClient } from "@supabase/supabase-js";
+
+// Connect to Supabase
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+const supabase = createClient(supabaseUrl, supabaseKey);
 
 // Added a function to generate a unique ID
 const generateId = () => `owner-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
@@ -46,7 +52,24 @@ const GroundOwners: React.FC = () => {
     // Fetch ground owners data
     const fetchOwners = async () => {
       try {
-        // In a real app, this would be an API call
+        setLoading(true);
+        // Fetch data from Supabase
+        const { data, error } = await supabase
+          .from('users')
+          .select('*')
+          .eq('role', 'admin');
+          
+        if (error) {
+          throw error;
+        }
+        
+        setOwners(data || []);
+        setLoading(false);
+      } catch (error) {
+        console.error("Error fetching ground owners:", error);
+        toast.error("Failed to load ground owners");
+        
+        // Fallback to mock data if Supabase connection fails
         setTimeout(() => {
           import("@/data/mockData").then(({ users }) => {
             // Filter users to only show admins (ground owners)
@@ -55,10 +78,6 @@ const GroundOwners: React.FC = () => {
             setLoading(false);
           });
         }, 500);
-      } catch (error) {
-        console.error("Error fetching ground owners:", error);
-        toast.error("Failed to load ground owners");
-        setLoading(false);
       }
     };
     
@@ -84,7 +103,7 @@ const GroundOwners: React.FC = () => {
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleAddOwner = (e: React.FormEvent) => {
+  const handleAddOwner = async (e: React.FormEvent) => {
     e.preventDefault();
     
     // Validate form data
@@ -93,52 +112,94 @@ const GroundOwners: React.FC = () => {
       return;
     }
     
-    // Create new owner object
-    const newOwner = {
-      id: generateId(),
-      name: formData.name,
-      email: formData.email,
-      phone: formData.phone,
-      whatsapp: formData.whatsapp || formData.phone,
-      role: 'admin' as const,
-    };
-    
-    // Update state with new owner
-    setOwners(prevOwners => [...prevOwners, newOwner]);
-    
-    // In a real app, we would call an API to add the owner
-    toast.success(`Ground owner ${formData.name} added successfully`);
-    
-    // Reset form and close dialog
-    setIsAddDialogOpen(false);
-    setFormData({
-      name: "",
-      email: "",
-      phone: "",
-      whatsapp: "",
-      password: "",
-    });
+    try {
+      // Create new owner object
+      const newOwner = {
+        id: generateId(),
+        name: formData.name,
+        email: formData.email,
+        phone: formData.phone,
+        whatsapp: formData.whatsapp || formData.phone,
+        role: 'admin',
+      };
+      
+      // First create the auth user
+      const { data: authData, error: authError } = await supabase.auth.signUp({
+        email: formData.email,
+        password: formData.password,
+      });
+      
+      if (authError) {
+        throw authError;
+      }
+      
+      // Then add to the users table with the auth ID
+      const { error } = await supabase
+        .from('users')
+        .insert([{
+          ...newOwner,
+          auth_id: authData.user?.id,
+        }]);
+        
+      if (error) {
+        throw error;
+      }
+      
+      // Update state with new owner
+      setOwners(prevOwners => [...prevOwners, newOwner]);
+      
+      toast.success(`Ground owner ${formData.name} added successfully`);
+      
+      // Reset form and close dialog
+      setIsAddDialogOpen(false);
+      setFormData({
+        name: "",
+        email: "",
+        phone: "",
+        whatsapp: "",
+        password: "",
+      });
+      
+    } catch (error: any) {
+      console.error("Error adding ground owner:", error);
+      toast.error(error.message || "Failed to add ground owner");
+    }
   };
 
-  const handleDeleteOwner = () => {
+  const handleDeleteOwner = async () => {
     if (!selectedOwnerId) return;
     
-    // Find owner to delete
-    const ownerToDelete = owners.find(owner => owner.id === selectedOwnerId);
-    if (!ownerToDelete) {
-      toast.error("Owner not found");
-      return;
+    try {
+      // Find owner to delete
+      const ownerToDelete = owners.find(owner => owner.id === selectedOwnerId);
+      if (!ownerToDelete) {
+        toast.error("Owner not found");
+        return;
+      }
+      
+      // Delete from Supabase
+      const { error } = await supabase
+        .from('users')
+        .delete()
+        .eq('id', selectedOwnerId);
+        
+      if (error) {
+        throw error;
+      }
+      
+      // Update state by removing the owner
+      setOwners(prevOwners => prevOwners.filter(owner => owner.id !== selectedOwnerId));
+      
+      toast.success(`Ground owner ${ownerToDelete.name} deleted successfully`);
+      
+      // Reset state and close dialog
+      setIsDeleteDialogOpen(false);
+      setSelectedOwnerId(null);
+      
+    } catch (error: any) {
+      console.error("Error deleting ground owner:", error);
+      toast.error(error.message || "Failed to delete ground owner");
     }
-    
-    // Update state by removing the owner
-    setOwners(prevOwners => prevOwners.filter(owner => owner.id !== selectedOwnerId));
-    
-    // In a real app, we would call an API to delete the owner
-    toast.success(`Ground owner ${ownerToDelete.name} deleted successfully`);
-    
-    // Reset state and close dialog
-    setIsDeleteDialogOpen(false);
-    setSelectedOwnerId(null);
   };
 
   return (
