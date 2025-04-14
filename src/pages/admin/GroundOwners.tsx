@@ -26,10 +26,23 @@ import { hasRole } from "@/utils/auth";
 import { toast } from "sonner";
 import { createClient } from "@supabase/supabase-js";
 
-// Connect to Supabase
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
-const supabase = createClient(supabaseUrl, supabaseKey);
+// Connect to Supabase with fallback values
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || 'https://your-project.supabase.co';
+const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY || 'your-anon-key';
+
+// Check if environment variables are available
+let supabase;
+try {
+  if (!supabaseUrl || supabaseUrl === 'https://your-project.supabase.co') {
+    console.warn('Supabase URL not found in environment variables. Using mock data.');
+    supabase = null;
+  } else {
+    supabase = createClient(supabaseUrl, supabaseKey);
+  }
+} catch (error) {
+  console.error('Error initializing Supabase client:', error);
+  supabase = null;
+}
 
 // Added a function to generate a unique ID
 const generateId = () => `owner-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
@@ -53,17 +66,31 @@ const GroundOwners: React.FC = () => {
     const fetchOwners = async () => {
       try {
         setLoading(true);
-        // Fetch data from Supabase
-        const { data, error } = await supabase
-          .from('users')
-          .select('*')
-          .eq('role', 'admin');
+        
+        // Check if Supabase client is available
+        if (supabase) {
+          // Fetch data from Supabase
+          const { data, error } = await supabase
+            .from('users')
+            .select('*')
+            .eq('role', 'admin');
+            
+          if (error) {
+            throw error;
+          }
           
-        if (error) {
-          throw error;
+          setOwners(data || []);
+        } else {
+          // Fallback to mock data if Supabase client is not available
+          setTimeout(() => {
+            import("@/data/mockData").then(({ users }) => {
+              // Filter users to only show admins (ground owners)
+              const groundOwners = users.filter(user => user.role === 'admin');
+              setOwners(groundOwners);
+            });
+          }, 500);
         }
         
-        setOwners(data || []);
         setLoading(false);
       } catch (error) {
         console.error("Error fetching ground owners:", error);
@@ -123,26 +150,32 @@ const GroundOwners: React.FC = () => {
         role: 'admin',
       };
       
-      // First create the auth user
-      const { data: authData, error: authError } = await supabase.auth.signUp({
-        email: formData.email,
-        password: formData.password,
-      });
-      
-      if (authError) {
-        throw authError;
-      }
-      
-      // Then add to the users table with the auth ID
-      const { error } = await supabase
-        .from('users')
-        .insert([{
-          ...newOwner,
-          auth_id: authData.user?.id,
-        }]);
+      // Check if Supabase client is available
+      if (supabase) {
+        // First create the auth user
+        const { data: authData, error: authError } = await supabase.auth.signUp({
+          email: formData.email,
+          password: formData.password,
+        });
         
-      if (error) {
-        throw error;
+        if (authError) {
+          throw authError;
+        }
+        
+        // Then add to the users table with the auth ID
+        const { error } = await supabase
+          .from('users')
+          .insert([{
+            ...newOwner,
+            auth_id: authData.user?.id,
+          }]);
+          
+        if (error) {
+          throw error;
+        }
+      } else {
+        // Using mock data, just log the action
+        console.log('Using mock data mode - would create user:', newOwner);
       }
       
       // Update state with new owner
@@ -177,14 +210,20 @@ const GroundOwners: React.FC = () => {
         return;
       }
       
-      // Delete from Supabase
-      const { error } = await supabase
-        .from('users')
-        .delete()
-        .eq('id', selectedOwnerId);
-        
-      if (error) {
-        throw error;
+      // Check if Supabase client is available
+      if (supabase) {
+        // Delete from Supabase
+        const { error } = await supabase
+          .from('users')
+          .delete()
+          .eq('id', selectedOwnerId);
+          
+        if (error) {
+          throw error;
+        }
+      } else {
+        // Using mock data, just log the action
+        console.log('Using mock data mode - would delete user:', ownerToDelete);
       }
       
       // Update state by removing the owner
