@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { PlusCircle, Edit, Trash, User, Mail, Phone } from "lucide-react";
 import AdminLayout from "@/components/layouts/AdminLayout";
 import { Button } from "@/components/ui/button";
@@ -22,14 +22,18 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { users } from "@/data/mockData";
 import { hasRole } from "@/utils/auth";
 import { toast } from "sonner";
+
+// Added a function to generate a unique ID
+const generateId = () => `owner-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
 
 const GroundOwners: React.FC = () => {
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [selectedOwnerId, setSelectedOwnerId] = useState<string | null>(null);
+  const [owners, setOwners] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -37,6 +41,29 @@ const GroundOwners: React.FC = () => {
     whatsapp: "",
     password: "",
   });
+
+  useEffect(() => {
+    // Fetch ground owners data
+    const fetchOwners = async () => {
+      try {
+        // In a real app, this would be an API call
+        setTimeout(() => {
+          import("@/data/mockData").then(({ users }) => {
+            // Filter users to only show admins (ground owners)
+            const groundOwners = users.filter(user => user.role === 'admin');
+            setOwners(groundOwners);
+            setLoading(false);
+          });
+        }, 500);
+      } catch (error) {
+        console.error("Error fetching ground owners:", error);
+        toast.error("Failed to load ground owners");
+        setLoading(false);
+      }
+    };
+    
+    fetchOwners();
+  }, []);
 
   // Check if the current user is a super admin
   if (!hasRole('super_admin')) {
@@ -52,9 +79,6 @@ const GroundOwners: React.FC = () => {
     );
   }
 
-  // Filter users to only show admins (ground owners)
-  const groundOwners = users.filter(user => user.role === 'admin');
-
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
@@ -62,8 +86,30 @@ const GroundOwners: React.FC = () => {
 
   const handleAddOwner = (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Validate form data
+    if (!formData.name || !formData.email || !formData.phone || !formData.password) {
+      toast.error("Please fill in all required fields");
+      return;
+    }
+    
+    // Create new owner object
+    const newOwner = {
+      id: generateId(),
+      name: formData.name,
+      email: formData.email,
+      phone: formData.phone,
+      whatsapp: formData.whatsapp || formData.phone,
+      role: 'admin' as const,
+    };
+    
+    // Update state with new owner
+    setOwners(prevOwners => [...prevOwners, newOwner]);
+    
     // In a real app, we would call an API to add the owner
     toast.success(`Ground owner ${formData.name} added successfully`);
+    
+    // Reset form and close dialog
     setIsAddDialogOpen(false);
     setFormData({
       name: "",
@@ -77,9 +123,20 @@ const GroundOwners: React.FC = () => {
   const handleDeleteOwner = () => {
     if (!selectedOwnerId) return;
     
+    // Find owner to delete
+    const ownerToDelete = owners.find(owner => owner.id === selectedOwnerId);
+    if (!ownerToDelete) {
+      toast.error("Owner not found");
+      return;
+    }
+    
+    // Update state by removing the owner
+    setOwners(prevOwners => prevOwners.filter(owner => owner.id !== selectedOwnerId));
+    
     // In a real app, we would call an API to delete the owner
-    const ownerName = users.find(user => user.id === selectedOwnerId)?.name;
-    toast.success(`Ground owner ${ownerName} deleted successfully`);
+    toast.success(`Ground owner ${ownerToDelete.name} deleted successfully`);
+    
+    // Reset state and close dialog
     setIsDeleteDialogOpen(false);
     setSelectedOwnerId(null);
   };
@@ -191,112 +248,118 @@ const GroundOwners: React.FC = () => {
         </Dialog>
       </div>
 
-      <div className="bg-white rounded-lg shadow-sm overflow-hidden border">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Name</TableHead>
-              <TableHead>Email</TableHead>
-              <TableHead>Phone</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead>Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {groundOwners.length === 0 ? (
+      {loading ? (
+        <div className="text-center py-8">
+          <p className="text-gray-500">Loading ground owners data...</p>
+        </div>
+      ) : (
+        <div className="bg-white rounded-lg shadow-sm overflow-hidden border">
+          <Table>
+            <TableHeader>
               <TableRow>
-                <TableCell colSpan={5} className="text-center py-6 text-gray-500">
-                  No ground owners found
-                </TableCell>
+                <TableHead>Name</TableHead>
+                <TableHead>Email</TableHead>
+                <TableHead>Phone</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead>Actions</TableHead>
               </TableRow>
-            ) : (
-              groundOwners.map((owner) => (
-                <TableRow key={owner.id}>
-                  <TableCell>
-                    <div className="flex items-center space-x-3">
-                      <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center">
-                        <User className="h-5 w-5 text-gray-500" />
-                      </div>
-                      <div>
-                        <div className="font-medium">{owner.name}</div>
-                        <div className="text-xs text-gray-500">ID: {owner.id}</div>
-                      </div>
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex items-center space-x-1">
-                      <Mail className="h-4 w-4 text-gray-500" />
-                      <span>{owner.email}</span>
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex items-center space-x-1">
-                      <Phone className="h-4 w-4 text-gray-500" />
-                      <span>{owner.phone}</span>
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                      Active
-                    </span>
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex items-center space-x-2">
-                      <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                        <Edit className="h-4 w-4" />
-                        <span className="sr-only">Edit</span>
-                      </Button>
-                      <Dialog
-                        open={isDeleteDialogOpen && selectedOwnerId === owner.id}
-                        onOpenChange={(open) => {
-                          setIsDeleteDialogOpen(open);
-                          if (!open) setSelectedOwnerId(null);
-                        }}
-                      >
-                        <DialogTrigger asChild>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="h-8 w-8 p-0 text-red-500 hover:text-red-600 hover:bg-red-50"
-                            onClick={() => setSelectedOwnerId(owner.id)}
-                          >
-                            <Trash className="h-4 w-4" />
-                            <span className="sr-only">Delete</span>
-                          </Button>
-                        </DialogTrigger>
-                        <DialogContent>
-                          <DialogHeader>
-                            <DialogTitle>Delete Ground Owner</DialogTitle>
-                            <DialogDescription>
-                              Are you sure you want to delete this ground owner? This action cannot be
-                              undone and all associated grounds and bookings will need to be
-                              reassigned.
-                            </DialogDescription>
-                          </DialogHeader>
-                          <DialogFooter>
-                            <Button
-                              variant="outline"
-                              onClick={() => setIsDeleteDialogOpen(false)}
-                            >
-                              Cancel
-                            </Button>
-                            <Button
-                              variant="destructive"
-                              onClick={handleDeleteOwner}
-                            >
-                              Delete
-                            </Button>
-                          </DialogFooter>
-                        </DialogContent>
-                      </Dialog>
-                    </div>
+            </TableHeader>
+            <TableBody>
+              {owners.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={5} className="text-center py-6 text-gray-500">
+                    No ground owners found
                   </TableCell>
                 </TableRow>
-              ))
-            )}
-          </TableBody>
-        </Table>
-      </div>
+              ) : (
+                owners.map((owner) => (
+                  <TableRow key={owner.id}>
+                    <TableCell>
+                      <div className="flex items-center space-x-3">
+                        <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center">
+                          <User className="h-5 w-5 text-gray-500" />
+                        </div>
+                        <div>
+                          <div className="font-medium">{owner.name}</div>
+                          <div className="text-xs text-gray-500">ID: {owner.id}</div>
+                        </div>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex items-center space-x-1">
+                        <Mail className="h-4 w-4 text-gray-500" />
+                        <span>{owner.email}</span>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex items-center space-x-1">
+                        <Phone className="h-4 w-4 text-gray-500" />
+                        <span>{owner.phone}</span>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                        Active
+                      </span>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex items-center space-x-2">
+                        <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                          <Edit className="h-4 w-4" />
+                          <span className="sr-only">Edit</span>
+                        </Button>
+                        <Dialog
+                          open={isDeleteDialogOpen && selectedOwnerId === owner.id}
+                          onOpenChange={(open) => {
+                            setIsDeleteDialogOpen(open);
+                            if (!open) setSelectedOwnerId(null);
+                          }}
+                        >
+                          <DialogTrigger asChild>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="h-8 w-8 p-0 text-red-500 hover:text-red-600 hover:bg-red-50"
+                              onClick={() => setSelectedOwnerId(owner.id)}
+                            >
+                              <Trash className="h-4 w-4" />
+                              <span className="sr-only">Delete</span>
+                            </Button>
+                          </DialogTrigger>
+                          <DialogContent>
+                            <DialogHeader>
+                              <DialogTitle>Delete Ground Owner</DialogTitle>
+                              <DialogDescription>
+                                Are you sure you want to delete this ground owner? This action cannot be
+                                undone and all associated grounds and bookings will need to be
+                                reassigned.
+                              </DialogDescription>
+                            </DialogHeader>
+                            <DialogFooter>
+                              <Button
+                                variant="outline"
+                                onClick={() => setIsDeleteDialogOpen(false)}
+                              >
+                                Cancel
+                              </Button>
+                              <Button
+                                variant="destructive"
+                                onClick={handleDeleteOwner}
+                              >
+                                Delete
+                              </Button>
+                            </DialogFooter>
+                          </DialogContent>
+                        </Dialog>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
+            </TableBody>
+          </Table>
+        </div>
+      )}
     </AdminLayout>
   );
 };

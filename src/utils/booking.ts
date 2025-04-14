@@ -4,6 +4,9 @@ import { bookings, grounds, timeSlots } from "@/data/mockData";
 import { getCurrentUser } from "./auth";
 import { useInventoryItems } from "./inventory";
 
+// Generate unique ID
+const generateId = () => `booking-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
+
 // Get available grounds
 export const getAvailableGrounds = (
   game?: string,
@@ -53,8 +56,12 @@ export const createBooking = (
   if (!user && !userName) return null;
   
   const ground = grounds.find(g => g.id === groundId);
-  if (!ground) return null;
+  if (!ground) {
+    console.error(`Ground with ID ${groundId} not found`);
+    return null;
+  }
   
+  // Get the selected time slots
   const selectedSlots = timeSlots.filter(
     slot => slotIds.includes(slot.id) && slot.groundId === groundId && slot.date === date && !slot.isBooked
   );
@@ -64,6 +71,7 @@ export const createBooking = (
     return null; // Some slots are not available
   }
   
+  // Calculate total amount
   const totalAmount = selectedSlots.reduce((sum, slot) => sum + slot.price, 0);
   
   // Mark slots as booked
@@ -78,8 +86,9 @@ export const createBooking = (
   const inventoryUsed = useInventoryItems(groundId, "item-1", 1); // Example inventory usage
   console.log("Inventory used:", inventoryUsed);
   
+  // Create new booking object
   const newBooking: Booking = {
-    id: `booking-${Date.now()}`,
+    id: generateId(),
     userId: user?.id || 'guest',
     userName: user?.name || userName,
     userPhone: user?.phone || userPhone,
@@ -113,7 +122,10 @@ export const getGroundBookings = (groundId: string): Booking[] => {
 // Complete payment for a booking
 export const completePayment = (bookingId: string): boolean => {
   const index = bookings.findIndex(booking => booking.id === bookingId);
-  if (index === -1) return false;
+  if (index === -1) {
+    console.error(`Booking with ID ${bookingId} not found`);
+    return false;
+  }
   
   bookings[index] = {
     ...bookings[index],
@@ -127,7 +139,10 @@ export const completePayment = (bookingId: string): boolean => {
 // Cancel a booking
 export const cancelBooking = (bookingId: string): boolean => {
   const index = bookings.findIndex(booking => booking.id === bookingId);
-  if (index === -1) return false;
+  if (index === -1) {
+    console.error(`Booking with ID ${bookingId} not found`);
+    return false;
+  }
   
   // Unmark slots as booked
   bookings[index].slots.forEach(slot => {

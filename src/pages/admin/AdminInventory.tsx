@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { PlusCircle, Package, ListPlus } from "lucide-react";
 import AdminLayout from "@/components/layouts/AdminLayout";
 import {
@@ -24,8 +24,13 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import InventoryTable from "@/components/inventory/InventoryTable";
 import { getCurrentUser, hasRole } from "@/utils/auth";
-import { addInventoryItem, getAllInventoryItems, getGroundInventory, useInventoryItems } from "@/utils/inventory";
-import { grounds } from "@/data/mockData";
+import { 
+  addInventoryItem, 
+  getAllInventoryItems, 
+  getGroundInventory,
+  useInventoryItems 
+} from "@/utils/inventory";
+import { Ground, GroundInventory, InventoryItem } from "@/types/models";
 import { toast } from "sonner";
 
 const AdminInventory: React.FC = () => {
@@ -37,24 +42,52 @@ const AdminInventory: React.FC = () => {
     description: "",
   });
   
+  const [inventoryItems, setInventoryItems] = useState<InventoryItem[]>([]);
+  const [groundsWithInventory, setGroundsWithInventory] = useState<{
+    ground: Ground;
+    inventory: GroundInventory[];
+  }[]>([]);
+  const [loading, setLoading] = useState(true);
+  
   const currentUser = getCurrentUser();
   const isSuperAdmin = hasRole('super_admin');
   
-  // Get user's grounds
-  const userGrounds = isSuperAdmin
-    ? grounds
-    : grounds.filter(ground => ground.ownerId === currentUser?.id);
-  
-  // Get ground inventory
-  const inventory = userGrounds.flatMap(ground => 
-    getGroundInventory(ground.id)
-  );
-  
-  // Group inventory by ground
-  const inventoryByGround = userGrounds.map(ground => ({
-    ground,
-    inventory: getGroundInventory(ground.id),
-  }));
+  useEffect(() => {
+    // Fetch inventory data
+    const fetchInventoryData = async () => {
+      try {
+        // In a real app, these would be API calls
+        setTimeout(async () => {
+          // Import dynamically to avoid circular dependencies
+          const { grounds } = await import("@/data/mockData");
+          
+          // Get user's grounds
+          const userGrounds = isSuperAdmin
+            ? grounds
+            : grounds.filter(ground => ground.ownerId === currentUser?.id);
+          
+          // Get inventory items
+          const items = getAllInventoryItems();
+          
+          // Group inventory by ground
+          const inventoryByGround = userGrounds.map(ground => ({
+            ground,
+            inventory: getGroundInventory(ground.id),
+          }));
+          
+          setInventoryItems(items);
+          setGroundsWithInventory(inventoryByGround);
+          setLoading(false);
+        }, 500);
+      } catch (error) {
+        console.error("Error fetching inventory data:", error);
+        toast.error("Failed to load inventory data");
+        setLoading(false);
+      }
+    };
+    
+    fetchInventoryData();
+  }, [currentUser, isSuperAdmin]);
   
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -70,35 +103,69 @@ const AdminInventory: React.FC = () => {
       return;
     }
     
-    // Add new item (only super admin can do this)
-    if (isSuperAdmin) {
-      const newItem = addInventoryItem({
-        name: newItemData.name,
-        category: newItemData.category,
-        price: parseFloat(newItemData.price),
-        description: newItemData.description,
-      });
-      
-      toast.success(`Item "${newItem.name}" added successfully`);
-      setIsAddItemDialogOpen(false);
-      setNewItemData({
-        name: "",
-        category: "",
-        price: "",
-        description: "",
-      });
-    } else {
-      toast.error("Only super admins can add new inventory items");
+    try {
+      // Add new item (only super admin can do this)
+      if (isSuperAdmin) {
+        const newItem = addInventoryItem({
+          name: newItemData.name,
+          category: newItemData.category,
+          price: parseFloat(newItemData.price),
+          description: newItemData.description,
+        });
+        
+        // Update state with the new item
+        setInventoryItems(prevItems => [...prevItems, newItem]);
+        
+        toast.success(`Item "${newItem.name}" added successfully`);
+        setIsAddItemDialogOpen(false);
+        setNewItemData({
+          name: "",
+          category: "",
+          price: "",
+          description: "",
+        });
+      } else {
+        toast.error("Only super admins can add new inventory items");
+      }
+    } catch (error) {
+      console.error("Error adding inventory item:", error);
+      toast.error("Failed to add inventory item");
     }
   };
   
   const handleUseItem = (groundId: string, itemId: string, quantity: number) => {
-    const used = useInventoryItems(groundId, itemId, quantity);
-    
-    if (used) {
-      toast.success(`Inventory updated successfully`);
-    } else {
-      toast.error("Failed to update inventory");
+    try {
+      const used = useInventoryItems(groundId, itemId, quantity);
+      
+      if (used) {
+        // Update the state to reflect the inventory change
+        setGroundsWithInventory(prevGrounds => 
+          prevGrounds.map(groundData => {
+            if (groundData.ground.id === groundId) {
+              return {
+                ...groundData,
+                inventory: groundData.inventory.map(item => {
+                  if (item.itemId === itemId) {
+                    return {
+                      ...item,
+                      quantity: item.quantity - quantity
+                    };
+                  }
+                  return item;
+                })
+              };
+            }
+            return groundData;
+          })
+        );
+        
+        toast.success(`Inventory updated successfully`);
+      } else {
+        toast.error("Failed to update inventory");
+      }
+    } catch (error) {
+      console.error("Error using inventory:", error);
+      toast.error("An error occurred while updating inventory");
     }
   };
 
@@ -208,82 +275,90 @@ const AdminInventory: React.FC = () => {
         </div>
       </div>
 
-      {/* Inventory Overview */}
-      {isSuperAdmin && (
-        <div className="mb-8">
-          <h2 className="text-xl font-semibold mb-4">All Inventory Items</h2>
-          <div className="bg-white rounded-lg shadow-sm border overflow-hidden">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Item Name</TableHead>
-                  <TableHead>Category</TableHead>
-                  <TableHead className="text-right">Price</TableHead>
-                  <TableHead>Description</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {getAllInventoryItems().map((item) => (
-                  <TableRow key={item.id}>
-                    <TableCell className="font-medium">{item.name}</TableCell>
-                    <TableCell>{item.category}</TableCell>
-                    <TableCell className="text-right">₹{item.price}</TableCell>
-                    <TableCell>{item.description || "-"}</TableCell>
-                  </TableRow>
-                ))}
-                
-                {getAllInventoryItems().length === 0 && (
-                  <TableRow>
-                    <TableCell colSpan={4} className="text-center py-6 text-gray-500">
-                      No inventory items found
-                    </TableCell>
-                  </TableRow>
-                )}
-              </TableBody>
-            </Table>
-          </div>
+      {loading ? (
+        <div className="text-center py-8">
+          <p className="text-gray-500">Loading inventory data...</p>
         </div>
-      )}
-
-      {/* Ground Inventory */}
-      <div>
-        <h2 className="text-xl font-semibold mb-4">
-          {isSuperAdmin ? "Ground Inventory" : "Your Inventory"}
-        </h2>
-        
-        {inventoryByGround.length === 0 ? (
-          <div className="text-center py-16 bg-gray-50 rounded-lg">
-            <div className="flex justify-center mb-4">
-              <Package className="h-12 w-12 text-gray-400" />
+      ) : (
+        <>
+          {/* Inventory Overview */}
+          {isSuperAdmin && (
+            <div className="mb-8">
+              <h2 className="text-xl font-semibold mb-4">All Inventory Items</h2>
+              <div className="bg-white rounded-lg shadow-sm border overflow-hidden">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Item Name</TableHead>
+                      <TableHead>Category</TableHead>
+                      <TableHead className="text-right">Price</TableHead>
+                      <TableHead>Description</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {inventoryItems.length === 0 ? (
+                      <TableRow>
+                        <TableCell colSpan={4} className="text-center py-6 text-gray-500">
+                          No inventory items found
+                        </TableCell>
+                      </TableRow>
+                    ) : (
+                      inventoryItems.map((item) => (
+                        <TableRow key={item.id}>
+                          <TableCell className="font-medium">{item.name}</TableCell>
+                          <TableCell>{item.category}</TableCell>
+                          <TableCell className="text-right">₹{item.price}</TableCell>
+                          <TableCell>{item.description || "-"}</TableCell>
+                        </TableRow>
+                      ))
+                    )}
+                  </TableBody>
+                </Table>
+              </div>
             </div>
-            <p className="text-gray-600 mb-6">
-              No grounds or inventory found.
-            </p>
-            {isSuperAdmin && (
-              <Button onClick={() => setIsAddItemDialogOpen(true)}>
-                Add Inventory Items
-              </Button>
+          )}
+
+          {/* Ground Inventory */}
+          <div>
+            <h2 className="text-xl font-semibold mb-4">
+              {isSuperAdmin ? "Ground Inventory" : "Your Inventory"}
+            </h2>
+            
+            {groundsWithInventory.length === 0 ? (
+              <div className="text-center py-16 bg-gray-50 rounded-lg">
+                <div className="flex justify-center mb-4">
+                  <Package className="h-12 w-12 text-gray-400" />
+                </div>
+                <p className="text-gray-600 mb-6">
+                  No grounds or inventory found.
+                </p>
+                {isSuperAdmin && (
+                  <Button onClick={() => setIsAddItemDialogOpen(true)}>
+                    Add Inventory Items
+                  </Button>
+                )}
+              </div>
+            ) : (
+              <div className="space-y-6">
+                {groundsWithInventory.map(({ ground, inventory }) => (
+                  <div key={ground.id} className="bg-white rounded-lg shadow-sm border overflow-hidden">
+                    <div className="bg-gray-50 border-b px-4 py-3">
+                      <h3 className="font-medium">{ground.name}</h3>
+                    </div>
+                    
+                    <InventoryTable
+                      inventory={inventory}
+                      onUseItem={(itemId, quantity) =>
+                        handleUseItem(ground.id, itemId, quantity)
+                      }
+                    />
+                  </div>
+                ))}
+              </div>
             )}
           </div>
-        ) : (
-          <div className="space-y-6">
-            {inventoryByGround.map(({ ground, inventory }) => (
-              <div key={ground.id} className="bg-white rounded-lg shadow-sm border overflow-hidden">
-                <div className="bg-gray-50 border-b px-4 py-3">
-                  <h3 className="font-medium">{ground.name}</h3>
-                </div>
-                
-                <InventoryTable
-                  inventory={inventory}
-                  onUseItem={(itemId, quantity) =>
-                    handleUseItem(ground.id, itemId, quantity)
-                  }
-                />
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
+        </>
+      )}
     </AdminLayout>
   );
 };

@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { format, parseISO } from "date-fns";
 import { Calendar, Clock, User, Phone, CheckCircle, XCircle, Calendar as CalendarIcon } from "lucide-react";
 import AdminLayout from "@/components/layouts/AdminLayout";
@@ -28,7 +28,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import TimeSlotPicker from "@/components/booking/TimeSlotPicker";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { bookings, grounds, timeSlots } from "@/data/mockData";
 import { cancelBooking, createBooking, getAvailableTimeSlots } from "@/utils/booking";
 import { getCurrentUser, hasRole } from "@/utils/auth";
 import { toast } from "sonner";
@@ -77,6 +76,9 @@ const AdminBookings: React.FC = () => {
   const [selectedBooking, setSelectedBooking] = useState<Booking | null>(null);
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
   const [isAddBookingOpen, setIsAddBookingOpen] = useState(false);
+  const [bookings, setBookings] = useState<Booking[]>([]);
+  const [grounds, setGrounds] = useState<Ground[]>([]);
+  const [loading, setLoading] = useState(true);
   
   const [selectedGround, setSelectedGround] = useState<string>("");
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
@@ -87,16 +89,39 @@ const AdminBookings: React.FC = () => {
   const currentUser = getCurrentUser();
   const isSuperAdmin = hasRole('super_admin');
   
-  const userBookings = isSuperAdmin
-    ? bookings
-    : bookings.filter(booking => {
-        const ground = grounds.find(g => g.id === booking.groundId);
-        return ground?.ownerId === currentUser?.id;
-      });
-  
-  const userGrounds = isSuperAdmin
-    ? grounds
-    : grounds.filter(ground => ground.ownerId === currentUser?.id);
+  useEffect(() => {
+    // Fetch bookings and grounds data
+    const fetchData = async () => {
+      try {
+        // In a real app, this would be API calls
+        setTimeout(async () => {
+          const { bookings: allBookings, grounds: allGrounds } = await import("@/data/mockData");
+          
+          // Filter bookings and grounds based on user role
+          let userBookings = isSuperAdmin
+            ? allBookings
+            : allBookings.filter(booking => {
+                const ground = allGrounds.find(g => g.id === booking.groundId);
+                return ground?.ownerId === currentUser?.id;
+              });
+          
+          let userGrounds = isSuperAdmin
+            ? allGrounds
+            : allGrounds.filter(ground => ground.ownerId === currentUser?.id);
+          
+          setBookings(userBookings);
+          setGrounds(userGrounds);
+          setLoading(false);
+        }, 500);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+        toast.error("Failed to load data");
+        setLoading(false);
+      }
+    };
+    
+    fetchData();
+  }, [currentUser, isSuperAdmin]);
   
   const handleGroundChange = (groundId: string) => {
     setSelectedGround(groundId);
@@ -125,30 +150,54 @@ const AdminBookings: React.FC = () => {
     }
     
     const formattedDate = format(selectedDate, "yyyy-MM-dd");
-    const newBooking = createBooking(
-      selectedGround,
-      formattedDate,
-      selectedSlots,
-      customerName,
-      customerPhone
-    );
     
-    if (newBooking) {
-      toast.success("Booking created successfully");
-      setIsAddBookingOpen(false);
-      resetForm();
-    } else {
-      toast.error("Failed to create booking. Please try again.");
+    try {
+      const newBooking = createBooking(
+        selectedGround,
+        formattedDate,
+        selectedSlots,
+        customerName,
+        customerPhone
+      );
+      
+      if (newBooking) {
+        // Update the bookings state with the new booking
+        setBookings(prevBookings => [...prevBookings, newBooking]);
+        
+        toast.success("Booking created successfully");
+        setIsAddBookingOpen(false);
+        resetForm();
+      } else {
+        toast.error("Failed to create booking. Please try again.");
+      }
+    } catch (error) {
+      console.error("Error creating booking:", error);
+      toast.error("An error occurred while creating the booking");
     }
   };
   
   const handleCancelBooking = (bookingId: string) => {
-    const cancelled = cancelBooking(bookingId);
-    if (cancelled) {
-      toast.success("Booking cancelled successfully");
-      setIsDetailsOpen(false);
-    } else {
-      toast.error("Failed to cancel booking");
+    try {
+      const cancelled = cancelBooking(bookingId);
+      
+      if (cancelled) {
+        // Update the bookings state to reflect the cancellation
+        setBookings(prevBookings => 
+          prevBookings.map(booking => 
+            booking.id === bookingId 
+              ? { ...booking, bookingStatus: 'cancelled', paymentStatus: 'cancelled' } 
+              : booking
+          )
+        );
+        
+        toast.success("Booking cancelled successfully");
+        setIsDetailsOpen(false);
+      } else {
+        toast.error("Failed to cancel booking");
+      }
+    } catch (error) {
+      console.error("Error cancelling booking:", error);
+      toast.error("An error occurred while cancelling the booking");
     }
   };
   
@@ -197,7 +246,7 @@ const AdminBookings: React.FC = () => {
                       <SelectValue placeholder="Select a ground" />
                     </SelectTrigger>
                     <SelectContent>
-                      {userGrounds.map((ground) => (
+                      {grounds.map((ground) => (
                         <SelectItem key={ground.id} value={ground.id}>
                           {ground.name}
                         </SelectItem>
@@ -281,82 +330,88 @@ const AdminBookings: React.FC = () => {
         </Dialog>
       </div>
 
-      <div className="bg-white rounded-lg shadow-sm overflow-hidden border">
-        <div className="overflow-x-auto">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Customer</TableHead>
-                <TableHead>Ground</TableHead>
-                <TableHead>Date & Time</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Amount</TableHead>
-                <TableHead>Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {userBookings.length === 0 ? (
+      {loading ? (
+        <div className="text-center py-8">
+          <p className="text-gray-500">Loading bookings data...</p>
+        </div>
+      ) : (
+        <div className="bg-white rounded-lg shadow-sm overflow-hidden border">
+          <div className="overflow-x-auto">
+            <Table>
+              <TableHeader>
                 <TableRow>
-                  <TableCell
-                    colSpan={6}
-                    className="text-center py-6 text-gray-500"
-                  >
-                    No bookings found
-                  </TableCell>
+                  <TableHead>Customer</TableHead>
+                  <TableHead>Ground</TableHead>
+                  <TableHead>Date & Time</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead>Amount</TableHead>
+                  <TableHead>Actions</TableHead>
                 </TableRow>
-              ) : (
-                userBookings.map((booking) => (
-                  <TableRow key={booking.id}>
-                    <TableCell>
-                      <div className="flex flex-col">
-                        <div className="font-medium">{booking.userName}</div>
-                        <div className="flex items-center text-sm text-gray-500">
-                          <Phone className="h-3.5 w-3.5 mr-1" />
-                          {booking.userPhone}
-                        </div>
-                      </div>
-                    </TableCell>
-                    <TableCell>{booking.groundName}</TableCell>
-                    <TableCell>
-                      <div className="flex flex-col">
-                        <div className="flex items-center">
-                          <Calendar className="h-3.5 w-3.5 mr-1 text-gray-500" />
-                          {format(parseISO(booking.date), "dd MMM yyyy")}
-                        </div>
-                        <div className="text-sm text-gray-500">
-                          {booking.slots.length > 0
-                            ? `${formatTime(booking.slots[0].startTime)} - ${formatTime(
-                                booking.slots[booking.slots.length - 1].endTime
-                              )}`
-                            : "N/A"}
-                        </div>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <StatusBadge status={booking.bookingStatus} />
-                    </TableCell>
-                    <TableCell className="font-medium">
-                      ₹{booking.totalAmount}
-                    </TableCell>
-                    <TableCell>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => {
-                          setSelectedBooking(booking);
-                          setIsDetailsOpen(true);
-                        }}
-                      >
-                        View Details
-                      </Button>
+              </TableHeader>
+              <TableBody>
+                {bookings.length === 0 ? (
+                  <TableRow>
+                    <TableCell
+                      colSpan={6}
+                      className="text-center py-6 text-gray-500"
+                    >
+                      No bookings found
                     </TableCell>
                   </TableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
+                ) : (
+                  bookings.map((booking) => (
+                    <TableRow key={booking.id}>
+                      <TableCell>
+                        <div className="flex flex-col">
+                          <div className="font-medium">{booking.userName}</div>
+                          <div className="flex items-center text-sm text-gray-500">
+                            <Phone className="h-3.5 w-3.5 mr-1" />
+                            {booking.userPhone}
+                          </div>
+                        </div>
+                      </TableCell>
+                      <TableCell>{booking.groundName}</TableCell>
+                      <TableCell>
+                        <div className="flex flex-col">
+                          <div className="flex items-center">
+                            <Calendar className="h-3.5 w-3.5 mr-1 text-gray-500" />
+                            {format(parseISO(booking.date), "dd MMM yyyy")}
+                          </div>
+                          <div className="text-sm text-gray-500">
+                            {booking.slots.length > 0
+                              ? `${formatTime(booking.slots[0].startTime)} - ${formatTime(
+                                  booking.slots[booking.slots.length - 1].endTime
+                                )}`
+                              : "N/A"}
+                          </div>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <StatusBadge status={booking.bookingStatus} />
+                      </TableCell>
+                      <TableCell className="font-medium">
+                        ₹{booking.totalAmount}
+                      </TableCell>
+                      <TableCell>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => {
+                            setSelectedBooking(booking);
+                            setIsDetailsOpen(true);
+                          }}
+                        >
+                          View Details
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                )}
+              </TableBody>
+            </Table>
+          </div>
         </div>
-      </div>
+      )}
 
       <Dialog open={isDetailsOpen} onOpenChange={setIsDetailsOpen}>
         {selectedBooking && (

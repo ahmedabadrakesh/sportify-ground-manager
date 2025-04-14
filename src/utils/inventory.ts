@@ -2,6 +2,9 @@
 import { GroundInventory, InventoryItem } from "@/types/models";
 import { groundInventory, inventoryItems } from "@/data/mockData";
 
+// Generate unique ID
+const generateId = () => `item-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
+
 // Get all inventory items
 export const getAllInventoryItems = (): InventoryItem[] => {
   return [...inventoryItems];
@@ -19,7 +22,10 @@ export const allocateInventory = (
   quantity: number
 ): boolean => {
   const item = inventoryItems.find(item => item.id === itemId);
-  if (!item) return false;
+  if (!item) {
+    console.error(`Inventory item with ID ${itemId} not found`);
+    return false;
+  }
   
   // Check if ground already has this item
   const existingIndex = groundInventory.findIndex(
@@ -80,7 +86,7 @@ export const useInventoryItems = (
 // Add new inventory item
 export const addInventoryItem = (item: Omit<InventoryItem, 'id'>): InventoryItem => {
   const newItem: InventoryItem = {
-    id: `item-${Date.now()}`,
+    id: generateId(),
     ...item,
   };
   
