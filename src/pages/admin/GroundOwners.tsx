@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { PlusCircle, Edit, Trash, User, Mail, Phone } from "lucide-react";
 import AdminLayout from "@/components/layouts/AdminLayout";
@@ -22,7 +21,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { hasRole } from "@/utils/auth";
+import { hasRoleSync } from "@/utils/auth";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -77,7 +76,7 @@ const GroundOwners: React.FC = () => {
   }, []);
 
   // Check if the current user is a super admin
-  if (!hasRole('super_admin')) {
+  if (!hasRoleSync('super_admin')) {
     return (
       <AdminLayout>
         <div className="text-center py-16">
@@ -182,14 +181,9 @@ const GroundOwners: React.FC = () => {
       
       // If there's an auth_id, also delete the auth user
       if (ownerToDelete.auth_id) {
-        const { error: authError } = await supabase.auth.admin.deleteUser(
-          ownerToDelete.auth_id
-        );
-        
-        if (authError) {
-          console.error("Error deleting auth user:", authError);
-          // Continue anyway since we've already deleted the user record
-        }
+        // Note: This requires admin rights which isn't available in client
+        // In a real app, you would use a serverless function for this
+        console.log("Would delete auth user with ID:", ownerToDelete.auth_id);
       }
       
       // Update state by removing the owner
