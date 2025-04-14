@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { format, parseISO } from "date-fns";
 import { Calendar, Clock, User, Phone, CheckCircle, XCircle, Calendar as CalendarIcon } from "lucide-react";
@@ -201,6 +202,23 @@ const AdminBookings: React.FC = () => {
     setSelectedSlots([]);
   };
 
+  // Helper function to safely display time slot information
+  const renderTimeSlotInfo = (booking: Booking) => {
+    if (!booking.slots || booking.slots.length === 0) {
+      return "No time slots available";
+    }
+    
+    // Make sure first and last slots exist before accessing properties
+    const firstSlot = booking.slots[0];
+    const lastSlot = booking.slots[booking.slots.length - 1];
+    
+    if (!firstSlot || !lastSlot) {
+      return "Time information unavailable";
+    }
+    
+    return `${formatTime(firstSlot.startTime)} - ${formatTime(lastSlot.endTime)}`;
+  };
+
   return (
     <AdminLayout>
       <div className="flex justify-between items-center mb-6">
@@ -370,11 +388,7 @@ const AdminBookings: React.FC = () => {
                             {format(parseISO(booking.date), "dd MMM yyyy")}
                           </div>
                           <div className="text-sm text-gray-500">
-                            {booking.slots.length > 0
-                              ? `${formatTime(booking.slots[0].startTime)} - ${formatTime(
-                                  booking.slots[booking.slots.length - 1].endTime
-                                )}`
-                              : "N/A"}
+                            {renderTimeSlotInfo(booking)}
                           </div>
                         </div>
                       </TableCell>
@@ -459,20 +473,24 @@ const AdminBookings: React.FC = () => {
                   Booked Slots
                 </h3>
                 <div className="bg-gray-50 rounded-md p-3 space-y-2">
-                  {selectedBooking.slots.map((slot) => (
-                    <div
-                      key={slot.id}
-                      className="flex justify-between items-center"
-                    >
-                      <div className="flex items-center">
-                        <Clock className="h-4 w-4 mr-2 text-gray-500" />
-                        <span>
-                          {formatTime(slot.startTime)} - {formatTime(slot.endTime)}
-                        </span>
+                  {selectedBooking.slots && selectedBooking.slots.length > 0 ? (
+                    selectedBooking.slots.map((slot) => (
+                      <div
+                        key={slot.id}
+                        className="flex justify-between items-center"
+                      >
+                        <div className="flex items-center">
+                          <Clock className="h-4 w-4 mr-2 text-gray-500" />
+                          <span>
+                            {formatTime(slot.startTime)} - {formatTime(slot.endTime)}
+                          </span>
+                        </div>
+                        <span className="font-medium">₹{slot.price}</span>
                       </div>
-                      <span className="font-medium">₹{slot.price}</span>
-                    </div>
-                  ))}
+                    ))
+                  ) : (
+                    <div className="text-gray-500 text-center py-2">No time slots available</div>
+                  )}
                 </div>
               </div>
               
