@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { getCurrentUser, logout, hasRole } from "@/utils/auth";
+import { getCurrentUserSync, logout, hasRoleSync } from "@/utils/auth";
 import { useLocation } from "react-router-dom";
 import { toast } from "sonner";
 
@@ -20,8 +20,8 @@ interface AdminLayoutProps {
 const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
   const location = useLocation();
   const navigate = useNavigate();
-  const currentUser = getCurrentUser();
-  const isSuperAdmin = hasRole('super_admin');
+  const currentUser = getCurrentUserSync();
+  const isSuperAdmin = hasRoleSync('super_admin');
   
   const handleLogout = () => {
     logout();

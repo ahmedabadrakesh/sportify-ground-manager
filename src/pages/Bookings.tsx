@@ -18,7 +18,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { cancelBooking, getUserBookings } from "@/utils/booking";
 import { Booking } from "@/types/models";
-import { getCurrentUser, isAuthenticated } from "@/utils/auth";
+import { getCurrentUserSync, isAuthenticatedSync } from "@/utils/auth";
 import { toast } from "sonner";
 
 const BookingStatusBadge: React.FC<{ status: string }> = ({ status }) => {
@@ -63,9 +63,9 @@ const Bookings: React.FC = () => {
   const [selectedBooking, setSelectedBooking] = useState<Booking | null>(null);
   const [bookingDetailsOpen, setBookingDetailsOpen] = useState(false);
   
-  const user = getCurrentUser();
+  const user = getCurrentUserSync();
   
-  if (!isAuthenticated()) {
+  if (!isAuthenticatedSync()) {
     return (
       <MainLayout>
         <div className="text-center py-16">

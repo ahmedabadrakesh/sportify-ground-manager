@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import MainLayout from "@/components/layouts/MainLayout";
@@ -24,9 +23,8 @@ import { ShoppingBag, CreditCard, Truck, Check, ArrowLeft, Loader2 } from "lucid
 import { getCart, getCartTotal, processCheckout } from "@/utils/cart";
 import { CartItem } from "@/types/models";
 import { products } from "@/data/mockData";
-import { getCurrentUser } from "@/utils/auth";
+import { getCurrentUserSync } from "@/utils/auth";
 
-// Form validation schema
 const checkoutFormSchema = z.object({
   name: z.string().min(2, { message: "Name must be at least 2 characters" }),
   email: z.string().email({ message: "Please enter a valid email address" }),
@@ -44,9 +42,8 @@ const Checkout: React.FC = () => {
   const [cart, setCart] = useState<CartItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [processingOrder, setProcessingOrder] = useState(false);
-  const currentUser = getCurrentUser();
+  const currentUser = getCurrentUserSync();
 
-  // Setup form with validation
   const form = useForm<CheckoutFormValues>({
     resolver: zodResolver(checkoutFormSchema),
     defaultValues: {
@@ -69,7 +66,6 @@ const Checkout: React.FC = () => {
     setLoading(false);
   }, [navigate]);
 
-  // Get product details for cart items
   const cartItems = cart.map(item => {
     const product = products.find(p => p.id === item.productId);
     return { 

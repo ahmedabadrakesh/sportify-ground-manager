@@ -1,7 +1,6 @@
-
 import { Booking, Ground, TimeSlot, User } from "@/types/models";
 import { bookings, grounds, timeSlots } from "@/data/mockData";
-import { getCurrentUser } from "./auth";
+import { getCurrentUserSync } from "./auth";
 import { useInventoryItems } from "./inventory";
 
 // Generate unique ID
@@ -52,7 +51,7 @@ export const createBooking = (
   userName: string,
   userPhone: string
 ): Booking | null => {
-  const user = getCurrentUser();
+  const user = getCurrentUserSync();
   if (!user && !userName) return null;
   
   const ground = grounds.find(g => g.id === groundId);

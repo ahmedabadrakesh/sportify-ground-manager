@@ -2,7 +2,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import AdminLayout from "@/components/layouts/AdminLayout";
 import { bookings, grounds, inventoryItems } from "@/data/mockData";
-import { getCurrentUser, hasRole } from "@/utils/auth";
+import { getCurrentUserSync, hasRoleSync } from "@/utils/auth";
 
 // Import refactored components
 import DashboardHeader from "@/components/admin/dashboard/DashboardHeader";
@@ -11,8 +11,8 @@ import BookingChart from "@/components/admin/dashboard/BookingChart";
 import RecentActivityCard from "@/components/admin/dashboard/RecentActivityCard";
 
 const AdminDashboard: React.FC = () => {
-  const currentUser = getCurrentUser();
-  const isSuperAdmin = hasRole('super_admin');
+  const currentUser = getCurrentUserSync();
+  const isSuperAdmin = hasRoleSync('super_admin');
   const [statsVisible, setStatsVisible] = useState(false);
   const statsRef = useRef<HTMLDivElement>(null);
   

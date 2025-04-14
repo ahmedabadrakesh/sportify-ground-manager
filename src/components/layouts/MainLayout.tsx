@@ -3,7 +3,7 @@ import React from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Home, Search, Calendar, User, LogOut, ShoppingBag, ShoppingCart } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { getCurrentUser, logout } from "@/utils/auth";
+import { getCurrentUserSync, logout, hasRoleSync } from "@/utils/auth";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { getCartItemsCount } from "@/utils/cart";
@@ -15,7 +15,7 @@ interface MainLayoutProps {
 const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
   const location = useLocation();
   const navigate = useNavigate();
-  const currentUser = getCurrentUser();
+  const currentUser = getCurrentUserSync();
   const cartItemsCount = getCartItemsCount();
 
   const handleLogout = () => {

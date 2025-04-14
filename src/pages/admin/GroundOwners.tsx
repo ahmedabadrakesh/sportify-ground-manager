@@ -40,7 +40,6 @@ const GroundOwners: React.FC = () => {
   });
 
   useEffect(() => {
-    // Fetch ground owners data from Supabase
     const fetchOwners = async () => {
       try {
         setLoading(true);
@@ -60,10 +59,8 @@ const GroundOwners: React.FC = () => {
         console.error("Error fetching ground owners:", error);
         toast.error("Failed to load ground owners");
         
-        // Fallback to mock data if Supabase connection fails
         setTimeout(() => {
           import("@/data/mockData").then(({ users }) => {
-            // Filter users to only show admins (ground owners)
             const groundOwners = users.filter(user => user.role === 'admin');
             setOwners(groundOwners);
             setLoading(false);
@@ -75,7 +72,6 @@ const GroundOwners: React.FC = () => {
     fetchOwners();
   }, []);
 
-  // Check if the current user is a super admin
   if (!hasRoleSync('super_admin')) {
     return (
       <AdminLayout>
@@ -97,14 +93,12 @@ const GroundOwners: React.FC = () => {
   const handleAddOwner = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Validate form data
     if (!formData.name || !formData.email || !formData.phone || !formData.password) {
       toast.error("Please fill in all required fields");
       return;
     }
     
     try {
-      // First create the auth user
       const { data: authData, error: authError } = await supabase.auth.signUp({
         email: formData.email,
         password: formData.password,
@@ -118,7 +112,6 @@ const GroundOwners: React.FC = () => {
         throw new Error("Failed to create user account");
       }
       
-      // Then add to the users table with the auth ID
       const { data: userData, error: userError } = await supabase
         .from('users')
         .insert([{
@@ -135,14 +128,12 @@ const GroundOwners: React.FC = () => {
         throw userError;
       }
       
-      // Update state with new owner
       if (userData && userData.length > 0) {
         setOwners(prevOwners => [...prevOwners, userData[0]]);
       }
       
       toast.success(`Ground owner ${formData.name} added successfully`);
       
-      // Reset form and close dialog
       setIsAddDialogOpen(false);
       setFormData({
         name: "",
@@ -162,14 +153,12 @@ const GroundOwners: React.FC = () => {
     if (!selectedOwnerId) return;
     
     try {
-      // Find owner to delete
       const ownerToDelete = owners.find(owner => owner.id === selectedOwnerId);
       if (!ownerToDelete) {
         toast.error("Owner not found");
         return;
       }
       
-      // Delete from Supabase users table
       const { error: userError } = await supabase
         .from('users')
         .delete()
@@ -179,19 +168,14 @@ const GroundOwners: React.FC = () => {
         throw userError;
       }
       
-      // If there's an auth_id, also delete the auth user
       if (ownerToDelete.auth_id) {
-        // Note: This requires admin rights which isn't available in client
-        // In a real app, you would use a serverless function for this
         console.log("Would delete auth user with ID:", ownerToDelete.auth_id);
       }
       
-      // Update state by removing the owner
       setOwners(prevOwners => prevOwners.filter(owner => owner.id !== selectedOwnerId));
       
       toast.success(`Ground owner ${ownerToDelete.name} deleted successfully`);
       
-      // Reset state and close dialog
       setIsDeleteDialogOpen(false);
       setSelectedOwnerId(null);
       

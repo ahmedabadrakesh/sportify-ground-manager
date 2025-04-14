@@ -14,7 +14,7 @@ const Login: React.FC = () => {
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
 
@@ -26,9 +26,8 @@ const Login: React.FC = () => {
     }
 
     // Demo login functionality
-    // In a real app, we would call an API to validate credentials
-    setTimeout(() => {
-      const user = login(email, "password");
+    try {
+      const user = await login(email, "password");
       
       if (user) {
         toast.success(`Welcome back, ${user.name}!`);
@@ -42,9 +41,12 @@ const Login: React.FC = () => {
       } else {
         toast.error("Invalid credentials. Please try again.");
       }
-      
+    } catch (error) {
+      console.error("Login error:", error);
+      toast.error("An error occurred during login");
+    } finally {
       setIsLoading(false);
-    }, 1000);
+    }
   };
 
   return (

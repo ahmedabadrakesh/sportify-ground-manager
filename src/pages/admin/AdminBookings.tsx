@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { format, parseISO } from "date-fns";
 import { Calendar, Clock, User, Phone, CheckCircle, XCircle, Calendar as CalendarIcon } from "lucide-react";
@@ -29,11 +28,10 @@ import { Label } from "@/components/ui/label";
 import TimeSlotPicker from "@/components/booking/TimeSlotPicker";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { cancelBooking, createBooking, getAvailableTimeSlots } from "@/utils/booking";
-import { getCurrentUser, hasRole } from "@/utils/auth";
+import { getCurrentUserSync, hasRoleSync } from "@/utils/auth";
 import { toast } from "sonner";
 import { Booking, Ground } from "@/types/models";
 
-// Helper function to format time
 const formatTime = (time: string) => {
   const [hour, minute] = time.split(":");
   const hourNum = parseInt(hour);
@@ -49,7 +47,6 @@ const formatTime = (time: string) => {
   }
 };
 
-// Status badge component
 const StatusBadge: React.FC<{ status: string }> = ({ status }) => {
   if (status === "confirmed") {
     return (
@@ -86,18 +83,15 @@ const AdminBookings: React.FC = () => {
   const [customerPhone, setCustomerPhone] = useState("");
   const [selectedSlots, setSelectedSlots] = useState<string[]>([]);
   
-  const currentUser = getCurrentUser();
-  const isSuperAdmin = hasRole('super_admin');
+  const currentUser = getCurrentUserSync();
+  const isSuperAdmin = hasRoleSync('super_admin');
   
   useEffect(() => {
-    // Fetch bookings and grounds data
     const fetchData = async () => {
       try {
-        // In a real app, this would be API calls
         setTimeout(async () => {
           const { bookings: allBookings, grounds: allGrounds } = await import("@/data/mockData");
           
-          // Filter bookings and grounds based on user role
           let userBookings = isSuperAdmin
             ? allBookings
             : allBookings.filter(booking => {
@@ -161,7 +155,6 @@ const AdminBookings: React.FC = () => {
       );
       
       if (newBooking) {
-        // Update the bookings state with the new booking
         setBookings(prevBookings => [...prevBookings, newBooking]);
         
         toast.success("Booking created successfully");
@@ -181,7 +174,6 @@ const AdminBookings: React.FC = () => {
       const cancelled = cancelBooking(bookingId);
       
       if (cancelled) {
-        // Update the bookings state to reflect the cancellation
         setBookings(prevBookings => 
           prevBookings.map(booking => 
             booking.id === bookingId 

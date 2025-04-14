@@ -3,7 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { User, UserRole } from "@/types/models";
 import { users } from "@/data/mockData";
 
-// Get current user from Supabase auth
+// Get current user from Supabase auth - async version
 export const getCurrentUser = async (): Promise<User | null> => {
   // First check local storage for compatibility with existing code
   const storedUser = localStorage.getItem('currentUser');
@@ -23,6 +23,8 @@ export const getCurrentUser = async (): Promise<User | null> => {
         .single();
       
       if (userData && !error) {
+        // Store user in localStorage for compatibility
+        localStorage.setItem('currentUser', JSON.stringify(userData));
         return userData as User;
       }
       
@@ -39,6 +41,15 @@ export const getCurrentUser = async (): Promise<User | null> => {
     console.error("Error getting current user:", error);
   }
   
+  return null;
+};
+
+// Synchronous version for backward compatibility
+export const getCurrentUserSync = (): User | null => {
+  const storedUser = localStorage.getItem('currentUser');
+  if (storedUser) {
+    return JSON.parse(storedUser);
+  }
   return null;
 };
 
@@ -107,13 +118,18 @@ export const logout = async (): Promise<void> => {
   localStorage.removeItem('currentUser');
 };
 
-// Check if user is authenticated
+// Check if user is authenticated - async version
 export const isAuthenticated = async (): Promise<boolean> => {
   const user = await getCurrentUser();
   return !!user;
 };
 
-// Check if user has a specific role
+// Synchronous version for backward compatibility
+export const isAuthenticatedSync = (): boolean => {
+  return !!getCurrentUserSync();
+};
+
+// Check if user has a specific role - async version
 export const hasRole = async (role: UserRole): Promise<boolean> => {
   const user = await getCurrentUser();
   if (!user) return false;
@@ -127,10 +143,7 @@ export const hasRole = async (role: UserRole): Promise<boolean> => {
 
 // Sync version for compatibility with existing code
 export const hasRoleSync = (role: UserRole): boolean => {
-  const user = localStorage.getItem('currentUser') 
-    ? JSON.parse(localStorage.getItem('currentUser') || '{}')
-    : null;
-  
+  const user = getCurrentUserSync();
   if (!user) return false;
   
   if (role === 'user') return true;

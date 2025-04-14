@@ -6,7 +6,7 @@ import AdminLayout from "@/components/layouts/AdminLayout";
 import { Button } from "@/components/ui/button";
 import GroundsTable from "@/components/grounds/GroundsTable";
 import { Ground } from "@/types/models";
-import { getCurrentUser, hasRole } from "@/utils/auth";
+import { getCurrentUserSync, hasRoleSync } from "@/utils/auth";
 import { toast } from "sonner";
 
 const AdminGrounds: React.FC = () => {
@@ -14,8 +14,8 @@ const AdminGrounds: React.FC = () => {
   const [grounds, setGrounds] = useState<Ground[]>([]);
   const [loading, setLoading] = useState(true);
   
-  const currentUser = getCurrentUser();
-  const isSuperAdmin = hasRole('super_admin');
+  const currentUser = getCurrentUserSync();
+  const isSuperAdmin = hasRoleSync('super_admin');
   
   useEffect(() => {
     // Fetch grounds data from API
