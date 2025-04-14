@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { PlusCircle, Boxes, BarChart3 } from "lucide-react";
 import AdminLayout from "@/components/layouts/AdminLayout";
@@ -92,7 +93,15 @@ const AdminInventory: React.FC = () => {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <InventoryTable items={inventoryItems} />
+                <InventoryTable inventory={inventoryItems.map(item => ({
+                  groundId: '',
+                  itemId: item.id,
+                  itemName: item.name,
+                  itemPrice: item.price,
+                  quantity: 0
+                }))} 
+                readonly={true}
+                />
               </CardContent>
             </Card>
           </TabsContent>
