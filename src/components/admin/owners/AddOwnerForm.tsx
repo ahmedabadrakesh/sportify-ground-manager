@@ -25,6 +25,7 @@ const AddOwnerForm: React.FC<AddOwnerFormProps> = ({ onSuccess, onCancel }) => {
     whatsapp: "",
     password: "",
   });
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -40,19 +41,10 @@ const AddOwnerForm: React.FC<AddOwnerFormProps> = ({ onSuccess, onCancel }) => {
     }
     
     try {
-      const { data: authData, error: authError } = await supabase.auth.signUp({
-        email: formData.email,
-        password: formData.password,
-      });
+      setIsSubmitting(true);
       
-      if (authError) {
-        throw authError;
-      }
-      
-      if (!authData.user?.id) {
-        throw new Error("Failed to create user account");
-      }
-      
+      // First create the user in the users table directly
+      // Instead of creating auth users, create a normal DB user
       const { data: userData, error: userError } = await supabase
         .from('users')
         .insert([{
@@ -60,8 +52,7 @@ const AddOwnerForm: React.FC<AddOwnerFormProps> = ({ onSuccess, onCancel }) => {
           email: formData.email,
           phone: formData.phone,
           whatsapp: formData.whatsapp || formData.phone,
-          role: 'admin',
-          auth_id: authData.user.id
+          role: 'admin'
         }])
         .select();
         
@@ -77,6 +68,8 @@ const AddOwnerForm: React.FC<AddOwnerFormProps> = ({ onSuccess, onCancel }) => {
     } catch (error: any) {
       console.error("Error adding ground owner:", error);
       toast.error(error.message || "Failed to add ground owner");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -140,18 +133,18 @@ const AddOwnerForm: React.FC<AddOwnerFormProps> = ({ onSuccess, onCancel }) => {
       </div>
       
       <div className="space-y-2">
-        <Label htmlFor="password">Temporary Password</Label>
+        <Label htmlFor="password">Password</Label>
         <Input
           id="password"
           name="password"
           type="password"
-          placeholder="Create a temporary password"
+          placeholder="Create a password"
           value={formData.password}
           onChange={handleInputChange}
           required
         />
         <p className="text-xs text-gray-500">
-          The owner will be prompted to change this on first login.
+          This password will be used for account access.
         </p>
       </div>
       
@@ -160,10 +153,13 @@ const AddOwnerForm: React.FC<AddOwnerFormProps> = ({ onSuccess, onCancel }) => {
           type="button"
           variant="outline"
           onClick={onCancel}
+          disabled={isSubmitting}
         >
           Cancel
         </Button>
-        <Button type="submit">Create Account</Button>
+        <Button type="submit" disabled={isSubmitting}>
+          {isSubmitting ? "Creating..." : "Create Account"}
+        </Button>
       </DialogFooter>
     </form>
   );

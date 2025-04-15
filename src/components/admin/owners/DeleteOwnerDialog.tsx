@@ -1,5 +1,5 @@
 
-import React from "react";
+import React, { useState } from "react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -24,11 +24,15 @@ const DeleteOwnerDialog: React.FC<DeleteOwnerDialogProps> = ({
   onSuccess,
   onCancel
 }) => {
+  const [isDeleting, setIsDeleting] = useState(false);
+
   const handleDeleteOwner = async () => {
     if (!ownerId) return;
     
     try {
+      setIsDeleting(true);
       const ownerToDelete = owners.find(owner => owner.id === ownerId);
+      
       if (!ownerToDelete) {
         toast.error("Owner not found");
         return;
@@ -43,16 +47,14 @@ const DeleteOwnerDialog: React.FC<DeleteOwnerDialogProps> = ({
         throw userError;
       }
       
-      if (ownerToDelete.auth_id) {
-        console.log("Would delete auth user with ID:", ownerToDelete.auth_id);
-      }
-      
       onSuccess(ownerId);
       toast.success(`Ground owner ${ownerToDelete.name} deleted successfully`);
       
     } catch (error: any) {
       console.error("Error deleting ground owner:", error);
       toast.error(error.message || "Failed to delete ground owner");
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -70,14 +72,16 @@ const DeleteOwnerDialog: React.FC<DeleteOwnerDialogProps> = ({
         <Button
           variant="outline"
           onClick={onCancel}
+          disabled={isDeleting}
         >
           Cancel
         </Button>
         <Button
           variant="destructive"
           onClick={handleDeleteOwner}
+          disabled={isDeleting}
         >
-          Delete
+          {isDeleting ? "Deleting..." : "Delete"}
         </Button>
       </DialogFooter>
     </DialogContent>
