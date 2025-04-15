@@ -28,11 +28,9 @@ const GroundOwners: React.FC = () => {
         
         console.log("Fetching ground owners...");
         
-        // Use direct query with no filters to avoid RLS recursion
+        // Use the Postgres anonymous function to bypass RLS
         const { data, error } = await supabase
-          .from('users')
-          .select('*')
-          .eq('role', 'admin');
+          .rpc('get_admin_users');
           
         if (error) {
           console.error("Database error fetching ground owners:", error);

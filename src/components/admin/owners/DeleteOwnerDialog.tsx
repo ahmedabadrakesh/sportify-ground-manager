@@ -43,14 +43,15 @@ const DeleteOwnerDialog: React.FC<DeleteOwnerDialogProps> = ({
       
       console.log("Deleting owner:", ownerToDelete);
       
-      const { error: userError } = await supabase
-        .from('users')
-        .delete()
-        .eq('id', ownerId);
+      // Use RPC to delete the user
+      const { error: deleteError } = await supabase
+        .rpc('delete_admin_user', { 
+          user_id: ownerId 
+        });
         
-      if (userError) {
-        console.error("Database error deleting owner:", userError);
-        throw userError;
+      if (deleteError) {
+        console.error("Database error deleting owner:", deleteError);
+        throw deleteError;
       }
       
       console.log("Owner deleted successfully");

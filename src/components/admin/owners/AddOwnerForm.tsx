@@ -52,17 +52,14 @@ const AddOwnerForm: React.FC<AddOwnerFormProps> = ({ onSuccess, onCancel }) => {
         role: 'admin'
       });
       
-      // Insert directly into users table
+      // Use RPC function to add a user
       const { data: userData, error: userError } = await supabase
-        .from('users')
-        .insert([{
-          name: formData.name,
-          email: formData.email,
-          phone: formData.phone,
-          whatsapp: formData.whatsapp || formData.phone,
-          role: 'admin'
-        }])
-        .select();
+        .rpc('add_admin_user', {
+          user_name: formData.name,
+          user_email: formData.email,
+          user_phone: formData.phone,
+          user_whatsapp: formData.whatsapp || formData.phone
+        });
         
       if (userError) {
         console.error("Database error creating owner:", userError);
@@ -71,8 +68,8 @@ const AddOwnerForm: React.FC<AddOwnerFormProps> = ({ onSuccess, onCancel }) => {
       
       console.log("Created ground owner:", userData);
       
-      if (userData && userData.length > 0) {
-        onSuccess(userData[0]);
+      if (userData) {
+        onSuccess(userData);
         toast.success(`Ground owner ${formData.name} added successfully`);
       } else {
         throw new Error("No data returned after creating owner");
