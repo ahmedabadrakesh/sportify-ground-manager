@@ -26,10 +26,12 @@ const AddOwnerForm: React.FC<AddOwnerFormProps> = ({ onSuccess, onCancel }) => {
     password: "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
+    setError(null);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -42,9 +44,15 @@ const AddOwnerForm: React.FC<AddOwnerFormProps> = ({ onSuccess, onCancel }) => {
     
     try {
       setIsSubmitting(true);
+      setError(null);
       
-      // First create the user in the users table directly
-      // Instead of creating auth users, create a normal DB user
+      console.log("Creating ground owner:", { 
+        name: formData.name, 
+        email: formData.email,
+        role: 'admin'
+      });
+      
+      // Insert directly into users table
       const { data: userData, error: userError } = await supabase
         .from('users')
         .insert([{
@@ -57,16 +65,22 @@ const AddOwnerForm: React.FC<AddOwnerFormProps> = ({ onSuccess, onCancel }) => {
         .select();
         
       if (userError) {
+        console.error("Database error creating owner:", userError);
         throw userError;
       }
+      
+      console.log("Created ground owner:", userData);
       
       if (userData && userData.length > 0) {
         onSuccess(userData[0]);
         toast.success(`Ground owner ${formData.name} added successfully`);
+      } else {
+        throw new Error("No data returned after creating owner");
       }
       
     } catch (error: any) {
       console.error("Error adding ground owner:", error);
+      setError(error.message || "Failed to add ground owner");
       toast.error(error.message || "Failed to add ground owner");
     } finally {
       setIsSubmitting(false);
@@ -81,6 +95,13 @@ const AddOwnerForm: React.FC<AddOwnerFormProps> = ({ onSuccess, onCancel }) => {
           Create a new account for a ground owner with management access.
         </DialogDescription>
       </DialogHeader>
+      
+      {error && (
+        <div className="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded">
+          <p className="font-medium">Error</p>
+          <p className="text-sm">{error}</p>
+        </div>
+      )}
       
       <div className="space-y-2">
         <Label htmlFor="name">Full Name</Label>

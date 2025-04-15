@@ -18,37 +18,41 @@ const GroundOwners: React.FC = () => {
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [owners, setOwners] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchOwners = async () => {
       try {
         setLoading(true);
+        setError(null);
         
-        // Use a simpler query to avoid RLS recursion issues
+        console.log("Fetching ground owners...");
+        
+        // Use direct query with no filters to avoid RLS recursion
         const { data, error } = await supabase
           .from('users')
-          .select('id, name, email, phone, role, created_at')
+          .select('*')
           .eq('role', 'admin');
           
         if (error) {
-          console.error("Error fetching ground owners:", error);
+          console.error("Database error fetching ground owners:", error);
           throw error;
         }
         
+        console.log("Ground owners data:", data);
         setOwners(data || []);
-        setLoading(false);
-      } catch (error) {
+      } catch (error: any) {
         console.error("Error fetching ground owners:", error);
-        toast.error("Failed to load ground owners");
+        setError(error.message || "Failed to load ground owners");
         
-        // Fallback to mock data if Supabase fails
-        setTimeout(() => {
-          import("@/data/mockData").then(({ users }) => {
-            const groundOwners = users.filter(user => user.role === 'admin');
-            setOwners(groundOwners);
-            setLoading(false);
-          });
-        }, 500);
+        // Fallback to mock data
+        console.log("Falling back to mock data");
+        import("@/data/mockData").then(({ users }) => {
+          const groundOwners = users.filter(user => user.role === 'admin');
+          setOwners(groundOwners);
+        });
+      } finally {
+        setLoading(false);
       }
     };
     
@@ -102,6 +106,14 @@ const GroundOwners: React.FC = () => {
           </DialogContent>
         </Dialog>
       </div>
+
+      {error && (
+        <div className="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded mb-6">
+          <p className="font-medium">Error loading ground owners</p>
+          <p className="text-sm">{error}</p>
+          <p className="text-sm mt-2">Using fallback data for demo purposes.</p>
+        </div>
+      )}
 
       {loading ? (
         <div className="text-center py-8">

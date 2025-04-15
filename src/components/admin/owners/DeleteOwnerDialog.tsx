@@ -25,12 +25,15 @@ const DeleteOwnerDialog: React.FC<DeleteOwnerDialogProps> = ({
   onCancel
 }) => {
   const [isDeleting, setIsDeleting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const handleDeleteOwner = async () => {
     if (!ownerId) return;
     
     try {
       setIsDeleting(true);
+      setError(null);
+      
       const ownerToDelete = owners.find(owner => owner.id === ownerId);
       
       if (!ownerToDelete) {
@@ -38,20 +41,25 @@ const DeleteOwnerDialog: React.FC<DeleteOwnerDialogProps> = ({
         return;
       }
       
+      console.log("Deleting owner:", ownerToDelete);
+      
       const { error: userError } = await supabase
         .from('users')
         .delete()
         .eq('id', ownerId);
         
       if (userError) {
+        console.error("Database error deleting owner:", userError);
         throw userError;
       }
       
+      console.log("Owner deleted successfully");
       onSuccess(ownerId);
       toast.success(`Ground owner ${ownerToDelete.name} deleted successfully`);
       
     } catch (error: any) {
       console.error("Error deleting ground owner:", error);
+      setError(error.message || "Failed to delete ground owner");
       toast.error(error.message || "Failed to delete ground owner");
     } finally {
       setIsDeleting(false);
@@ -68,6 +76,14 @@ const DeleteOwnerDialog: React.FC<DeleteOwnerDialogProps> = ({
           reassigned.
         </DialogDescription>
       </DialogHeader>
+      
+      {error && (
+        <div className="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded">
+          <p className="font-medium">Error</p>
+          <p className="text-sm">{error}</p>
+        </div>
+      )}
+      
       <DialogFooter>
         <Button
           variant="outline"
