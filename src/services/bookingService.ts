@@ -96,8 +96,8 @@ export const fetchBookings = async (options?: { groundId?: string, userId?: stri
           date: bookingData.date,
           slots: slots,
           totalAmount: bookingData.total_amount,
-          paymentStatus: bookingData.payment_status,
-          bookingStatus: bookingData.booking_status,
+          paymentStatus: bookingData.payment_status as 'pending' | 'completed' | 'cancelled',
+          bookingStatus: bookingData.booking_status as 'confirmed' | 'pending' | 'cancelled',
           createdAt: bookingData.created_at
         });
       } catch (err) {
@@ -167,7 +167,7 @@ export const createBooking = async (
       throw slotsError;
     }
     
-    totalAmount = slotsData?.reduce((sum, slot) => sum + parseFloat(slot.price), 0) || 0;
+    totalAmount = slotsData?.reduce((sum, slot) => sum + parseFloat(slot.price.toString()), 0) || 0;
     
     // Insert the booking
     const { data: bookingData, error: bookingError } = await supabase

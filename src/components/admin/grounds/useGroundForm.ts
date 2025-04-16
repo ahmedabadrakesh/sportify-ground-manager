@@ -5,7 +5,7 @@ import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { fetchGroundOwners, createGround } from "@/services/groundFormService";
-import { groundFormSchema, GroundFormValues } from "./groundFormSchema";
+import { groundSchema, GroundFormValues } from "./groundFormSchema";
 import { getCurrentUserSync, hasRoleSync } from "@/utils/auth";
 
 export const useGroundForm = (images?: File[]) => {
@@ -17,7 +17,7 @@ export const useGroundForm = (images?: File[]) => {
   const isSuperAdmin = hasRoleSync('super_admin');
 
   const form = useForm<GroundFormValues>({
-    resolver: zodResolver(groundFormSchema),
+    resolver: zodResolver(groundSchema),
     defaultValues: {
       name: "",
       description: "",
