@@ -20,10 +20,10 @@ export const createGround = async ({
     const gamesArray = values.games.split(',').map(game => game.trim());
     const facilitiesArray = values.facilities.split(',').map(facility => facility.trim());
     
-    // Create proper location object
+    // Simplify the location to a string address instead of coordinates
     const location = {
-      lat: 0,
-      lng: 0
+      address: values.address,
+      coordinates: null
     };
     
     // Determine the owner ID (current user ID for regular admins, selected owner for super admins)
@@ -35,8 +35,8 @@ export const createGround = async ({
     
     console.log("Inserting ground with owner_id:", ownerId);
     
-    // Using direct insert method with proper data formatting
-    const { data: directData, error: directError } = await supabase
+    // Using direct insert method with simplified data
+    const { data: groundData, error: insertError } = await supabase
       .from('grounds')
       .insert({
         name: values.name,
@@ -49,70 +49,32 @@ export const createGround = async ({
       })
       .select();
     
-    if (directError) {
-      console.log("Direct insert failed, trying with custom query...", directError);
-      
-      // If direct insert fails, try manual query method
-      // Since TypeScript doesn't know about our custom function, we need to use a type assertion
-      const { data: rpcData, error: rpcError } = await supabase.rpc(
-        'insert_ground' as any, // Type assertion to bypass TypeScript checking
-        {
-          name: values.name,
-          description: values.description,
-          address: values.address,
-          owner_id: ownerId,
-          games: gamesArray,
-          facilities: facilitiesArray,
-          // Pass the correctly typed location object
-          location_lat: location.lat,
-          location_lng: location.lng
-        }
-      );
-        
-      if (rpcError) {
-        console.error("RPC error:", rpcError);
-        throw new Error(rpcError.message || "Failed to create ground");
-      }
-      
-      console.log("Ground created successfully with ID:", rpcData);
-      return null; // We don't have the full ground object from the RPC function
+    if (insertError) {
+      console.error("Error creating ground:", insertError);
+      throw new Error(insertError.message || "Failed to create ground");
     }
     
-    console.log("Ground created successfully:", directData);
+    console.log("Ground created successfully:", groundData);
     
     // Convert the response data to our Ground type
-    if (directData && directData.length > 0) {
-      const groundData = directData[0];
-      
-      // Process location data safely
-      let locationData = { lat: 0, lng: 0 };
-      
-      if (groundData.location) {
-        // Check if location is an object and has lat/lng properties
-        const loc = groundData.location as any;
-        if (typeof loc === 'object' && loc !== null && 'lat' in loc && 'lng' in loc) {
-          locationData = {
-            lat: Number(loc.lat || 0),
-            lng: Number(loc.lng || 0)
-          };
-        }
-      }
+    if (groundData && groundData.length > 0) {
+      const ground = groundData[0];
       
       return {
-        id: groundData.id,
-        name: groundData.name,
-        description: groundData.description || '',
-        address: groundData.address,
-        location: locationData,
-        ownerId: groundData.owner_id,
+        id: ground.id,
+        name: ground.name,
+        description: ground.description || '',
+        address: ground.address,
+        location: { lat: 0, lng: 0 }, // Default location values since we're not using coordinates
+        ownerId: ground.owner_id,
         ownerName: 'Unknown Owner', // We don't have owner details in the response
         ownerContact: '',
         ownerWhatsapp: '',
-        games: groundData.games || [],
-        facilities: groundData.facilities || [],
-        images: groundData.images || [],
-        rating: groundData.rating || 0,
-        reviewCount: groundData.review_count || 0
+        games: ground.games || [],
+        facilities: ground.facilities || [],
+        images: ground.images || [],
+        rating: ground.rating || 0,
+        reviewCount: ground.review_count || 0
       };
     }
     

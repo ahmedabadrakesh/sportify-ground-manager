@@ -12,12 +12,27 @@ export const fetchGrounds = async ({ isSuperAdmin, currentUserId }: FetchGrounds
   try {
     console.log("Fetching grounds data...");
     
-    // TypeScript doesn't know about our custom function, so we need to use a type assertion
-    const { data, error } = await supabase
-      .rpc('get_all_grounds_with_owners' as any, { 
-        is_super_admin: isSuperAdmin,
-        current_user_id: currentUserId
-      });
+    // Direct query approach instead of using custom function
+    let query = supabase.from('grounds').select(`
+      id, 
+      name, 
+      description, 
+      address, 
+      location, 
+      owner_id, 
+      games, 
+      facilities, 
+      images, 
+      rating, 
+      review_count
+    `);
+    
+    // If not super admin, only show grounds owned by the current user
+    if (!isSuperAdmin && currentUserId) {
+      query = query.eq('owner_id', currentUserId);
+    }
+    
+    const { data, error } = await query;
     
     if (error) {
       console.error("Error fetching grounds:", error);
@@ -60,34 +75,17 @@ export const deleteGround = async (groundId: string) => {
 // Helper function to transform API data to Ground model
 const formatGroundsData = (data: any[]): Ground[] => {
   return data.map(ground => {
-    // Ensure location has lat and lng properties
-    let locationObj = { lat: 0, lng: 0 };
-    
-    // If location exists and is an object with lat/lng, use it
-    if (ground.location && typeof ground.location === 'object') {
-      try {
-        const loc = ground.location as Record<string, any>;
-        if ('lat' in loc && 'lng' in loc) {
-          locationObj = {
-            lat: Number(loc.lat),
-            lng: Number(loc.lng)
-          };
-        }
-      } catch (e) {
-        console.error("Error parsing location:", e);
-      }
-    }
-    
     return {
       id: ground.id,
       name: ground.name,
       description: ground.description || '',
       address: ground.address,
-      location: locationObj,
+      // Simplify location to just use default values
+      location: { lat: 0, lng: 0 },
       ownerId: ground.owner_id,
-      ownerName: ground.owner_name || 'Unknown Owner',
-      ownerContact: ground.owner_phone || '',
-      ownerWhatsapp: ground.owner_whatsapp || '',
+      ownerName: 'Unknown Owner', // We'll fetch this separately if needed
+      ownerContact: '',
+      ownerWhatsapp: '',
       games: ground.games || [],
       facilities: ground.facilities || [],
       images: ground.images || [],
