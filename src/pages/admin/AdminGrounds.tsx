@@ -18,8 +18,7 @@ const AdminGrounds: React.FC = () => {
     const checkAuth = async () => {
       const { data } = await supabase.auth.getSession();
       if (!data.session) {
-        // For demo purposes, show a toast instead of redirecting
-        console.warn("No active Supabase session found. Using local auth.");
+        console.log("No active Supabase session found. Using local auth fallback.");
       }
     };
     

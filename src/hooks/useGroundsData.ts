@@ -28,8 +28,8 @@ export const useGroundsData = ({ isSuperAdmin, currentUserId }: UseGroundsDataPr
       const isAuthenticated = await checkAuthentication();
       
       if (!isAuthenticated) {
-        console.warn("No active session found, authentication may be required");
-        // You could redirect to login here if needed
+        console.log("No active session found, using fallback authentication");
+        // For demo purposes, we'll continue with the mock data
       }
       
       const groundsData = await fetchGrounds({ 

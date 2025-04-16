@@ -453,6 +453,10 @@ export type Database = {
           whatsapp: string | null
         }[]
       }
+      get_auth_user_role: {
+        Args: Record<PropertyKey, never>
+        Returns: string
+      }
       is_super_admin: {
         Args: Record<PropertyKey, never>
         Returns: boolean
