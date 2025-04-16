@@ -28,7 +28,7 @@ const GroundOwners: React.FC = () => {
         
         console.log("Fetching ground owners...");
         
-        // Use the Postgres anonymous function to bypass RLS
+        // Use the Postgres security definer function to bypass RLS
         const { data, error } = await supabase
           .rpc('get_admin_users');
           
@@ -38,6 +38,7 @@ const GroundOwners: React.FC = () => {
         }
         
         console.log("Ground owners data:", data);
+        // TypeScript will accept this as data is an array or null
         setOwners(data || []);
       } catch (error: any) {
         console.error("Error fetching ground owners:", error);

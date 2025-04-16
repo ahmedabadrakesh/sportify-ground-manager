@@ -416,6 +416,43 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      add_admin_user: {
+        Args: {
+          user_name: string
+          user_email: string
+          user_phone: string
+          user_whatsapp: string
+        }
+        Returns: {
+          auth_id: string | null
+          created_at: string
+          email: string
+          id: string
+          name: string
+          phone: string | null
+          role: string
+          updated_at: string
+          whatsapp: string | null
+        }
+      }
+      delete_admin_user: {
+        Args: { user_id: string }
+        Returns: boolean
+      }
+      get_admin_users: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          auth_id: string | null
+          created_at: string
+          email: string
+          id: string
+          name: string
+          phone: string | null
+          role: string
+          updated_at: string
+          whatsapp: string | null
+        }[]
+      }
       is_super_admin: {
         Args: Record<PropertyKey, never>
         Returns: boolean

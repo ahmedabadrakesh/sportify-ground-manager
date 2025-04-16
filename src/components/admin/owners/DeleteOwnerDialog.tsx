@@ -43,8 +43,8 @@ const DeleteOwnerDialog: React.FC<DeleteOwnerDialogProps> = ({
       
       console.log("Deleting owner:", ownerToDelete);
       
-      // Use RPC to delete the user
-      const { error: deleteError } = await supabase
+      // Use the security definer function to delete the user
+      const { data: success, error: deleteError } = await supabase
         .rpc('delete_admin_user', { 
           user_id: ownerId 
         });
@@ -54,9 +54,14 @@ const DeleteOwnerDialog: React.FC<DeleteOwnerDialogProps> = ({
         throw deleteError;
       }
       
-      console.log("Owner deleted successfully");
-      onSuccess(ownerId);
-      toast.success(`Ground owner ${ownerToDelete.name} deleted successfully`);
+      console.log("Owner deleted successfully:", success);
+      
+      if (success) {
+        onSuccess(ownerId);
+        toast.success(`Ground owner ${ownerToDelete.name} deleted successfully`);
+      } else {
+        throw new Error("Failed to delete ground owner");
+      }
       
     } catch (error: any) {
       console.error("Error deleting ground owner:", error);

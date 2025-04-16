@@ -52,7 +52,7 @@ const AddOwnerForm: React.FC<AddOwnerFormProps> = ({ onSuccess, onCancel }) => {
         role: 'admin'
       });
       
-      // Use RPC function to add a user
+      // Use the security definer function to add a user
       const { data: userData, error: userError } = await supabase
         .rpc('add_admin_user', {
           user_name: formData.name,
