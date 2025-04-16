@@ -2,6 +2,7 @@
 import { supabase } from "@/integrations/supabase/client";
 import { Booking, TimeSlot } from "@/types/models";
 import { toast } from "sonner";
+import { formatTimeSlot } from "@/components/booking/TimeSlotFormatter";
 
 export const createBooking = async (
   groundId: string,
@@ -27,7 +28,7 @@ export const createBooking = async (
     // Fetch selected slots to calculate price
     const { data: slotsData, error: slotsError } = await supabase
       .from('time_slots')
-      .select('id, price')
+      .select('id, price, start_time, end_time')
       .in('id', slotIds);
     
     if (slotsError) {
@@ -40,12 +41,17 @@ export const createBooking = async (
     
     console.log("Total amount calculated:", totalAmount);
     
-    // Use a guest ID placeholder if userId is not in UUID format
+    // Use a guest ID if userId is not valid UUID; otherwise, use the provided userId
     const effectiveUserId = isValidUUID(userId) ? 
       userId : 
-      '00000000-0000-0000-0000-000000000000'; // Guest ID placeholder
+      '00000000-0000-0000-0000-000000000000'; // Guest user ID
     
     console.log("Using effectiveUserId:", effectiveUserId);
+    
+    // Create booking summary for toast notification
+    const timeSlotSummary = slotsData?.length 
+      ? `${slotsData.length} slots (${formatTimeSlot(slotsData[0].start_time, slotsData[slotsData.length-1].end_time)})`
+      : 'selected slots';
     
     // Insert the booking
     const { data: bookingData, error: bookingError } = await supabase
@@ -134,6 +140,9 @@ export const createBooking = async (
       bookingStatus: 'pending',
       createdAt: new Date().toISOString()
     };
+    
+    // Show success message with booking details
+    toast.success(`Booking created successfully for ${groundData?.name || 'ground'} on ${date}`);
     
     return newBooking;
   } catch (error) {
