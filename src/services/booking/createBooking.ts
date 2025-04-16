@@ -3,7 +3,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { Booking, TimeSlot } from "@/types/models";
 import { toast } from "sonner";
 
-// Create a booking
 export const createBooking = async (
   groundId: string,
   date: string,
@@ -13,72 +12,19 @@ export const createBooking = async (
   userId?: string
 ): Promise<Booking | null> => {
   try {
-    // Check if we're dealing with mock slots (client-side only)
-    const isMockBooking = slotIds.some(id => id.startsWith('mock-'));
-    
-    if (isMockBooking) {
-      // For mock bookings, create a client-side booking object
-      // This will be displayed to the user but not saved to the database
-      toast.success("Your booking request has been received. An admin will contact you to confirm.", {
-        duration: 5000,
-      });
-      
-      // Create mock slots based on the IDs
-      const mockSlots: TimeSlot[] = slotIds.map(id => {
-        const parts = id.split('-');
-        const hour = parseInt(parts[parts.length - 1]);
-        return {
-          id,
-          groundId,
-          date,
-          startTime: `${hour}:00`,
-          endTime: `${hour + 1}:00`,
-          isBooked: true,
-          price: hour < 12 ? 500 : hour < 17 ? 600 : 700
-        };
-      });
-      
-      // Calculate total amount from mock slots
-      const totalAmount = mockSlots.reduce((sum, slot) => sum + slot.price, 0);
-      
-      // Get ground name (if possible)
-      let groundName = "Selected Ground";
-      try {
-        const { data } = await supabase
-          .from('grounds')
-          .select('name')
-          .eq('id', groundId)
-          .single();
-          
-        if (data) {
-          groundName = data.name;
-        }
-      } catch (error) {
-        console.error("Error fetching ground name:", error);
-      }
-      
-      // Return a client-side booking object
-      return {
-        id: `mock-booking-${Date.now()}`,
-        userId: userId || '00000000-0000-0000-0000-000000000000',
-        userName,
-        userPhone,
-        groundId,
-        groundName,
-        date,
-        slots: mockSlots,
-        totalAmount,
-        paymentStatus: 'pending',
-        bookingStatus: 'pending',
-        createdAt: new Date().toISOString()
-      };
-    }
-    
-    // For real bookings, continue with the regular flow
+    console.log("Creating booking with params:", {
+      groundId,
+      date,
+      slotIds,
+      userName,
+      userPhone,
+      userId
+    });
+
     // Calculate total amount based on slot prices
     let totalAmount = 0;
     
-    // Get all selected slots to calculate price
+    // Fetch selected slots to calculate price
     const { data: slotsData, error: slotsError } = await supabase
       .from('time_slots')
       .select('id, price')
@@ -86,10 +32,13 @@ export const createBooking = async (
     
     if (slotsError) {
       console.error("Error fetching slot prices:", slotsError);
-      throw slotsError;
+      toast.error("Failed to fetch slot prices");
+      return null;
     }
     
     totalAmount = slotsData?.reduce((sum, slot) => sum + parseFloat(slot.price.toString()), 0) || 0;
+    
+    console.log("Total amount calculated:", totalAmount);
     
     // Insert the booking
     const { data: bookingData, error: bookingError } = await supabase
@@ -107,8 +56,11 @@ export const createBooking = async (
     
     if (bookingError) {
       console.error("Error creating booking:", bookingError);
-      throw bookingError;
+      toast.error("Failed to create booking");
+      return null;
     }
+    
+    console.log("Booking created:", bookingData);
     
     // Link the slots to the booking
     const bookingSlots = slotIds.map(slotId => ({
@@ -122,7 +74,8 @@ export const createBooking = async (
     
     if (joinError) {
       console.error("Error linking slots to booking:", joinError);
-      throw joinError;
+      toast.error("Failed to link time slots");
+      return null;
     }
     
     // Mark the slots as booked
@@ -177,7 +130,8 @@ export const createBooking = async (
     
     return newBooking;
   } catch (error) {
-    console.error("Error in createBooking:", error);
+    console.error("Unexpected error in createBooking:", error);
+    toast.error("An unexpected error occurred while creating the booking");
     return null;
   }
 };
