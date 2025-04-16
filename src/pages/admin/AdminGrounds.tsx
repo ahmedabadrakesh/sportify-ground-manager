@@ -28,32 +28,23 @@ const AdminGrounds: React.FC = () => {
       setLoading(true);
       console.log("Fetching grounds data...");
       
-      // Try to fetch grounds directly first
-      let { data, error } = await supabase
-        .from('grounds')
-        .select(`
-          id,
-          name,
-          description,
-          address,
-          location,
-          owner_id,
-          games,
-          facilities,
-          images,
-          rating,
-          review_count,
-          users:owner_id (name, phone, whatsapp)
-        `);
-      
-      // If not super admin, only fetch grounds owned by the current user
-      if (!isSuperAdmin && currentUser?.id) {
-        data = data?.filter(ground => ground.owner_id === currentUser.id) || [];
-      }
+      // Use the RPC function to fetch grounds safely
+      const { data, error } = await supabase
+        .rpc('get_all_grounds_with_owners', { 
+          is_super_admin: isSuperAdmin,
+          current_user_id: currentUser?.id
+        });
       
       if (error) {
         console.error("Error fetching grounds:", error);
-        // If there's an error, fall back to mock data 
+        
+        // Try direct query as fallback
+        const directQueryResult = await fetchGroundsDirectly();
+        if (directQueryResult.length > 0) {
+          return;
+        }
+        
+        // If both methods fail, fall back to mock data
         import("@/data/mockData").then(({ grounds: mockGrounds }) => {
           console.log("Using mock ground data");
           const filteredGrounds = isSuperAdmin 
@@ -74,12 +65,98 @@ const AdminGrounds: React.FC = () => {
         
         // If location exists and is an object with lat/lng, use it
         if (ground.location && typeof ground.location === 'object') {
-          const loc = ground.location as Record<string, any>;
-          if ('lat' in loc && 'lng' in loc) {
-            locationObj = {
-              lat: Number(loc.lat),
-              lng: Number(loc.lng)
-            };
+          try {
+            const loc = ground.location as Record<string, any>;
+            if ('lat' in loc && 'lng' in loc) {
+              locationObj = {
+                lat: Number(loc.lat),
+                lng: Number(loc.lng)
+              };
+            }
+          } catch (e) {
+            console.error("Error parsing location:", e);
+          }
+        }
+        
+        return {
+          id: ground.id,
+          name: ground.name,
+          description: ground.description || '',
+          address: ground.address,
+          location: locationObj,
+          ownerId: ground.owner_id,
+          ownerName: ground.owner_name || 'Unknown Owner',
+          ownerContact: ground.owner_phone || '',
+          ownerWhatsapp: ground.owner_whatsapp || '',
+          games: ground.games || [],
+          facilities: ground.facilities || [],
+          images: ground.images || [],
+          rating: ground.rating || 0,
+          reviewCount: ground.review_count || 0
+        };
+      });
+      
+      setGrounds(formattedGrounds);
+      setLoading(false);
+    } catch (error) {
+      console.error("Error fetching grounds:", error);
+      toast.error("Failed to load grounds data");
+      setLoading(false);
+    }
+  };
+  
+  // Fallback method to fetch grounds directly
+  const fetchGroundsDirectly = async () => {
+    try {
+      console.log("Attempting direct grounds query...");
+      
+      let query = supabase
+        .from('grounds')
+        .select(`
+          id,
+          name,
+          description,
+          address,
+          location,
+          owner_id,
+          games,
+          facilities,
+          images,
+          rating,
+          review_count,
+          users:owner_id (name, phone, whatsapp)
+        `);
+      
+      // If not super admin, only fetch grounds owned by the current user
+      if (!isSuperAdmin && currentUser?.id) {
+        query = query.eq('owner_id', currentUser.id);
+      }
+      
+      const { data, error } = await query;
+      
+      if (error) {
+        console.error("Direct query error:", error);
+        return [];
+      }
+      
+      console.log("Direct query grounds data:", data);
+      
+      const formattedGrounds: Ground[] = data.map(ground => {
+        // Ensure location has lat and lng properties
+        let locationObj = { lat: 0, lng: 0 };
+        
+        // If location exists and is an object with lat/lng, use it
+        if (ground.location && typeof ground.location === 'object') {
+          try {
+            const loc = ground.location as Record<string, any>;
+            if ('lat' in loc && 'lng' in loc) {
+              locationObj = {
+                lat: Number(loc.lat),
+                lng: Number(loc.lng)
+              };
+            }
+          } catch (e) {
+            console.error("Error parsing location:", e);
           }
         }
         
@@ -103,10 +180,10 @@ const AdminGrounds: React.FC = () => {
       
       setGrounds(formattedGrounds);
       setLoading(false);
+      return formattedGrounds;
     } catch (error) {
-      console.error("Error fetching grounds:", error);
-      toast.error("Failed to load grounds data");
-      setLoading(false);
+      console.error("Error in direct grounds query:", error);
+      return [];
     }
   };
   

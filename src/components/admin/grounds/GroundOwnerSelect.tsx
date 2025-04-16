@@ -31,7 +31,7 @@ const GroundOwnerSelect: React.FC<GroundOwnerSelectProps> = ({ form, owners }) =
     if (hasOwners && !form.getValues().ownerId) {
       form.setValue('ownerId', owners[0].id);
     }
-  }, [owners, form]);
+  }, [owners, form, hasOwners]);
 
   return (
     <FormField
@@ -43,7 +43,8 @@ const GroundOwnerSelect: React.FC<GroundOwnerSelectProps> = ({ form, owners }) =
           <Select 
             onValueChange={field.onChange} 
             defaultValue={field.value}
-            value={field.value}
+            value={field.value || undefined}
+            disabled={!hasOwners}
           >
             <FormControl>
               <SelectTrigger>
