@@ -87,7 +87,7 @@ export const fetchGroundOwners = async (): Promise<any[]> => {
   try {
     console.log("Fetching ground owners...");
     
-    // Use the Postgres security definer function to bypass RLS
+    // Use the Postgres security definer function to get admin users
     const { data, error } = await supabase
       .rpc('get_admin_users');
       

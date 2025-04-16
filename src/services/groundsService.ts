@@ -10,10 +10,8 @@ interface FetchGroundsOptions {
 
 export const fetchGrounds = async ({ isSuperAdmin, currentUserId }: FetchGroundsOptions) => {
   try {
-    console.log("Fetching grounds data with auth...");
+    console.log("Fetching grounds data...");
     
-    // With our RLS policies in place, we can simplify our query
-    // The policies will automatically filter results based on user role
     let query = supabase.from('grounds').select(`
       id, 
       name, 
@@ -28,7 +26,11 @@ export const fetchGrounds = async ({ isSuperAdmin, currentUserId }: FetchGrounds
       review_count
     `);
     
-    // The RLS policies will handle permissions correctly now
+    // If not super admin, we filter by owner_id
+    if (!isSuperAdmin && currentUserId) {
+      query = query.eq('owner_id', currentUserId);
+    }
+    
     const { data, error } = await query;
     
     if (error) {
@@ -52,7 +54,6 @@ export const fetchGrounds = async ({ isSuperAdmin, currentUserId }: FetchGrounds
 
 export const deleteGround = async (groundId: string) => {
   try {
-    // The RLS policies will ensure only authorized users can delete
     const { error } = await supabase
       .from('grounds')
       .delete()
