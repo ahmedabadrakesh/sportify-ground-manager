@@ -21,6 +21,7 @@ import Index from "./pages/Index";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import GroundOwners from "./pages/admin/GroundOwners";
 import AdminGrounds from "./pages/admin/AdminGrounds";
+import AddGround from "./pages/admin/AddGround";
 import AdminBookings from "./pages/admin/AdminBookings";
 import AdminInventory from "./pages/admin/AdminInventory";
 import InventoryAllocate from "./pages/admin/InventoryAllocate";
@@ -54,6 +55,7 @@ const App = () => {
             <Route path="/admin" element={<AdminDashboard />} />
             <Route path="/admin/ground-owners" element={<GroundOwners />} />
             <Route path="/admin/grounds" element={<AdminGrounds />} />
+            <Route path="/admin/grounds/add" element={<AddGround />} />
             <Route path="/admin/bookings" element={<AdminBookings />} />
             <Route path="/admin/inventory" element={<AdminInventory />} />
             <Route path="/admin/inventory/allocate" element={<InventoryAllocate />} />
