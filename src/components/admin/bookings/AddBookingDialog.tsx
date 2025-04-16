@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { format } from "date-fns";
 import { Calendar as CalendarIcon } from "lucide-react";
@@ -19,7 +18,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import TimeSlotPicker from "@/components/booking/TimeSlotPicker";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Ground, TimeSlot } from "@/types/models";
-import { getAvailableTimeSlots, createBooking } from "@/services/bookingService";
+import { getAvailableTimeSlots, createBooking } from "@/services/booking";
 
 interface AddBookingDialogProps {
   isOpen: boolean;

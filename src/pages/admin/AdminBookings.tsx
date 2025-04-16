@@ -4,7 +4,7 @@ import { Calendar } from "lucide-react";
 import AdminLayout from "@/components/layouts/AdminLayout";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { fetchBookings, cancelBooking } from "@/services/bookingService";
+import { fetchBookings, cancelBooking } from "@/services/booking";
 import { fetchGrounds } from "@/services/groundsService";
 import { getCurrentUserSync, hasRoleSync } from "@/utils/auth";
 import { toast } from "sonner";
