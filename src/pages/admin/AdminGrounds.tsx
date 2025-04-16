@@ -55,22 +55,38 @@ const AdminGrounds: React.FC = () => {
       }
       
       // Transform the data to match the Ground model
-      const formattedGrounds: Ground[] = data.map(ground => ({
-        id: ground.id,
-        name: ground.name,
-        description: ground.description || '',
-        address: ground.address,
-        location: ground.location || { lat: 0, lng: 0 },
-        ownerId: ground.owner_id,
-        ownerName: ground.users?.name || 'Unknown Owner',
-        ownerContact: ground.users?.phone || '',
-        ownerWhatsapp: ground.users?.whatsapp || '',
-        games: ground.games || [],
-        facilities: ground.facilities || [],
-        images: ground.images || [],
-        rating: ground.rating || 0,
-        reviewCount: ground.review_count || 0
-      }));
+      const formattedGrounds: Ground[] = data.map(ground => {
+        // Ensure location has lat and lng properties
+        let locationObj = { lat: 0, lng: 0 };
+        
+        // If location exists and is an object with lat/lng, use it
+        if (ground.location && typeof ground.location === 'object') {
+          const loc = ground.location as Record<string, any>;
+          if ('lat' in loc && 'lng' in loc) {
+            locationObj = {
+              lat: Number(loc.lat),
+              lng: Number(loc.lng)
+            };
+          }
+        }
+        
+        return {
+          id: ground.id,
+          name: ground.name,
+          description: ground.description || '',
+          address: ground.address,
+          location: locationObj,
+          ownerId: ground.owner_id,
+          ownerName: ground.users?.name || 'Unknown Owner',
+          ownerContact: ground.users?.phone || '',
+          ownerWhatsapp: ground.users?.whatsapp || '',
+          games: ground.games || [],
+          facilities: ground.facilities || [],
+          images: ground.images || [],
+          rating: ground.rating || 0,
+          reviewCount: ground.review_count || 0
+        };
+      });
       
       setGrounds(formattedGrounds);
       setLoading(false);
