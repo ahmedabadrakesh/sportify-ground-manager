@@ -20,6 +20,7 @@ const AdminBookings: React.FC = () => {
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [grounds, setGrounds] = useState<Ground[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   
   const currentUser = getCurrentUserSync();
   const isSuperAdmin = hasRoleSync('super_admin');
@@ -27,6 +28,7 @@ const AdminBookings: React.FC = () => {
   const fetchData = async () => {
     try {
       setLoading(true);
+      setError(null);
       
       // Fetch grounds first
       const groundsData = await fetchGrounds({ 
@@ -40,6 +42,7 @@ const AdminBookings: React.FC = () => {
       setBookings(bookingsData);
     } catch (error) {
       console.error("Error fetching data:", error);
+      setError("Failed to load data. Please try again later.");
       toast.error("Failed to load data");
     } finally {
       setLoading(false);
@@ -47,8 +50,9 @@ const AdminBookings: React.FC = () => {
   };
   
   useEffect(() => {
+    // Only fetch data on initial mount, not on every render
     fetchData();
-  }, [currentUser, isSuperAdmin]);
+  }, []);
   
   const handleCancelBooking = async (bookingId: string) => {
     try {
@@ -110,6 +114,13 @@ const AdminBookings: React.FC = () => {
               </div>
             </div>
           </div>
+        </div>
+      ) : error ? (
+        <div className="bg-red-50 border border-red-200 rounded-lg p-6 text-center">
+          <p className="text-red-600 mb-4">{error}</p>
+          <Button onClick={fetchData} variant="outline">
+            Try Again
+          </Button>
         </div>
       ) : (
         <BookingsTable 

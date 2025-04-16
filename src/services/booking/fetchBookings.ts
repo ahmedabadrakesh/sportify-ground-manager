@@ -37,10 +37,15 @@ export const fetchBookings = async (options?: { groundId?: string, userId?: stri
     
     console.log("Booking data fetched:", data);
     
+    // If no bookings found, return empty array early
+    if (!data || data.length === 0) {
+      return [];
+    }
+    
     // Now fetch related data to build complete booking objects
     const bookings: Booking[] = [];
     
-    for (const bookingData of data || []) {
+    for (const bookingData of data) {
       try {
         // Get ground details
         const { data: groundData } = await supabase
@@ -107,6 +112,6 @@ export const fetchBookings = async (options?: { groundId?: string, userId?: stri
     return bookings;
   } catch (error) {
     console.error("Error in fetchBookings:", error);
-    throw error;
+    return []; // Return empty array instead of throwing to avoid infinite loops
   }
 };
