@@ -1,5 +1,5 @@
 
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -9,10 +9,12 @@ import GroundBasicDetails from "@/components/admin/grounds/GroundBasicDetails";
 import GroundFeatures from "@/components/admin/grounds/GroundFeatures";
 import GroundOwnerSelect from "@/components/admin/grounds/GroundOwnerSelect";
 import GroundFormActions from "@/components/admin/grounds/GroundFormActions";
+import GroundImageUpload from "@/components/admin/grounds/GroundImageUpload";
 import { useGroundForm } from "@/components/admin/grounds/useGroundForm";
 
 const AddGround: React.FC = () => {
   const navigate = useNavigate();
+  const [selectedImages, setSelectedImages] = useState<File[]>([]);
   const { 
     form, 
     isLoading, 
@@ -20,11 +22,15 @@ const AddGround: React.FC = () => {
     isSuperAdmin, 
     fetchOwners, 
     onSubmit 
-  } = useGroundForm();
+  } = useGroundForm(selectedImages);
 
   useEffect(() => {
     fetchOwners();
   }, []);
+
+  const handleImagesChange = (files: File[]) => {
+    setSelectedImages(files);
+  };
 
   return (
     <AdminLayout>
@@ -61,6 +67,9 @@ const AddGround: React.FC = () => {
               </div>
 
               <GroundFeatures form={form} />
+
+              {/* Add the new image upload component */}
+              <GroundImageUpload onImagesChange={handleImagesChange} />
               
               <GroundFormActions 
                 isLoading={isLoading} 

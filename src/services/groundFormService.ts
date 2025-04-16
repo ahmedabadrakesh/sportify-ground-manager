@@ -8,12 +8,14 @@ interface CreateGroundParams {
   values: GroundFormValues;
   isSuperAdmin: boolean;
   currentUserId?: string;
+  images?: File[];
 }
 
 export const createGround = async ({ 
   values, 
   isSuperAdmin, 
-  currentUserId 
+  currentUserId,
+  images = []
 }: CreateGroundParams): Promise<Ground | null> => {
   try {
     // Format the games and facilities as arrays
@@ -32,6 +34,37 @@ export const createGround = async ({
     // Create a simplified location object that just stores the address
     const locationData = { address: values.address };
     
+    // Handle image uploads if any
+    const imageUrls: string[] = [];
+    
+    if (images && images.length > 0) {
+      for (let i = 0; i < images.length; i++) {
+        const file = images[i];
+        const fileExt = file.name.split('.').pop();
+        const fileName = `${Date.now()}-${i}.${fileExt}`;
+        const filePath = `grounds/${ownerId}/${fileName}`;
+        
+        // Upload the image to Supabase Storage
+        const { error: uploadError } = await supabase.storage
+          .from('grounds')
+          .upload(filePath, file);
+        
+        if (uploadError) {
+          console.error("Error uploading image:", uploadError);
+          continue; // Skip this image but continue with others
+        }
+        
+        // Get the public URL for the uploaded image
+        const { data: urlData } = supabase.storage
+          .from('grounds')
+          .getPublicUrl(filePath);
+        
+        if (urlData?.publicUrl) {
+          imageUrls.push(urlData.publicUrl);
+        }
+      }
+    }
+    
     // Using direct insert method with simplified data
     const { data: groundData, error: insertError } = await supabase
       .from('grounds')
@@ -42,7 +75,8 @@ export const createGround = async ({
         owner_id: ownerId,
         games: gamesArray,
         facilities: facilitiesArray,
-        location: locationData
+        location: locationData,
+        images: imageUrls
       })
       .select();
     

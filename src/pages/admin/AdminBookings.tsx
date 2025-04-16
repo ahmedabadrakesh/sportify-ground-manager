@@ -28,8 +28,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import TimeSlotPicker from "@/components/booking/TimeSlotPicker";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { cancelBooking, createBooking, getAvailableTimeSlots } from "@/utils/booking";
+import { fetchBookings, getAvailableTimeSlots, createBooking, cancelBooking } from "@/services/bookingService";
 import { getCurrentUserSync, hasRoleSync } from "@/utils/auth";
+import { Skeleton } from "@/components/ui/skeleton";
+import { fetchGrounds } from "@/services/groundsService";
 import { toast } from "sonner";
 import { Booking, Ground } from "@/types/models";
 
@@ -83,6 +85,8 @@ const AdminBookings: React.FC = () => {
   const [customerName, setCustomerName] = useState("");
   const [customerPhone, setCustomerPhone] = useState("");
   const [selectedSlots, setSelectedSlots] = useState<string[]>([]);
+  const [availableSlots, setAvailableSlots] = useState<any[]>([]);
+  const [loadingSlots, setLoadingSlots] = useState(false);
   
   const currentUser = getCurrentUserSync();
   const isSuperAdmin = hasRoleSync('super_admin');
@@ -90,33 +94,48 @@ const AdminBookings: React.FC = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        setTimeout(async () => {
-          const { bookings: allBookings, grounds: allGrounds } = await import("@/data/mockData");
-          
-          let userBookings = isSuperAdmin
-            ? allBookings
-            : allBookings.filter(booking => {
-                const ground = allGrounds.find(g => g.id === booking.groundId);
-                return ground?.ownerId === currentUser?.id;
-              });
-          
-          let userGrounds = isSuperAdmin
-            ? allGrounds
-            : allGrounds.filter(ground => ground.ownerId === currentUser?.id);
-          
-          setBookings(userBookings);
-          setGrounds(userGrounds);
-          setLoading(false);
-        }, 500);
+        setLoading(true);
+        
+        // Fetch grounds first
+        const groundsData = await fetchGrounds({ 
+          isSuperAdmin, 
+          currentUserId: currentUser?.id 
+        });
+        setGrounds(groundsData);
+        
+        // Then fetch bookings
+        const bookingsData = await fetchBookings();
+        setBookings(bookingsData);
       } catch (error) {
         console.error("Error fetching data:", error);
         toast.error("Failed to load data");
+      } finally {
         setLoading(false);
       }
     };
     
     fetchData();
   }, [currentUser, isSuperAdmin]);
+  
+  useEffect(() => {
+    const fetchTimeSlots = async () => {
+      if (selectedGround && selectedDate) {
+        setLoadingSlots(true);
+        try {
+          const formattedDate = format(selectedDate, "yyyy-MM-dd");
+          const slots = await getAvailableTimeSlots(selectedGround, formattedDate);
+          setAvailableSlots(slots);
+        } catch (error) {
+          console.error("Error fetching time slots:", error);
+          toast.error("Failed to load time slots");
+        } finally {
+          setLoadingSlots(false);
+        }
+      }
+    };
+    
+    fetchTimeSlots();
+  }, [selectedGround, selectedDate]);
   
   const handleGroundChange = (groundId: string) => {
     setSelectedGround(groundId);
@@ -138,7 +157,7 @@ const AdminBookings: React.FC = () => {
     );
   };
   
-  const handleAddBooking = () => {
+  const handleAddBooking = async () => {
     if (!selectedGround || !selectedDate || !customerName || !customerPhone || selectedSlots.length === 0) {
       toast.error("Please fill in all required fields and select at least one slot");
       return;
@@ -147,12 +166,13 @@ const AdminBookings: React.FC = () => {
     const formattedDate = format(selectedDate, "yyyy-MM-dd");
     
     try {
-      const newBooking = createBooking(
+      const newBooking = await createBooking(
         selectedGround,
         formattedDate,
         selectedSlots,
         customerName,
-        customerPhone
+        customerPhone,
+        currentUser?.id
       );
       
       if (newBooking) {
@@ -170,9 +190,9 @@ const AdminBookings: React.FC = () => {
     }
   };
   
-  const handleCancelBooking = (bookingId: string) => {
+  const handleCancelBooking = async (bookingId: string) => {
     try {
-      const cancelled = cancelBooking(bookingId);
+      const cancelled = await cancelBooking(bookingId);
       
       if (cancelled) {
         setBookings(prevBookings => 
@@ -313,14 +333,22 @@ const AdminBookings: React.FC = () => {
               </div>
               
               {selectedGround && selectedDate && (
-                <TimeSlotPicker
-                  slots={getAvailableTimeSlots(
-                    selectedGround,
-                    format(selectedDate, "yyyy-MM-dd")
-                  )}
-                  selectedSlots={selectedSlots}
-                  onSelectSlot={handleSelectSlot}
-                />
+                loadingSlots ? (
+                  <div className="space-y-2">
+                    <p className="text-sm text-gray-500">Loading available time slots...</p>
+                    <div className="grid grid-cols-3 gap-2">
+                      {[1, 2, 3, 4, 5, 6].map((i) => (
+                        <Skeleton key={i} className="h-12 w-full" />
+                      ))}
+                    </div>
+                  </div>
+                ) : (
+                  <TimeSlotPicker
+                    slots={availableSlots}
+                    selectedSlots={selectedSlots}
+                    onSelectSlot={handleSelectSlot}
+                  />
+                )
               )}
               
               <div className="flex justify-end space-x-2">
@@ -341,8 +369,17 @@ const AdminBookings: React.FC = () => {
       </div>
 
       {loading ? (
-        <div className="text-center py-8">
-          <p className="text-gray-500">Loading bookings data...</p>
+        <div className="space-y-4">
+          <div className="bg-white rounded-lg shadow-sm overflow-hidden border">
+            <div className="p-6">
+              <Skeleton className="h-8 w-64 mb-4" />
+              <div className="space-y-3">
+                <Skeleton className="h-5 w-full" />
+                <Skeleton className="h-5 w-full" />
+                <Skeleton className="h-5 w-3/4" />
+              </div>
+            </div>
+          </div>
         </div>
       ) : (
         <div className="bg-white rounded-lg shadow-sm overflow-hidden border">
@@ -385,7 +422,7 @@ const AdminBookings: React.FC = () => {
                         <div className="flex flex-col">
                           <div className="flex items-center">
                             <Calendar className="h-3.5 w-3.5 mr-1 text-gray-500" />
-                            {format(parseISO(booking.date), "dd MMM yyyy")}
+                            {format(new Date(booking.date), "dd MMM yyyy")}
                           </div>
                           <div className="text-sm text-gray-500">
                             {renderTimeSlotInfo(booking)}
@@ -439,7 +476,7 @@ const AdminBookings: React.FC = () => {
                     Booking Date
                   </h3>
                   <p>
-                    {format(parseISO(selectedBooking.date), "PPP")}
+                    {format(new Date(selectedBooking.date), "PPP")}
                   </p>
                 </div>
                 <div>
