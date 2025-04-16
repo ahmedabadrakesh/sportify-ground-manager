@@ -84,15 +84,19 @@ export const createGround = async ({
     if (directData && directData.length > 0) {
       const groundData = directData[0];
       
-      // Ensure location has the correct type
-      const locationData = groundData.location ? 
-        (typeof groundData.location === 'object' ? 
-          {
-            lat: Number(groundData.location.lat || 0),
-            lng: Number(groundData.location.lng || 0)
-          } : 
-          { lat: 0, lng: 0 }) : 
-        { lat: 0, lng: 0 };
+      // Process location data safely
+      let locationData = { lat: 0, lng: 0 };
+      
+      if (groundData.location) {
+        // Check if location is an object and has lat/lng properties
+        const loc = groundData.location as any;
+        if (typeof loc === 'object' && loc !== null && 'lat' in loc && 'lng' in loc) {
+          locationData = {
+            lat: Number(loc.lat || 0),
+            lng: Number(loc.lng || 0)
+          };
+        }
+      }
       
       return {
         id: groundData.id,
