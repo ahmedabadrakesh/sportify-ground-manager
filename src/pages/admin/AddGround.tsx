@@ -7,7 +7,6 @@ import AdminLayout from "@/components/layouts/AdminLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
 import { 
   Form,
   FormControl,
@@ -71,12 +70,14 @@ const AddGround: React.FC = () => {
         
         if (error) {
           console.error("Error fetching ground owners:", error);
+          toast.error("Failed to fetch ground owners");
           return;
         }
         
         setOwners(data || []);
       } catch (error) {
         console.error("Error fetching ground owners:", error);
+        toast.error("Failed to fetch ground owners");
       }
     };
     
@@ -87,15 +88,33 @@ const AddGround: React.FC = () => {
     setIsLoading(true);
     
     try {
+      // Get the current user's session to ensure we're authenticated
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (!session) {
+        toast.error("You must be logged in to create a ground");
+        navigate("/login");
+        return;
+      }
+      
       // Format the games and facilities as arrays
       const gamesArray = values.games.split(',').map(game => game.trim());
       const facilitiesArray = values.facilities.split(',').map(facility => facility.trim());
       
-      // Create the location object (placeholder values)
+      // Use placeholder location values - in a real app, you'd want to get these from a map component
       const location = {
         lat: 0,
         lng: 0
       };
+      
+      // Determine the owner ID (current user ID for regular admins, selected owner for super admins)
+      const ownerId = isSuperAdmin ? values.ownerId : currentUser?.id;
+      
+      if (!ownerId) {
+        throw new Error("Owner ID is required");
+      }
+      
+      console.log("Inserting ground with owner_id:", ownerId);
       
       // Insert the ground into Supabase
       const { data, error } = await supabase
@@ -104,7 +123,7 @@ const AddGround: React.FC = () => {
           name: values.name,
           description: values.description,
           address: values.address,
-          owner_id: isSuperAdmin ? values.ownerId : currentUser?.id,
+          owner_id: ownerId,
           games: gamesArray,
           facilities: facilitiesArray,
           location
@@ -112,7 +131,8 @@ const AddGround: React.FC = () => {
         .select();
       
       if (error) {
-        throw error;
+        console.error("Supabase error:", error);
+        throw new Error(error.message || "Failed to create ground");
       }
       
       toast.success("Ground created successfully!");
