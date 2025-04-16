@@ -40,11 +40,18 @@ export const createBooking = async (
     
     console.log("Total amount calculated:", totalAmount);
     
+    // Use a guest ID placeholder if userId is not in UUID format
+    const effectiveUserId = isValidUUID(userId) ? 
+      userId : 
+      '00000000-0000-0000-0000-000000000000'; // Guest ID placeholder
+    
+    console.log("Using effectiveUserId:", effectiveUserId);
+    
     // Insert the booking
     const { data: bookingData, error: bookingError } = await supabase
       .from('bookings')
       .insert({
-        user_id: userId || '00000000-0000-0000-0000-000000000000', // Guest ID placeholder
+        user_id: effectiveUserId,
         ground_id: groundId,
         date: date,
         total_amount: totalAmount,
@@ -115,7 +122,7 @@ export const createBooking = async (
     
     const newBooking: Booking = {
       id: bookingData.id,
-      userId: userId || '00000000-0000-0000-0000-000000000000',
+      userId: effectiveUserId,
       userName: userName,
       userPhone: userPhone,
       groundId: groundId,
@@ -135,3 +142,12 @@ export const createBooking = async (
     return null;
   }
 };
+
+// Helper function to validate UUID format
+function isValidUUID(str?: string): boolean {
+  if (!str) return false;
+  
+  // UUID regex pattern
+  const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+  return uuidPattern.test(str);
+}
