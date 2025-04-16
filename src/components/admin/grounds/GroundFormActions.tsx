@@ -2,16 +2,17 @@
 import React from "react";
 import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
-import { UseFormReturn } from "react-hook-form";
 
 interface GroundFormActionsProps {
   isLoading: boolean;
   onCancel: () => void;
+  isEditMode?: boolean;
 }
 
 const GroundFormActions: React.FC<GroundFormActionsProps> = ({ 
   isLoading, 
-  onCancel 
+  onCancel,
+  isEditMode = false
 }) => {
   return (
     <div className="flex justify-end">
@@ -27,10 +28,10 @@ const GroundFormActions: React.FC<GroundFormActionsProps> = ({
         {isLoading ? (
           <>
             <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-            Creating...
+            {isEditMode ? "Updating..." : "Creating..."}
           </>
         ) : (
-          "Create Ground"
+          isEditMode ? "Update Ground" : "Create Ground"
         )}
       </Button>
     </div>

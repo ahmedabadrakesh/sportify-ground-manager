@@ -1,6 +1,12 @@
 
 import React from "react";
-import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
+import {
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage
+} from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { UseFormReturn } from "react-hook-form";
 import { GroundFormValues } from "./groundFormSchema";
@@ -20,7 +26,7 @@ const GroundFeatures: React.FC<GroundFeaturesProps> = ({ form }) => {
             <FormLabel>Games</FormLabel>
             <FormControl>
               <Input 
-                placeholder="Cricket, Football, etc. (comma separated)" 
+                placeholder="e.g. Cricket, Football, Basketball (comma separated)" 
                 {...field} 
               />
             </FormControl>
@@ -37,7 +43,7 @@ const GroundFeatures: React.FC<GroundFeaturesProps> = ({ form }) => {
             <FormLabel>Facilities</FormLabel>
             <FormControl>
               <Input 
-                placeholder="Parking, Canteen, etc. (comma separated)" 
+                placeholder="e.g. Changing Room, Parking, Floodlights (comma separated)" 
                 {...field} 
               />
             </FormControl>

@@ -8,6 +8,7 @@ import GroundsTable from "@/components/grounds/GroundsTable";
 import { Ground } from "@/types/models";
 import { getCurrentUserSync, hasRoleSync } from "@/utils/auth";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 
 const AdminGrounds: React.FC = () => {
   const navigate = useNavigate();
@@ -18,37 +19,88 @@ const AdminGrounds: React.FC = () => {
   const isSuperAdmin = hasRoleSync('super_admin');
   
   useEffect(() => {
-    // Fetch grounds data from API
-    const fetchGrounds = async () => {
-      try {
-        // In a real app, this would be an API call
-        // For demo, we'll simulate API fetch with timeout
-        setTimeout(() => {
-          // Import dynamically to avoid circular dependencies
-          import("@/data/mockData").then(({ grounds }) => {
-            // Filter grounds based on user role
-            const userGrounds = isSuperAdmin
-              ? grounds
-              : grounds.filter(ground => ground.ownerId === currentUser?.id);
-            
-            setGrounds(userGrounds);
-            setLoading(false);
-          });
-        }, 500);
-      } catch (error) {
+    fetchGrounds();
+  }, []);
+  
+  // Fetch grounds from Supabase
+  const fetchGrounds = async () => {
+    try {
+      let query = supabase.from('grounds').select(`
+        id,
+        name,
+        description,
+        address,
+        location,
+        owner_id,
+        games,
+        facilities,
+        images,
+        rating,
+        review_count,
+        users:owner_id (name, phone, whatsapp)
+      `);
+      
+      // If not super admin, only fetch grounds owned by the current user
+      if (!isSuperAdmin && currentUser?.id) {
+        query = query.eq('owner_id', currentUser.id);
+      }
+      
+      const { data, error } = await query;
+      
+      if (error) {
         console.error("Error fetching grounds:", error);
         toast.error("Failed to load grounds data");
         setLoading(false);
+        return;
       }
-    };
-    
-    fetchGrounds();
-  }, [currentUser, isSuperAdmin]);
+      
+      // Transform the data to match the Ground model
+      const formattedGrounds: Ground[] = data.map(ground => ({
+        id: ground.id,
+        name: ground.name,
+        description: ground.description || '',
+        address: ground.address,
+        location: ground.location || { lat: 0, lng: 0 },
+        ownerId: ground.owner_id,
+        ownerName: ground.users?.name || 'Unknown Owner',
+        ownerContact: ground.users?.phone || '',
+        ownerWhatsapp: ground.users?.whatsapp || '',
+        games: ground.games || [],
+        facilities: ground.facilities || [],
+        images: ground.images || [],
+        rating: ground.rating || 0,
+        reviewCount: ground.review_count || 0
+      }));
+      
+      setGrounds(formattedGrounds);
+      setLoading(false);
+    } catch (error) {
+      console.error("Error fetching grounds:", error);
+      toast.error("Failed to load grounds data");
+      setLoading(false);
+    }
+  };
   
-  const handleDeleteGround = (groundId: string) => {
-    // In a real app, we would call an API to delete the ground
-    // For demo, we'll just update the state
-    setGrounds(prevGrounds => prevGrounds.filter(ground => ground.id !== groundId));
+  const handleDeleteGround = async (groundId: string) => {
+    try {
+      const { error } = await supabase
+        .from('grounds')
+        .delete()
+        .eq('id', groundId);
+      
+      if (error) {
+        console.error("Error deleting ground:", error);
+        toast.error("Failed to delete ground");
+        return;
+      }
+      
+      // Update the state after successful deletion
+      setGrounds(prevGrounds => prevGrounds.filter(ground => ground.id !== groundId));
+      toast.success("Ground deleted successfully");
+    } catch (error) {
+      console.error("Error deleting ground:", error);
+      toast.error("Failed to delete ground");
+    }
   };
 
   return (

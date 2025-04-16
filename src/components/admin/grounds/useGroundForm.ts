@@ -33,7 +33,11 @@ export const useGroundForm = () => {
     if (!isSuperAdmin) return;
     
     try {
-      const { data, error } = await supabase.rpc('get_admin_users');
+      // For super admin, fetch all admin users to assign as ground owner
+      const { data, error } = await supabase
+        .from('users')
+        .select('id, name, email')
+        .eq('role', 'admin');
       
       if (error) {
         console.error("Error fetching ground owners:", error);
