@@ -1,76 +1,17 @@
 
 import React, { useState, useEffect } from "react";
-import { format, parseISO } from "date-fns";
-import { Calendar, Clock, User, Phone, CheckCircle, XCircle, Calendar as CalendarIcon } from "lucide-react";
+import { Calendar } from "lucide-react";
 import AdminLayout from "@/components/layouts/AdminLayout";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Calendar as CalendarComponent } from "@/components/ui/calendar";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import TimeSlotPicker from "@/components/booking/TimeSlotPicker";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { fetchBookings, getAvailableTimeSlots, createBooking, cancelBooking } from "@/services/bookingService";
-import { getCurrentUserSync, hasRoleSync } from "@/utils/auth";
 import { Skeleton } from "@/components/ui/skeleton";
+import { fetchBookings, cancelBooking } from "@/services/bookingService";
 import { fetchGrounds } from "@/services/groundsService";
+import { getCurrentUserSync, hasRoleSync } from "@/utils/auth";
 import { toast } from "sonner";
 import { Booking, Ground } from "@/types/models";
-
-const formatTime = (time: string) => {
-  const [hour, minute] = time.split(":");
-  const hourNum = parseInt(hour);
-  
-  if (hourNum === 0) {
-    return "12:00 AM";
-  } else if (hourNum < 12) {
-    return `${hourNum}:${minute} AM`;
-  } else if (hourNum === 12) {
-    return `12:${minute} PM`;
-  } else {
-    return `${hourNum - 12}:${minute} PM`;
-  }
-};
-
-const StatusBadge: React.FC<{ status: string }> = ({ status }) => {
-  if (status === "confirmed") {
-    return (
-      <Badge className="bg-green-100 text-green-800 hover:bg-green-200">
-        <CheckCircle className="w-3.5 h-3.5 mr-1" /> Confirmed
-      </Badge>
-    );
-  } else if (status === "cancelled") {
-    return (
-      <Badge variant="destructive">
-        <XCircle className="w-3.5 h-3.5 mr-1" /> Cancelled
-      </Badge>
-    );
-  } else {
-    return (
-      <Badge variant="outline" className="bg-yellow-100 text-yellow-800 hover:bg-yellow-200">
-        <Clock className="w-3.5 h-3.5 mr-1" /> Pending
-      </Badge>
-    );
-  }
-};
+import BookingsTable from "@/components/admin/bookings/BookingsTable";
+import BookingDetailsDialog from "@/components/admin/bookings/BookingDetailsDialog";
+import AddBookingDialog from "@/components/admin/bookings/AddBookingDialog";
 
 const AdminBookings: React.FC = () => {
   const [selectedBooking, setSelectedBooking] = useState<Booking | null>(null);
@@ -80,115 +21,34 @@ const AdminBookings: React.FC = () => {
   const [grounds, setGrounds] = useState<Ground[]>([]);
   const [loading, setLoading] = useState(true);
   
-  const [selectedGround, setSelectedGround] = useState<string>("");
-  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
-  const [customerName, setCustomerName] = useState("");
-  const [customerPhone, setCustomerPhone] = useState("");
-  const [selectedSlots, setSelectedSlots] = useState<string[]>([]);
-  const [availableSlots, setAvailableSlots] = useState<any[]>([]);
-  const [loadingSlots, setLoadingSlots] = useState(false);
-  
   const currentUser = getCurrentUserSync();
   const isSuperAdmin = hasRoleSync('super_admin');
   
+  const fetchData = async () => {
+    try {
+      setLoading(true);
+      
+      // Fetch grounds first
+      const groundsData = await fetchGrounds({ 
+        isSuperAdmin, 
+        currentUserId: currentUser?.id 
+      });
+      setGrounds(groundsData);
+      
+      // Then fetch bookings
+      const bookingsData = await fetchBookings();
+      setBookings(bookingsData);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+      toast.error("Failed to load data");
+    } finally {
+      setLoading(false);
+    }
+  };
+  
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        setLoading(true);
-        
-        // Fetch grounds first
-        const groundsData = await fetchGrounds({ 
-          isSuperAdmin, 
-          currentUserId: currentUser?.id 
-        });
-        setGrounds(groundsData);
-        
-        // Then fetch bookings
-        const bookingsData = await fetchBookings();
-        setBookings(bookingsData);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-        toast.error("Failed to load data");
-      } finally {
-        setLoading(false);
-      }
-    };
-    
     fetchData();
   }, [currentUser, isSuperAdmin]);
-  
-  useEffect(() => {
-    const fetchTimeSlots = async () => {
-      if (selectedGround && selectedDate) {
-        setLoadingSlots(true);
-        try {
-          const formattedDate = format(selectedDate, "yyyy-MM-dd");
-          const slots = await getAvailableTimeSlots(selectedGround, formattedDate);
-          setAvailableSlots(slots);
-        } catch (error) {
-          console.error("Error fetching time slots:", error);
-          toast.error("Failed to load time slots");
-        } finally {
-          setLoadingSlots(false);
-        }
-      }
-    };
-    
-    fetchTimeSlots();
-  }, [selectedGround, selectedDate]);
-  
-  const handleGroundChange = (groundId: string) => {
-    setSelectedGround(groundId);
-    setSelectedSlots([]);
-  };
-  
-  const handleDateChange = (date: Date | undefined) => {
-    if (date) {
-      setSelectedDate(date);
-      setSelectedSlots([]);
-    }
-  };
-  
-  const handleSelectSlot = (slotId: string) => {
-    setSelectedSlots((prev) =>
-      prev.includes(slotId)
-        ? prev.filter((id) => id !== slotId)
-        : [...prev, slotId]
-    );
-  };
-  
-  const handleAddBooking = async () => {
-    if (!selectedGround || !selectedDate || !customerName || !customerPhone || selectedSlots.length === 0) {
-      toast.error("Please fill in all required fields and select at least one slot");
-      return;
-    }
-    
-    const formattedDate = format(selectedDate, "yyyy-MM-dd");
-    
-    try {
-      const newBooking = await createBooking(
-        selectedGround,
-        formattedDate,
-        selectedSlots,
-        customerName,
-        customerPhone,
-        currentUser?.id
-      );
-      
-      if (newBooking) {
-        setBookings(prevBookings => [...prevBookings, newBooking]);
-        
-        toast.success("Booking created successfully");
-        setIsAddBookingOpen(false);
-        resetForm();
-      } else {
-        toast.error("Failed to create booking. Please try again.");
-      }
-    } catch (error) {
-      console.error("Error creating booking:", error);
-      toast.error("An error occurred while creating the booking");
-    }
-  };
   
   const handleCancelBooking = async (bookingId: string) => {
     try {
@@ -213,30 +73,10 @@ const AdminBookings: React.FC = () => {
       toast.error("An error occurred while cancelling the booking");
     }
   };
-  
-  const resetForm = () => {
-    setSelectedGround("");
-    setSelectedDate(new Date());
-    setCustomerName("");
-    setCustomerPhone("");
-    setSelectedSlots([]);
-  };
 
-  // Helper function to safely display time slot information
-  const renderTimeSlotInfo = (booking: Booking) => {
-    if (!booking.slots || booking.slots.length === 0) {
-      return "No time slots available";
-    }
-    
-    // Make sure first and last slots exist before accessing properties
-    const firstSlot = booking.slots[0];
-    const lastSlot = booking.slots[booking.slots.length - 1];
-    
-    if (!firstSlot || !lastSlot) {
-      return "Time information unavailable";
-    }
-    
-    return `${formatTime(firstSlot.startTime)} - ${formatTime(lastSlot.endTime)}`;
+  const handleViewDetails = (booking: Booking) => {
+    setSelectedBooking(booking);
+    setIsDetailsOpen(true);
   };
 
   return (
@@ -249,123 +89,13 @@ const AdminBookings: React.FC = () => {
           </p>
         </div>
         
-        <Dialog open={isAddBookingOpen} onOpenChange={setIsAddBookingOpen}>
-          <DialogTrigger asChild>
-            <Button className="flex items-center">
-              <Calendar className="h-4 w-4 mr-2" />
-              Add Booking
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
-            <DialogHeader>
-              <DialogTitle>Add New Booking</DialogTitle>
-              <DialogDescription>
-                Create a new booking for a customer directly.
-              </DialogDescription>
-            </DialogHeader>
-            
-            <div className="space-y-6 py-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="ground">Select Ground</Label>
-                  <Select
-                    value={selectedGround}
-                    onValueChange={handleGroundChange}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select a ground" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {grounds.map((ground) => (
-                        <SelectItem key={ground.id} value={ground.id}>
-                          {ground.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-                
-                <div className="space-y-2">
-                  <Label htmlFor="date">Select Date</Label>
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <Button
-                        variant="outline"
-                        className="w-full justify-start text-left font-normal"
-                        disabled={!selectedGround}
-                      >
-                        <CalendarIcon className="mr-2 h-4 w-4" />
-                        {selectedDate ? format(selectedDate, "PPP") : <span>Pick a date</span>}
-                      </Button>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0 pointer-events-auto">
-                      <CalendarComponent
-                        mode="single"
-                        selected={selectedDate}
-                        onSelect={handleDateChange}
-                        initialFocus
-                      />
-                    </PopoverContent>
-                  </Popover>
-                </div>
-                
-                <div className="space-y-2">
-                  <Label htmlFor="customerName">Customer Name</Label>
-                  <Input
-                    id="customerName"
-                    placeholder="Enter customer name"
-                    value={customerName}
-                    onChange={(e) => setCustomerName(e.target.value)}
-                    disabled={!selectedGround}
-                  />
-                </div>
-                
-                <div className="space-y-2">
-                  <Label htmlFor="customerPhone">Customer Phone</Label>
-                  <Input
-                    id="customerPhone"
-                    placeholder="Enter customer phone number"
-                    value={customerPhone}
-                    onChange={(e) => setCustomerPhone(e.target.value)}
-                    disabled={!selectedGround}
-                  />
-                </div>
-              </div>
-              
-              {selectedGround && selectedDate && (
-                loadingSlots ? (
-                  <div className="space-y-2">
-                    <p className="text-sm text-gray-500">Loading available time slots...</p>
-                    <div className="grid grid-cols-3 gap-2">
-                      {[1, 2, 3, 4, 5, 6].map((i) => (
-                        <Skeleton key={i} className="h-12 w-full" />
-                      ))}
-                    </div>
-                  </div>
-                ) : (
-                  <TimeSlotPicker
-                    slots={availableSlots}
-                    selectedSlots={selectedSlots}
-                    onSelectSlot={handleSelectSlot}
-                  />
-                )
-              )}
-              
-              <div className="flex justify-end space-x-2">
-                <Button
-                  variant="outline"
-                  onClick={() => {
-                    setIsAddBookingOpen(false);
-                    resetForm();
-                  }}
-                >
-                  Cancel
-                </Button>
-                <Button onClick={handleAddBooking}>Create Booking</Button>
-              </div>
-            </div>
-          </DialogContent>
-        </Dialog>
+        <Button 
+          className="flex items-center"
+          onClick={() => setIsAddBookingOpen(true)}
+        >
+          <Calendar className="h-4 w-4 mr-2" />
+          Add Booking
+        </Button>
       </div>
 
       {loading ? (
@@ -382,176 +112,26 @@ const AdminBookings: React.FC = () => {
           </div>
         </div>
       ) : (
-        <div className="bg-white rounded-lg shadow-sm overflow-hidden border">
-          <div className="overflow-x-auto">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Customer</TableHead>
-                  <TableHead>Ground</TableHead>
-                  <TableHead>Date & Time</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Amount</TableHead>
-                  <TableHead>Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {bookings.length === 0 ? (
-                  <TableRow>
-                    <TableCell
-                      colSpan={6}
-                      className="text-center py-6 text-gray-500"
-                    >
-                      No bookings found
-                    </TableCell>
-                  </TableRow>
-                ) : (
-                  bookings.map((booking) => (
-                    <TableRow key={booking.id}>
-                      <TableCell>
-                        <div className="flex flex-col">
-                          <div className="font-medium">{booking.userName}</div>
-                          <div className="flex items-center text-sm text-gray-500">
-                            <Phone className="h-3.5 w-3.5 mr-1" />
-                            {booking.userPhone}
-                          </div>
-                        </div>
-                      </TableCell>
-                      <TableCell>{booking.groundName}</TableCell>
-                      <TableCell>
-                        <div className="flex flex-col">
-                          <div className="flex items-center">
-                            <Calendar className="h-3.5 w-3.5 mr-1 text-gray-500" />
-                            {format(new Date(booking.date), "dd MMM yyyy")}
-                          </div>
-                          <div className="text-sm text-gray-500">
-                            {renderTimeSlotInfo(booking)}
-                          </div>
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <StatusBadge status={booking.bookingStatus} />
-                      </TableCell>
-                      <TableCell className="font-medium">
-                        ₹{booking.totalAmount}
-                      </TableCell>
-                      <TableCell>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => {
-                            setSelectedBooking(booking);
-                            setIsDetailsOpen(true);
-                          }}
-                        >
-                          View Details
-                        </Button>
-                      </TableCell>
-                    </TableRow>
-                  ))
-                )}
-              </TableBody>
-            </Table>
-          </div>
-        </div>
+        <BookingsTable 
+          bookings={bookings} 
+          onViewDetails={handleViewDetails} 
+        />
       )}
 
-      <Dialog open={isDetailsOpen} onOpenChange={setIsDetailsOpen}>
-        {selectedBooking && (
-          <DialogContent className="max-w-2xl">
-            <DialogHeader>
-              <DialogTitle>Booking Details</DialogTitle>
-            </DialogHeader>
-            
-            <div className="space-y-6">
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <h3 className="text-sm font-medium text-gray-500 mb-1">
-                    Booking ID
-                  </h3>
-                  <p className="font-mono text-sm">{selectedBooking.id}</p>
-                </div>
-                <div>
-                  <h3 className="text-sm font-medium text-gray-500 mb-1">
-                    Booking Date
-                  </h3>
-                  <p>
-                    {format(new Date(selectedBooking.date), "PPP")}
-                  </p>
-                </div>
-                <div>
-                  <h3 className="text-sm font-medium text-gray-500 mb-1">
-                    Customer
-                  </h3>
-                  <p className="font-medium">{selectedBooking.userName}</p>
-                </div>
-                <div>
-                  <h3 className="text-sm font-medium text-gray-500 mb-1">
-                    Contact
-                  </h3>
-                  <p>{selectedBooking.userPhone}</p>
-                </div>
-                <div>
-                  <h3 className="text-sm font-medium text-gray-500 mb-1">
-                    Ground
-                  </h3>
-                  <p>{selectedBooking.groundName}</p>
-                </div>
-                <div>
-                  <h3 className="text-sm font-medium text-gray-500 mb-1">
-                    Status
-                  </h3>
-                  <StatusBadge status={selectedBooking.bookingStatus} />
-                </div>
-              </div>
-              
-              <div>
-                <h3 className="text-sm font-medium text-gray-500 mb-2">
-                  Booked Slots
-                </h3>
-                <div className="bg-gray-50 rounded-md p-3 space-y-2">
-                  {selectedBooking.slots && selectedBooking.slots.length > 0 ? (
-                    selectedBooking.slots.map((slot) => (
-                      <div
-                        key={slot.id}
-                        className="flex justify-between items-center"
-                      >
-                        <div className="flex items-center">
-                          <Clock className="h-4 w-4 mr-2 text-gray-500" />
-                          <span>
-                            {formatTime(slot.startTime)} - {formatTime(slot.endTime)}
-                          </span>
-                        </div>
-                        <span className="font-medium">₹{slot.price}</span>
-                      </div>
-                    ))
-                  ) : (
-                    <div className="text-gray-500 text-center py-2">No time slots available</div>
-                  )}
-                </div>
-              </div>
-              
-              <div className="flex justify-between items-center pt-2 border-t">
-                <div>
-                  <p className="text-sm text-gray-500">Total Amount</p>
-                  <p className="text-xl font-bold text-primary-700">
-                    ₹{selectedBooking.totalAmount}
-                  </p>
-                </div>
-                
-                {selectedBooking.bookingStatus !== "cancelled" && (
-                  <Button
-                    variant="destructive"
-                    onClick={() => handleCancelBooking(selectedBooking.id)}
-                  >
-                    Cancel Booking
-                  </Button>
-                )}
-              </div>
-            </div>
-          </DialogContent>
-        )}
-      </Dialog>
+      <BookingDetailsDialog
+        booking={selectedBooking}
+        isOpen={isDetailsOpen}
+        onOpenChange={setIsDetailsOpen}
+        onCancelBooking={handleCancelBooking}
+      />
+
+      <AddBookingDialog
+        isOpen={isAddBookingOpen}
+        onOpenChange={setIsAddBookingOpen}
+        grounds={grounds}
+        onBookingCreated={fetchData}
+        currentUserId={currentUser?.id}
+      />
     </AdminLayout>
   );
 };
