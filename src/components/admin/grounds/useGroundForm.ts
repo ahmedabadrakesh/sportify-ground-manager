@@ -85,7 +85,7 @@ export const useGroundForm = () => {
       
       console.log("Inserting ground with owner_id:", ownerId);
       
-      // Try insertion using direct insert first (for better error reporting)
+      // Using direct insert method with proper data formatting
       const { data: directData, error: directError } = await supabase
         .from('grounds')
         .insert({
@@ -100,11 +100,13 @@ export const useGroundForm = () => {
         .select();
       
       if (directError) {
-        console.log("Direct insert failed, trying RPC function...", directError);
+        console.log("Direct insert failed, trying with custom query...", directError);
         
-        // If direct insert fails, try using the RPC function
-        const { data: rpcData, error: rpcError } = await supabase
-          .rpc('insert_ground', {
+        // If direct insert fails, try manual query method
+        // TypeScript doesn't know about our custom function, so we need to use a more generic approach
+        const { data: rpcData, error: rpcError } = await supabase.rpc(
+          'insert_ground' as any, // Type assertion to bypass TypeScript checking
+          {
             name: values.name,
             description: values.description,
             address: values.address,
@@ -112,7 +114,8 @@ export const useGroundForm = () => {
             games: gamesArray,
             facilities: facilitiesArray,
             location
-          });
+          }
+        );
           
         if (rpcError) {
           console.error("RPC error:", rpcError);

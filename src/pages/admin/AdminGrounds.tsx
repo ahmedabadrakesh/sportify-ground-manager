@@ -28,9 +28,9 @@ const AdminGrounds: React.FC = () => {
       setLoading(true);
       console.log("Fetching grounds data...");
       
-      // Use the RPC function to fetch grounds safely
+      // TypeScript doesn't know about our custom function, so we need to use a type assertion
       const { data, error } = await supabase
-        .rpc('get_all_grounds_with_owners', { 
+        .rpc('get_all_grounds_with_owners' as any, { 
           is_super_admin: isSuperAdmin,
           current_user_id: currentUser?.id
         });
@@ -58,45 +58,59 @@ const AdminGrounds: React.FC = () => {
       
       console.log("Ground data fetched:", data);
       
-      // Transform the data to match the Ground model
-      const formattedGrounds: Ground[] = data.map(ground => {
-        // Ensure location has lat and lng properties
-        let locationObj = { lat: 0, lng: 0 };
-        
-        // If location exists and is an object with lat/lng, use it
-        if (ground.location && typeof ground.location === 'object') {
-          try {
-            const loc = ground.location as Record<string, any>;
-            if ('lat' in loc && 'lng' in loc) {
-              locationObj = {
-                lat: Number(loc.lat),
-                lng: Number(loc.lng)
-              };
+      // Make sure data is an array before we try to map it
+      if (Array.isArray(data)) {
+        // Transform the data to match the Ground model
+        const formattedGrounds: Ground[] = data.map(ground => {
+          // Ensure location has lat and lng properties
+          let locationObj = { lat: 0, lng: 0 };
+          
+          // If location exists and is an object with lat/lng, use it
+          if (ground.location && typeof ground.location === 'object') {
+            try {
+              const loc = ground.location as Record<string, any>;
+              if ('lat' in loc && 'lng' in loc) {
+                locationObj = {
+                  lat: Number(loc.lat),
+                  lng: Number(loc.lng)
+                };
+              }
+            } catch (e) {
+              console.error("Error parsing location:", e);
             }
-          } catch (e) {
-            console.error("Error parsing location:", e);
           }
-        }
+          
+          return {
+            id: ground.id,
+            name: ground.name,
+            description: ground.description || '',
+            address: ground.address,
+            location: locationObj,
+            ownerId: ground.owner_id,
+            ownerName: ground.owner_name || 'Unknown Owner',
+            ownerContact: ground.owner_phone || '',
+            ownerWhatsapp: ground.owner_whatsapp || '',
+            games: ground.games || [],
+            facilities: ground.facilities || [],
+            images: ground.images || [],
+            rating: ground.rating || 0,
+            reviewCount: ground.review_count || 0
+          };
+        });
         
-        return {
-          id: ground.id,
-          name: ground.name,
-          description: ground.description || '',
-          address: ground.address,
-          location: locationObj,
-          ownerId: ground.owner_id,
-          ownerName: ground.owner_name || 'Unknown Owner',
-          ownerContact: ground.owner_phone || '',
-          ownerWhatsapp: ground.owner_whatsapp || '',
-          games: ground.games || [],
-          facilities: ground.facilities || [],
-          images: ground.images || [],
-          rating: ground.rating || 0,
-          reviewCount: ground.review_count || 0
-        };
-      });
+        setGrounds(formattedGrounds);
+      } else {
+        console.error("Expected an array of grounds but received:", data);
+        // Fall back to mock data
+        import("@/data/mockData").then(({ grounds: mockGrounds }) => {
+          console.log("Using mock ground data");
+          const filteredGrounds = isSuperAdmin 
+            ? mockGrounds 
+            : mockGrounds.filter(ground => ground.ownerId === currentUser?.id);
+          setGrounds(filteredGrounds);
+        });
+      }
       
-      setGrounds(formattedGrounds);
       setLoading(false);
     } catch (error) {
       console.error("Error fetching grounds:", error);
