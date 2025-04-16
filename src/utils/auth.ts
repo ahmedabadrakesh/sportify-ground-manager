@@ -5,15 +5,10 @@ import { users } from "@/data/mockData";
 
 // Get current user from Supabase auth - async version
 export const getCurrentUser = async (): Promise<User | null> => {
-  // First check local storage for compatibility with existing code
-  const storedUser = localStorage.getItem('currentUser');
-  if (storedUser) {
-    return JSON.parse(storedUser);
-  }
-  
-  // Then try to get from Supabase
   try {
+    // First check session from Supabase
     const { data: { session } } = await supabase.auth.getSession();
+    
     if (session?.user) {
       // Fetch user details from our users table
       const { data: userData, error } = await supabase
@@ -29,13 +24,22 @@ export const getCurrentUser = async (): Promise<User | null> => {
       }
       
       // Fallback to auth user if no profile exists
-      return {
+      const fallbackUser = {
         id: session.user.id,
         name: session.user.email?.split('@')[0] || 'User',
         email: session.user.email || '',
         phone: '',
-        role: 'user'
+        role: 'user' as UserRole
       };
+      
+      localStorage.setItem('currentUser', JSON.stringify(fallbackUser));
+      return fallbackUser;
+    }
+    
+    // If no active session, check localStorage as fallback
+    const storedUser = localStorage.getItem('currentUser');
+    if (storedUser) {
+      return JSON.parse(storedUser);
     }
   } catch (error) {
     console.error("Error getting current user:", error);

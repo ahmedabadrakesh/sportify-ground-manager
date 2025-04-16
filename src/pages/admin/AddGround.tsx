@@ -88,15 +88,6 @@ const AddGround: React.FC = () => {
     setIsLoading(true);
     
     try {
-      // Get the current user's session to ensure we're authenticated
-      const { data: { session } } = await supabase.auth.getSession();
-      
-      if (!session) {
-        toast.error("You must be logged in to create a ground");
-        navigate("/login");
-        return;
-      }
-      
       // Format the games and facilities as arrays
       const gamesArray = values.games.split(',').map(game => game.trim());
       const facilitiesArray = values.facilities.split(',').map(facility => facility.trim());
