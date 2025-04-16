@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { Ground } from "@/types/models";
 import { fetchGrounds, deleteGround, getMockGroundsData } from "@/services/groundsService";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 
 interface UseGroundsDataProps {
   isSuperAdmin: boolean;
@@ -13,9 +14,24 @@ export const useGroundsData = ({ isSuperAdmin, currentUserId }: UseGroundsDataPr
   const [grounds, setGrounds] = useState<Ground[]>([]);
   const [loading, setLoading] = useState(true);
 
+  const checkAuthentication = async () => {
+    // Check if we have an active Supabase session
+    const { data } = await supabase.auth.getSession();
+    return !!data.session;
+  };
+
   const loadGrounds = async () => {
     try {
       setLoading(true);
+      
+      // Check authentication first
+      const isAuthenticated = await checkAuthentication();
+      
+      if (!isAuthenticated) {
+        console.warn("No active session found, authentication may be required");
+        // You could redirect to login here if needed
+      }
+      
       const groundsData = await fetchGrounds({ 
         isSuperAdmin, 
         currentUserId 

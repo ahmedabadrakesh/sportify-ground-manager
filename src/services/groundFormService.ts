@@ -20,12 +20,6 @@ export const createGround = async ({
     const gamesArray = values.games.split(',').map(game => game.trim());
     const facilitiesArray = values.facilities.split(',').map(facility => facility.trim());
     
-    // Simplify the location to a string address instead of coordinates
-    const location = {
-      address: values.address,
-      coordinates: null
-    };
-    
     // Determine the owner ID (current user ID for regular admins, selected owner for super admins)
     const ownerId = isSuperAdmin ? values.ownerId : currentUserId;
     
@@ -34,6 +28,9 @@ export const createGround = async ({
     }
     
     console.log("Inserting ground with owner_id:", ownerId);
+    
+    // Create a simplified location object that just stores the address
+    const locationData = { address: values.address };
     
     // Using direct insert method with simplified data
     const { data: groundData, error: insertError } = await supabase
@@ -45,7 +42,7 @@ export const createGround = async ({
         owner_id: ownerId,
         games: gamesArray,
         facilities: facilitiesArray,
-        location: location
+        location: locationData
       })
       .select();
     
@@ -65,7 +62,7 @@ export const createGround = async ({
         name: ground.name,
         description: ground.description || '',
         address: ground.address,
-        location: { lat: 0, lng: 0 }, // Default location values since we're not using coordinates
+        location: { lat: 0, lng: 0 }, // Default location values
         ownerId: ground.owner_id,
         ownerName: 'Unknown Owner', // We don't have owner details in the response
         ownerContact: '',
