@@ -1,5 +1,5 @@
 
-import React from "react";
+import React, { useEffect } from "react";
 import {
   FormControl,
   FormField,
@@ -23,6 +23,16 @@ interface GroundOwnerSelectProps {
 }
 
 const GroundOwnerSelect: React.FC<GroundOwnerSelectProps> = ({ form, owners }) => {
+  // Handle empty owners array
+  const hasOwners = Array.isArray(owners) && owners.length > 0;
+  
+  useEffect(() => {
+    // If we have owners and no owner is selected, select the first one
+    if (hasOwners && !form.getValues().ownerId) {
+      form.setValue('ownerId', owners[0].id);
+    }
+  }, [owners, form]);
+
   return (
     <FormField
       control={form.control}
@@ -33,18 +43,25 @@ const GroundOwnerSelect: React.FC<GroundOwnerSelectProps> = ({ form, owners }) =
           <Select 
             onValueChange={field.onChange} 
             defaultValue={field.value}
+            value={field.value}
           >
             <FormControl>
               <SelectTrigger>
-                <SelectValue placeholder="Select ground owner" />
+                <SelectValue placeholder={hasOwners ? "Select ground owner" : "Loading owners..."} />
               </SelectTrigger>
             </FormControl>
             <SelectContent>
-              {owners.map((owner) => (
-                <SelectItem key={owner.id} value={owner.id}>
-                  {owner.name}
+              {hasOwners ? (
+                owners.map((owner) => (
+                  <SelectItem key={owner.id} value={owner.id}>
+                    {owner.name}
+                  </SelectItem>
+                ))
+              ) : (
+                <SelectItem value="loading" disabled>
+                  No owners available
                 </SelectItem>
-              ))}
+              )}
             </SelectContent>
           </Select>
           <FormMessage />
