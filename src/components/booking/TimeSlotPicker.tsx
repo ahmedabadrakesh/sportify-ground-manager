@@ -63,7 +63,7 @@ const TimeSlotPicker: React.FC<TimeSlotPickerProps> = ({
       <h3 className="text-lg font-medium text-gray-900">Available Time Slots</h3>
       
       {hasMockSlots && (
-        <Alert variant="warning" className="mb-4">
+        <Alert variant="default" className="mb-4">
           <AlertCircle className="h-4 w-4 mr-2" />
           <AlertDescription>
             These are preview time slots. Actual booking will be confirmed by admin.
