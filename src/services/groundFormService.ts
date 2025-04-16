@@ -53,7 +53,7 @@ export const createGround = async ({
       console.log("Direct insert failed, trying with custom query...", directError);
       
       // If direct insert fails, try manual query method
-      // TypeScript doesn't know about our custom function, so we need to use a more generic approach
+      // Since TypeScript doesn't know about our custom function, we need to use a type assertion
       const { data: rpcData, error: rpcError } = await supabase.rpc(
         'insert_ground' as any, // Type assertion to bypass TypeScript checking
         {
@@ -63,7 +63,9 @@ export const createGround = async ({
           owner_id: ownerId,
           games: gamesArray,
           facilities: facilitiesArray,
-          location
+          // Pass the correctly typed location object
+          location_lat: location.lat,
+          location_lng: location.lng
         }
       );
         
@@ -82,12 +84,22 @@ export const createGround = async ({
     if (directData && directData.length > 0) {
       const groundData = directData[0];
       
+      // Ensure location has the correct type
+      const locationData = groundData.location ? 
+        (typeof groundData.location === 'object' ? 
+          {
+            lat: Number(groundData.location.lat || 0),
+            lng: Number(groundData.location.lng || 0)
+          } : 
+          { lat: 0, lng: 0 }) : 
+        { lat: 0, lng: 0 };
+      
       return {
         id: groundData.id,
         name: groundData.name,
         description: groundData.description || '',
         address: groundData.address,
-        location: groundData.location || { lat: 0, lng: 0 },
+        location: locationData,
         ownerId: groundData.owner_id,
         ownerName: 'Unknown Owner', // We don't have owner details in the response
         ownerContact: '',
