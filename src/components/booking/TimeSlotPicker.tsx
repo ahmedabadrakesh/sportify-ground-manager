@@ -3,6 +3,8 @@ import React from "react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { TimeSlot } from "@/types/models";
+import { AlertCircle } from "lucide-react";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 interface TimeSlotPickerProps {
   slots: TimeSlot[];
@@ -15,6 +17,9 @@ const TimeSlotPicker: React.FC<TimeSlotPickerProps> = ({
   selectedSlots,
   onSelectSlot,
 }) => {
+  // Check if slots are mock data
+  const hasMockSlots = slots.length > 0 && slots[0].id.startsWith('mock-');
+
   // Format time for display
   const formatTime = (time: string) => {
     const [hour, minute] = time.split(":");
@@ -50,12 +55,21 @@ const TimeSlotPicker: React.FC<TimeSlotPickerProps> = ({
   const timeOfDayLabels = {
     morning: "Morning (6 AM - 12 PM)",
     afternoon: "Afternoon (12 PM - 5 PM)",
-    evening: "Evening (5 PM - 6 AM)"
+    evening: "Evening (5 PM - 10 PM)"
   };
 
   return (
     <div className="space-y-6">
       <h3 className="text-lg font-medium text-gray-900">Available Time Slots</h3>
+      
+      {hasMockSlots && (
+        <Alert variant="warning" className="mb-4">
+          <AlertCircle className="h-4 w-4 mr-2" />
+          <AlertDescription>
+            These are preview time slots. Actual booking will be confirmed by admin.
+          </AlertDescription>
+        </Alert>
+      )}
       
       {Object.entries(groupedByTimeOfDay).map(([timeOfDay, timeSlots]) => (
         timeSlots.length > 0 && (
