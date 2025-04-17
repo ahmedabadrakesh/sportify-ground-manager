@@ -30,12 +30,14 @@ const InventoryItemsTab: React.FC<InventoryItemsTabProps> = ({
             itemId: item.id,
             itemName: item.name,
             itemPrice: item.price,
-            quantity: 0
+            quantity: item.availableQuantity || 0,
+            purchasedQuantity: item.purchaseQuantity || 0
           }))} 
           readonly={true}
           allowEdit={true}
           onEditItem={onEditItem}
           onDeleteItem={onDeleteItem}
+          showPurchasedQuantity={true}
         />
       </CardContent>
     </Card>

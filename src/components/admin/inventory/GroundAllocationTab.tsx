@@ -8,12 +8,14 @@ interface GroundAllocationTabProps {
   groundInventory: GroundInventory[];
   grounds: Ground[];
   isSuperAdmin: boolean;
+  onInventoryUpdated?: () => void;
 }
 
 const GroundAllocationTab: React.FC<GroundAllocationTabProps> = ({
   groundInventory,
   grounds,
   isSuperAdmin,
+  onInventoryUpdated,
 }) => {
   return (
     <Card>
@@ -28,6 +30,7 @@ const GroundAllocationTab: React.FC<GroundAllocationTabProps> = ({
           groundInventory={groundInventory} 
           grounds={grounds}
           isSuperAdmin={isSuperAdmin}
+          onInventoryUpdated={onInventoryUpdated}
         />
       </CardContent>
     </Card>

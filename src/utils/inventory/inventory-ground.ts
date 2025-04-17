@@ -13,7 +13,8 @@ export const getGroundInventory = async (groundId: string): Promise<GroundInvent
         inventory_items (
           id,
           name,
-          price
+          price,
+          purchase_quantity
         ),
         ground_id
       `)
@@ -30,7 +31,8 @@ export const getGroundInventory = async (groundId: string): Promise<GroundInvent
       itemId: item.inventory_items.id,
       itemName: item.inventory_items.name,
       itemPrice: item.inventory_items.price,
-      quantity: item.quantity
+      quantity: item.quantity,
+      purchasedQuantity: item.inventory_items.purchase_quantity || 0
     }));
   } catch (error) {
     console.error('Unexpected error in getGroundInventory:', error);

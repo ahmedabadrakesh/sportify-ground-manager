@@ -33,11 +33,9 @@ const AdminInventory: React.FC = () => {
   const fetchData = async () => {
     setLoading(true);
     try {
-      // Fetch inventory items from database
       const items = await getAllInventoryItems();
       setInventoryItems(items);
 
-      // Fetch grounds data
       const { data: groundsData, error: groundsError } = await supabase
         .from('grounds')
         .select('*');
@@ -55,7 +53,7 @@ const AdminInventory: React.FC = () => {
         address: g.address,
         location: g.location as { lat: number; lng: number },
         ownerId: g.owner_id,
-        ownerName: "", // Would be fetched in a real app
+        ownerName: "",
         ownerContact: "",
         ownerWhatsapp: "",
         games: g.games || [],
@@ -67,12 +65,9 @@ const AdminInventory: React.FC = () => {
       
       setGrounds(fetchedGrounds);
       
-      // Fetch ground inventory for all grounds if superadmin, 
-      // otherwise only for grounds owned by current user
       let allGroundInventory: GroundInventory[] = [];
       
       if (isSuperAdmin && fetchedGrounds.length > 0) {
-        // Limit the number of parallel requests to avoid performance issues
         const groundInventoryPromises = fetchedGrounds.slice(0, 5).map(ground => 
           getGroundInventory(ground.id)
         );
@@ -185,6 +180,7 @@ const AdminInventory: React.FC = () => {
               groundInventory={groundInventory}
               grounds={grounds}
               isSuperAdmin={isSuperAdmin}
+              onInventoryUpdated={fetchData}
             />
           </TabsContent>
         </Tabs>

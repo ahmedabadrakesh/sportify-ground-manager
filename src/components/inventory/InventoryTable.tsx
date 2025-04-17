@@ -12,6 +12,7 @@ interface InventoryTableProps {
   onDeleteItem?: (itemId: string) => void;
   readonly?: boolean;
   allowEdit?: boolean;
+  showPurchasedQuantity?: boolean;
 }
 
 const InventoryTable: React.FC<InventoryTableProps> = ({
@@ -21,6 +22,7 @@ const InventoryTable: React.FC<InventoryTableProps> = ({
   onDeleteItem,
   readonly = false,
   allowEdit = false,
+  showPurchasedQuantity = false,
 }) => {
   const [useQuantities, setUseQuantities] = React.useState<Record<string, number>>(
     inventory.reduce((acc, item) => {
@@ -46,6 +48,7 @@ const InventoryTable: React.FC<InventoryTableProps> = ({
           <TableRow>
             <TableHead>Item Name</TableHead>
             <TableHead className="text-right">Price (₹)</TableHead>
+            {showPurchasedQuantity && <TableHead className="text-right">Purchased Qty</TableHead>}
             <TableHead className="text-right">Available Qty</TableHead>
             {(!readonly || allowEdit) && <TableHead>Actions</TableHead>}
           </TableRow>
@@ -53,7 +56,7 @@ const InventoryTable: React.FC<InventoryTableProps> = ({
         <TableBody>
           {inventory.length === 0 ? (
             <TableRow>
-              <TableCell colSpan={readonly && !allowEdit ? 3 : 4} className="text-center py-6 text-gray-500">
+              <TableCell colSpan={showPurchasedQuantity ? (readonly && !allowEdit ? 4 : 5) : (readonly && !allowEdit ? 3 : 4)} className="text-center py-6 text-gray-500">
                 No inventory items found
               </TableCell>
             </TableRow>
@@ -62,6 +65,9 @@ const InventoryTable: React.FC<InventoryTableProps> = ({
               <TableRow key={item.itemId}>
                 <TableCell className="font-medium">{item.itemName}</TableCell>
                 <TableCell className="text-right">{item.itemPrice}</TableCell>
+                {showPurchasedQuantity && (
+                  <TableCell className="text-right">{item.purchasedQuantity || 0}</TableCell>
+                )}
                 <TableCell className="text-right">{item.quantity}</TableCell>
                 {(!readonly || allowEdit) && (
                   <TableCell>

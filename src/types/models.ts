@@ -18,6 +18,7 @@ export interface GroundInventory {
   itemName: string;
   itemPrice: number;
   quantity: number;
+  purchasedQuantity?: number;
 }
 
 export interface Ground {
