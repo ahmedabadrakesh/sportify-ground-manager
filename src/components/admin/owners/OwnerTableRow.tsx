@@ -21,9 +21,8 @@ const OwnerTableRow: React.FC<OwnerTableRowProps> = ({
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [isEditOpen, setIsEditOpen] = useState(false);
 
-  const handleDeleteConfirm = () => {
-    onDeleteOwner(owner.id);
-    setIsDeleteOpen(false);
+  const handleDeleteConfirm = (ownerId: string) => {
+    onDeleteOwner(ownerId);
   };
 
   const handleEditSuccess = (updatedOwner: any) => {
@@ -61,10 +60,12 @@ const OwnerTableRow: React.FC<OwnerTableRowProps> = ({
       </TableRow>
 
       <DeleteOwnerDialog
-        isOpen={isDeleteOpen}
+        ownerId={owner.id}
         ownerName={owner.name}
         onConfirm={handleDeleteConfirm}
         onCancel={() => setIsDeleteOpen(false)}
+        open={isDeleteOpen}
+        onOpenChange={setIsDeleteOpen}
       />
 
       <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
