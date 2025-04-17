@@ -61,6 +61,7 @@ export const getAllInventoryItems = async (): Promise<InventoryItem[]> => {
       });
     }
 
+    console.log('Fetched inventory items:', items);
     return items;
   } catch (error) {
     console.error('Unexpected error in getAllInventoryItems:', error);

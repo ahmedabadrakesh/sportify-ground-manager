@@ -26,7 +26,7 @@ export const getGroundInventory = async (groundId: string): Promise<GroundInvent
       return [];
     }
 
-    return data.map(item => ({
+    const inventory = data.map(item => ({
       groundId: item.ground_id,
       itemId: item.inventory_items.id,
       itemName: item.inventory_items.name,
@@ -34,6 +34,9 @@ export const getGroundInventory = async (groundId: string): Promise<GroundInvent
       quantity: item.quantity,
       purchasedQuantity: item.inventory_items.purchase_quantity || 0
     }));
+    
+    console.log('Fetched ground inventory:', inventory);
+    return inventory;
   } catch (error) {
     console.error('Unexpected error in getGroundInventory:', error);
     toast.error('Failed to load ground inventory');

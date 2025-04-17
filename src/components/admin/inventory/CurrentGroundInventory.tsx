@@ -31,7 +31,8 @@ const CurrentGroundInventory: React.FC<CurrentGroundInventoryProps> = ({
           <TableRow>
             <TableHead>Item Name</TableHead>
             <TableHead className="text-right">Price</TableHead>
-            <TableHead className="text-right">Quantity</TableHead>
+            <TableHead className="text-right">Purchased Qty</TableHead>
+            <TableHead className="text-right">Allocated Qty</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -39,13 +40,14 @@ const CurrentGroundInventory: React.FC<CurrentGroundInventoryProps> = ({
             <TableRow key={item.itemId}>
               <TableCell className="font-medium">{item.itemName}</TableCell>
               <TableCell className="text-right">₹{item.itemPrice}</TableCell>
+              <TableCell className="text-right">{item.purchasedQuantity || 0}</TableCell>
               <TableCell className="text-right">{item.quantity}</TableCell>
             </TableRow>
           ))}
           
           {groundInventory.length === 0 && (
             <TableRow>
-              <TableCell colSpan={3} className="text-center py-6 text-gray-500">
+              <TableCell colSpan={4} className="text-center py-6 text-gray-500">
                 No inventory assigned to this ground yet.
               </TableCell>
             </TableRow>
