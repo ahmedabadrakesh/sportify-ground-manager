@@ -1,100 +1,108 @@
 
-import { CartItem } from "@/types/models";
+import { Product, CartItem } from "@/types/models";
+import { toast } from "sonner";
 
-// Get cart from localStorage
-export const getCart = (): CartItem[] => {
-  const cartJson = localStorage.getItem('cart');
-  return cartJson ? JSON.parse(cartJson) : [];
+// Helper to get cart from localStorage
+const getCart = (): CartItem[] => {
+  const cartItems = localStorage.getItem("cart");
+  return cartItems ? JSON.parse(cartItems) : [];
 };
 
-// Add item to cart
-export const addToCart = (productId: string, quantity: number): void => {
-  const cart = getCart();
-  const existingItem = cart.find(item => item.productId === productId);
-  
-  if (existingItem) {
-    existingItem.quantity += quantity;
-  } else {
-    cart.push({ productId, quantity });
+// Add to cart
+export const addToCart = (product: Product, quantity: number = 1): CartItem | null => {
+  try {
+    const cart = getCart();
+    
+    // Check if product already in cart
+    const existingItem = cart.find(item => item.productId === product.id);
+    
+    if (existingItem) {
+      // Update quantity
+      const newCart = cart.map(item => 
+        item.productId === product.id 
+          ? { ...item, quantity: item.quantity + quantity } 
+          : item
+      );
+      
+      localStorage.setItem("cart", JSON.stringify(newCart));
+      return existingItem;
+    } else {
+      // Add new item
+      const newItem: CartItem = {
+        id: `cart-${Date.now()}-${product.id}`,
+        productId: product.id,
+        name: product.name,
+        price: product.price,
+        quantity,
+        image: product.images?.[0] || undefined
+      };
+      
+      const newCart = [...cart, newItem];
+      localStorage.setItem("cart", JSON.stringify(newCart));
+      return newItem;
+    }
+  } catch (error) {
+    console.error("Error adding to cart:", error);
+    toast.error("Failed to add item to cart");
+    return null;
   }
-  
-  localStorage.setItem('cart', JSON.stringify(cart));
+};
+
+// Get cart items
+export const getCartItems = (): CartItem[] => {
+  return getCart();
 };
 
 // Update cart item quantity
-export const updateCartItemQuantity = (productId: string, quantity: number): void => {
-  const cart = getCart();
-  const existingItemIndex = cart.findIndex(item => item.productId === productId);
-  
-  if (existingItemIndex !== -1) {
-    cart[existingItemIndex].quantity = quantity;
-    localStorage.setItem('cart', JSON.stringify(cart));
+export const updateCartItemQuantity = (productId: string, quantity: number): boolean => {
+  try {
+    const cart = getCart();
+    const itemIndex = cart.findIndex(item => item.productId === productId);
+    
+    if (itemIndex === -1) return false;
+    
+    cart[itemIndex].quantity = quantity;
+    localStorage.setItem("cart", JSON.stringify(cart));
+    return true;
+  } catch (error) {
+    console.error("Error updating cart item:", error);
+    return false;
   }
 };
 
 // Remove item from cart
-export const removeFromCart = (productId: string): void => {
-  const cart = getCart();
-  const updatedCart = cart.filter(item => item.productId !== productId);
-  localStorage.setItem('cart', JSON.stringify(updatedCart));
+export const removeFromCart = (productId: string): boolean => {
+  try {
+    const cart = getCart();
+    const newCart = cart.filter(item => item.productId !== productId);
+    
+    localStorage.setItem("cart", JSON.stringify(newCart));
+    return true;
+  } catch (error) {
+    console.error("Error removing from cart:", error);
+    return false;
+  }
 };
 
 // Clear cart
 export const clearCart = (): void => {
-  localStorage.removeItem('cart');
+  localStorage.setItem("cart", JSON.stringify([]));
 };
 
-// Get cart total items count
-export const getCartItemsCount = (): number => {
+// Calculate cart total
+export const getCartTotal = (): number => {
   const cart = getCart();
-  return cart.reduce((total, item) => total + item.quantity, 0);
+  return cart.reduce((total, item) => total + (item.price * item.quantity), 0);
 };
 
-// Calculate cart total amount
-export const getCartTotal = (cartItems: { productId: string; quantity: number; product?: any }[]): number => {
-  return cartItems.reduce((total, item) => {
-    if (item.product) {
-      return total + (item.product.price * item.quantity);
-    }
-    return total;
-  }, 0);
+// Get cart count
+export const getCartCount = (): number => {
+  const cart = getCart();
+  return cart.reduce((count, item) => count + item.quantity, 0);
 };
 
-// Process checkout (in a real app, this would integrate with a payment gateway)
-export const processCheckout = async (
-  orderData: {
-    items: CartItem[];
-    customer: {
-      name: string;
-      email: string;
-      phone: string;
-      address: string;
-    };
-    paymentMethod: string;
-    totalAmount: number;
-  }
-): Promise<{ success: boolean; orderId?: string; message?: string }> => {
-  // Simulate API call processing delay
-  await new Promise(resolve => setTimeout(resolve, 1500));
-  
-  // In a real app, you would send orderData to your backend
-  // and create an order in your database
-
-  // For demo purposes, we'll just simulate a successful checkout 90% of the time
-  const isSuccessful = Math.random() < 0.9;
-  
-  if (isSuccessful) {
-    // Clear the cart after successful checkout
-    clearCart();
-    return {
-      success: true,
-      orderId: `ORD-${Date.now()}`,
-      message: "Order placed successfully!"
-    };
-  } else {
-    return {
-      success: false,
-      message: "Payment processing failed. Please try again."
-    };
-  }
+// Check if product is in cart
+export const isInCart = (productId: string): boolean => {
+  const cart = getCart();
+  return cart.some(item => item.productId === productId);
 };

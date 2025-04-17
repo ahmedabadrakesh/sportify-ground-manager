@@ -31,24 +31,23 @@ export const getAllInventoryItems = async (): Promise<InventoryItem[]> => {
       return [];
     }
 
-    return data.map((item: InventoryItemDB) => {
-      // Calculate available quantity by subtracting allocated quantity from purchase quantity
-      const calculateAvailableQuantity = async () => {
-        const { data: allocatedData, error: allocatedError } = await supabase
-          .from('ground_inventory')
-          .select('SUM(quantity) as total_allocated')
-          .eq('item_id', item.id);
+    // Process items and calculate available quantity
+    const items: InventoryItem[] = [];
+    
+    for (const item of data) {
+      const { data: allocatedData, error: allocatedError } = await supabase
+        .from('ground_inventory')
+        .select('quantity')
+        .eq('item_id', item.id);
 
-        if (allocatedError) {
-          console.error('Error calculating allocated quantity:', allocatedError);
-          return item.purchase_quantity || 0;
-        }
+      let availableQuantity = item.purchase_quantity || 0;
+      
+      if (!allocatedError && allocatedData) {
+        const totalAllocated = allocatedData.reduce((sum, record) => sum + (record.quantity || 0), 0);
+        availableQuantity = Math.max((item.purchase_quantity || 0) - totalAllocated, 0);
+      }
 
-        const totalAllocated = allocatedData?.[0]?.total_allocated || 0;
-        return Math.max((item.purchase_quantity || 0) - totalAllocated, 0);
-      };
-
-      return {
+      items.push({
         id: item.id,
         name: item.name,
         category: item.category,
@@ -58,9 +57,11 @@ export const getAllInventoryItems = async (): Promise<InventoryItem[]> => {
         quantity: item.quantity || 0,
         description: item.description || '',
         image: item.image || '',
-        availableQuantity: calculateAvailableQuantity()
-      };
-    });
+        availableQuantity: availableQuantity
+      });
+    }
+
+    return items;
   } catch (error) {
     console.error('Unexpected error in getAllInventoryItems:', error);
     toast.error('Failed to load inventory items');
@@ -102,7 +103,8 @@ export const addInventoryItemToDB = async (item: Omit<InventoryItem, 'id'> & { i
       purchaseQuantity: data.purchase_quantity || 0,
       quantity: data.quantity || 0,
       description: data.description || '',
-      image: data.image || ''
+      image: data.image || '',
+      availableQuantity: data.purchase_quantity || 0
     };
   } catch (error) {
     console.error('Unexpected error in addInventoryItemToDB:', error);
@@ -137,6 +139,20 @@ export const updateInventoryItemInDB = async (item: InventoryItem): Promise<Inve
     }
 
     toast.success(`Updated inventory item: ${data.name}`);
+    
+    // Calculate available quantity
+    const { data: allocatedData } = await supabase
+      .from('ground_inventory')
+      .select('quantity')
+      .eq('item_id', item.id);
+      
+    let availableQuantity = data.purchase_quantity || 0;
+    
+    if (allocatedData) {
+      const totalAllocated = allocatedData.reduce((sum, record) => sum + (record.quantity || 0), 0);
+      availableQuantity = Math.max((data.purchase_quantity || 0) - totalAllocated, 0);
+    }
+
     return {
       id: data.id,
       name: data.name,
@@ -146,7 +162,8 @@ export const updateInventoryItemInDB = async (item: InventoryItem): Promise<Inve
       purchaseQuantity: data.purchase_quantity || 0,
       quantity: data.quantity || 0,
       description: data.description || '',
-      image: data.image || ''
+      image: data.image || '',
+      availableQuantity: availableQuantity
     };
   } catch (error) {
     console.error('Unexpected error in updateInventoryItemInDB:', error);

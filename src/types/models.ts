@@ -37,7 +37,7 @@ export interface Ground {
   reviewCount: number;
 }
 
-// Adding these types to fix the build errors
+// Extending the Booking interface to include fields used in the application
 export interface Booking {
   id: string;
   userId: string;
@@ -47,7 +47,12 @@ export interface Booking {
   bookingStatus: string;
   paymentStatus: string;
   createdAt: string;
-  updatedAt: string;
+  updatedAt?: string;
+  // Adding missing properties
+  userName?: string;
+  userPhone?: string;
+  groundName?: string;
+  slots?: TimeSlot[];
 }
 
 export interface TimeSlot {
@@ -68,6 +73,7 @@ export interface User {
   whatsapp?: string;
   role: UserRole;
   authId?: string;
+  avatar?: string; // Adding this to fix errors in mockData
 }
 
 export type UserRole = 'user' | 'admin' | 'super_admin' | 'ground_owner';
