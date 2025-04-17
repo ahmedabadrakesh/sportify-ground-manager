@@ -23,7 +23,9 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 const inventoryItemSchema = z.object({
   name: z.string().min(2, { message: "Name must be at least 2 characters" }),
   category: z.string().min(2, { message: "Category is required" }),
-  price: z.coerce.number().min(0, { message: "Price must be a positive number" }),
+  purchasePrice: z.coerce.number().min(0, { message: "Purchase price must be a positive number" }),
+  sellPrice: z.coerce.number().min(0, { message: "Sell price must be a positive number" }),
+  quantity: z.coerce.number().min(0, { message: "Quantity must be a positive number" }),
   description: z.string().optional(),
   image: z.string().optional(),
 });
@@ -48,7 +50,9 @@ const EditItemForm: React.FC<EditItemFormProps> = ({
     defaultValues: {
       name: "",
       category: "",
-      price: 0,
+      purchasePrice: 0,
+      sellPrice: 0,
+      quantity: 0,
       description: "",
       image: "",
     },
@@ -60,7 +64,9 @@ const EditItemForm: React.FC<EditItemFormProps> = ({
       form.reset({
         name: item.name,
         category: item.category,
-        price: item.price,
+        purchasePrice: item.purchasePrice || 0,
+        sellPrice: item.price,
+        quantity: item.quantity || 0,
         description: item.description || "",
         image: item.image || ""
       });
@@ -78,7 +84,9 @@ const EditItemForm: React.FC<EditItemFormProps> = ({
         id: item.id,
         name: data.name,
         category: data.category,
-        price: data.price,
+        purchasePrice: data.purchasePrice,
+        price: data.sellPrice,
+        quantity: data.quantity,
         description: data.description || "",
         image: data.image || ""
       };
@@ -132,14 +140,44 @@ const EditItemForm: React.FC<EditItemFormProps> = ({
               )}
             />
             
+            <div className="grid grid-cols-2 gap-4">
+              <FormField
+                control={form.control}
+                name="purchasePrice"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Purchase Price (₹)</FormLabel>
+                    <FormControl>
+                      <Input type="number" min="0" step="0.01" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              
+              <FormField
+                control={form.control}
+                name="sellPrice"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Sell Price (₹)</FormLabel>
+                    <FormControl>
+                      <Input type="number" min="0" step="0.01" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+            
             <FormField
               control={form.control}
-              name="price"
+              name="quantity"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Price (₹)</FormLabel>
+                  <FormLabel>Quantity</FormLabel>
                   <FormControl>
-                    <Input type="number" min="0" step="0.01" {...field} />
+                    <Input type="number" min="0" step="1" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

@@ -1,3 +1,4 @@
+
 import { GroundInventory, InventoryItem } from "@/types/models";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -23,6 +24,8 @@ export const getAllInventoryItems = async (): Promise<InventoryItem[]> => {
       name: item.name,
       category: item.category,
       price: item.price,
+      purchasePrice: item.purchase_price,
+      quantity: item.quantity || 0,
       description: item.description || '',
       image: item.image || ''
     }));
@@ -190,7 +193,6 @@ export const useInventoryItems = async (
 // Add new inventory item to database
 export const addInventoryItem = async (item: Omit<InventoryItem, 'id'> & { initialQuantity?: number }): Promise<InventoryItem | null> => {
   try {
-    // Start a transaction by manually controlling the Supabase operations
     // First, insert the inventory item
     const { data, error } = await supabase
       .from('inventory_items')
@@ -198,6 +200,8 @@ export const addInventoryItem = async (item: Omit<InventoryItem, 'id'> & { initi
         name: item.name,
         category: item.category,
         price: item.price,
+        purchase_price: item.purchasePrice,
+        quantity: item.initialQuantity || 0,
         description: item.description || null,
         image: item.image || null
       })
@@ -210,20 +214,14 @@ export const addInventoryItem = async (item: Omit<InventoryItem, 'id'> & { initi
       return null;
     }
 
-    // If initialQuantity is provided and greater than 0, add it to the central inventory
-    // This would require a central_inventory table in a real application
-    // For now we just log it
-    if (item.initialQuantity && item.initialQuantity > 0) {
-      console.log(`Added ${item.initialQuantity} of ${item.name} to central inventory`);
-      // In a real app, here we would insert into central_inventory or similar
-    }
-
     toast.success(`Added new inventory item: ${data.name}`);
     return {
       id: data.id,
       name: data.name,
       category: data.category,
       price: data.price,
+      purchasePrice: data.purchase_price,
+      quantity: data.quantity || 0,
       description: data.description || '',
       image: data.image || ''
     };
@@ -243,6 +241,8 @@ export const updateInventoryItem = async (item: InventoryItem): Promise<Inventor
         name: item.name,
         category: item.category,
         price: item.price,
+        purchase_price: item.purchasePrice,
+        quantity: item.quantity,
         description: item.description || null,
         image: item.image || null
       })
@@ -262,6 +262,8 @@ export const updateInventoryItem = async (item: InventoryItem): Promise<Inventor
       name: data.name,
       category: data.category,
       price: data.price,
+      purchasePrice: data.purchase_price,
+      quantity: data.quantity || 0,
       description: data.description || '',
       image: data.image || ''
     };

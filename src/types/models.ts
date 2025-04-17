@@ -60,6 +60,8 @@ export interface InventoryItem {
   name: string;
   category: string;
   price: number;
+  purchasePrice?: number;
+  quantity?: number;
   description?: string;
   image?: string;
 }

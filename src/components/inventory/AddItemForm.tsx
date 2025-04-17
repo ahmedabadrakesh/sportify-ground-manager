@@ -22,7 +22,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 const inventoryItemSchema = z.object({
   name: z.string().min(2, { message: "Name must be at least 2 characters" }),
   category: z.string().min(2, { message: "Category is required" }),
-  price: z.coerce.number().min(0, { message: "Price must be a positive number" }),
+  purchasePrice: z.coerce.number().min(0, { message: "Purchase price must be a positive number" }),
+  sellPrice: z.coerce.number().min(0, { message: "Sell price must be a positive number" }),
   initialQuantity: z.coerce.number().min(0, { message: "Quantity must be a positive number" }),
   description: z.string().optional(),
   image: z.string().optional(),
@@ -46,7 +47,8 @@ const AddItemForm: React.FC<AddItemFormProps> = ({
     defaultValues: {
       name: "",
       category: "",
-      price: 0,
+      purchasePrice: 0,
+      sellPrice: 0,
       initialQuantity: 0,
       description: "",
       image: "",
@@ -61,7 +63,8 @@ const AddItemForm: React.FC<AddItemFormProps> = ({
       const itemData = {
         name: data.name,
         category: data.category,
-        price: data.price,
+        purchasePrice: data.purchasePrice,
+        price: data.sellPrice,
         initialQuantity: data.initialQuantity,
         description: data.description || "",
         image: data.image || ""
@@ -117,19 +120,35 @@ const AddItemForm: React.FC<AddItemFormProps> = ({
               )}
             />
             
-            <FormField
-              control={form.control}
-              name="price"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Price (₹)</FormLabel>
-                  <FormControl>
-                    <Input type="number" min="0" step="0.01" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            <div className="grid grid-cols-2 gap-4">
+              <FormField
+                control={form.control}
+                name="purchasePrice"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Purchase Price (₹)</FormLabel>
+                    <FormControl>
+                      <Input type="number" min="0" step="0.01" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              
+              <FormField
+                control={form.control}
+                name="sellPrice"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Sell Price (₹)</FormLabel>
+                    <FormControl>
+                      <Input type="number" min="0" step="0.01" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
             
             <FormField
               control={form.control}
