@@ -55,7 +55,7 @@ const AddItemForm: React.FC<AddItemFormProps> = ({
 
   const onSubmit = async (data: InventoryItemFormValues) => {
     try {
-      // Ensure all required fields have values
+      // Create a properly typed object with required fields
       const itemData = {
         name: data.name,
         category: data.category,
@@ -66,6 +66,7 @@ const AddItemForm: React.FC<AddItemFormProps> = ({
       
       const result = await addInventoryItem(itemData);
       if (result) {
+        toast.success(`Item "${data.name}" added successfully`);
         form.reset();
         onOpenChange(false);
         onItemAdded();

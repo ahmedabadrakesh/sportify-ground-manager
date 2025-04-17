@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { PlusCircle, Boxes, BarChart3 } from "lucide-react";
 import AdminLayout from "@/components/layouts/AdminLayout";
@@ -64,16 +65,24 @@ const AdminInventory: React.FC = () => {
       // otherwise only for grounds owned by current user
       let allGroundInventory: GroundInventory[] = [];
       
-      if (isSuperAdmin) {
-        for (const ground of fetchedGrounds) {
-          const groundInv = await getGroundInventory(ground.id);
-          allGroundInventory = [...allGroundInventory, ...groundInv];
-        }
-      } else if (currentUser) {
+      if (isSuperAdmin && fetchedGrounds.length > 0) {
+        // Limit the number of parallel requests to avoid performance issues
+        const groundInventoryPromises = fetchedGrounds.slice(0, 5).map(ground => 
+          getGroundInventory(ground.id)
+        );
+        
+        const groundInventoryResults = await Promise.all(groundInventoryPromises);
+        allGroundInventory = groundInventoryResults.flat();
+      } else if (currentUser && fetchedGrounds.length > 0) {
         const userGrounds = fetchedGrounds.filter(g => g.ownerId === currentUser.id);
-        for (const ground of userGrounds) {
-          const groundInv = await getGroundInventory(ground.id);
-          allGroundInventory = [...allGroundInventory, ...groundInv];
+        
+        if (userGrounds.length > 0) {
+          const groundInventoryPromises = userGrounds.slice(0, 5).map(ground => 
+            getGroundInventory(ground.id)
+          );
+          
+          const groundInventoryResults = await Promise.all(groundInventoryPromises);
+          allGroundInventory = groundInventoryResults.flat();
         }
       }
       
@@ -88,7 +97,9 @@ const AdminInventory: React.FC = () => {
   
   useEffect(() => {
     fetchData();
-  }, [currentUser, isSuperAdmin]);
+    // Only re-run this effect when these specific dependencies change
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleItemAdded = () => {
     fetchData();
