@@ -1,4 +1,3 @@
-
 export interface InventoryItem {
   id: string;
   name: string;
@@ -7,7 +6,6 @@ export interface InventoryItem {
   purchasePrice?: number;
   purchaseQuantity?: number;
   availableQuantity?: number;
-  quantity?: number;
   description?: string;
   image?: string;
 }
@@ -38,7 +36,6 @@ export interface Ground {
   reviewCount: number;
 }
 
-// Extending the Booking interface to include fields used in the application
 export interface Booking {
   id: string;
   userId: string;
@@ -49,7 +46,6 @@ export interface Booking {
   paymentStatus: string;
   createdAt: string;
   updatedAt?: string;
-  // Adding missing properties
   userName?: string;
   userPhone?: string;
   groundName?: string;
@@ -74,7 +70,7 @@ export interface User {
   whatsapp?: string;
   role: UserRole;
   authId?: string;
-  avatar?: string; // Adding this to fix errors in mockData
+  avatar?: string;
 }
 
 export type UserRole = 'user' | 'admin' | 'super_admin' | 'ground_owner';

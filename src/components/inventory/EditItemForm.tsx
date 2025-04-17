@@ -25,7 +25,7 @@ const inventoryItemSchema = z.object({
   category: z.string().min(2, { message: "Category is required" }),
   purchasePrice: z.coerce.number().min(0, { message: "Purchase price must be a positive number" }),
   sellPrice: z.coerce.number().min(0, { message: "Sell price must be a positive number" }),
-  quantity: z.coerce.number().min(0, { message: "Quantity must be a positive number" }),
+  purchaseQuantity: z.coerce.number().min(0, { message: "Quantity must be a positive number" }),
   description: z.string().optional(),
   image: z.string().optional(),
 });
@@ -52,7 +52,7 @@ const EditItemForm: React.FC<EditItemFormProps> = ({
       category: "",
       purchasePrice: 0,
       sellPrice: 0,
-      quantity: 0,
+      purchaseQuantity: 0,
       description: "",
       image: "",
     },
@@ -66,7 +66,7 @@ const EditItemForm: React.FC<EditItemFormProps> = ({
         category: item.category,
         purchasePrice: item.purchasePrice || 0,
         sellPrice: item.price,
-        quantity: item.quantity || 0,
+        purchaseQuantity: item.purchaseQuantity || 0,
         description: item.description || "",
         image: item.image || ""
       });
@@ -86,9 +86,10 @@ const EditItemForm: React.FC<EditItemFormProps> = ({
         category: data.category,
         purchasePrice: data.purchasePrice,
         price: data.sellPrice,
-        quantity: data.quantity,
+        purchaseQuantity: data.purchaseQuantity,
         description: data.description || "",
-        image: data.image || ""
+        image: data.image || "",
+        availableQuantity: 0  // This will be calculated in the service
       };
       
       const result = await updateInventoryItem(itemData);
@@ -172,10 +173,10 @@ const EditItemForm: React.FC<EditItemFormProps> = ({
             
             <FormField
               control={form.control}
-              name="quantity"
+              name="purchaseQuantity"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Quantity</FormLabel>
+                  <FormLabel>Purchased Quantity</FormLabel>
                   <FormControl>
                     <Input type="number" min="0" step="1" {...field} />
                   </FormControl>

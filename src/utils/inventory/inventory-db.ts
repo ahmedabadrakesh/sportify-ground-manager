@@ -11,7 +11,6 @@ type InventoryItemDB = {
   price: number;
   purchase_price?: number;
   purchase_quantity?: number;
-  quantity?: number;
   description?: string | null;
   image?: string | null;
   created_at: string;
@@ -54,7 +53,6 @@ export const getAllInventoryItems = async (): Promise<InventoryItem[]> => {
         price: item.price,
         purchasePrice: item.purchase_price || 0,
         purchaseQuantity: item.purchase_quantity || 0,
-        quantity: item.quantity || 0,
         description: item.description || '',
         image: item.image || '',
         availableQuantity: availableQuantity
@@ -81,7 +79,6 @@ export const addInventoryItemToDB = async (item: Omit<InventoryItem, 'id'> & { i
         price: item.price,
         purchase_price: item.purchasePrice,
         purchase_quantity: item.initialQuantity || 0,
-        quantity: item.initialQuantity || 0,
         description: item.description || null,
         image: item.image || null
       })
@@ -102,7 +99,6 @@ export const addInventoryItemToDB = async (item: Omit<InventoryItem, 'id'> & { i
       price: data.price,
       purchasePrice: data.purchase_price || 0,
       purchaseQuantity: data.purchase_quantity || 0,
-      quantity: data.quantity || 0,
       description: data.description || '',
       image: data.image || '',
       availableQuantity: data.purchase_quantity || 0
@@ -125,7 +121,6 @@ export const updateInventoryItemInDB = async (item: InventoryItem): Promise<Inve
         price: item.price,
         purchase_price: item.purchasePrice,
         purchase_quantity: item.purchaseQuantity,
-        quantity: item.quantity,
         description: item.description || null,
         image: item.image || null
       })
@@ -161,7 +156,6 @@ export const updateInventoryItemInDB = async (item: InventoryItem): Promise<Inve
       price: data.price,
       purchasePrice: data.purchase_price || 0,
       purchaseQuantity: data.purchase_quantity || 0,
-      quantity: data.quantity || 0,
       description: data.description || '',
       image: data.image || '',
       availableQuantity: availableQuantity
