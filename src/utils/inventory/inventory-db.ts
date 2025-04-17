@@ -3,6 +3,20 @@ import { InventoryItem, GroundInventory } from "@/types/models";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
+// Define a type to match what the database actually returns
+type InventoryItemDB = {
+  id: string;
+  name: string;
+  category: string;
+  price: number;
+  purchase_price?: number;
+  quantity?: number;
+  description?: string | null;
+  image?: string | null;
+  created_at: string;
+  updated_at: string;
+};
+
 // Get all inventory items from database
 export const getAllInventoryItems = async (): Promise<InventoryItem[]> => {
   try {
@@ -16,12 +30,12 @@ export const getAllInventoryItems = async (): Promise<InventoryItem[]> => {
       return [];
     }
 
-    return data.map(item => ({
+    return data.map((item: InventoryItemDB) => ({
       id: item.id,
       name: item.name,
       category: item.category,
       price: item.price,
-      purchasePrice: item.purchase_price,
+      purchasePrice: item.purchase_price || 0,
       quantity: item.quantity || 0,
       description: item.description || '',
       image: item.image || ''
@@ -96,8 +110,8 @@ export const addInventoryItemToDB = async (item: Omit<InventoryItem, 'id'> & { i
       name: data.name,
       category: data.category,
       price: data.price,
-      purchasePrice: data.purchase_price,
-      quantity: data.quantity || 0,
+      purchasePrice: (data as unknown as InventoryItemDB).purchase_price || 0,
+      quantity: (data as unknown as InventoryItemDB).quantity || 0,
       description: data.description || '',
       image: data.image || ''
     };
@@ -138,8 +152,8 @@ export const updateInventoryItemInDB = async (item: InventoryItem): Promise<Inve
       name: data.name,
       category: data.category,
       price: data.price,
-      purchasePrice: data.purchase_price,
-      quantity: data.quantity || 0,
+      purchasePrice: (data as unknown as InventoryItemDB).purchase_price || 0,
+      quantity: (data as unknown as InventoryItemDB).quantity || 0,
       description: data.description || '',
       image: data.image || ''
     };
