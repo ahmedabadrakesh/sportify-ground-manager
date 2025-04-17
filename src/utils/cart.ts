@@ -3,7 +3,7 @@ import { Product, CartItem } from "@/types/models";
 import { toast } from "sonner";
 
 // Helper to get cart from localStorage
-const getCart = (): CartItem[] => {
+export const getCart = (): CartItem[] => {
   const cartItems = localStorage.getItem("cart");
   return cartItems ? JSON.parse(cartItems) : [];
 };
@@ -101,8 +101,46 @@ export const getCartCount = (): number => {
   return cart.reduce((count, item) => count + item.quantity, 0);
 };
 
+// Get cart items count (alias for getCartCount for backward compatibility)
+export const getCartItemsCount = (): number => {
+  return getCartCount();
+};
+
 // Check if product is in cart
 export const isInCart = (productId: string): boolean => {
   const cart = getCart();
   return cart.some(item => item.productId === productId);
+};
+
+// Process checkout
+export const processCheckout = async (checkoutData: {
+  items: CartItem[];
+  customer: {
+    name: string;
+    email: string;
+    phone: string;
+    address: string;
+  };
+  paymentMethod: string;
+  totalAmount: number;
+}): Promise<{ success: boolean; message: string; orderId?: string }> => {
+  try {
+    // Simulate API call
+    await new Promise(resolve => setTimeout(resolve, 1500));
+    
+    // Clear cart after successful checkout
+    clearCart();
+    
+    return {
+      success: true,
+      message: "Order placed successfully!",
+      orderId: `ORD-${Date.now()}`
+    };
+  } catch (error) {
+    console.error("Error processing checkout:", error);
+    return {
+      success: false,
+      message: "Failed to process your order. Please try again."
+    };
+  }
 };

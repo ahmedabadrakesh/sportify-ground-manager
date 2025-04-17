@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import MainLayout from "@/components/layouts/MainLayout";
@@ -75,7 +76,7 @@ const Checkout: React.FC = () => {
     };
   }).filter(item => item.product);
 
-  const totalAmount = getCartTotal(cartItems);
+  const totalAmount = getCartTotal();
 
   const onSubmit = async (data: CheckoutFormValues) => {
     setProcessingOrder(true);
