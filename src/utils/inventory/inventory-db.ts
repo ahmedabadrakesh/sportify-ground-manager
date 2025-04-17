@@ -3,13 +3,14 @@ import { InventoryItem, GroundInventory } from "@/types/models";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
-// Define a type to match what the database actually returns
+// Update the type to include purchase_quantity
 type InventoryItemDB = {
   id: string;
   name: string;
   category: string;
   price: number;
   purchase_price?: number;
+  purchase_quantity?: number;
   quantity?: number;
   description?: string | null;
   image?: string | null;
@@ -17,7 +18,7 @@ type InventoryItemDB = {
   updated_at: string;
 };
 
-// Get all inventory items from database
+// Modify getAllInventoryItems to include purchase_quantity
 export const getAllInventoryItems = async (): Promise<InventoryItem[]> => {
   try {
     const { data, error } = await supabase
@@ -30,16 +31,36 @@ export const getAllInventoryItems = async (): Promise<InventoryItem[]> => {
       return [];
     }
 
-    return data.map((item: InventoryItemDB) => ({
-      id: item.id,
-      name: item.name,
-      category: item.category,
-      price: item.price,
-      purchasePrice: item.purchase_price || 0,
-      quantity: item.quantity || 0,
-      description: item.description || '',
-      image: item.image || ''
-    }));
+    return data.map((item: InventoryItemDB) => {
+      // Calculate available quantity by subtracting allocated quantity from purchase quantity
+      const calculateAvailableQuantity = async () => {
+        const { data: allocatedData, error: allocatedError } = await supabase
+          .from('ground_inventory')
+          .select('SUM(quantity) as total_allocated')
+          .eq('item_id', item.id);
+
+        if (allocatedError) {
+          console.error('Error calculating allocated quantity:', allocatedError);
+          return item.purchase_quantity || 0;
+        }
+
+        const totalAllocated = allocatedData?.[0]?.total_allocated || 0;
+        return Math.max((item.purchase_quantity || 0) - totalAllocated, 0);
+      };
+
+      return {
+        id: item.id,
+        name: item.name,
+        category: item.category,
+        price: item.price,
+        purchasePrice: item.purchase_price || 0,
+        purchaseQuantity: item.purchase_quantity || 0,
+        quantity: item.quantity || 0,
+        description: item.description || '',
+        image: item.image || '',
+        availableQuantity: calculateAvailableQuantity()
+      };
+    });
   } catch (error) {
     console.error('Unexpected error in getAllInventoryItems:', error);
     toast.error('Failed to load inventory items');
@@ -47,43 +68,9 @@ export const getAllInventoryItems = async (): Promise<InventoryItem[]> => {
   }
 };
 
-// Get inventory for a specific ground from database
-export const getGroundInventory = async (groundId: string): Promise<GroundInventory[]> => {
-  try {
-    const { data, error } = await supabase
-      .from('ground_inventory')
-      .select(`
-        ground_id,
-        item_id,
-        quantity,
-        inventory_items(id, name, price)
-      `)
-      .eq('ground_id', groundId);
-
-    if (error) {
-      console.error('Error fetching ground inventory:', error);
-      toast.error('Failed to load ground inventory');
-      return [];
-    }
-
-    return data.map(item => ({
-      groundId: item.ground_id,
-      itemId: item.item_id,
-      quantity: item.quantity,
-      itemName: item.inventory_items.name,
-      itemPrice: item.inventory_items.price
-    }));
-  } catch (error) {
-    console.error('Unexpected error in getGroundInventory:', error);
-    toast.error('Failed to load ground inventory');
-    return [];
-  }
-};
-
-// Add new inventory item to database
+// Update addInventoryItemToDB to include purchase_quantity
 export const addInventoryItemToDB = async (item: Omit<InventoryItem, 'id'> & { initialQuantity?: number }): Promise<InventoryItem | null> => {
   try {
-    // First, insert the inventory item
     const { data, error } = await supabase
       .from('inventory_items')
       .insert({
@@ -91,6 +78,7 @@ export const addInventoryItemToDB = async (item: Omit<InventoryItem, 'id'> & { i
         category: item.category,
         price: item.price,
         purchase_price: item.purchasePrice,
+        purchase_quantity: item.initialQuantity || 0,
         quantity: item.initialQuantity || 0,
         description: item.description || null,
         image: item.image || null
@@ -111,6 +99,7 @@ export const addInventoryItemToDB = async (item: Omit<InventoryItem, 'id'> & { i
       category: data.category,
       price: data.price,
       purchasePrice: data.purchase_price || 0,
+      purchaseQuantity: data.purchase_quantity || 0,
       quantity: data.quantity || 0,
       description: data.description || '',
       image: data.image || ''
@@ -122,7 +111,7 @@ export const addInventoryItemToDB = async (item: Omit<InventoryItem, 'id'> & { i
   }
 };
 
-// Update existing inventory item in database
+// Update updateInventoryItemInDB to include purchase_quantity
 export const updateInventoryItemInDB = async (item: InventoryItem): Promise<InventoryItem | null> => {
   try {
     const { data, error } = await supabase
@@ -132,6 +121,7 @@ export const updateInventoryItemInDB = async (item: InventoryItem): Promise<Inve
         category: item.category,
         price: item.price,
         purchase_price: item.purchasePrice,
+        purchase_quantity: item.purchaseQuantity,
         quantity: item.quantity,
         description: item.description || null,
         image: item.image || null
@@ -153,6 +143,7 @@ export const updateInventoryItemInDB = async (item: InventoryItem): Promise<Inve
       category: data.category,
       price: data.price,
       purchasePrice: data.purchase_price || 0,
+      purchaseQuantity: data.purchase_quantity || 0,
       quantity: data.quantity || 0,
       description: data.description || '',
       image: data.image || ''
