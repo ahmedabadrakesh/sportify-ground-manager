@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { PlusCircle, Boxes, BarChart3 } from "lucide-react";
 import AdminLayout from "@/components/layouts/AdminLayout";
@@ -7,49 +6,93 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import InventoryTable from "@/components/inventory/InventoryTable";
 import GroundInventoryTable from "@/components/inventory/GroundInventoryTable";
+import AddItemForm from "@/components/inventory/AddItemForm";
 import { InventoryItem, GroundInventory, Ground } from "@/types/models";
 import { getCurrentUserSync, hasRoleSync } from "@/utils/auth";
 import { toast } from "sonner";
+import { getAllInventoryItems, getGroundInventory } from "@/utils/inventory";
+import { supabase } from "@/integrations/supabase/client";
 
 const AdminInventory: React.FC = () => {
   const [inventoryItems, setInventoryItems] = useState<InventoryItem[]>([]);
   const [groundInventory, setGroundInventory] = useState<GroundInventory[]>([]);
   const [grounds, setGrounds] = useState<Ground[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isAddItemOpen, setIsAddItemOpen] = useState(false);
   
   const currentUser = getCurrentUserSync();
   const isSuperAdmin = hasRoleSync('super_admin');
   
-  useEffect(() => {
-    // Fetch inventory and ground data
-    const fetchData = async () => {
-      try {
-        // Simulate API calls with timeouts
-        setTimeout(async () => {
-          const { inventoryItems: mockInventory, groundInventory: mockGroundInventory, grounds: mockGrounds } = await import("@/data/mockData");
-          
-          // Filter ground inventory based on user role
-          let userGroundInventory = isSuperAdmin
-            ? mockGroundInventory
-            : mockGroundInventory.filter(item => {
-                const ground = mockGrounds.find(g => g.id === item.groundId);
-                return ground?.ownerId === currentUser?.id;
-              });
-          
-          setInventoryItems(mockInventory);
-          setGroundInventory(userGroundInventory);
-          setGrounds(mockGrounds);
-          setLoading(false);
-        }, 500);
-      } catch (error) {
-        console.error("Error fetching inventory data:", error);
-        toast.error("Failed to load inventory data");
-        setLoading(false);
+  const fetchData = async () => {
+    setLoading(true);
+    try {
+      // Fetch inventory items from database
+      const items = await getAllInventoryItems();
+      setInventoryItems(items);
+
+      // Fetch grounds data
+      const { data: groundsData, error: groundsError } = await supabase
+        .from('grounds')
+        .select('*');
+      
+      if (groundsError) {
+        console.error("Error fetching grounds:", groundsError);
+        toast.error("Failed to load grounds data");
+        return;
       }
-    };
-    
+
+      const fetchedGrounds = groundsData.map((g) => ({
+        id: g.id,
+        name: g.name,
+        description: g.description || "",
+        address: g.address,
+        location: g.location as { lat: number; lng: number },
+        ownerId: g.owner_id,
+        ownerName: "", // Would be fetched in a real app
+        ownerContact: "",
+        ownerWhatsapp: "",
+        games: g.games || [],
+        facilities: g.facilities || [],
+        images: g.images || [],
+        rating: g.rating,
+        reviewCount: g.review_count
+      }));
+      
+      setGrounds(fetchedGrounds);
+      
+      // Fetch ground inventory for all grounds if superadmin, 
+      // otherwise only for grounds owned by current user
+      let allGroundInventory: GroundInventory[] = [];
+      
+      if (isSuperAdmin) {
+        for (const ground of fetchedGrounds) {
+          const groundInv = await getGroundInventory(ground.id);
+          allGroundInventory = [...allGroundInventory, ...groundInv];
+        }
+      } else if (currentUser) {
+        const userGrounds = fetchedGrounds.filter(g => g.ownerId === currentUser.id);
+        for (const ground of userGrounds) {
+          const groundInv = await getGroundInventory(ground.id);
+          allGroundInventory = [...allGroundInventory, ...groundInv];
+        }
+      }
+      
+      setGroundInventory(allGroundInventory);
+    } catch (error) {
+      console.error("Error fetching inventory data:", error);
+      toast.error("Failed to load inventory data");
+    } finally {
+      setLoading(false);
+    }
+  };
+  
+  useEffect(() => {
     fetchData();
   }, [currentUser, isSuperAdmin]);
+
+  const handleItemAdded = () => {
+    fetchData();
+  };
 
   return (
     <AdminLayout>
@@ -61,7 +104,7 @@ const AdminInventory: React.FC = () => {
           </p>
         </div>
         
-        <Button className="flex items-center">
+        <Button className="flex items-center" onClick={() => setIsAddItemOpen(true)}>
           <PlusCircle className="h-4 w-4 mr-2" />
           Add New Item
         </Button>
@@ -125,6 +168,12 @@ const AdminInventory: React.FC = () => {
           </TabsContent>
         </Tabs>
       )}
+      
+      <AddItemForm 
+        open={isAddItemOpen} 
+        onOpenChange={setIsAddItemOpen}
+        onItemAdded={handleItemAdded}
+      />
     </AdminLayout>
   );
 };
