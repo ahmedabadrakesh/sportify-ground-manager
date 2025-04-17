@@ -3,3 +3,4 @@
 export * from './inventory-db';
 export * from './inventory-operations';
 export * from './inventory-history';
+export * from './inventory-ground';

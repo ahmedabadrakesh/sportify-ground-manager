@@ -1,29 +1,20 @@
-
 import React, { useState, useEffect } from "react";
-import { PlusCircle, Boxes, BarChart3, Pencil, Trash } from "lucide-react";
+import { Boxes, BarChart3 } from "lucide-react";
 import AdminLayout from "@/components/layouts/AdminLayout";
-import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import InventoryTable from "@/components/inventory/InventoryTable";
-import GroundInventoryTable from "@/components/inventory/GroundInventoryTable";
 import AddItemForm from "@/components/inventory/AddItemForm";
 import EditItemForm from "@/components/inventory/EditItemForm";
 import { InventoryItem, GroundInventory, Ground } from "@/types/models";
 import { getCurrentUserSync, hasRoleSync } from "@/utils/auth";
 import { toast } from "sonner";
-import { getAllInventoryItems, getGroundInventory } from "@/utils/inventory";
+import { getAllInventoryItems } from "@/utils/inventory";
+import { getGroundInventory } from "@/utils/inventory/inventory-ground";
 import { supabase } from "@/integrations/supabase/client";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
+
+import InventoryHeader from "@/components/admin/inventory/InventoryHeader";
+import InventoryItemsTab from "@/components/admin/inventory/InventoryItemsTab";
+import GroundAllocationTab from "@/components/admin/inventory/GroundAllocationTab";
+import DeleteItemDialog from "@/components/admin/inventory/DeleteItemDialog";
 
 const AdminInventory: React.FC = () => {
   const [inventoryItems, setInventoryItems] = useState<InventoryItem[]>([]);
@@ -162,19 +153,7 @@ const AdminInventory: React.FC = () => {
 
   return (
     <AdminLayout>
-      <div className="flex justify-between items-center mb-6">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Inventory Management</h1>
-          <p className="text-gray-600">
-            Manage your platform's inventory items and ground-specific allocations.
-          </p>
-        </div>
-        
-        <Button className="flex items-center" onClick={() => setIsAddItemOpen(true)}>
-          <PlusCircle className="h-4 w-4 mr-2" />
-          Add New Item
-        </Button>
-      </div>
+      <InventoryHeader onAddItem={() => setIsAddItemOpen(true)} />
 
       {loading ? (
         <div className="text-center py-8">
@@ -194,47 +173,19 @@ const AdminInventory: React.FC = () => {
           </TabsList>
           
           <TabsContent value="items">
-            <Card>
-              <CardHeader>
-                <CardTitle>Available Items</CardTitle>
-                <CardDescription>
-                  Manage the items available across all grounds.
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <InventoryTable 
-                  inventory={inventoryItems.map(item => ({
-                    groundId: '',
-                    itemId: item.id,
-                    itemName: item.name,
-                    itemPrice: item.price,
-                    quantity: 0
-                  }))} 
-                  readonly={true}
-                  allowEdit={true}
-                  onEditItem={handleEditItem}
-                  onDeleteItem={handleDeleteItem}
-                />
-              </CardContent>
-            </Card>
+            <InventoryItemsTab 
+              inventoryItems={inventoryItems}
+              onEditItem={handleEditItem}
+              onDeleteItem={handleDeleteItem}
+            />
           </TabsContent>
           
           <TabsContent value="allocation">
-            <Card>
-              <CardHeader>
-                <CardTitle>Ground Inventory Allocation</CardTitle>
-                <CardDescription>
-                  Allocate specific items to individual grounds.
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <GroundInventoryTable 
-                  groundInventory={groundInventory} 
-                  grounds={grounds}
-                  isSuperAdmin={isSuperAdmin}
-                />
-              </CardContent>
-            </Card>
+            <GroundAllocationTab 
+              groundInventory={groundInventory}
+              grounds={grounds}
+              isSuperAdmin={isSuperAdmin}
+            />
           </TabsContent>
         </Tabs>
       )}
@@ -252,22 +203,11 @@ const AdminInventory: React.FC = () => {
         item={selectedItem}
       />
       
-      <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-            <AlertDialogDescription>
-              This action cannot be undone. This will permanently delete the inventory item.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={confirmDeleteItem} className="bg-red-600 hover:bg-red-700">
-              Delete
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      <DeleteItemDialog
+        isOpen={isDeleteDialogOpen}
+        onOpenChange={setIsDeleteDialogOpen}
+        onConfirm={confirmDeleteItem}
+      />
     </AdminLayout>
   );
 };
