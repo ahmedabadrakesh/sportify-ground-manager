@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Check, Package } from "lucide-react";
 import AdminLayout from "@/components/layouts/AdminLayout";
 import { Button } from "@/components/ui/button";
@@ -10,13 +10,18 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { hasRole } from "@/utils/auth";
 import { allocateInventory, getAllInventoryItems, getGroundInventory } from "@/utils/inventory";
-import { grounds } from "@/data/mockData";
+import { InventoryItem, GroundInventory, Ground } from "@/types/models";
+import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
 const InventoryAllocate: React.FC = () => {
   const [selectedGround, setSelectedGround] = useState<string>("");
   const [selectedItem, setSelectedItem] = useState<string>("");
   const [quantity, setQuantity] = useState<number>(1);
+  const [grounds, setGrounds] = useState<Ground[]>([]);
+  const [groundInventory, setGroundInventory] = useState<GroundInventory[]>([]);
+  const [inventoryItems, setInventoryItems] = useState<InventoryItem[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
   
   // Check if the current user is a super admin
   if (!hasRole('super_admin')) {
@@ -32,21 +37,98 @@ const InventoryAllocate: React.FC = () => {
     );
   }
   
-  const inventoryItems = getAllInventoryItems();
+  useEffect(() => {
+    const fetchGrounds = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('grounds')
+          .select('*');
+        
+        if (error) {
+          console.error("Error fetching grounds:", error);
+          toast.error("Failed to load grounds data");
+          return;
+        }
+        
+        const fetchedGrounds = data.map((g) => ({
+          id: g.id,
+          name: g.name,
+          description: g.description || "",
+          address: g.address,
+          location: g.location as { lat: number; lng: number },
+          ownerId: g.owner_id,
+          ownerName: "", // Would be fetched in a real app
+          ownerContact: "",
+          ownerWhatsapp: "",
+          games: g.games || [],
+          facilities: g.facilities || [],
+          images: g.images || [],
+          rating: g.rating,
+          reviewCount: g.review_count
+        }));
+        
+        setGrounds(fetchedGrounds);
+      } catch (error) {
+        console.error("Error fetching grounds:", error);
+        toast.error("Failed to load grounds data");
+      }
+    };
+    
+    const fetchInventoryItems = async () => {
+      try {
+        const items = await getAllInventoryItems();
+        setInventoryItems(items);
+      } catch (error) {
+        console.error("Error fetching inventory items:", error);
+        toast.error("Failed to load inventory items");
+      }
+    };
+    
+    fetchGrounds();
+    fetchInventoryItems();
+    setLoading(false);
+  }, []);
   
-  const handleAllocate = () => {
+  useEffect(() => {
+    const fetchGroundInventory = async () => {
+      if (selectedGround) {
+        try {
+          const inventory = await getGroundInventory(selectedGround);
+          setGroundInventory(inventory);
+        } catch (error) {
+          console.error("Error fetching ground inventory:", error);
+          toast.error("Failed to load ground inventory");
+        }
+      } else {
+        setGroundInventory([]);
+      }
+    };
+    
+    fetchGroundInventory();
+  }, [selectedGround]);
+  
+  const handleAllocate = async () => {
     if (!selectedGround || !selectedItem || quantity <= 0) {
       toast.error("Please select a ground, an item, and a valid quantity");
       return;
     }
     
-    const allocated = allocateInventory(selectedGround, selectedItem, quantity);
-    
-    if (allocated) {
-      toast.success("Inventory allocated successfully");
-      setSelectedItem("");
-      setQuantity(1);
-    } else {
+    try {
+      const allocated = await allocateInventory(selectedGround, selectedItem, quantity);
+      
+      if (allocated) {
+        toast.success("Inventory allocated successfully");
+        setSelectedItem("");
+        setQuantity(1);
+        
+        // Refresh ground inventory
+        const inventory = await getGroundInventory(selectedGround);
+        setGroundInventory(inventory);
+      } else {
+        toast.error("Failed to allocate inventory");
+      }
+    } catch (error) {
+      console.error("Error allocating inventory:", error);
       toast.error("Failed to allocate inventory");
     }
   };
@@ -99,7 +181,7 @@ const InventoryAllocate: React.FC = () => {
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {getGroundInventory(selectedGround).map((item) => (
+                      {groundInventory.map((item) => (
                         <TableRow key={item.itemId}>
                           <TableCell className="font-medium">{item.itemName}</TableCell>
                           <TableCell className="text-right">₹{item.itemPrice}</TableCell>
@@ -107,7 +189,7 @@ const InventoryAllocate: React.FC = () => {
                         </TableRow>
                       ))}
                       
-                      {getGroundInventory(selectedGround).length === 0 && (
+                      {groundInventory.length === 0 && (
                         <TableRow>
                           <TableCell colSpan={3} className="text-center py-6 text-gray-500">
                             No inventory assigned to this ground yet.

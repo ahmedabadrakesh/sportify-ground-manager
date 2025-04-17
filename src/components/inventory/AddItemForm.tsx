@@ -55,7 +55,16 @@ const AddItemForm: React.FC<AddItemFormProps> = ({
 
   const onSubmit = async (data: InventoryItemFormValues) => {
     try {
-      const result = await addInventoryItem(data);
+      // Ensure all required fields have values
+      const itemData = {
+        name: data.name,
+        category: data.category,
+        price: data.price,
+        description: data.description || "",
+        image: data.image || ""
+      };
+      
+      const result = await addInventoryItem(itemData);
       if (result) {
         form.reset();
         onOpenChange(false);
