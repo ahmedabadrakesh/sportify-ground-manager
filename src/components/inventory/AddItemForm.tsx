@@ -23,6 +23,7 @@ const inventoryItemSchema = z.object({
   name: z.string().min(2, { message: "Name must be at least 2 characters" }),
   category: z.string().min(2, { message: "Category is required" }),
   price: z.coerce.number().min(0, { message: "Price must be a positive number" }),
+  initialQuantity: z.coerce.number().min(0, { message: "Quantity must be a positive number" }),
   description: z.string().optional(),
   image: z.string().optional(),
 });
@@ -46,6 +47,7 @@ const AddItemForm: React.FC<AddItemFormProps> = ({
       name: "",
       category: "",
       price: 0,
+      initialQuantity: 0,
       description: "",
       image: "",
     },
@@ -60,6 +62,7 @@ const AddItemForm: React.FC<AddItemFormProps> = ({
         name: data.name,
         category: data.category,
         price: data.price,
+        initialQuantity: data.initialQuantity,
         description: data.description || "",
         image: data.image || ""
       };
@@ -122,6 +125,20 @@ const AddItemForm: React.FC<AddItemFormProps> = ({
                   <FormLabel>Price (₹)</FormLabel>
                   <FormControl>
                     <Input type="number" min="0" step="0.01" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            
+            <FormField
+              control={form.control}
+              name="initialQuantity"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Quantity Purchased</FormLabel>
+                  <FormControl>
+                    <Input type="number" min="0" step="1" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

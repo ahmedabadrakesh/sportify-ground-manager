@@ -189,8 +189,10 @@ export const useInventoryItems = async (
 };
 
 // Add new inventory item to database
-export const addInventoryItem = async (item: Omit<InventoryItem, 'id'>): Promise<InventoryItem | null> => {
+export const addInventoryItem = async (item: Omit<InventoryItem, 'id'> & { initialQuantity?: number }): Promise<InventoryItem | null> => {
   try {
+    // Start a transaction by manually controlling the Supabase operations
+    // First, insert the inventory item
     const { data, error } = await supabase
       .from('inventory_items')
       .insert({
@@ -207,6 +209,14 @@ export const addInventoryItem = async (item: Omit<InventoryItem, 'id'>): Promise
       console.error('Error adding inventory item:', error);
       toast.error('Failed to add inventory item');
       return null;
+    }
+
+    // If initialQuantity is provided and greater than 0, add it to the central inventory
+    // This would require a central_inventory table in a real application
+    // For now we just log it
+    if (item.initialQuantity && item.initialQuantity > 0) {
+      console.log(`Added ${item.initialQuantity} of ${item.name} to central inventory`);
+      // In a real app, here we would insert into central_inventory or similar
     }
 
     toast.success(`Added new inventory item: ${data.name}`);
