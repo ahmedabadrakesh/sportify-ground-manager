@@ -1,4 +1,3 @@
-
 import { GroundInventory, InventoryItem } from "@/types/models";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -231,6 +230,44 @@ export const addInventoryItem = async (item: Omit<InventoryItem, 'id'> & { initi
   } catch (error) {
     console.error('Unexpected error in addInventoryItem:', error);
     toast.error('Failed to add inventory item');
+    return null;
+  }
+};
+
+// Update existing inventory item in database
+export const updateInventoryItem = async (item: InventoryItem): Promise<InventoryItem | null> => {
+  try {
+    const { data, error } = await supabase
+      .from('inventory_items')
+      .update({
+        name: item.name,
+        category: item.category,
+        price: item.price,
+        description: item.description || null,
+        image: item.image || null
+      })
+      .eq('id', item.id)
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Error updating inventory item:', error);
+      toast.error('Failed to update inventory item');
+      return null;
+    }
+
+    toast.success(`Updated inventory item: ${data.name}`);
+    return {
+      id: data.id,
+      name: data.name,
+      category: data.category,
+      price: data.price,
+      description: data.description || '',
+      image: data.image || ''
+    };
+  } catch (error) {
+    console.error('Unexpected error in updateInventoryItem:', error);
+    toast.error('Failed to update inventory item');
     return null;
   }
 };

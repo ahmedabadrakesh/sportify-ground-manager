@@ -80,6 +80,14 @@ const GroundOwners: React.FC = () => {
     setOwners(prevOwners => prevOwners.filter(owner => owner.id !== ownerId));
   };
 
+  const handleEditOwner = (updatedOwner: any) => {
+    setOwners(prevOwners => 
+      prevOwners.map(owner => 
+        owner.id === updatedOwner.id ? updatedOwner : owner
+      )
+    );
+  };
+
   return (
     <AdminLayout>
       <div className="flex justify-between items-center mb-6">
@@ -122,6 +130,7 @@ const GroundOwners: React.FC = () => {
         <OwnerTable 
           owners={owners}
           onDeleteOwner={handleDeleteOwner}
+          onEditOwner={handleEditOwner}
         />
       )}
     </AdminLayout>

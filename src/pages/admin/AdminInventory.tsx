@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from "react";
-import { PlusCircle, Boxes, BarChart3 } from "lucide-react";
+import { PlusCircle, Boxes, BarChart3, Pencil, Trash } from "lucide-react";
 import AdminLayout from "@/components/layouts/AdminLayout";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -8,11 +8,22 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import InventoryTable from "@/components/inventory/InventoryTable";
 import GroundInventoryTable from "@/components/inventory/GroundInventoryTable";
 import AddItemForm from "@/components/inventory/AddItemForm";
+import EditItemForm from "@/components/inventory/EditItemForm";
 import { InventoryItem, GroundInventory, Ground } from "@/types/models";
 import { getCurrentUserSync, hasRoleSync } from "@/utils/auth";
 import { toast } from "sonner";
 import { getAllInventoryItems, getGroundInventory } from "@/utils/inventory";
 import { supabase } from "@/integrations/supabase/client";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 const AdminInventory: React.FC = () => {
   const [inventoryItems, setInventoryItems] = useState<InventoryItem[]>([]);
@@ -20,6 +31,10 @@ const AdminInventory: React.FC = () => {
   const [grounds, setGrounds] = useState<Ground[]>([]);
   const [loading, setLoading] = useState(true);
   const [isAddItemOpen, setIsAddItemOpen] = useState(false);
+  const [isEditItemOpen, setIsEditItemOpen] = useState(false);
+  const [selectedItem, setSelectedItem] = useState<InventoryItem | null>(null);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [itemToDelete, setItemToDelete] = useState<string | null>(null);
   
   const currentUser = getCurrentUserSync();
   const isSuperAdmin = hasRoleSync('super_admin');
@@ -105,6 +120,46 @@ const AdminInventory: React.FC = () => {
     fetchData();
   };
 
+  const handleEditItem = (itemId: string) => {
+    const item = inventoryItems.find(item => item.id === itemId);
+    if (item) {
+      setSelectedItem(item);
+      setIsEditItemOpen(true);
+    }
+  };
+
+  const handleDeleteItem = (itemId: string) => {
+    setItemToDelete(itemId);
+    setIsDeleteDialogOpen(true);
+  };
+
+  const confirmDeleteItem = async () => {
+    if (!itemToDelete) return;
+    
+    try {
+      const { error } = await supabase
+        .from('inventory_items')
+        .delete()
+        .eq('id', itemToDelete);
+      
+      if (error) {
+        throw error;
+      }
+      
+      setInventoryItems(prevItems => 
+        prevItems.filter(item => item.id !== itemToDelete)
+      );
+      
+      toast.success("Item deleted successfully");
+    } catch (error) {
+      console.error("Error deleting item:", error);
+      toast.error("Failed to delete item");
+    } finally {
+      setIsDeleteDialogOpen(false);
+      setItemToDelete(null);
+    }
+  };
+
   return (
     <AdminLayout>
       <div className="flex justify-between items-center mb-6">
@@ -147,14 +202,18 @@ const AdminInventory: React.FC = () => {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <InventoryTable inventory={inventoryItems.map(item => ({
-                  groundId: '',
-                  itemId: item.id,
-                  itemName: item.name,
-                  itemPrice: item.price,
-                  quantity: 0
-                }))} 
-                readonly={true}
+                <InventoryTable 
+                  inventory={inventoryItems.map(item => ({
+                    groundId: '',
+                    itemId: item.id,
+                    itemName: item.name,
+                    itemPrice: item.price,
+                    quantity: 0
+                  }))} 
+                  readonly={true}
+                  allowEdit={true}
+                  onEditItem={handleEditItem}
+                  onDeleteItem={handleDeleteItem}
                 />
               </CardContent>
             </Card>
@@ -185,6 +244,30 @@ const AdminInventory: React.FC = () => {
         onOpenChange={setIsAddItemOpen}
         onItemAdded={handleItemAdded}
       />
+      
+      <EditItemForm
+        open={isEditItemOpen}
+        onOpenChange={setIsEditItemOpen}
+        onItemUpdated={fetchData}
+        item={selectedItem}
+      />
+      
+      <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This will permanently delete the inventory item.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmDeleteItem} className="bg-red-600 hover:bg-red-700">
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </AdminLayout>
   );
 };
