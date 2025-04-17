@@ -1,6 +1,6 @@
 
-import React, { useState } from "react";
-import { GroundInventory, Ground } from "@/types/models";
+import React, { useState, useEffect } from "react";
+import { GroundInventory, Ground, InventoryItem } from "@/types/models";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
@@ -18,6 +18,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { allocateInventory } from "@/utils/inventory/inventory-operations";
 import { toast } from "sonner";
+import { getAllInventoryItems } from "@/utils/inventory";
 
 interface GroundInventoryTableProps {
   groundInventory: GroundInventory[];
@@ -37,6 +38,20 @@ const GroundInventoryTable: React.FC<GroundInventoryTableProps> = ({
   const [selectedGround, setSelectedGround] = useState<string>("");
   const [selectedInventoryItem, setSelectedInventoryItem] = useState<GroundInventory | null>(null);
   const [quantity, setQuantity] = useState<number>(1);
+  const [inventoryItems, setInventoryItems] = useState<InventoryItem[]>([]);
+  const [selectedItemId, setSelectedItemId] = useState<string>("");
+
+  // Load all inventory items for the dropdown
+  useEffect(() => {
+    const fetchInventoryItems = async () => {
+      const items = await getAllInventoryItems();
+      setInventoryItems(items);
+    };
+    
+    if (isDialogOpen && !selectedInventoryItem) {
+      fetchInventoryItems();
+    }
+  }, [isDialogOpen, selectedInventoryItem]);
 
   // Group inventory by ground
   const inventoryByGround = groundInventory.reduce<Record<string, GroundInventory[]>>((acc, item) => {
@@ -57,6 +72,7 @@ const GroundInventoryTable: React.FC<GroundInventoryTableProps> = ({
   const handleAddAllocation = (groundId: string) => {
     setSelectedGround(groundId);
     setSelectedInventoryItem(null);
+    setSelectedItemId("");
     setQuantity(1);
     setIsDialogOpen(true);
   };
@@ -67,7 +83,29 @@ const GroundInventoryTable: React.FC<GroundInventoryTableProps> = ({
       return;
     }
     
-    if (!selectedInventoryItem || !selectedInventoryItem.itemId) {
+    // If we're editing an existing item
+    if (selectedInventoryItem) {
+      try {
+        const success = await allocateInventory(
+          selectedGround, 
+          selectedInventoryItem.itemId, 
+          quantity
+        );
+        
+        if (success) {
+          setIsDialogOpen(false);
+          onInventoryUpdated?.();
+          toast.success("Inventory allocation updated successfully");
+        }
+      } catch (error) {
+        console.error("Error allocating inventory:", error);
+        toast.error("Failed to allocate inventory");
+      }
+      return;
+    }
+    
+    // If we're adding a new item
+    if (!selectedItemId) {
       toast.error("Please select an inventory item");
       return;
     }
@@ -75,14 +113,14 @@ const GroundInventoryTable: React.FC<GroundInventoryTableProps> = ({
     try {
       const success = await allocateInventory(
         selectedGround, 
-        selectedInventoryItem.itemId, 
+        selectedItemId, 
         quantity
       );
       
       if (success) {
         setIsDialogOpen(false);
         onInventoryUpdated?.();
-        toast.success("Inventory allocation updated successfully");
+        toast.success("Inventory allocation added successfully");
       }
     } catch (error) {
       console.error("Error allocating inventory:", error);
@@ -200,25 +238,18 @@ const GroundInventoryTable: React.FC<GroundInventoryTableProps> = ({
               <div className="space-y-2">
                 <Label htmlFor="item">Inventory Item</Label>
                 <Select
-                  value={selectedInventoryItem?.itemId || ""}
-                  onValueChange={(value) => {
-                    const item = groundInventory.find(i => i.itemId === value);
-                    setSelectedInventoryItem(item || null);
-                  }}
+                  value={selectedItemId}
+                  onValueChange={setSelectedItemId}
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Select an item" />
                   </SelectTrigger>
                   <SelectContent>
-                    {groundInventory
-                      .filter((item, index, self) => 
-                        self.findIndex(i => i.itemId === item.itemId) === index
-                      )
-                      .map(item => (
-                        <SelectItem key={item.itemId} value={item.itemId}>
-                          {item.itemName}
-                        </SelectItem>
-                      ))}
+                    {inventoryItems.map(item => (
+                      <SelectItem key={item.id} value={item.id}>
+                        {item.name} (₹{item.price}) - Available: {item.availableQuantity}
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </div>

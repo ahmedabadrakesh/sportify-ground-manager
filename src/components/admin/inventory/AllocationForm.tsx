@@ -1,12 +1,12 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { InventoryItem } from "@/types/models";
-import { allocateInventory } from "@/utils/inventory";
+import { allocateInventory, getAllInventoryItems } from "@/utils/inventory";
 import { toast } from "sonner";
 
 interface AllocationFormProps {
@@ -22,6 +22,22 @@ const AllocationForm: React.FC<AllocationFormProps> = ({
 }) => {
   const [selectedItem, setSelectedItem] = useState<string>("");
   const [quantity, setQuantity] = useState<number>(1);
+  const [allInventoryItems, setAllInventoryItems] = useState<InventoryItem[]>(inventoryItems);
+
+  // Load all inventory items for the dropdown
+  useEffect(() => {
+    const fetchAllItems = async () => {
+      try {
+        const items = await getAllInventoryItems();
+        setAllInventoryItems(items);
+      } catch (error) {
+        console.error("Error fetching inventory items:", error);
+        toast.error("Failed to load inventory items");
+      }
+    };
+    
+    fetchAllItems();
+  }, []);
 
   const handleAllocate = async () => {
     if (!selectedGround || !selectedItem || quantity <= 0) {
@@ -46,6 +62,10 @@ const AllocationForm: React.FC<AllocationFormProps> = ({
     }
   };
 
+  // Find the selected item's available quantity
+  const selectedItemDetails = allInventoryItems.find(item => item.id === selectedItem);
+  const maxQuantity = selectedItemDetails?.availableQuantity || 0;
+
   return (
     <div className="space-y-4">
       <div className="space-y-2">
@@ -59,9 +79,9 @@ const AllocationForm: React.FC<AllocationFormProps> = ({
             <SelectValue placeholder="Select an item" />
           </SelectTrigger>
           <SelectContent>
-            {inventoryItems.map((item) => (
+            {allInventoryItems.map((item) => (
               <SelectItem key={item.id} value={item.id}>
-                {item.name} (₹{item.price})
+                {item.name} (₹{item.price}) - Available: {item.availableQuantity}
               </SelectItem>
             ))}
           </SelectContent>
@@ -74,16 +94,22 @@ const AllocationForm: React.FC<AllocationFormProps> = ({
           id="quantity"
           type="number"
           min="1"
+          max={maxQuantity}
           value={quantity}
           onChange={(e) => setQuantity(parseInt(e.target.value) || 0)}
           disabled={!selectedGround || !selectedItem}
         />
+        {selectedItem && (
+          <p className="text-sm text-gray-500">
+            Maximum available: {maxQuantity}
+          </p>
+        )}
       </div>
       
       <Button
         className="w-full mt-4"
         onClick={handleAllocate}
-        disabled={!selectedGround || !selectedItem || quantity <= 0}
+        disabled={!selectedGround || !selectedItem || quantity <= 0 || quantity > maxQuantity}
       >
         <Check className="h-4 w-4 mr-2" />
         Allocate to Ground
