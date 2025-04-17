@@ -4,15 +4,16 @@ import MainLayout from "@/components/layouts/MainLayout";
 import { getAvailableGrounds } from "@/utils/booking";
 import { Ground } from "@/types/models";
 
-// Import all the new component sections
-import StatisticsSection from "@/components/home/StatisticsSection";
+// Import all the component sections
 import HeroSection from "@/components/home/HeroSection";
+import PopularSportsSection from "@/components/home/PopularSportsSection";
 import SearchResultsSection from "@/components/home/SearchResultsSection";
 import FeaturedGroundsSection from "@/components/home/FeaturedGroundsSection";
 import HowItWorksSection from "@/components/home/HowItWorksSection";
 import TestimonialsSection from "@/components/home/TestimonialsSection";
 import ShopPromotionSection from "@/components/home/ShopPromotionSection";
 import WhyChooseUsSection from "@/components/home/WhyChooseUsSection";
+import StatBanner from "@/components/home/StatBanner";
 
 const Home: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -29,8 +30,9 @@ const Home: React.FC = () => {
 
   return (
     <MainLayout>
-      <StatisticsSection />
       <HeroSection />
+      <StatBanner />
+      <PopularSportsSection />
       <SearchResultsSection 
         searchTerm={searchTerm} 
         filteredGrounds={filteredGrounds} 
