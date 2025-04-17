@@ -110,8 +110,8 @@ export const addInventoryItemToDB = async (item: Omit<InventoryItem, 'id'> & { i
       name: data.name,
       category: data.category,
       price: data.price,
-      purchasePrice: (data as unknown as InventoryItemDB).purchase_price || 0,
-      quantity: (data as unknown as InventoryItemDB).quantity || 0,
+      purchasePrice: data.purchase_price || 0,
+      quantity: data.quantity || 0,
       description: data.description || '',
       image: data.image || ''
     };
@@ -152,8 +152,8 @@ export const updateInventoryItemInDB = async (item: InventoryItem): Promise<Inve
       name: data.name,
       category: data.category,
       price: data.price,
-      purchasePrice: (data as unknown as InventoryItemDB).purchase_price || 0,
-      quantity: (data as unknown as InventoryItemDB).quantity || 0,
+      purchasePrice: data.purchase_price || 0,
+      quantity: data.quantity || 0,
       description: data.description || '',
       image: data.image || ''
     };
