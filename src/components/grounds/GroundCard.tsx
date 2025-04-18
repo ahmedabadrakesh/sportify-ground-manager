@@ -1,9 +1,15 @@
 
 import React from "react";
 import { Link } from "react-router-dom";
-import { MapPin, Star, Coffee, Droplets, BadgePercent } from "lucide-react";
+import { MapPin, Star, CupSoda, Droplets, Toilet } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Ground } from "@/types/models";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 interface GroundCardProps {
   ground: Ground;
@@ -18,12 +24,12 @@ const GroundCard: React.FC<GroundCardProps> = ({ ground }) => {
   const getFacilityIcon = (facility: string) => {
     switch (facility.toLowerCase()) {
       case "drinking water":
-        return <Droplets className="h-3.5 w-3.5 mr-1" />;
+        return <Droplets className="h-3.5 w-3.5" />;
       case "toilet - ladies":
       case "toilet - gents":
-        return <BadgePercent className="h-3.5 w-3.5 mr-1" />;
+        return <Toilet className="h-3.5 w-3.5" />;
       case "cafeteria":
-        return <Coffee className="h-3.5 w-3.5 mr-1" />;
+        return <CupSoda className="h-3.5 w-3.5" />;
       default:
         return null;
     }
@@ -34,10 +40,18 @@ const GroundCard: React.FC<GroundCardProps> = ({ ground }) => {
     if (!icon) return null;
     
     return (
-      <span key={facility} className="flex items-center mr-2">
-        {icon}
-        {facility.split(' - ')[0]}
-      </span>
+      <TooltipProvider key={facility}>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <span className="flex items-center mr-2">
+              {icon}
+            </span>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>{facility.split(' - ')[0]}</p>
+          </TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
     );
   };
 
@@ -95,4 +109,3 @@ const GroundCard: React.FC<GroundCardProps> = ({ ground }) => {
 };
 
 export default GroundCard;
-
