@@ -1,7 +1,7 @@
 
 import React from "react";
 import { Link } from "react-router-dom";
-import { MapPin, Star } from "lucide-react";
+import { MapPin, Star, Coffee, Droplets, BadgePercent } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Ground } from "@/types/models";
 
@@ -14,6 +14,32 @@ const GroundCard: React.FC<GroundCardProps> = ({ ground }) => {
   const imagePath = ground.images[0] || "/placeholder.svg";
   // Remove the "public/" prefix if it exists (for correct browser display)
   const displayImagePath = imagePath.startsWith("public/") ? imagePath.substring(7) : imagePath;
+
+  const getFacilityIcon = (facility: string) => {
+    switch (facility.toLowerCase()) {
+      case "drinking water":
+        return <Droplets className="h-3.5 w-3.5 mr-1" />;
+      case "toilet - ladies":
+      case "toilet - gents":
+        return <BadgePercent className="h-3.5 w-3.5 mr-1" />;
+      case "cafeteria":
+        return <Coffee className="h-3.5 w-3.5 mr-1" />;
+      default:
+        return null;
+    }
+  };
+
+  const renderFacility = (facility: string) => {
+    const icon = getFacilityIcon(facility);
+    if (!icon) return null;
+    
+    return (
+      <span key={facility} className="flex items-center mr-2">
+        {icon}
+        {facility.split(' - ')[0]}
+      </span>
+    );
+  };
 
   return (
     <Link
@@ -58,10 +84,8 @@ const GroundCard: React.FC<GroundCardProps> = ({ ground }) => {
         </div>
         
         <div className="mt-4 flex items-center justify-between">
-          <div className="text-xs text-gray-500">
-            {ground.facilities.includes("Drinking Water") && "Water • "}
-            {ground.facilities.includes("Toilet - Ladies") && "Toilets • "}
-            {ground.facilities.includes("Cafeteria") && "Cafeteria"}
+          <div className="text-xs text-gray-500 flex flex-wrap items-center">
+            {ground.facilities.map(renderFacility)}
           </div>
           <div className="text-sm font-medium text-primary-600">Book Now</div>
         </div>
@@ -71,3 +95,4 @@ const GroundCard: React.FC<GroundCardProps> = ({ ground }) => {
 };
 
 export default GroundCard;
+

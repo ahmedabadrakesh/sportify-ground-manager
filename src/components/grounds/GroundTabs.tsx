@@ -1,6 +1,5 @@
-
 import React from "react";
-import { Phone, MessageSquare, MapPin } from "lucide-react";
+import { Phone, MessageSquare, MapPin, Coffee, Droplets, BadgePercent } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Ground } from "@/types/models";
@@ -10,6 +9,20 @@ interface GroundTabsProps {
 }
 
 const GroundTabs: React.FC<GroundTabsProps> = ({ ground }) => {
+  const getFacilityIcon = (facility: string) => {
+    switch (facility.toLowerCase()) {
+      case "drinking water":
+        return <Droplets className="h-5 w-5" />;
+      case "toilet - ladies":
+      case "toilet - gents":
+        return <BadgePercent className="h-5 w-5" />;
+      case "cafeteria":
+        return <Coffee className="h-5 w-5" />;
+      default:
+        return null;
+    }
+  };
+
   return (
     <Tabs defaultValue="overview">
       <TabsList className="mb-6">
@@ -40,9 +53,9 @@ const GroundTabs: React.FC<GroundTabsProps> = ({ ground }) => {
         <h2 className="text-xl font-semibold mb-3">Facilities & Amenities</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {ground.facilities.map((facility) => (
-            <div key={facility} className="flex items-center space-x-2 p-3 bg-gray-50 rounded-md">
-              <div className="w-8 h-8 rounded-full bg-primary-100 flex items-center justify-center">
-                <span className="text-primary-600 text-sm">✓</span>
+            <div key={facility} className="flex items-center space-x-3 p-3 bg-gray-50 rounded-md">
+              <div className="w-10 h-10 rounded-full bg-primary-100 flex items-center justify-center">
+                {getFacilityIcon(facility) || <span className="text-primary-600 text-sm">✓</span>}
               </div>
               <span className="text-gray-700">{facility}</span>
             </div>
