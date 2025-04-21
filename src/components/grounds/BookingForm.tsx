@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { format } from "date-fns";
 import { Calendar as CalendarIcon, Clock } from "lucide-react";
@@ -36,9 +37,9 @@ const BookingForm: React.FC<BookingFormProps> = ({ ground }) => {
   const [bookingStep, setBookingStep] = useState(1);
   const [availableSlots, setAvailableSlots] = useState<TimeSlot[]>([]);
   const [loading, setLoading] = useState(false);
-  
+
   const formattedDate = date ? format(date, "yyyy-MM-dd") : "";
-  
+
   useEffect(() => {
     const loadTimeSlots = async () => {
       if (formattedDate && ground.id) {
@@ -55,10 +56,9 @@ const BookingForm: React.FC<BookingFormProps> = ({ ground }) => {
         }
       }
     };
-    
     loadTimeSlots();
   }, [formattedDate, ground.id]);
-  
+
   const handleSelectSlot = (slotId: string) => {
     setSelectedSlots((prev) =>
       prev.includes(slotId)
@@ -66,18 +66,18 @@ const BookingForm: React.FC<BookingFormProps> = ({ ground }) => {
         : [...prev, slotId]
     );
   };
-  
+
   const handleBookNow = async () => {
     if (!isAuthenticated() && (!name || !phone)) {
       toast.error("Please enter your name and phone number");
       return;
     }
-    
+
     if (selectedSlots.length === 0) {
       toast.error("Please select at least one time slot");
       return;
     }
-    
+
     try {
       const newBooking = await createBooking(
         ground.id,
@@ -86,7 +86,7 @@ const BookingForm: React.FC<BookingFormProps> = ({ ground }) => {
         name,
         phone
       );
-      
+
       if (newBooking) {
         setBookingStep(2);
       } else {
@@ -97,7 +97,7 @@ const BookingForm: React.FC<BookingFormProps> = ({ ground }) => {
       toast.error("An error occurred while creating your booking");
     }
   };
-  
+
   const handleCompleteBooking = () => {
     toast.success("Booking confirmed! Payment completed successfully.");
     setIsDialogOpen(false);
@@ -109,34 +109,36 @@ const BookingForm: React.FC<BookingFormProps> = ({ ground }) => {
   return (
     <div className="bg-white rounded-lg shadow-sm border p-6 h-fit sticky top-6">
       <h2 className="text-xl font-semibold mb-4">Book This Ground</h2>
-      
+
+      {/* Moved the Date Selector to always be visible above slots */}
+      <div className="mb-6">
+        <Label htmlFor="date" className="block mb-2 text-gray-700 font-medium">
+          Select Date
+        </Label>
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button
+              variant="outline"
+              className="w-full justify-start text-left font-normal border border-primary-200"
+              id="date"
+            >
+              <CalendarIcon className="mr-2 h-4 w-4" />
+              {date ? format(date, "PPP") : <span>Pick a date</span>}
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-auto p-0 pointer-events-auto" align="start">
+            <Calendar
+              mode="single"
+              selected={date}
+              onSelect={(date) => date && setDate(date)}
+              initialFocus
+              disabled={(date) => date < new Date()}
+            />
+          </PopoverContent>
+        </Popover>
+      </div>
+
       <div className="space-y-4">
-        <div>
-          <Label htmlFor="date" className="block mb-2 text-gray-700">
-            Select Date
-          </Label>
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button
-                variant="outline"
-                className="w-full justify-start text-left font-normal"
-              >
-                <CalendarIcon className="mr-2 h-4 w-4" />
-                {date ? format(date, "PPP") : <span>Pick a date</span>}
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-auto p-0 pointer-events-auto">
-              <Calendar
-                mode="single"
-                selected={date}
-                onSelect={(date) => date && setDate(date)}
-                initialFocus
-                disabled={(date) => date < new Date()}
-              />
-            </PopoverContent>
-          </Popover>
-        </div>
-        
         <div>
           <Label className="block mb-2 text-gray-700">
             Available Time Slots
@@ -147,7 +149,7 @@ const BookingForm: React.FC<BookingFormProps> = ({ ground }) => {
               Each slot is for 1 hour. Select multiple slots if needed.
             </span>
           </div>
-          
+
           <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
             <DialogTrigger asChild>
               <Button className="w-full">View Available Slots</Button>
@@ -160,7 +162,7 @@ const BookingForm: React.FC<BookingFormProps> = ({ ground }) => {
                     : "Complete Your Booking"}
                 </DialogTitle>
               </DialogHeader>
-              
+
               {bookingStep === 1 ? (
                 <div className="space-y-6">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -183,7 +185,7 @@ const BookingForm: React.FC<BookingFormProps> = ({ ground }) => {
                       />
                     </div>
                   </div>
-                  
+
                   {loading ? (
                     <div className="text-center py-6">
                       <p className="text-gray-500">Loading available slots...</p>
@@ -195,7 +197,7 @@ const BookingForm: React.FC<BookingFormProps> = ({ ground }) => {
                       onSelectSlot={handleSelectSlot}
                     />
                   )}
-                  
+
                   <div className="flex justify-end">
                     <Button onClick={handleBookNow}>
                       Proceed to Payment
@@ -231,7 +233,7 @@ const BookingForm: React.FC<BookingFormProps> = ({ ground }) => {
                       </div>
                     </div>
                   </div>
-                  
+
                   <div className="p-4 bg-gray-50 rounded-lg">
                     <h3 className="font-medium text-lg mb-3">Payment Details</h3>
                     <div className="space-y-4">
@@ -254,7 +256,7 @@ const BookingForm: React.FC<BookingFormProps> = ({ ground }) => {
                       </div>
                     </div>
                   </div>
-                  
+
                   <div className="flex justify-end space-x-2">
                     <Button variant="outline" onClick={() => setBookingStep(1)}>
                       Back
@@ -268,7 +270,7 @@ const BookingForm: React.FC<BookingFormProps> = ({ ground }) => {
             </DialogContent>
           </Dialog>
         </div>
-        
+
         <div className="pt-2 border-t">
           <div className="flex justify-between mb-2">
             <span className="text-gray-700">Price per hour:</span>
