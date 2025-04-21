@@ -19,7 +19,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ onSearch }) => {
   };
 
   return (
-    <div className="relative overflow-hidden">
+    <div className="relative overflow-hidden mb-16"> {/* Add bottom margin here */}
       <video
         className="absolute top-0 left-0 w-full h-full object-cover z-0"
         autoPlay
