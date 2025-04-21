@@ -10,6 +10,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { useGames } from "@/hooks/useGames";
 
 interface GroundTabsProps {
   ground: Ground;
@@ -30,6 +31,17 @@ const GroundTabs: React.FC<GroundTabsProps> = ({ ground }) => {
     }
   };
 
+  // Fetch all games for ID-to-name mapping
+  const { games: allGames, loading } = useGames();
+  const gameNameMap = React.useMemo(() => {
+    const map: Record<string, string> = {};
+    allGames.forEach((g) => {
+      map[g.id] = g.name;
+      map[g.name] = g.name; // fallback
+    });
+    return map;
+  }, [allGames]);
+
   return (
     <Tabs defaultValue="overview">
       <TabsList className="mb-6">
@@ -47,11 +59,15 @@ const GroundTabs: React.FC<GroundTabsProps> = ({ ground }) => {
         <div>
           <h2 className="text-xl font-semibold mb-3">Available Sports</h2>
           <div className="flex flex-wrap gap-2">
-            {ground.games.map((game) => (
-              <Badge key={game} variant="secondary" className="text-sm py-1">
-                {game}
-              </Badge>
-            ))}
+            {loading ? (
+              <span className="text-xs text-gray-400">Loading games...</span>
+            ) : (
+              ground.games.map((game) => (
+                <Badge key={game} variant="secondary" className="text-sm py-1">
+                  {gameNameMap[game] || game}
+                </Badge>
+              ))
+            )}
           </div>
         </div>
       </TabsContent>
