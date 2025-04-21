@@ -11,7 +11,7 @@ import TimeSlotSelector from "./TimeSlotSelector";
 import BookingDatePicker from "./BookingDatePicker";
 import BookingSummary from "./BookingSummary";
 import PaymentForm from "./PaymentForm";
-import { getAvailableTimeSlots } from "@/services/booking/timeSlots";
+import { getAvailableTimeSlots, getSportsAreasForGround } from "@/services/booking/timeSlots";
 import { createBooking } from "@/services/booking/createBooking";
 import { isAuthenticated } from "@/utils/auth";
 import { toast } from "sonner";
@@ -32,19 +32,20 @@ const BookingForm: React.FC<BookingFormProps> = ({ ground }) => {
   const [availableSlots, setAvailableSlots] = useState<TimeSlot[]>([]);
   const [loading, setLoading] = useState(false);
   const [selectedSportsArea, setSelectedSportsArea] = useState<string>("");
+  const [sportsAreas, setSportsAreas] = useState<{ id: string; name: string }[]>([]);
 
   const formattedDate = date ? format(date, "yyyy-MM-dd") : "";
 
-  // Parse sports areas from ground.sportsAreas (legacy) or ground.sports_areas (db)
-  const sportsAreas =
-    (ground.sportsAreas && Array.isArray(ground.sportsAreas) && ground.sportsAreas.length > 0)
-      ? ground.sportsAreas
-      : Array.isArray((ground as any).sports_areas)
-        ? ((ground as any).sports_areas.map((a: any, idx: number) => ({
-          id: a.id || String(idx),
-          name: a.name || (typeof a === "string" ? a : `Area ${idx+1}`)
-        })))
-        : [];
+  // Fetch sports areas from the new table
+  useEffect(() => {
+    const fetchSportsAreas = async () => {
+      if (ground.id) {
+        const areas = await getSportsAreasForGround(ground.id);
+        setSportsAreas(areas);
+      }
+    };
+    fetchSportsAreas();
+  }, [ground.id]);
 
   useEffect(() => {
     const loadTimeSlots = async () => {

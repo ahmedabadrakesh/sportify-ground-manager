@@ -1,4 +1,3 @@
-
 import { supabase } from "@/integrations/supabase/client";
 import { TimeSlot } from "@/types/models";
 
@@ -67,29 +66,26 @@ export const getAvailableTimeSlots = async (groundId: string, date: string): Pro
 // Helper function to create default time slots for a ground/date
 export const createDefaultTimeSlots = async (groundId: string, date: string) => {
   try {
-    // Create slots from 12 AM to 12 PM with 1-hour duration
-    const slots = [];
-    const basePrice = 500;
+    // Fetch sports areas for this ground from the sports_areas table
+    const { data: sportsAreasRaw, error: sportsAreaErr } = await supabase
+      .from('sports_areas')
+      .select('id, name')
+      .eq('ground_id', groundId);
+
+    if (sportsAreaErr) {
+      console.error("Error fetching sports areas:", sportsAreaErr);
+    }
     
-    // Get the sports areas for this ground
-    const { data: groundData } = await supabase
-      .from('grounds')
-      .select('sports_areas')
-      .eq('id', groundId)
-      .single();
-    
-    // Extract sports area IDs if available
-    const sportsAreas = groundData?.sports_areas || [];
+    // Pick first sports area id if available
     let firstSportsAreaId = null;
-    if (Array.isArray(sportsAreas) && sportsAreas.length > 0) {
-      // Try to get the ID from the first sports area
-      const firstArea = sportsAreas[0];
-      if (typeof firstArea === 'object' && firstArea !== null) {
-        firstSportsAreaId = firstArea.id || null;
-      }
+    if (Array.isArray(sportsAreasRaw) && sportsAreasRaw.length > 0) {
+      firstSportsAreaId = sportsAreasRaw[0]?.id || null;
     }
     
     console.log(`Creating default slots with sports area: ${firstSportsAreaId}`);
+    
+    const slots = [];
+    const basePrice = 500;
     
     // All 24 hours of the day
     for (let hour = 0; hour < 24; hour++) {
@@ -121,12 +117,10 @@ export const createDefaultTimeSlots = async (groundId: string, date: string) => 
     
     // Insert the slots into the database
     const { error } = await supabase.from('time_slots').insert(slots);
-    
     if (error) {
       console.error("Error creating default time slots:", error);
       throw error;
     }
-    
     console.log(`Created ${slots.length} default time slots for ground ${groundId} on ${date}`);
   } catch (error) {
     console.error("Error in createDefaultTimeSlots:", error);
@@ -168,6 +162,21 @@ const generateMockTimeSlots = (groundId: string, date: string): TimeSlot[] => {
     };
     slots.push(timeSlot);
   }
-  
   return slots;
+};
+
+export const getSportsAreasForGround = async (groundId: string) => {
+  // Fetch sports areas for a ground from the sports_areas table
+  const { data, error } = await supabase
+    .from('sports_areas')
+    .select('id, name')
+    .eq('ground_id', groundId);
+  if (error) {
+    console.error("Error fetching sports areas:", error);
+    return [];
+  }
+  return (data || []).map(area => ({
+    id: area.id,
+    name: area.name
+  }));
 };

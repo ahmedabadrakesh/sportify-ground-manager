@@ -346,6 +346,32 @@ export type Database = {
         }
         Relationships: []
       }
+      sports_areas: {
+        Row: {
+          ground_id: string
+          id: string
+          name: string
+        }
+        Insert: {
+          ground_id: string
+          id?: string
+          name: string
+        }
+        Update: {
+          ground_id?: string
+          id?: string
+          name?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sports_areas_ground_id_fkey"
+            columns: ["ground_id"]
+            isOneToOne: false
+            referencedRelation: "grounds"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       time_slots: {
         Row: {
           created_at: string
