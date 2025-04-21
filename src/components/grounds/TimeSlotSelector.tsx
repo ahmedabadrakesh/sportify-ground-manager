@@ -10,6 +10,7 @@ interface TimeSlotSelectorProps {
   availableSlots: TimeSlot[];
   selectedSlots: string[];
   onSelectSlot: (slotId: string) => void;
+  selectedSportsArea?: string;
 }
 
 const TimeSlotSelector: React.FC<TimeSlotSelectorProps> = ({
@@ -17,6 +18,7 @@ const TimeSlotSelector: React.FC<TimeSlotSelectorProps> = ({
   availableSlots,
   selectedSlots,
   onSelectSlot,
+  selectedSportsArea,
 }) => (
   <div className="mb-6">
     <div className="flex items-center justify-between mb-2">
@@ -32,7 +34,8 @@ const TimeSlotSelector: React.FC<TimeSlotSelectorProps> = ({
       </div>
     ) : availableSlots.length === 0 ? (
       <div className="text-center py-6 bg-gray-50 rounded-lg">
-        <p className="text-gray-500">No available slots for the selected date.</p>
+        <p className="text-gray-500">No available slots for the selected date{selectedSportsArea ? ` and sports area` : ''}.</p>
+        <p className="text-sm text-gray-400 mt-1">Try selecting a different date{selectedSportsArea ? ' or sports area' : ''}.</p>
       </div>
     ) : (
       <TimeSlotPicker

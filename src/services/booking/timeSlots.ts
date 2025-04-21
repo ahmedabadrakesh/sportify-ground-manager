@@ -54,7 +54,8 @@ export const getAvailableTimeSlots = async (groundId: string, date: string): Pro
       endTime: slot.end_time,
       date: slot.date,
       isBooked: slot.is_booked,
-      price: slot.price
+      price: slot.price,
+      sportsAreaId: slot.sports_area_id
     }));
   } catch (error) {
     console.error("Error in getAvailableTimeSlots:", error);
@@ -69,6 +70,26 @@ export const createDefaultTimeSlots = async (groundId: string, date: string) => 
     // Create slots from 12 AM to 12 PM with 1-hour duration
     const slots = [];
     const basePrice = 500;
+    
+    // Get the sports areas for this ground
+    const { data: groundData } = await supabase
+      .from('grounds')
+      .select('sports_areas')
+      .eq('id', groundId)
+      .single();
+    
+    // Extract sports area IDs if available
+    const sportsAreas = groundData?.sports_areas || [];
+    let firstSportsAreaId = null;
+    if (Array.isArray(sportsAreas) && sportsAreas.length > 0) {
+      // Try to get the ID from the first sports area
+      const firstArea = sportsAreas[0];
+      if (typeof firstArea === 'object' && firstArea !== null) {
+        firstSportsAreaId = firstArea.id || null;
+      }
+    }
+    
+    console.log(`Creating default slots with sports area: ${firstSportsAreaId}`);
     
     // All 24 hours of the day
     for (let hour = 0; hour < 24; hour++) {
@@ -93,7 +114,8 @@ export const createDefaultTimeSlots = async (groundId: string, date: string) => 
         start_time: `${formattedStartHour}:00`,
         end_time: `${formattedEndHour}:00`,
         is_booked: false,
-        price: price
+        price: price,
+        sports_area_id: firstSportsAreaId
       });
     }
     
@@ -141,7 +163,8 @@ const generateMockTimeSlots = (groundId: string, date: string): TimeSlot[] => {
       startTime: `${formattedStartHour}:00`,
       endTime: `${formattedEndHour}:00`,
       isBooked: false,
-      price: price
+      price: price,
+      sportsAreaId: undefined
     };
     slots.push(timeSlot);
   }

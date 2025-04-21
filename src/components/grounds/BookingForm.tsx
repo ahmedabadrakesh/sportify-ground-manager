@@ -12,7 +12,7 @@ import BookingDatePicker from "./BookingDatePicker";
 import BookingSummary from "./BookingSummary";
 import PaymentForm from "./PaymentForm";
 import { getAvailableTimeSlots } from "@/services/booking/timeSlots";
-import { createBooking } from "@/utils/booking";
+import { createBooking } from "@/services/booking/createBooking";
 import { isAuthenticated } from "@/utils/auth";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
@@ -48,16 +48,43 @@ const BookingForm: React.FC<BookingFormProps> = ({ ground }) => {
 
   useEffect(() => {
     const loadTimeSlots = async () => {
-      if (formattedDate && ground.id && selectedSportsArea) {
+      if (formattedDate && ground.id) {
         setLoading(true);
         try {
-          // Fetch slots for specific sports area if backend supports filtering; fallback otherwise
+          console.log("Loading time slots for date:", formattedDate, "ground:", ground.id, "sports area:", selectedSportsArea);
+          // Fetch all slots for the ground and date
           const slots = await getAvailableTimeSlots(ground.id, formattedDate);
-          // Only show relevant slots for selected area (if area id is present)
-          const filteredSlots = slots.filter(
-            slot => !slot.sportsAreaId || !selectedSportsArea || slot.sportsAreaId === selectedSportsArea
-          );
-          setAvailableSlots(filteredSlots.length > 0 ? filteredSlots : slots); // fallback so nothing blank
+          console.log("Fetched slots:", slots);
+          
+          if (slots.length === 0) {
+            console.log("No slots returned from server");
+            setAvailableSlots([]);
+            setLoading(false);
+            return;
+          }
+
+          // If no sports area is selected yet, show no slots until one is selected
+          if (!selectedSportsArea && sportsAreas.length > 0) {
+            console.log("No sports area selected yet, waiting for selection");
+            setAvailableSlots([]);
+            setLoading(false);
+            return;
+          }
+          
+          // If a sports area is selected, filter slots for that area
+          if (selectedSportsArea) {
+            console.log("Filtering slots for sports area:", selectedSportsArea);
+            // Include slots that either have no sportsAreaId (general slots) or match the selected area
+            const filteredSlots = slots.filter(slot => 
+              !slot.sportsAreaId || slot.sportsAreaId === selectedSportsArea
+            );
+            console.log("Filtered slots:", filteredSlots);
+            setAvailableSlots(filteredSlots);
+          } else {
+            // If no sports areas defined for the ground, show all slots
+            console.log("No sports areas defined, showing all slots");
+            setAvailableSlots(slots);
+          }
         } catch (error) {
           console.error("Error loading time slots:", error);
           toast.error("Failed to load available time slots");
@@ -67,9 +94,10 @@ const BookingForm: React.FC<BookingFormProps> = ({ ground }) => {
         }
       }
     };
+    
     loadTimeSlots();
     setSelectedSlots([]);
-  }, [formattedDate, ground.id, selectedSportsArea]);
+  }, [formattedDate, ground.id, selectedSportsArea, sportsAreas.length]);
 
   const handleSelectSlot = (slotId: string) => {
     setSelectedSlots((prev) =>
@@ -85,7 +113,7 @@ const BookingForm: React.FC<BookingFormProps> = ({ ground }) => {
       return;
     }
 
-    if (!selectedSportsArea) {
+    if (sportsAreas.length > 0 && !selectedSportsArea) {
       toast.error("Please select a sports area");
       return;
     }
@@ -96,13 +124,15 @@ const BookingForm: React.FC<BookingFormProps> = ({ ground }) => {
     }
 
     try {
+      console.log("Creating booking with sports area:", selectedSportsArea);
       const newBooking = await createBooking(
         ground.id,
         formattedDate,
         selectedSlots,
         name,
         phone,
-        selectedSportsArea // pass sport area id
+        selectedSportsArea, // pass sport area id
+        undefined // userId (will be determined by the service)
       );
 
       if (newBooking) {
@@ -182,6 +212,7 @@ const BookingForm: React.FC<BookingFormProps> = ({ ground }) => {
           availableSlots={availableSlots}
           selectedSlots={selectedSlots}
           onSelectSlot={handleSelectSlot}
+          selectedSportsArea={selectedSportsArea}
         />
 
         {selectedSlots.length > 0 && (
@@ -198,7 +229,7 @@ const BookingForm: React.FC<BookingFormProps> = ({ ground }) => {
 
         <Button
           className="w-full"
-          disabled={selectedSlots.length === 0 || !selectedSportsArea}
+          disabled={selectedSlots.length === 0 || (sportsAreas.length > 0 && !selectedSportsArea)}
           onClick={handleBookNow}
         >
           Proceed to Payment
