@@ -26,7 +26,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ onSearch }) => {
         muted
         loop
         playsInline
-        src="/videos/hero-background.mp4"
+        src="https://techitree.s3.ap-south-1.amazonaws.com/header_videdo.mp4"
       ></video>
       
       <div className="absolute inset-0 bg-gradient-to-b from-black/70 to-black/50 z-10"></div>
