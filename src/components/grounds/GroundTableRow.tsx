@@ -1,5 +1,5 @@
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Edit, Trash, MapPin, User, Grid3X3 } from "lucide-react";
 import { Ground } from "@/types/models";
@@ -19,11 +19,17 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 
 interface GroundTableRowProps {
   ground: Ground;
   isSuperAdmin: boolean;
   onDelete: (groundId: string) => void;
+}
+
+interface Game {
+  id: string;
+  name: string;
 }
 
 const GroundTableRow: React.FC<GroundTableRowProps> = ({ 
@@ -33,6 +39,29 @@ const GroundTableRow: React.FC<GroundTableRowProps> = ({
 }) => {
   const navigate = useNavigate();
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = React.useState(false);
+  const [allGames, setAllGames] = useState<Game[]>([]);
+
+  useEffect(() => {
+    // Fetch all games from the 'games' table once
+    const fetchGames = async () => {
+      const { data, error } = await supabase.from("games").select("id, name");
+      if (!error && data) {
+        setAllGames(data);
+      }
+    };
+    fetchGames();
+  }, []);
+
+  // Get the names of selected games for this ground
+  const getGameNames = () => {
+    if (!Array.isArray(ground.games) || allGames.length === 0) return [];
+    return ground.games
+      .map((gameId) => {
+        const gameObj = allGames.find((g) => g.id === gameId);
+        return gameObj ? gameObj.name : gameId;
+      })
+      .filter(Boolean);
+  };
 
   // Function to get the correct image path for display
   const getDisplayImagePath = (imagePath: string) => {
@@ -70,11 +99,16 @@ const GroundTableRow: React.FC<GroundTableRowProps> = ({
       </TableCell>
       <TableCell>
         <div className="flex flex-wrap gap-1">
-          {ground.games.map((game) => (
-            <Badge key={game} variant="outline" className="text-xs">
-              {game}
-            </Badge>
-          ))}
+          {getGameNames().length > 0
+            ? getGameNames().map((gameName) => (
+                <Badge key={gameName} variant="outline" className="text-xs">
+                  {gameName}
+                </Badge>
+              ))
+            : (
+                <span className="text-xs text-gray-500">No games selected</span>
+              )
+          }
         </div>
       </TableCell>
       {isSuperAdmin && (
