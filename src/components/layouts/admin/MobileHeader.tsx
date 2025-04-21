@@ -1,3 +1,4 @@
+
 import React from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { ChevronRight } from "lucide-react";
@@ -21,15 +22,7 @@ const MobileHeader: React.FC<MobileHeaderProps> = ({
   return (
     <div className="md:hidden bg-white border-b">
       <div className="flex items-center justify-between px-4 py-3">
-        <Link to="/" className="flex items-center">
-          <img 
-            src="/lovable-uploads/95389000-89d9-41a2-9e40-b2ad99632b9e.png"
-            alt="JOKOVA Logo"
-            className="h-10 w-auto mr-2"
-            style={{ background: "transparent", borderRadius: "4px", padding: "0" }}
-          />
-          <span className="text-xl font-bold text-primary-800">JOKOVA</span>
-        </Link>
+        {/* Removed logo section */}
         
         <div className="flex items-center">
           <Sheet>
@@ -69,3 +62,4 @@ const MobileHeader: React.FC<MobileHeaderProps> = ({
 };
 
 export default MobileHeader;
+
