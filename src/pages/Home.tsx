@@ -17,7 +17,7 @@ const Home: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [hasSearched, setHasSearched] = useState(false);
 
-  const onSearch = (term: string) => {
+  const handleSearch = (term: string) => {
     if (term.trim()) {
       setSearchTerm(term);
       setHasSearched(true);
@@ -26,7 +26,7 @@ const Home: React.FC = () => {
 
   return (
     <MainLayout>
-      <HeroSection onSearch={onSearch} />
+      <HeroSection onSearch={handleSearch} />
       <StatBanner />
       <PopularSportsSection />
       <SearchResultsSection 

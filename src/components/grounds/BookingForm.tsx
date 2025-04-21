@@ -1,5 +1,4 @@
-
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { format } from "date-fns";
 import { Calendar as CalendarIcon, Clock } from "lucide-react";
 import { Calendar } from "@/components/ui/calendar";
@@ -20,7 +19,7 @@ import TimeSlotPicker from "@/components/booking/TimeSlotPicker";
 import { getAvailableTimeSlots, createBooking } from "@/utils/booking";
 import { isAuthenticated } from "@/utils/auth";
 import { toast } from "sonner";
-import { Ground } from "@/types/models";
+import { Ground, TimeSlot } from "@/types/models";
 import { useNavigate } from "react-router-dom";
 
 interface BookingFormProps {
@@ -35,9 +34,30 @@ const BookingForm: React.FC<BookingFormProps> = ({ ground }) => {
   const [phone, setPhone] = useState("");
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [bookingStep, setBookingStep] = useState(1);
+  const [availableSlots, setAvailableSlots] = useState<TimeSlot[]>([]);
+  const [loading, setLoading] = useState(false);
   
   const formattedDate = date ? format(date, "yyyy-MM-dd") : "";
-  const availableSlots = getAvailableTimeSlots(ground.id, formattedDate);
+  
+  useEffect(() => {
+    const loadTimeSlots = async () => {
+      if (formattedDate && ground.id) {
+        setLoading(true);
+        try {
+          const slots = await getAvailableTimeSlots(ground.id, formattedDate);
+          setAvailableSlots(slots);
+        } catch (error) {
+          console.error("Error loading time slots:", error);
+          toast.error("Failed to load available time slots");
+          setAvailableSlots([]);
+        } finally {
+          setLoading(false);
+        }
+      }
+    };
+    
+    loadTimeSlots();
+  }, [formattedDate, ground.id]);
   
   const handleSelectSlot = (slotId: string) => {
     setSelectedSlots((prev) =>
@@ -47,7 +67,7 @@ const BookingForm: React.FC<BookingFormProps> = ({ ground }) => {
     );
   };
   
-  const handleBookNow = () => {
+  const handleBookNow = async () => {
     if (!isAuthenticated() && (!name || !phone)) {
       toast.error("Please enter your name and phone number");
       return;
@@ -58,18 +78,23 @@ const BookingForm: React.FC<BookingFormProps> = ({ ground }) => {
       return;
     }
     
-    const newBooking = createBooking(
-      ground.id,
-      formattedDate,
-      selectedSlots,
-      name,
-      phone
-    );
-    
-    if (newBooking) {
-      setBookingStep(2);
-    } else {
-      toast.error("Failed to create booking. Please try again.");
+    try {
+      const newBooking = await createBooking(
+        ground.id,
+        formattedDate,
+        selectedSlots,
+        name,
+        phone
+      );
+      
+      if (newBooking) {
+        setBookingStep(2);
+      } else {
+        toast.error("Failed to create booking. Please try again.");
+      }
+    } catch (error) {
+      console.error("Booking error:", error);
+      toast.error("An error occurred while creating your booking");
     }
   };
   
@@ -159,11 +184,17 @@ const BookingForm: React.FC<BookingFormProps> = ({ ground }) => {
                     </div>
                   </div>
                   
-                  <TimeSlotPicker
-                    slots={availableSlots}
-                    selectedSlots={selectedSlots}
-                    onSelectSlot={handleSelectSlot}
-                  />
+                  {loading ? (
+                    <div className="text-center py-6">
+                      <p className="text-gray-500">Loading available slots...</p>
+                    </div>
+                  ) : (
+                    <TimeSlotPicker
+                      slots={availableSlots}
+                      selectedSlots={selectedSlots}
+                      onSelectSlot={handleSelectSlot}
+                    />
+                  )}
                   
                   <div className="flex justify-end">
                     <Button onClick={handleBookNow}>

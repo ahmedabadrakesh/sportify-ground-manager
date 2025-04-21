@@ -45,22 +45,49 @@ export const getAvailableGrounds = async (
       throw error;
     }
     
-    let grounds = data.map(ground => ({
-      id: ground.id,
-      name: ground.name,
-      description: ground.description || '',
-      address: ground.address,
-      location: ground.location || { lat: 0, lng: 0 },
-      ownerId: ground.owner_id,
-      ownerName: ground.users ? ground.users.name : 'Unknown Owner',
-      ownerContact: ground.users ? ground.users.phone || '' : '',
-      ownerWhatsapp: ground.users ? ground.users.whatsapp || '' : '',
-      games: ground.games || [],
-      facilities: ground.facilities || [],
-      images: ground.images || [],
-      rating: ground.rating || 0,
-      reviewCount: ground.review_count || 0
-    }));
+    let grounds = data.map(ground => {
+      // Handle location type safely
+      let locationObj = { lat: 0, lng: 0 };
+      if (ground.location) {
+        try {
+          // If location is a string, try to parse it
+          if (typeof ground.location === 'string') {
+            const parsedLocation = JSON.parse(ground.location);
+            locationObj = {
+              lat: Number(parsedLocation.lat) || 0,
+              lng: Number(parsedLocation.lng) || 0
+            };
+          } 
+          // If location is an object, use it directly
+          else if (typeof ground.location === 'object') {
+            const locObj = ground.location as any;
+            locationObj = {
+              lat: Number(locObj.lat) || 0,
+              lng: Number(locObj.lng) || 0
+            };
+          }
+        } catch (e) {
+          console.error("Error parsing location:", e);
+        }
+      }
+      
+      return {
+        id: ground.id,
+        name: ground.name,
+        description: ground.description || '',
+        address: ground.address,
+        location: locationObj,
+        ownerId: ground.owner_id,
+        ownerName: ground.users ? ground.users.name : 'Unknown Owner',
+        ownerContact: ground.users ? ground.users.phone || '' : '',
+        ownerWhatsapp: ground.users ? ground.users.whatsapp || '' : '',
+        games: ground.games || [],
+        facilities: ground.facilities || [],
+        images: ground.images || [],
+        rating: ground.rating || 0,
+        reviewCount: ground.review_count || 0
+      };
+    });
     
     // Filter by location (if provided) - this would ideally be done in the database
     // but we're implementing it in JS for simplicity

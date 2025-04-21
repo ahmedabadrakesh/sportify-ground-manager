@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { format, parseISO } from "date-fns";
 import { Calendar, Clock, MapPin, CheckCircle, XCircle, AlertCircle } from "lucide-react";
@@ -62,8 +62,29 @@ const Bookings: React.FC = () => {
   const navigate = useNavigate();
   const [selectedBooking, setSelectedBooking] = useState<Booking | null>(null);
   const [bookingDetailsOpen, setBookingDetailsOpen] = useState(false);
+  const [userBookings, setUserBookings] = useState<Booking[]>([]);
+  const [loading, setLoading] = useState(true);
   
   const user = getCurrentUserSync();
+  
+  useEffect(() => {
+    const loadBookings = async () => {
+      if (user && user.id) {
+        setLoading(true);
+        try {
+          const bookings = await getUserBookings(user.id);
+          setUserBookings(bookings);
+        } catch (error) {
+          console.error("Error loading bookings:", error);
+          toast.error("Failed to load your bookings");
+        } finally {
+          setLoading(false);
+        }
+      }
+    };
+    
+    loadBookings();
+  }, [user]);
   
   if (!isAuthenticatedSync()) {
     return (
@@ -81,8 +102,6 @@ const Bookings: React.FC = () => {
     );
   }
   
-  const userBookings = getUserBookings(user!.id);
-  
   const activeBookings = userBookings.filter(
     (booking) => booking.bookingStatus !== "cancelled"
   );
@@ -95,12 +114,22 @@ const Bookings: React.FC = () => {
     setBookingDetailsOpen(true);
   };
   
-  const handleCancelBooking = (bookingId: string) => {
-    const cancelled = cancelBooking(bookingId);
-    if (cancelled) {
-      toast.success("Booking cancelled successfully");
-      setBookingDetailsOpen(false);
-    } else {
+  const handleCancelBooking = async (bookingId: string) => {
+    try {
+      const cancelled = await cancelBooking(bookingId);
+      if (cancelled) {
+        toast.success("Booking cancelled successfully");
+        setBookingDetailsOpen(false);
+        // Refresh bookings after cancellation
+        if (user && user.id) {
+          const updatedBookings = await getUserBookings(user.id);
+          setUserBookings(updatedBookings);
+        }
+      } else {
+        toast.error("Failed to cancel booking");
+      }
+    } catch (error) {
+      console.error("Error canceling booking:", error);
       toast.error("Failed to cancel booking");
     }
   };
@@ -112,147 +141,153 @@ const Bookings: React.FC = () => {
         <p className="text-gray-600">View and manage your ground bookings.</p>
       </div>
 
-      <Tabs defaultValue="active" className="mb-8">
-        <TabsList className="mb-6">
-          <TabsTrigger value="active">
-            Active Bookings ({activeBookings.length})
-          </TabsTrigger>
-          <TabsTrigger value="past">
-            Past Bookings ({pastBookings.length})
-          </TabsTrigger>
-        </TabsList>
-        
-        <TabsContent value="active">
-          {activeBookings.length === 0 ? (
-            <div className="text-center py-16 bg-gray-50 rounded-lg">
-              <p className="text-gray-600 mb-4">
-                You don't have any active bookings yet.
-              </p>
-              <Button onClick={() => navigate("/search")}>
-                Find a Ground to Book
-              </Button>
-            </div>
-          ) : (
-            <div className="bg-white rounded-lg shadow-sm overflow-hidden">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Ground</TableHead>
-                    <TableHead>Date</TableHead>
-                    <TableHead>Time</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead>Amount</TableHead>
-                    <TableHead></TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {activeBookings.map((booking) => (
-                    <TableRow key={booking.id}>
-                      <TableCell className="font-medium">
-                        {booking.groundName}
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex items-center">
-                          <Calendar className="w-4 h-4 mr-1 text-gray-500" />
-                          {format(parseISO(booking.date), "dd MMM yyyy")}
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex items-center">
-                          <Clock className="w-4 h-4 mr-1 text-gray-500" />
-                          {booking.slots.length > 0
-                            ? `${formatTime(booking.slots[0].startTime)} - ${formatTime(
-                                booking.slots[booking.slots.length - 1].endTime
-                              )}`
-                            : "N/A"}
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <BookingStatusBadge status={booking.bookingStatus} />
-                      </TableCell>
-                      <TableCell className="font-medium">
-                        ₹{booking.totalAmount}
-                      </TableCell>
-                      <TableCell>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => viewBookingDetails(booking)}
-                        >
-                          View Details
-                        </Button>
-                      </TableCell>
+      {loading ? (
+        <div className="text-center py-16 bg-gray-50 rounded-lg">
+          <p className="text-gray-600 mb-4">Loading your bookings...</p>
+        </div>
+      ) : (
+        <Tabs defaultValue="active" className="mb-8">
+          <TabsList className="mb-6">
+            <TabsTrigger value="active">
+              Active Bookings ({activeBookings.length})
+            </TabsTrigger>
+            <TabsTrigger value="past">
+              Past Bookings ({pastBookings.length})
+            </TabsTrigger>
+          </TabsList>
+          
+          <TabsContent value="active">
+            {activeBookings.length === 0 ? (
+              <div className="text-center py-16 bg-gray-50 rounded-lg">
+                <p className="text-gray-600 mb-4">
+                  You don't have any active bookings yet.
+                </p>
+                <Button onClick={() => navigate("/search")}>
+                  Find a Ground to Book
+                </Button>
+              </div>
+            ) : (
+              <div className="bg-white rounded-lg shadow-sm overflow-hidden">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Ground</TableHead>
+                      <TableHead>Date</TableHead>
+                      <TableHead>Time</TableHead>
+                      <TableHead>Status</TableHead>
+                      <TableHead>Amount</TableHead>
+                      <TableHead></TableHead>
                     </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </div>
-          )}
-        </TabsContent>
-        
-        <TabsContent value="past">
-          {pastBookings.length === 0 ? (
-            <div className="text-center py-16 bg-gray-50 rounded-lg">
-              <p className="text-gray-600">You don't have any past bookings.</p>
-            </div>
-          ) : (
-            <div className="bg-white rounded-lg shadow-sm overflow-hidden">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Ground</TableHead>
-                    <TableHead>Date</TableHead>
-                    <TableHead>Time</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead>Amount</TableHead>
-                    <TableHead></TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {pastBookings.map((booking) => (
-                    <TableRow key={booking.id}>
-                      <TableCell className="font-medium">
-                        {booking.groundName}
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex items-center">
-                          <Calendar className="w-4 h-4 mr-1 text-gray-500" />
-                          {format(parseISO(booking.date), "dd MMM yyyy")}
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex items-center">
-                          <Clock className="w-4 h-4 mr-1 text-gray-500" />
-                          {booking.slots.length > 0
-                            ? `${formatTime(booking.slots[0].startTime)} - ${formatTime(
-                                booking.slots[booking.slots.length - 1].endTime
-                              )}`
-                            : "N/A"}
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <BookingStatusBadge status={booking.bookingStatus} />
-                      </TableCell>
-                      <TableCell className="font-medium">
-                        ₹{booking.totalAmount}
-                      </TableCell>
-                      <TableCell>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => viewBookingDetails(booking)}
-                        >
-                          View Details
-                        </Button>
-                      </TableCell>
+                  </TableHeader>
+                  <TableBody>
+                    {activeBookings.map((booking) => (
+                      <TableRow key={booking.id}>
+                        <TableCell className="font-medium">
+                          {booking.groundName}
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex items-center">
+                            <Calendar className="w-4 h-4 mr-1 text-gray-500" />
+                            {format(parseISO(booking.date), "dd MMM yyyy")}
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex items-center">
+                            <Clock className="w-4 h-4 mr-1 text-gray-500" />
+                            {booking.slots && booking.slots.length > 0
+                              ? `${formatTime(booking.slots[0].startTime)} - ${formatTime(
+                                  booking.slots[booking.slots.length - 1].endTime
+                                )}`
+                              : "N/A"}
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <BookingStatusBadge status={booking.bookingStatus} />
+                        </TableCell>
+                        <TableCell className="font-medium">
+                          ₹{booking.totalAmount}
+                        </TableCell>
+                        <TableCell>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => viewBookingDetails(booking)}
+                          >
+                            View Details
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+            )}
+          </TabsContent>
+          
+          <TabsContent value="past">
+            {pastBookings.length === 0 ? (
+              <div className="text-center py-16 bg-gray-50 rounded-lg">
+                <p className="text-gray-600">You don't have any past bookings.</p>
+              </div>
+            ) : (
+              <div className="bg-white rounded-lg shadow-sm overflow-hidden">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Ground</TableHead>
+                      <TableHead>Date</TableHead>
+                      <TableHead>Time</TableHead>
+                      <TableHead>Status</TableHead>
+                      <TableHead>Amount</TableHead>
+                      <TableHead></TableHead>
                     </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </div>
-          )}
-        </TabsContent>
-      </Tabs>
+                  </TableHeader>
+                  <TableBody>
+                    {pastBookings.map((booking) => (
+                      <TableRow key={booking.id}>
+                        <TableCell className="font-medium">
+                          {booking.groundName}
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex items-center">
+                            <Calendar className="w-4 h-4 mr-1 text-gray-500" />
+                            {format(parseISO(booking.date), "dd MMM yyyy")}
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex items-center">
+                            <Clock className="w-4 h-4 mr-1 text-gray-500" />
+                            {booking.slots && booking.slots.length > 0
+                              ? `${formatTime(booking.slots[0].startTime)} - ${formatTime(
+                                  booking.slots[booking.slots.length - 1].endTime
+                                )}`
+                              : "N/A"}
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <BookingStatusBadge status={booking.bookingStatus} />
+                        </TableCell>
+                        <TableCell className="font-medium">
+                          ₹{booking.totalAmount}
+                        </TableCell>
+                        <TableCell>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => viewBookingDetails(booking)}
+                          >
+                            View Details
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+            )}
+          </TabsContent>
+        </Tabs>
+      )}
 
       {/* Booking Details Dialog */}
       <Dialog open={bookingDetailsOpen} onOpenChange={setBookingDetailsOpen}>
@@ -283,7 +318,7 @@ const Bookings: React.FC = () => {
                   <div className="mt-3 flex flex-wrap gap-2">
                     <BookingStatusBadge status={selectedBooking.bookingStatus} />
                     <Badge variant="outline" className="bg-gray-100 hover:bg-gray-200">
-                      {selectedBooking.slots.length} slot(s)
+                      {selectedBooking.slots ? selectedBooking.slots.length : 0} slot(s)
                     </Badge>
                   </div>
                 </div>
@@ -300,7 +335,7 @@ const Bookings: React.FC = () => {
                 
                 <div>
                   <p className="text-sm text-gray-500 mb-1">Time Slots</p>
-                  {selectedBooking.slots.map((slot) => (
+                  {selectedBooking.slots && selectedBooking.slots.map((slot) => (
                     <p key={slot.id} className="font-medium flex items-center">
                       <Clock className="w-4 h-4 mr-1 text-gray-500" />
                       {formatTime(slot.startTime)} - {formatTime(slot.endTime)}
