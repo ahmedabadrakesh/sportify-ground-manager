@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useMemo } from "react";
 import { format } from "date-fns";
 import { Calendar as CalendarIcon } from "lucide-react";
@@ -21,6 +20,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Ground, TimeSlot } from "@/types/models";
 import { getAvailableTimeSlots, createBooking } from "@/services/booking";
 import { supabase } from "@/integrations/supabase/client";
+import GamesPicker from "./GamesPicker";
 
 interface AddBookingDialogProps {
   isOpen: boolean;
@@ -231,28 +231,12 @@ const AddBookingDialog: React.FC<AddBookingDialogProps> = ({
             </div>
 
             <div className="space-y-2 col-span-1 md:col-span-2">
-              <Label htmlFor="games">Select Games</Label>
-              {gamesLoading ? (
-                <p className="text-sm text-gray-500">Loading games...</p>
-              ) : (
-                <div className="flex flex-wrap gap-2">
-                  {shownGames.length > 0 ?
-                    shownGames.map((game) => (
-                      <Button
-                        key={game.id}
-                        type="button"
-                        variant={selectedGames.includes(game.id) ? "default" : "outline"}
-                        className="text-xs px-3 py-1 rounded-full"
-                        onClick={() => handleGameToggle(game.id)}
-                      >
-                        {game.name}
-                      </Button>
-                    ))
-                  : (
-                    <span className="text-xs text-gray-500">No games available</span>
-                  )}
-                </div>
-              )}
+              <GamesPicker
+                games={shownGames}
+                selectedGames={selectedGames}
+                onToggle={handleGameToggle}
+                loading={gamesLoading}
+              />
             </div>
             
             <div className="space-y-2">
@@ -328,4 +312,3 @@ const AddBookingDialog: React.FC<AddBookingDialogProps> = ({
 };
 
 export default AddBookingDialog;
-
