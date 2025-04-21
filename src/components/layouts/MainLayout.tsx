@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Home, Search, Calendar, User, LogOut, ShoppingBag, ShoppingCart } from "lucide-react";
@@ -30,11 +29,6 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
       <header className="bg-white shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
           <Link to="/" className="flex items-center">
-            <img 
-              src="/lovable-uploads/803e7f63-d335-4d08-972e-1faa955d4b84.png" 
-              alt="JOKOVA Logo" 
-              className="h-8 w-auto mr-2" 
-            />
             <span className="text-2xl font-bold text-primary-800">JOKOVA</span>
           </Link>
           <div className="flex items-center gap-4">
@@ -181,4 +175,3 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
 };
 
 export default MainLayout;
-
