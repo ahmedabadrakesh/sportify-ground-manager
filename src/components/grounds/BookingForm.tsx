@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { format } from "date-fns";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -12,7 +13,7 @@ import BookingSummary from "./BookingSummary";
 import PaymentForm from "./PaymentForm";
 import { getAvailableTimeSlots, getSportsAreasForGround } from "@/services/booking/timeSlots";
 import { createBooking } from "@/services/booking/createBooking";
-import { isAuthenticated } from "@/utils/auth";
+import { isAuthenticated, getCurrentUserSync } from "@/utils/auth";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 import BookingGamesPicker from "./BookingGamesPicker";
@@ -55,13 +56,9 @@ const BookingForm: React.FC<BookingFormProps> = ({ ground }) => {
       if (formattedDate && ground.id) {
         setLoading(true);
         try {
-          console.log("Loading time slots for date:", formattedDate, "ground:", ground.id, "sports area:", selectedSportsArea);
           // Fetch all slots for the ground and date
           const slots = await getAvailableTimeSlots(ground.id, formattedDate);
-          console.log("Fetched slots:", slots);
-          
           if (slots.length === 0) {
-            console.log("No slots returned from server");
             setAvailableSlots([]);
             setLoading(false);
             return;
@@ -69,7 +66,6 @@ const BookingForm: React.FC<BookingFormProps> = ({ ground }) => {
 
           // If no sports area is selected yet, show no slots until one is selected
           if (!selectedSportsArea && sportsAreas.length > 0) {
-            console.log("No sports area selected yet, waiting for selection");
             setAvailableSlots([]);
             setLoading(false);
             return;
@@ -77,20 +73,15 @@ const BookingForm: React.FC<BookingFormProps> = ({ ground }) => {
           
           // If a sports area is selected, filter slots for that area
           if (selectedSportsArea) {
-            console.log("Filtering slots for sports area:", selectedSportsArea);
-            // Include slots that either have no sportsAreaId (general slots) or match the selected area
             const filteredSlots = slots.filter(slot => 
               !slot.sportsAreaId || slot.sportsAreaId === selectedSportsArea
             );
-            console.log("Filtered slots:", filteredSlots);
             setAvailableSlots(filteredSlots);
           } else {
             // If no sports areas defined for the ground, show all slots
-            console.log("No sports areas defined, showing all slots");
             setAvailableSlots(slots);
           }
         } catch (error) {
-          console.error("Error loading time slots:", error);
           toast.error("Failed to load available time slots");
           setAvailableSlots([]);
         } finally {
@@ -98,7 +89,6 @@ const BookingForm: React.FC<BookingFormProps> = ({ ground }) => {
         }
       }
     };
-    
     loadTimeSlots();
     setSelectedSlots([]);
   }, [formattedDate, ground.id, selectedSportsArea, sportsAreas.length]);
@@ -112,7 +102,12 @@ const BookingForm: React.FC<BookingFormProps> = ({ ground }) => {
   };
 
   const handleBookNow = async () => {
-    if (!isAuthenticated() && (!name || !phone)) {
+    // Allow booking only if name and phone are provided, even if authenticated
+    const currentUser = getCurrentUserSync();
+    const effectiveName = name || currentUser?.name || "";
+    const effectivePhone = phone || currentUser?.phone || "";
+
+    if (!effectiveName || !effectivePhone) {
       toast.error("Please enter your name and phone number");
       return;
     }
@@ -127,16 +122,21 @@ const BookingForm: React.FC<BookingFormProps> = ({ ground }) => {
       return;
     }
 
+    if (!selectedGame) {
+      toast.error("Please select a game");
+      return;
+    }
+
     try {
-      console.log("Creating booking with sports area:", selectedSportsArea);
+      // Create booking with selectedGame sent as an array
       const newBooking = await createBooking(
         ground.id,
         formattedDate,
         selectedSlots,
-        name,
-        phone,
-        selectedSportsArea, // pass sport area id
-        undefined // userId (will be determined by the service)
+        effectiveName,
+        effectivePhone,
+        undefined,              // userId (service determines)
+        [selectedGame]          // Pass as array for gameIds
       );
 
       if (newBooking) {
@@ -145,9 +145,15 @@ const BookingForm: React.FC<BookingFormProps> = ({ ground }) => {
       } else {
         toast.error("Failed to create booking. Please try again.");
       }
-    } catch (error) {
-      console.error("Booking error:", error);
-      toast.error("An error occurred while creating your booking");
+    } catch (error: any) {
+      if (
+        typeof error === "object" &&
+        error?.message?.includes("game_ids")
+      ) {
+        toast.error("Booking failed: Game selection column missing. Please refresh and try again.");
+      } else {
+        toast.error("An error occurred while creating your booking");
+      }
     }
   };
 
@@ -195,28 +201,29 @@ const BookingForm: React.FC<BookingFormProps> = ({ ground }) => {
           </div>
         )}
 
-        {!isAuthenticated() && (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <Label htmlFor="booking-name">Your Name</Label>
-              <Input
-                id="booking-name"
-                placeholder="Enter your name"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-              />
-            </div>
-            <div>
-              <Label htmlFor="booking-phone">Phone Number</Label>
-              <Input
-                id="booking-phone"
-                placeholder="Enter your phone number"
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-              />
-            </div>
+        {/* Always show user's name/phone fields (also for authenticated) */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <Label htmlFor="booking-name">Your Name</Label>
+            <Input
+              id="booking-name"
+              placeholder="Enter your name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              required
+            />
           </div>
-        )}
+          <div>
+            <Label htmlFor="booking-phone">Phone Number</Label>
+            <Input
+              id="booking-phone"
+              placeholder="Enter your phone number"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              required
+            />
+          </div>
+        </div>
 
         <TimeSlotSelector
           loading={loading}

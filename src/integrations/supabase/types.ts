@@ -44,6 +44,7 @@ export type Database = {
           booking_status: string
           created_at: string
           date: string
+          game_ids: string[] | null
           ground_id: string
           id: string
           payment_status: string
@@ -56,6 +57,7 @@ export type Database = {
           booking_status: string
           created_at?: string
           date: string
+          game_ids?: string[] | null
           ground_id: string
           id?: string
           payment_status: string
@@ -68,6 +70,7 @@ export type Database = {
           booking_status?: string
           created_at?: string
           date?: string
+          game_ids?: string[] | null
           ground_id?: string
           id?: string
           payment_status?: string
