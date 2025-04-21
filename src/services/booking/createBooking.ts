@@ -4,12 +4,16 @@ import { Booking, TimeSlot } from "@/types/models";
 import { toast } from "sonner";
 import { formatTimeSlot } from "@/components/booking/TimeSlotFormatter";
 
+/**
+* Update: Accepts sportsAreaId and writes it to booking and slots
+*/
 export const createBooking = async (
   groundId: string,
   date: string,
   slotIds: string[],
   userName: string,
   userPhone: string,
+  sportsAreaId?: string,
   userId?: string
 ): Promise<Booking | null> => {
   try {
@@ -19,6 +23,7 @@ export const createBooking = async (
       slotIds,
       userName,
       userPhone,
+      sportsAreaId,
       userId
     });
 
@@ -53,7 +58,7 @@ export const createBooking = async (
       ? `${slotsData.length} slots (${formatTimeSlot(slotsData[0].start_time, slotsData[slotsData.length-1].end_time)})`
       : 'selected slots';
     
-    // Insert the booking
+    // Insert the booking including sports_area_id
     const { data: bookingData, error: bookingError } = await supabase
       .from('bookings')
       .insert({
@@ -62,7 +67,8 @@ export const createBooking = async (
         date: date,
         total_amount: totalAmount,
         booking_status: 'pending',
-        payment_status: 'pending'
+        payment_status: 'pending',
+        sports_area_id: sportsAreaId || null
       })
       .select()
       .single();
@@ -91,11 +97,11 @@ export const createBooking = async (
       return null;
     }
     
-    // Mark the slots as booked
+    // Mark the slots as booked AND assign sports_area_id to slot if not already set
     for (const slotId of slotIds) {
       const { error: updateError } = await supabase
         .from('time_slots')
-        .update({ is_booked: true })
+        .update({ is_booked: true, sports_area_id: sportsAreaId || null })
         .eq('id', slotId);
       
       if (updateError) {
@@ -123,7 +129,8 @@ export const createBooking = async (
       endTime: slot.end_time,
       date: slot.date,
       isBooked: true,
-      price: slot.price
+      price: slot.price,
+      sportsAreaId: slot.sports_area_id || undefined
     }));
     
     const newBooking: Booking = {
@@ -138,7 +145,8 @@ export const createBooking = async (
       totalAmount: totalAmount,
       paymentStatus: 'pending',
       bookingStatus: 'pending',
-      createdAt: new Date().toISOString()
+      createdAt: new Date().toISOString(),
+      sportsAreaId: sportsAreaId
     };
     
     // Show success message with booking details
@@ -160,3 +168,4 @@ function isValidUUID(str?: string): boolean {
   const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
   return uuidPattern.test(str);
 }
+

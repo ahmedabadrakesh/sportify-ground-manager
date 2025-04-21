@@ -5,6 +5,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
 import { Ground, TimeSlot } from "@/types/models";
 import TimeSlotSelector from "./TimeSlotSelector";
 import BookingDatePicker from "./BookingDatePicker";
@@ -30,17 +31,33 @@ const BookingForm: React.FC<BookingFormProps> = ({ ground }) => {
   const [bookingStep, setBookingStep] = useState(1);
   const [availableSlots, setAvailableSlots] = useState<TimeSlot[]>([]);
   const [loading, setLoading] = useState(false);
+  const [selectedSportsArea, setSelectedSportsArea] = useState<string>("");
 
   const formattedDate = date ? format(date, "yyyy-MM-dd") : "";
 
+  // Parse sports areas from ground.sportsAreas (legacy) or ground.sports_areas (db)
+  const sportsAreas =
+    (ground.sportsAreas && Array.isArray(ground.sportsAreas) && ground.sportsAreas.length > 0)
+      ? ground.sportsAreas
+      : Array.isArray((ground as any).sports_areas)
+        ? ((ground as any).sports_areas.map((a: any, idx: number) => ({
+          id: a.id || String(idx),
+          name: a.name || (typeof a === "string" ? a : `Area ${idx+1}`)
+        })))
+        : [];
+
   useEffect(() => {
     const loadTimeSlots = async () => {
-      if (formattedDate && ground.id) {
+      if (formattedDate && ground.id && selectedSportsArea) {
         setLoading(true);
         try {
+          // Fetch slots for specific sports area if backend supports filtering; fallback otherwise
           const slots = await getAvailableTimeSlots(ground.id, formattedDate);
-          setAvailableSlots(slots);
-          console.log("Loaded slots:", slots);
+          // Only show relevant slots for selected area (if area id is present)
+          const filteredSlots = slots.filter(
+            slot => !slot.sportsAreaId || !selectedSportsArea || slot.sportsAreaId === selectedSportsArea
+          );
+          setAvailableSlots(filteredSlots.length > 0 ? filteredSlots : slots); // fallback so nothing blank
         } catch (error) {
           console.error("Error loading time slots:", error);
           toast.error("Failed to load available time slots");
@@ -52,7 +69,7 @@ const BookingForm: React.FC<BookingFormProps> = ({ ground }) => {
     };
     loadTimeSlots();
     setSelectedSlots([]);
-  }, [formattedDate, ground.id]);
+  }, [formattedDate, ground.id, selectedSportsArea]);
 
   const handleSelectSlot = (slotId: string) => {
     setSelectedSlots((prev) =>
@@ -68,6 +85,11 @@ const BookingForm: React.FC<BookingFormProps> = ({ ground }) => {
       return;
     }
 
+    if (!selectedSportsArea) {
+      toast.error("Please select a sports area");
+      return;
+    }
+
     if (selectedSlots.length === 0) {
       toast.error("Please select at least one time slot");
       return;
@@ -79,7 +101,8 @@ const BookingForm: React.FC<BookingFormProps> = ({ ground }) => {
         formattedDate,
         selectedSlots,
         name,
-        phone
+        phone,
+        selectedSportsArea // pass sport area id
       );
 
       if (newBooking) {
@@ -103,11 +126,33 @@ const BookingForm: React.FC<BookingFormProps> = ({ ground }) => {
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-sm border p-6">
+    <div className="bg-white rounded-lg shadow-sm border p-6 max-w-2xl mx-auto">
       <h2 className="text-xl font-semibold mb-4">Book This Ground</h2>
 
       <div className="space-y-6">
         <BookingDatePicker date={date} setDate={setDate} />
+
+        {/* SPORTS AREA SELECTOR */}
+        {sportsAreas.length > 0 && (
+          <div>
+            <Label htmlFor="booking-sports-area">Select Sports Area</Label>
+            <Select
+              value={selectedSportsArea}
+              onValueChange={setSelectedSportsArea}
+            >
+              <SelectTrigger id="booking-sports-area">
+                <SelectValue placeholder="Choose Sports Area" />
+              </SelectTrigger>
+              <SelectContent>
+                {sportsAreas.map((area) => (
+                  <SelectItem key={area.id} value={area.id}>
+                    {area.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        )}
 
         {!isAuthenticated() && (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -153,7 +198,7 @@ const BookingForm: React.FC<BookingFormProps> = ({ ground }) => {
 
         <Button
           className="w-full"
-          disabled={selectedSlots.length === 0}
+          disabled={selectedSlots.length === 0 || !selectedSportsArea}
           onClick={handleBookNow}
         >
           Proceed to Payment

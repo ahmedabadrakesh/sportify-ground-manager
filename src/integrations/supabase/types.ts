@@ -47,6 +47,7 @@ export type Database = {
           ground_id: string
           id: string
           payment_status: string
+          sports_area_id: string | null
           total_amount: number
           updated_at: string
           user_id: string
@@ -58,6 +59,7 @@ export type Database = {
           ground_id: string
           id?: string
           payment_status: string
+          sports_area_id?: string | null
           total_amount: number
           updated_at?: string
           user_id: string
@@ -69,6 +71,7 @@ export type Database = {
           ground_id?: string
           id?: string
           payment_status?: string
+          sports_area_id?: string | null
           total_amount?: number
           updated_at?: string
           user_id?: string
@@ -137,6 +140,7 @@ export type Database = {
           owner_id: string
           rating: number | null
           review_count: number | null
+          sports_areas: Json[] | null
           updated_at: string
         }
         Insert: {
@@ -152,6 +156,7 @@ export type Database = {
           owner_id: string
           rating?: number | null
           review_count?: number | null
+          sports_areas?: Json[] | null
           updated_at?: string
         }
         Update: {
@@ -167,6 +172,7 @@ export type Database = {
           owner_id?: string
           rating?: number | null
           review_count?: number | null
+          sports_areas?: Json[] | null
           updated_at?: string
         }
         Relationships: [
@@ -349,6 +355,7 @@ export type Database = {
           id: string
           is_booked: boolean | null
           price: number
+          sports_area_id: string | null
           start_time: string
           updated_at: string
         }
@@ -360,6 +367,7 @@ export type Database = {
           id?: string
           is_booked?: boolean | null
           price: number
+          sports_area_id?: string | null
           start_time: string
           updated_at?: string
         }
@@ -371,6 +379,7 @@ export type Database = {
           id?: string
           is_booked?: boolean | null
           price?: number
+          sports_area_id?: string | null
           start_time?: string
           updated_at?: string
         }

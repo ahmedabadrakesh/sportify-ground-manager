@@ -1,4 +1,3 @@
-
 import { Booking, Ground, TimeSlot } from "@/types/models";
 import { supabase } from "@/integrations/supabase/client";
 import { getCurrentUserSync } from "./auth";
@@ -147,7 +146,8 @@ export const createBooking = async (
   date: string,
   slotIds: string[],
   userName: string,
-  userPhone: string
+  userPhone: string,
+  sportsAreaId?: string
 ): Promise<Booking | null> => {
   try {
     const user = getCurrentUserSync();
@@ -191,7 +191,8 @@ export const createBooking = async (
         date,
         total_amount: totalAmount,
         booking_status: 'pending',
-        payment_status: 'pending'
+        payment_status: 'pending',
+        sports_area_id: sportsAreaId || null
       })
       .select()
       .single();
@@ -216,19 +217,16 @@ export const createBooking = async (
       return null;
     }
     
-    // Mark the slots as booked
-    const { error: updateError } = await supabase
-      .from('time_slots')
-      .update({ is_booked: true })
-      .in('id', slotIds);
-    
-    if (updateError) {
-      console.error("Error updating slots as booked:", updateError);
+    // Mark the slots as booked and assign sports_area_id
+    for (const slotId of slotIds) {
+      const { error: updateError } = await supabase
+        .from('time_slots')
+        .update({ is_booked: true, sports_area_id: sportsAreaId || null })
+        .eq('id', slotId);
+      if (updateError) {
+        console.error(`Error updating slot ${slotId} as booked:`, updateError);
+      }
     }
-    
-    // Use some inventory items for each booked slot (if needed)
-    const inventoryUsed = useInventoryItems(groundId, "item-1", 1); // Example inventory usage
-    console.log("Inventory used:", inventoryUsed);
     
     // Format the slots for the return data
     const slots = slotsData.map(slot => ({
@@ -238,7 +236,8 @@ export const createBooking = async (
       endTime: slot.end_time,
       date: slot.date,
       isBooked: true,
-      price: slot.price
+      price: slot.price,
+      sportsAreaId: slot.sports_area_id || undefined,
     }));
     
     // Create the booking object to return
@@ -255,6 +254,7 @@ export const createBooking = async (
       paymentStatus: 'pending',
       bookingStatus: 'pending',
       createdAt: bookingData.created_at,
+      sportsAreaId: sportsAreaId
     };
     
     return newBooking;

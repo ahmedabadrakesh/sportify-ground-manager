@@ -34,6 +34,7 @@ export interface Ground {
   images: string[];
   rating: number;
   reviewCount: number;
+  sportsAreas?: { id: string; name: string }[];
 }
 
 export interface Booking {
@@ -46,6 +47,7 @@ export interface Booking {
   paymentStatus: string;
   createdAt: string;
   updatedAt?: string;
+  sportsAreaId?: string;
   userName?: string;
   userPhone?: string;
   groundName?: string;
@@ -60,6 +62,7 @@ export interface TimeSlot {
   endTime: string;
   price: number;
   isBooked: boolean;
+  sportsAreaId?: string;
 }
 
 export interface User {
