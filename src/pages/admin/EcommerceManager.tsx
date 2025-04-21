@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import AdminLayout from "@/components/layouts/AdminLayout";
 import { Button } from "@/components/ui/button";
@@ -24,7 +25,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Plus, Edit, Trash2, Tags, ImagePlus } from "lucide-react";
 import { toast } from "sonner";
 import { Product } from "@/types/models";
-import { addProduct, editProduct, deleteProduct, getProducts } from "@/utils/ecommerce";
+import { addProduct, updateProduct, deleteProduct, getAllProducts } from "@/utils/ecommerce";
 
 const EcommerceManager: React.FC = () => {
   const [products, setProducts] = useState<Product[]>([]);
@@ -50,7 +51,7 @@ const EcommerceManager: React.FC = () => {
   const loadProducts = async () => {
     setLoading(true);
     try {
-      const fetchedProducts = await getProducts();
+      const fetchedProducts = await getAllProducts();
       setProducts(fetchedProducts);
     } catch (error) {
       console.error("Error loading products:", error);
@@ -68,14 +69,15 @@ const EcommerceManager: React.FC = () => {
         price: parseFloat(productPrice),
         category: productCategory,
         stock: parseInt(productStock),
-        images: productImages,
         featured: productFeatured,
       });
       
-      setProducts([...products, newProduct]);
-      resetForm();
-      setIsAddDialogOpen(false);
-      toast.success("Product added successfully");
+      if (newProduct) {
+        setProducts([...products, newProduct]);
+        resetForm();
+        setIsAddDialogOpen(false);
+        toast.success("Product added successfully");
+      }
     } catch (error) {
       console.error("Error adding product:", error);
       toast.error("Failed to add product");
@@ -86,22 +88,25 @@ const EcommerceManager: React.FC = () => {
     if (!selectedProduct) return;
     
     try {
-      const updatedProduct = await editProduct({
-        id: selectedProduct.id,
-        name: productName,
-        description: productDescription,
-        price: parseFloat(productPrice),
-        category: productCategory,
-        stock: parseInt(productStock),
-        images: productImages,
-        featured: productFeatured,
-      });
+      const updatedProduct = await updateProduct(
+        selectedProduct.id,
+        {
+          name: productName,
+          description: productDescription,
+          price: parseFloat(productPrice),
+          category: productCategory,
+          stock: parseInt(productStock),
+          featured: productFeatured,
+        }
+      );
       
-      setProducts(products.map(p => p.id === updatedProduct.id ? updatedProduct : p));
-      resetForm();
-      setIsEditDialogOpen(false);
-      setSelectedProduct(null);
-      toast.success("Product updated successfully");
+      if (updatedProduct) {
+        setProducts(products.map(p => p.id === updatedProduct.id ? updatedProduct : p));
+        resetForm();
+        setIsEditDialogOpen(false);
+        setSelectedProduct(null);
+        toast.success("Product updated successfully");
+      }
     } catch (error) {
       console.error("Error updating product:", error);
       toast.error("Failed to update product");
@@ -112,11 +117,13 @@ const EcommerceManager: React.FC = () => {
     if (!selectedProduct) return;
     
     try {
-      await deleteProduct(selectedProduct.id);
-      setProducts(products.filter(p => p.id !== selectedProduct.id));
-      setIsDeleteDialogOpen(false);
-      setSelectedProduct(null);
-      toast.success("Product deleted successfully");
+      const success = await deleteProduct(selectedProduct.id);
+      if (success) {
+        setProducts(products.filter(p => p.id !== selectedProduct.id));
+        setIsDeleteDialogOpen(false);
+        setSelectedProduct(null);
+        toast.success("Product deleted successfully");
+      }
     } catch (error) {
       console.error("Error deleting product:", error);
       toast.error("Failed to delete product");
