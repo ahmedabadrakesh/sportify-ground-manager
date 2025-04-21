@@ -22,7 +22,7 @@ export const useGroundForm = (images?: File[]) => {
       name: "",
       description: "",
       address: "",
-      games: "",
+      games: [],   // Updated to array of ids
       facilities: "",
       ownerId: ""
     },

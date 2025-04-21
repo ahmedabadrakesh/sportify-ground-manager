@@ -93,6 +93,21 @@ export type Database = {
           },
         ]
       }
+      games: {
+        Row: {
+          id: string
+          name: string
+        }
+        Insert: {
+          id?: string
+          name: string
+        }
+        Update: {
+          id?: string
+          name?: string
+        }
+        Relationships: []
+      }
       ground_inventory: {
         Row: {
           ground_id: string

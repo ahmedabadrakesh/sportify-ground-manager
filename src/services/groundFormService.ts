@@ -1,4 +1,3 @@
-
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { GroundFormValues } from "@/components/admin/grounds/groundFormSchema";
@@ -28,15 +27,15 @@ export const createGround = async ({
   currentUserId,
   images = []
 }: { 
-  values: GroundFormValues, 
+  values: any, // Accept any/unknown due to form casting
   isSuperAdmin: boolean, 
   currentUserId?: string,
   images?: File[]
 }) => {
   try {
-    // Parse games and facilities from comma-separated strings to arrays
-    const gamesArray = values.games ? values.games.split(',').map(item => item.trim()) : [];
-    const facilitiesArray = values.facilities ? values.facilities.split(',').map(item => item.trim()) : [];
+    // Parse games from array of ids instead of comma-separated string
+    const gamesArray = Array.isArray(values.games) ? values.games : [];
+    const facilitiesArray = values.facilities ? values.facilities.split(',').map((item: string) => item.trim()) : [];
 
     // Determine owner ID (if not super admin, use current user's ID)
     const ownerId = isSuperAdmin ? values.ownerId : currentUserId;
@@ -47,24 +46,20 @@ export const createGround = async ({
 
     // Upload images to storage if provided
     const imageUrls: string[] = [];
-    
     if (images && images.length > 0) {
       for (const image of images) {
         const fileName = `${Date.now()}-${image.name}`;
         const { data, error } = await supabase.storage
           .from('grounds')
           .upload(fileName, image);
-        
         if (error) {
           console.error("Error uploading image:", error);
           throw error;
         }
-        
         // Get the public URL for the uploaded image
         const { data: { publicUrl } } = supabase.storage
           .from('grounds')
           .getPublicUrl(fileName);
-        
         imageUrls.push(publicUrl);
       }
     }
