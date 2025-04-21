@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Link } from "react-router-dom";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -22,7 +21,7 @@ const Sidebar: React.FC<SidebarProps> = ({
         <div className="flex items-center flex-shrink-0 px-4 mb-5">
           <Link to="/" className="flex items-center">
             <img
-              src="/lovable-uploads/353972a0-b234-4411-9146-bd65a99899be.png"
+              src="/lovable-uploads/95389000-89d9-41a2-9e40-b2ad99632b9e.png"
               alt="JOKOVA Logo"
               className="h-10 w-auto mr-2"
               style={{ background: "transparent", borderRadius: "4px", padding: "0" }}
@@ -42,4 +41,3 @@ const Sidebar: React.FC<SidebarProps> = ({
 };
 
 export default Sidebar;
-
