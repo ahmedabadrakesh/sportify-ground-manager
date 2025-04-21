@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { format } from "date-fns";
 import { Calendar as CalendarIcon } from "lucide-react";
 import {
@@ -55,8 +55,8 @@ const AddBookingDialog: React.FC<AddBookingDialogProps> = ({
   const [selectedGames, setSelectedGames] = useState<string[]>([]);
   const [gamesLoading, setGamesLoading] = useState(false);
 
+  // Fetch all games once
   useEffect(() => {
-    // Fetch available games
     const fetchGames = async () => {
       setGamesLoading(true);
       const { data, error } = await supabase.from("games").select("id, name").order("name", { ascending: true });
@@ -157,6 +157,21 @@ const AddBookingDialog: React.FC<AddBookingDialogProps> = ({
     setSelectedGames([]);
   };
 
+  // Get games for the selected ground (by id)
+  const availableGameIds: string[] = useMemo(() => {
+    if (!selectedGround) return [];
+    const ground = grounds.find(g => g.id === selectedGround);
+    if (!ground || !Array.isArray(ground.games)) return [];
+    // Some "games" arrays might store IDs as string[] or (rarely) as any type
+    return ground.games as string[];
+  }, [selectedGround, grounds]);
+
+  // Filter full game objects to only show those allowed for this ground
+  const shownGames: Game[] = useMemo(() => {
+    if (!availableGameIds.length) return [];
+    return games.filter(game => availableGameIds.includes(game.id));
+  }, [games, availableGameIds]);
+
   return (
     <Dialog open={isOpen} onOpenChange={(open) => {
       if (!open) resetForm();
@@ -221,18 +236,19 @@ const AddBookingDialog: React.FC<AddBookingDialogProps> = ({
                 <p className="text-sm text-gray-500">Loading games...</p>
               ) : (
                 <div className="flex flex-wrap gap-2">
-                  {games.map((game) => (
-                    <Button
-                      key={game.id}
-                      type="button"
-                      variant={selectedGames.includes(game.id) ? "default" : "outline"}
-                      className="text-xs px-3 py-1 rounded-full"
-                      onClick={() => handleGameToggle(game.id)}
-                    >
-                      {game.name}
-                    </Button>
-                  ))}
-                  {games.length === 0 && (
+                  {shownGames.length > 0 ?
+                    shownGames.map((game) => (
+                      <Button
+                        key={game.id}
+                        type="button"
+                        variant={selectedGames.includes(game.id) ? "default" : "outline"}
+                        className="text-xs px-3 py-1 rounded-full"
+                        onClick={() => handleGameToggle(game.id)}
+                      >
+                        {game.name}
+                      </Button>
+                    ))
+                  : (
                     <span className="text-xs text-gray-500">No games available</span>
                   )}
                 </div>
@@ -312,3 +328,4 @@ const AddBookingDialog: React.FC<AddBookingDialogProps> = ({
 };
 
 export default AddBookingDialog;
+
