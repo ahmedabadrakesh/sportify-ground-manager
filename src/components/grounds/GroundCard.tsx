@@ -1,7 +1,7 @@
 
 import React from "react";
 import { Link } from "react-router-dom";
-import { MapPin, Star, CupSoda, Droplets, Toilet } from "lucide-react";
+import { MapPin, Star, CupSoda, Toilet } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Ground } from "@/types/models";
 import {
@@ -24,12 +24,54 @@ const GroundCard: React.FC<GroundCardProps> = ({ ground }) => {
   const getFacilityIcon = (facility: string) => {
     switch (facility.toLowerCase()) {
       case "drinking water":
-        return <Droplets className="h-3.5 w-3.5" />;
+        return (
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <span className="flex items-center mr-2">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M6 2a1 1 0 0 0-1 1v19a1 1 0 1 0 2 0v-6a2 2 0 1 1 4 0v6a1 1 0 1 0 2 0V3a1 1 0 0 0-1-1H6z" />
+                  </svg>
+                </span>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Drinking Water</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        );
+      case "toilet":
       case "toilet - ladies":
       case "toilet - gents":
-        return <Toilet className="h-3.5 w-3.5" />;
+        return (
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <span className="flex items-center mr-2">
+                  <Toilet className="h-3.5 w-3.5" />
+                </span>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Toilet</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        );
       case "cafeteria":
-        return <CupSoda className="h-3.5 w-3.5" />;
+        return (
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <span className="flex items-center mr-2">
+                  <CupSoda className="h-3.5 w-3.5" />
+                </span>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Cafeteria</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        );
       default:
         return null;
     }
@@ -39,20 +81,7 @@ const GroundCard: React.FC<GroundCardProps> = ({ ground }) => {
     const icon = getFacilityIcon(facility);
     if (!icon) return null;
     
-    return (
-      <TooltipProvider key={facility}>
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <span className="flex items-center mr-2">
-              {icon}
-            </span>
-          </TooltipTrigger>
-          <TooltipContent>
-            <p>{facility.split(' - ')[0]}</p>
-          </TooltipContent>
-        </Tooltip>
-      </TooltipProvider>
-    );
+    return icon;
   };
 
   return (
@@ -109,3 +138,4 @@ const GroundCard: React.FC<GroundCardProps> = ({ ground }) => {
 };
 
 export default GroundCard;
+

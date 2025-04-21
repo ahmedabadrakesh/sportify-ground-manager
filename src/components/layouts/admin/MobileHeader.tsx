@@ -23,7 +23,12 @@ const MobileHeader: React.FC<MobileHeaderProps> = ({
     <div className="md:hidden bg-white border-b">
       <div className="flex items-center justify-between px-4 py-3">
         <Link to="/" className="flex items-center">
-          <span className="text-xl font-bold text-primary-800">SportifyGround</span>
+          <img 
+            src="/lovable-uploads/803e7f63-d335-4d08-972e-1faa955d4b84.png" 
+            alt="JOKOVA Logo" 
+            className="h-10 w-auto mr-2" 
+          />
+          <span className="text-xl font-bold text-primary-800">JOKOVA</span>
         </Link>
         
         <div className="flex items-center">
@@ -64,3 +69,4 @@ const MobileHeader: React.FC<MobileHeaderProps> = ({
 };
 
 export default MobileHeader;
+

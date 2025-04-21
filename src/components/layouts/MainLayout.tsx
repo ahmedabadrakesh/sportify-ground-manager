@@ -30,7 +30,12 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
       <header className="bg-white shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
           <Link to="/" className="flex items-center">
-            <span className="text-2xl font-bold text-primary-800">SportifyGround</span>
+            <img 
+              src="/lovable-uploads/803e7f63-d335-4d08-972e-1faa955d4b84.png" 
+              alt="JOKOVA Logo" 
+              className="h-8 w-auto mr-2" 
+            />
+            <span className="text-2xl font-bold text-primary-800">JOKOVA</span>
           </Link>
           <div className="flex items-center gap-4">
             <Link to="/shop" className="text-gray-700 hover:text-primary-600">
@@ -151,7 +156,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
           <div className="flex flex-col md:flex-row justify-between items-center">
             <div className="text-center md:text-left mb-4 md:mb-0">
               <p className="text-sm text-gray-500">
-                &copy; {new Date().getFullYear()} SportifyGround. All rights reserved.
+                &copy; {new Date().getFullYear()} JOKOVA. All rights reserved.
               </p>
             </div>
             <div className="flex space-x-6">
@@ -176,3 +181,4 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
 };
 
 export default MainLayout;
+
