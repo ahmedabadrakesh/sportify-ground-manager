@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from "react";
 import { format } from "date-fns";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -10,7 +10,8 @@ import TimeSlotSelector from "./TimeSlotSelector";
 import BookingDatePicker from "./BookingDatePicker";
 import BookingSummary from "./BookingSummary";
 import PaymentForm from "./PaymentForm";
-import { getAvailableTimeSlots, createBooking } from "@/utils/booking";
+import { getAvailableTimeSlots } from "@/services/booking/timeSlots";
+import { createBooking } from "@/utils/booking";
 import { isAuthenticated } from "@/utils/auth";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
@@ -39,6 +40,7 @@ const BookingForm: React.FC<BookingFormProps> = ({ ground }) => {
         try {
           const slots = await getAvailableTimeSlots(ground.id, formattedDate);
           setAvailableSlots(slots);
+          console.log("Loaded slots:", slots);
         } catch (error) {
           console.error("Error loading time slots:", error);
           toast.error("Failed to load available time slots");
@@ -141,8 +143,11 @@ const BookingForm: React.FC<BookingFormProps> = ({ ground }) => {
           <BookingSummary
             ground={ground}
             date={date}
-            selectedSlots={selectedSlots}
-            amountPerSlot={800}
+            selectedSlots={selectedSlots.length}
+            totalAmount={selectedSlots.reduce((total, slotId) => {
+              const slot = availableSlots.find(s => s.id === slotId);
+              return total + (slot?.price || 0);
+            }, 0)}
           />
         )}
 

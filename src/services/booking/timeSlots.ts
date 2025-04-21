@@ -31,7 +31,8 @@ export const getAvailableTimeSlots = async (groundId: string, date: string): Pro
       .select('*')
       .eq('ground_id', groundId)
       .eq('date', date)
-      .eq('is_booked', false);
+      .eq('is_booked', false)
+      .order('start_time', { ascending: true });
     
     if (error) {
       console.error("Error fetching time slots:", error);
@@ -65,43 +66,34 @@ export const getAvailableTimeSlots = async (groundId: string, date: string): Pro
 // Helper function to create default time slots for a ground/date
 export const createDefaultTimeSlots = async (groundId: string, date: string) => {
   try {
-    // Create slots from 6 AM to 10 PM with 1-hour duration
+    // Create slots from 12 AM to 12 PM with 1-hour duration
     const slots = [];
     const basePrice = 500;
     
-    // Morning slots (6 AM - 12 PM)
-    for (let hour = 6; hour < 12; hour++) {
+    // All 24 hours of the day
+    for (let hour = 0; hour < 24; hour++) {
+      const formattedStartHour = hour.toString().padStart(2, '0');
+      const formattedEndHour = ((hour + 1) % 24).toString().padStart(2, '0');
+      
+      // Set different prices for different times of day
+      let price = basePrice;
+      if (hour >= 6 && hour < 12) {
+        price = basePrice; // Morning slots
+      } else if (hour >= 12 && hour < 17) {
+        price = basePrice + 100; // Afternoon slots
+      } else if (hour >= 17 && hour < 22) {
+        price = basePrice + 200; // Evening slots
+      } else {
+        price = basePrice - 100; // Night slots (discounted)
+      }
+      
       slots.push({
         ground_id: groundId,
         date: date,
-        start_time: `${hour}:00`,
-        end_time: `${hour + 1}:00`,
+        start_time: `${formattedStartHour}:00`,
+        end_time: `${formattedEndHour}:00`,
         is_booked: false,
-        price: basePrice
-      });
-    }
-    
-    // Afternoon slots (12 PM - 5 PM)
-    for (let hour = 12; hour < 17; hour++) {
-      slots.push({
-        ground_id: groundId,
-        date: date,
-        start_time: `${hour}:00`,
-        end_time: `${hour + 1}:00`,
-        is_booked: false,
-        price: basePrice + 100
-      });
-    }
-    
-    // Evening slots (5 PM - 10 PM)
-    for (let hour = 17; hour < 22; hour++) {
-      slots.push({
-        ground_id: groundId,
-        date: date,
-        start_time: `${hour}:00`,
-        end_time: `${hour + 1}:00`,
-        is_booked: false,
-        price: basePrice + 200
+        price: price
       });
     }
     
@@ -125,16 +117,31 @@ const generateMockTimeSlots = (groundId: string, date: string): TimeSlot[] => {
   const slots: TimeSlot[] = [];
   const basePrice = 500;
   
-  // Generate mock slots for the entire day
-  for (let hour = 6; hour < 22; hour++) {
+  // Generate mock slots for all 24 hours
+  for (let hour = 0; hour < 24; hour++) {
+    const formattedStartHour = hour.toString().padStart(2, '0');
+    const formattedEndHour = ((hour + 1) % 24).toString().padStart(2, '0');
+    
+    // Set different prices for different times of day
+    let price = basePrice;
+    if (hour >= 6 && hour < 12) {
+      price = basePrice; // Morning slots
+    } else if (hour >= 12 && hour < 17) {
+      price = basePrice + 100; // Afternoon slots
+    } else if (hour >= 17 && hour < 22) {
+      price = basePrice + 200; // Evening slots
+    } else {
+      price = basePrice - 100; // Night slots (discounted)
+    }
+    
     const timeSlot: TimeSlot = {
       id: `mock-${groundId}-${date}-${hour}`,
       groundId: groundId,
       date: date,
-      startTime: `${hour}:00`,
-      endTime: `${hour + 1}:00`,
+      startTime: `${formattedStartHour}:00`,
+      endTime: `${formattedEndHour}:00`,
       isBooked: false,
-      price: hour < 12 ? basePrice : hour < 17 ? basePrice + 100 : basePrice + 200
+      price: price
     };
     slots.push(timeSlot);
   }

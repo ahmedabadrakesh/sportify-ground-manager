@@ -18,7 +18,7 @@ const TimeSlotSelector: React.FC<TimeSlotSelectorProps> = ({
   selectedSlots,
   onSelectSlot,
 }) => (
-  <div>
+  <div className="mb-6">
     <div className="flex items-center justify-between mb-2">
       <Label className="text-gray-700 font-medium">Available Time Slots</Label>
       <div className="text-sm text-gray-500 flex items-center">

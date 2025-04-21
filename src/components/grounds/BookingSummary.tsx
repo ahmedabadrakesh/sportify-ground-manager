@@ -6,15 +6,15 @@ import { format } from "date-fns";
 interface BookingSummaryProps {
   ground: Ground;
   date: Date;
-  selectedSlots: string[];
-  amountPerSlot: number;
+  selectedSlots: number;
+  totalAmount: number;
 }
 
 const BookingSummary: React.FC<BookingSummaryProps> = ({
   ground,
   date,
   selectedSlots,
-  amountPerSlot,
+  totalAmount,
 }) => {
   return (
     <div className="p-4 bg-gray-50 rounded-lg">
@@ -29,15 +29,15 @@ const BookingSummary: React.FC<BookingSummaryProps> = ({
           <span className="font-medium">{date ? format(date, "PPP") : ""}</span>
         </div>
         <div className="flex justify-between">
-          <span className="text-gray-600">Slots:</span>
+          <span className="text-gray-600">Hours:</span>
           <span className="font-medium">
-            {selectedSlots.length} slot{selectedSlots.length !== 1 ? "s" : ""}
+            {selectedSlots} hour{selectedSlots !== 1 ? "s" : ""}
           </span>
         </div>
         <div className="flex justify-between border-t pt-2 mt-2">
           <span className="text-gray-600">Total Amount:</span>
           <span className="font-bold text-primary-700">
-            ₹{selectedSlots.length * amountPerSlot}
+            ₹{totalAmount}
           </span>
         </div>
       </div>
