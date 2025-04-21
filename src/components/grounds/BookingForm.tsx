@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { format } from "date-fns";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -16,6 +15,7 @@ import { createBooking } from "@/services/booking/createBooking";
 import { isAuthenticated } from "@/utils/auth";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
+import BookingGamesPicker from "./BookingGamesPicker";
 
 interface BookingFormProps {
   ground: Ground;
@@ -33,6 +33,9 @@ const BookingForm: React.FC<BookingFormProps> = ({ ground }) => {
   const [loading, setLoading] = useState(false);
   const [selectedSportsArea, setSelectedSportsArea] = useState<string>("");
   const [sportsAreas, setSportsAreas] = useState<{ id: string; name: string }[]>([]);
+  const [selectedGame, setSelectedGame] = useState<string>(
+    ground.games && ground.games.length > 0 ? ground.games[0] : ""
+  );
 
   const formattedDate = date ? format(date, "yyyy-MM-dd") : "";
 
@@ -159,8 +162,15 @@ const BookingForm: React.FC<BookingFormProps> = ({ ground }) => {
   return (
     <div className="bg-white rounded-lg shadow-sm border p-6 max-w-2xl mx-auto">
       <h2 className="text-xl font-semibold mb-4">Book This Ground</h2>
-
       <div className="space-y-6">
+        {/* Game Picker (Only for ground's available games) */}
+        <BookingGamesPicker
+          games={ground.games}
+          selectedGame={selectedGame}
+          setSelectedGame={setSelectedGame}
+          required
+        />
+
         <BookingDatePicker date={date} setDate={setDate} />
 
         {/* SPORTS AREA SELECTOR */}
