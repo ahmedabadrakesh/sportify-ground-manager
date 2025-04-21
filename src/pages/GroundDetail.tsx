@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import MainLayout from "@/components/layouts/MainLayout";
@@ -60,19 +61,16 @@ const GroundDetail: React.FC = () => {
     );
   }
 
+  // Instead of grid/columns, stack info and then booking form beneath (full width)
   return (
     <MainLayout>
       <div className="mb-8">
         <GroundHeader ground={ground} />
       </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
-        <div className="lg:col-span-2">
-          <GroundTabs ground={ground} />
-        </div>
-
-        <BookingForm ground={ground} />
+      <div className="mb-8">
+        <GroundTabs ground={ground} />
       </div>
+      <BookingForm ground={ground} />
     </MainLayout>
   );
 };
