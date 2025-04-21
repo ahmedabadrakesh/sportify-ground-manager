@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { format } from "date-fns";
 import { Calendar as CalendarIcon } from "lucide-react";
@@ -19,6 +20,7 @@ import TimeSlotPicker from "@/components/booking/TimeSlotPicker";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Ground, TimeSlot } from "@/types/models";
 import { getAvailableTimeSlots, createBooking } from "@/services/booking";
+import { supabase } from "@/integrations/supabase/client";
 
 interface AddBookingDialogProps {
   isOpen: boolean;
@@ -26,6 +28,11 @@ interface AddBookingDialogProps {
   grounds: Ground[];
   onBookingCreated: () => void;
   currentUserId?: string;
+}
+
+interface Game {
+  id: string;
+  name: string;
 }
 
 const AddBookingDialog: React.FC<AddBookingDialogProps> = ({
@@ -42,6 +49,26 @@ const AddBookingDialog: React.FC<AddBookingDialogProps> = ({
   const [selectedSlots, setSelectedSlots] = useState<string[]>([]);
   const [availableSlots, setAvailableSlots] = useState<TimeSlot[]>([]);
   const [loadingSlots, setLoadingSlots] = useState(false);
+
+  // State for games
+  const [games, setGames] = useState<Game[]>([]);
+  const [selectedGames, setSelectedGames] = useState<string[]>([]);
+  const [gamesLoading, setGamesLoading] = useState(false);
+
+  useEffect(() => {
+    // Fetch available games
+    const fetchGames = async () => {
+      setGamesLoading(true);
+      const { data, error } = await supabase.from("games").select("id, name").order("name", { ascending: true });
+      if (!error && data) {
+        setGames(data);
+      } else {
+        setGames([]);
+      }
+      setGamesLoading(false);
+    };
+    fetchGames();
+  }, []);
 
   useEffect(() => {
     const fetchTimeSlots = async () => {
@@ -65,6 +92,7 @@ const AddBookingDialog: React.FC<AddBookingDialogProps> = ({
   const handleGroundChange = (groundId: string) => {
     setSelectedGround(groundId);
     setSelectedSlots([]);
+    setSelectedGames([]); // Reset games when ground changes
   };
   
   const handleDateChange = (date: Date | undefined) => {
@@ -82,21 +110,32 @@ const AddBookingDialog: React.FC<AddBookingDialogProps> = ({
     );
   };
 
+  // Multi-select handler for games
+  const handleGameToggle = (gameId: string) => {
+    setSelectedGames((prev) =>
+      prev.includes(gameId)
+        ? prev.filter((id) => id !== gameId)
+        : [...prev, gameId]
+    );
+  };
+
   const handleAddBooking = async () => {
-    if (!selectedGround || !selectedDate || !customerName || !customerPhone || selectedSlots.length === 0) {
+    if (!selectedGround || !selectedDate || !customerName || !customerPhone || selectedSlots.length === 0 || selectedGames.length === 0) {
       return;
     }
     
     const formattedDate = format(selectedDate, "yyyy-MM-dd");
     
     try {
+      // Pass selectedGames along, attach as needed. Assuming createBooking supports a games argument (update if not).
       const newBooking = await createBooking(
         selectedGround,
         formattedDate,
         selectedSlots,
         customerName,
         customerPhone,
-        currentUserId
+        currentUserId,
+        selectedGames // supply games as an extra argument, if schema needs
       );
       
       if (newBooking) {
@@ -115,6 +154,7 @@ const AddBookingDialog: React.FC<AddBookingDialogProps> = ({
     setCustomerName("");
     setCustomerPhone("");
     setSelectedSlots([]);
+    setSelectedGames([]);
   };
 
   return (
@@ -174,6 +214,30 @@ const AddBookingDialog: React.FC<AddBookingDialogProps> = ({
                 </PopoverContent>
               </Popover>
             </div>
+
+            <div className="space-y-2 col-span-1 md:col-span-2">
+              <Label htmlFor="games">Select Games</Label>
+              {gamesLoading ? (
+                <p className="text-sm text-gray-500">Loading games...</p>
+              ) : (
+                <div className="flex flex-wrap gap-2">
+                  {games.map((game) => (
+                    <Button
+                      key={game.id}
+                      type="button"
+                      variant={selectedGames.includes(game.id) ? "default" : "outline"}
+                      className="text-xs px-3 py-1 rounded-full"
+                      onClick={() => handleGameToggle(game.id)}
+                    >
+                      {game.name}
+                    </Button>
+                  ))}
+                  {games.length === 0 && (
+                    <span className="text-xs text-gray-500">No games available</span>
+                  )}
+                </div>
+              )}
+            </div>
             
             <div className="space-y-2">
               <Label htmlFor="customerName">Customer Name</Label>
@@ -227,7 +291,19 @@ const AddBookingDialog: React.FC<AddBookingDialogProps> = ({
             >
               Cancel
             </Button>
-            <Button onClick={handleAddBooking}>Create Booking</Button>
+            <Button 
+              onClick={handleAddBooking}
+              disabled={
+                !selectedGround ||
+                !selectedDate ||
+                !customerName ||
+                !customerPhone ||
+                selectedSlots.length === 0 ||
+                selectedGames.length === 0
+              }
+            >
+              Create Booking
+            </Button>
           </div>
         </div>
       </DialogContent>

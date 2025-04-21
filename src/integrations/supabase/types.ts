@@ -155,7 +155,6 @@ export type Database = {
           owner_id: string
           rating: number | null
           review_count: number | null
-          sports_areas: Json[] | null
           updated_at: string
         }
         Insert: {
@@ -171,7 +170,6 @@ export type Database = {
           owner_id: string
           rating?: number | null
           review_count?: number | null
-          sports_areas?: Json[] | null
           updated_at?: string
         }
         Update: {
@@ -187,7 +185,6 @@ export type Database = {
           owner_id?: string
           rating?: number | null
           review_count?: number | null
-          sports_areas?: Json[] | null
           updated_at?: string
         }
         Relationships: [
