@@ -8,22 +8,30 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import NavItems from "./NavItems";
 import UserProfile from "./UserProfile";
 
+const LOGO_PATH = "/lovable-uploads/c9d204d2-6de6-4a97-855d-f2acf0bd0180.png";
+
 interface MobileHeaderProps {
   userName: string;
   userRole: string;
   isSuperAdmin: boolean;
 }
 
-const MobileHeader: React.FC<MobileHeaderProps> = ({ 
-  userName, 
-  userRole, 
-  isSuperAdmin 
+const MobileHeader: React.FC<MobileHeaderProps> = ({
+  userName,
+  userRole,
+  isSuperAdmin
 }) => {
   return (
     <div className="md:hidden bg-white border-b">
       <div className="flex items-center justify-between px-4 py-3">
-        {/* Removed logo section */}
-        
+        <Link to="/admin" className="flex items-center">
+          <img
+            src={LOGO_PATH}
+            alt="JOKOVA Logo"
+            className="h-10 w-auto rounded shadow"
+            style={{ background: "#fff" }}
+          />
+        </Link>
         <div className="flex items-center">
           <Sheet>
             <SheetTrigger asChild>
@@ -46,11 +54,11 @@ const MobileHeader: React.FC<MobileHeaderProps> = ({
                     </div>
                   </div>
                 </div>
-                
+
                 <ScrollArea className="flex-1 p-4">
                   <NavItems isSuperAdmin={isSuperAdmin} />
                 </ScrollArea>
-                
+
                 <UserProfile userName={userName} userRole={userRole} />
               </div>
             </SheetContent>

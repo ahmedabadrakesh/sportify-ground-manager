@@ -1,3 +1,4 @@
+
 import React from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Home, Search, Calendar, User, LogOut, ShoppingBag, ShoppingCart } from "lucide-react";
@@ -10,6 +11,8 @@ import { getCartItemsCount } from "@/utils/cart";
 interface MainLayoutProps {
   children: React.ReactNode;
 }
+
+const LOGO_PATH = "/lovable-uploads/c9d204d2-6de6-4a97-855d-f2acf0bd0180.png";
 
 const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
   const location = useLocation();
@@ -29,6 +32,12 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
       <header className="bg-white shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
           <Link to="/" className="flex items-center">
+            <img
+              src={LOGO_PATH}
+              alt="JOKOVA Logo"
+              className="h-10 w-auto mr-2 rounded"
+              style={{ background: "#fff" }}
+            />
             <span className="text-2xl font-bold text-primary-800">JOKOVA</span>
           </Link>
           <div className="flex items-center gap-4">
@@ -43,8 +52,8 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                 <ShoppingCart className="h-5 w-5 mr-1" />
                 <span className="hidden md:inline">Cart</span>
                 {cartItemsCount > 0 && (
-                  <Badge 
-                    variant="destructive" 
+                  <Badge
+                    variant="destructive"
                     className="absolute -top-2 -right-2 h-5 w-5 flex items-center justify-center p-0 text-xs"
                   >
                     {cartItemsCount}
@@ -132,8 +141,8 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
           >
             <ShoppingCart size={20} />
             {cartItemsCount > 0 && (
-              <Badge 
-                variant="destructive" 
+              <Badge
+                variant="destructive"
                 className="absolute -top-1 right-1 h-4 w-4 flex items-center justify-center p-0 text-[10px]"
               >
                 {cartItemsCount}
@@ -175,3 +184,4 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
 };
 
 export default MainLayout;
+
