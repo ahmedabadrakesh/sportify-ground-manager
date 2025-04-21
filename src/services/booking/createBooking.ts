@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import { formatTimeSlot } from "@/components/booking/TimeSlotFormatter";
 
 /**
-* Update: Accepts sportsAreaId and writes it to booking and slots
+* Update: Accepts an array of game IDs and writes it to booking
 */
 export const createBooking = async (
   groundId: string,
@@ -13,8 +13,8 @@ export const createBooking = async (
   slotIds: string[],
   userName: string,
   userPhone: string,
-  sportsAreaId?: string,
-  userId?: string
+  userId?: string,
+  gameIds?: string[]
 ): Promise<Booking | null> => {
   try {
     console.log("Creating booking with params:", {
@@ -23,8 +23,8 @@ export const createBooking = async (
       slotIds,
       userName,
       userPhone,
-      sportsAreaId,
-      userId
+      userId,
+      gameIds
     });
 
     // Calculate total amount based on slot prices
@@ -58,7 +58,7 @@ export const createBooking = async (
       ? `${slotsData.length} slots (${formatTimeSlot(slotsData[0].start_time, slotsData[slotsData.length-1].end_time)})`
       : 'selected slots';
     
-    // Insert the booking including sports_area_id
+    // Insert the booking including game_ids if provided
     const { data: bookingData, error: bookingError } = await supabase
       .from('bookings')
       .insert({
@@ -68,7 +68,7 @@ export const createBooking = async (
         total_amount: totalAmount,
         booking_status: 'pending',
         payment_status: 'pending',
-        sports_area_id: sportsAreaId || null
+        game_ids: gameIds || []
       })
       .select()
       .single();
@@ -97,11 +97,11 @@ export const createBooking = async (
       return null;
     }
     
-    // Mark the slots as booked AND assign sports_area_id to slot if not already set
+    // Mark the slots as booked
     for (const slotId of slotIds) {
       const { error: updateError } = await supabase
         .from('time_slots')
-        .update({ is_booked: true, sports_area_id: sportsAreaId || null })
+        .update({ is_booked: true })
         .eq('id', slotId);
       
       if (updateError) {
@@ -146,7 +146,7 @@ export const createBooking = async (
       paymentStatus: 'pending',
       bookingStatus: 'pending',
       createdAt: new Date().toISOString(),
-      sportsAreaId: sportsAreaId
+      gameIds: gameIds // Include gameIds in the returned booking object
     };
     
     // Show success message with booking details
@@ -168,4 +168,3 @@ function isValidUUID(str?: string): boolean {
   const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
   return uuidPattern.test(str);
 }
-

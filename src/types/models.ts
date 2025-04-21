@@ -49,6 +49,7 @@ export interface Booking {
   createdAt: string;
   updatedAt?: string;
   sportsAreaId?: string;
+  gameIds?: string[]; // Add this new field to store multiple game IDs
   userName?: string;
   userPhone?: string;
   groundName?: string;

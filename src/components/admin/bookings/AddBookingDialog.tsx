@@ -127,7 +127,7 @@ const AddBookingDialog: React.FC<AddBookingDialogProps> = ({
     const formattedDate = format(selectedDate, "yyyy-MM-dd");
     
     try {
-      // Pass selectedGames along, attach as needed. Assuming createBooking supports a games argument (update if not).
+      // Pass the whole selectedGames array to the createBooking function
       const newBooking = await createBooking(
         selectedGround,
         formattedDate,
@@ -135,7 +135,7 @@ const AddBookingDialog: React.FC<AddBookingDialogProps> = ({
         customerName,
         customerPhone,
         currentUserId,
-        selectedGames // supply games as an extra argument, if schema needs
+        selectedGames // This is correctly an array now
       );
       
       if (newBooking) {
