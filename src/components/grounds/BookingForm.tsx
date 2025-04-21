@@ -1,6 +1,7 @@
+
 import React, { useState, useEffect } from "react";
 import { format } from "date-fns";
-import { Calendar as CalendarIcon, Clock } from "lucide-react";
+import { CalendarIcon, Clock } from "lucide-react";
 import { Calendar } from "@/components/ui/calendar";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -88,6 +89,7 @@ const BookingForm: React.FC<BookingFormProps> = ({ ground }) => {
       );
 
       if (newBooking) {
+        setIsDialogOpen(true);
         setBookingStep(2);
       } else {
         toast.error("Failed to create booking. Please try again.");
@@ -107,176 +109,132 @@ const BookingForm: React.FC<BookingFormProps> = ({ ground }) => {
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-sm border p-6 h-fit sticky top-6">
+    <div className="bg-white rounded-lg shadow-sm border p-6">
       <h2 className="text-xl font-semibold mb-4">Book This Ground</h2>
 
-      <div className="mb-4">
-        <Label htmlFor="date" className="block mb-2 text-gray-700 font-medium">
-          Select Date
-        </Label>
-        <Popover>
-          <PopoverTrigger asChild>
-            <Button
-              variant="outline"
-              className="w-full justify-start text-left font-normal border border-primary-200"
-              id="date"
-            >
-              <CalendarIcon className="mr-2 h-4 w-4" />
-              {date ? format(date, "PPP") : <span>Pick a date</span>}
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent className="w-auto p-0 pointer-events-auto" align="start">
-            <Calendar
-              mode="single"
-              selected={date}
-              onSelect={newDate => newDate && setDate(newDate)}
-              initialFocus
-              disabled={d => d < new Date()}
-            />
-          </PopoverContent>
-        </Popover>
-      </div>
-
-      <div className="space-y-4">
+      <div className="space-y-6">
+        {/* Date Selector */}
         <div>
-          <Label className="block mb-2 text-gray-700">
-            Available Time Slots
+          <Label htmlFor="date" className="block mb-2 text-gray-700 font-medium">
+            Select Date
           </Label>
-          <div className="text-sm text-gray-500 mb-2 flex items-center">
-            <Clock size={14} className="mr-1" />
-            <span>
-              Each slot is for 1 hour. Select multiple slots if needed.
-            </span>
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button
+                variant="outline"
+                className="w-full justify-start text-left font-normal border border-primary-200"
+                id="date"
+              >
+                <CalendarIcon className="mr-2 h-4 w-4" />
+                {date ? format(date, "PPP") : <span>Pick a date</span>}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0 pointer-events-auto" align="start">
+              <Calendar
+                mode="single"
+                selected={date}
+                onSelect={newDate => newDate && setDate(newDate)}
+                initialFocus
+                disabled={d => d < new Date()}
+              />
+            </PopoverContent>
+          </Popover>
+        </div>
+
+        {/* User Information */}
+        {!isAuthenticated() && (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <Label htmlFor="booking-name">Your Name</Label>
+              <Input
+                id="booking-name"
+                placeholder="Enter your name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+              />
+            </div>
+            <div>
+              <Label htmlFor="booking-phone">Phone Number</Label>
+              <Input
+                id="booking-phone"
+                placeholder="Enter your phone number"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+              />
+            </div>
+          </div>
+        )}
+
+        {/* Time Slots Section */}
+        <div>
+          <div className="flex items-center justify-between mb-2">
+            <Label className="text-gray-700 font-medium">
+              Available Time Slots
+            </Label>
+            <div className="text-sm text-gray-500 flex items-center">
+              <Clock size={14} className="mr-1" />
+              <span>Each slot is for 1 hour</span>
+            </div>
           </div>
 
-          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-            <DialogTrigger asChild>
-              <Button className="w-full">View Available Slots</Button>
-            </DialogTrigger>
-            <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
-              <DialogHeader>
-                <DialogTitle>
-                  {bookingStep === 1
-                    ? `Book ${ground.name} - ${date ? format(date, "PPP") : "Select a Date"}`
-                    : "Complete Your Booking"}
-                </DialogTitle>
-              </DialogHeader>
-
-              {bookingStep === 1 ? (
-                <div className="space-y-6">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <Label htmlFor="booking-name">Your Name</Label>
-                      <Input
-                        id="booking-name"
-                        placeholder="Enter your name"
-                        value={name}
-                        onChange={(e) => setName(e.target.value)}
-                      />
-                    </div>
-                    <div>
-                      <Label htmlFor="booking-phone">Phone Number</Label>
-                      <Input
-                        id="booking-phone"
-                        placeholder="Enter your phone number"
-                        value={phone}
-                        onChange={(e) => setPhone(e.target.value)}
-                      />
-                    </div>
-                  </div>
-
-                  {loading ? (
-                    <div className="text-center py-6">
-                      <p className="text-gray-500">Loading available slots...</p>
-                    </div>
-                  ) : (
-                    <>
-                      {(availableSlots.length === 0) ? (
-                        <div className="text-center py-6">
-                          <p className="text-gray-500">
-                            No available slots for the selected date.
-                          </p>
-                        </div>
-                      ) : (
-                        <TimeSlotPicker
-                          slots={availableSlots}
-                          selectedSlots={selectedSlots}
-                          onSelectSlot={handleSelectSlot}
-                        />
-                      )}
-                    </>
-                  )}
-
-                  <div className="flex justify-end">
-                    <Button onClick={handleBookNow}>
-                      Proceed to Payment
-                    </Button>
-                  </div>
-                </div>
-              ) : (
-                <div className="space-y-6">
-                  <div className="p-4 bg-gray-50 rounded-lg">
-                    <h3 className="font-medium text-lg mb-3">Booking Summary</h3>
-                    <div className="space-y-2">
-                      <div className="flex justify-between">
-                        <span className="text-gray-600">Ground:</span>
-                        <span className="font-medium">{ground.name}</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-gray-600">Date:</span>
-                        <span className="font-medium">
-                          {date ? format(date, "PPP") : ""}
-                        </span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-gray-600">Slots:</span>
-                        <span className="font-medium">
-                          {selectedSlots.length} slots
-                        </span>
-                      </div>
-                      <div className="flex justify-between border-t pt-2 mt-2">
-                        <span className="text-gray-600">Total Amount:</span>
-                        <span className="font-bold text-primary-700">
-                          ₹{selectedSlots.length * 800}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="p-4 bg-gray-50 rounded-lg">
-                    <h3 className="font-medium text-lg mb-3">Payment Details</h3>
-                    <div className="space-y-4">
-                      <div>
-                        <Label htmlFor="card-number">Card Number</Label>
-                        <Input
-                          id="card-number"
-                          placeholder="1234 5678 9012 3456"
-                        />
-                      </div>
-                      <div className="grid grid-cols-2 gap-4">
-                        <div>
-                          <Label htmlFor="expiry">Expiry Date</Label>
-                          <Input id="expiry" placeholder="MM/YY" />
-                        </div>
-                        <div>
-                          <Label htmlFor="cvv">CVV</Label>
-                          <Input id="cvv" placeholder="123" />
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="flex justify-end space-x-2">
-                    <Button variant="outline" onClick={() => setBookingStep(1)}>
-                      Back
-                    </Button>
-                    <Button onClick={handleCompleteBooking}>
-                      Complete Booking
-                    </Button>
-                  </div>
-                </div>
-              )}
-            </DialogContent>
-          </Dialog>
+          {loading ? (
+            <div className="text-center py-6 bg-gray-50 rounded-lg">
+              <p className="text-gray-500">Loading available slots...</p>
+            </div>
+          ) : availableSlots.length === 0 ? (
+            <div className="text-center py-6 bg-gray-50 rounded-lg">
+              <p className="text-gray-500">
+                No available slots for the selected date.
+              </p>
+            </div>
+          ) : (
+            <TimeSlotPicker
+              slots={availableSlots}
+              selectedSlots={selectedSlots}
+              onSelectSlot={handleSelectSlot}
+            />
+          )}
         </div>
+
+        {/* Booking Summary */}
+        {selectedSlots.length > 0 && (
+          <div className="p-4 bg-gray-50 rounded-lg">
+            <h3 className="font-medium text-lg mb-3">Booking Summary</h3>
+            <div className="space-y-2">
+              <div className="flex justify-between">
+                <span className="text-gray-600">Ground:</span>
+                <span className="font-medium">{ground.name}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-600">Date:</span>
+                <span className="font-medium">
+                  {date ? format(date, "PPP") : ""}
+                </span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-600">Slots:</span>
+                <span className="font-medium">
+                  {selectedSlots.length} slot{selectedSlots.length !== 1 ? 's' : ''}
+                </span>
+              </div>
+              <div className="flex justify-between border-t pt-2 mt-2">
+                <span className="text-gray-600">Total Amount:</span>
+                <span className="font-bold text-primary-700">
+                  ₹{selectedSlots.length * 800}
+                </span>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Book Now Button */}
+        <Button 
+          className="w-full" 
+          disabled={selectedSlots.length === 0}
+          onClick={handleBookNow}
+        >
+          Proceed to Payment
+        </Button>
 
         <div className="pt-2 border-t">
           <div className="flex justify-between mb-2">
@@ -288,6 +246,47 @@ const BookingForm: React.FC<BookingFormProps> = ({ ground }) => {
           </p>
         </div>
       </div>
+
+      {/* Payment Dialog */}
+      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Complete Your Booking</DialogTitle>
+            <DialogDescription>
+              Please complete your payment to confirm booking
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="p-4 bg-gray-50 rounded-lg">
+            <h3 className="font-medium text-lg mb-3">Payment Details</h3>
+            <div className="space-y-4">
+              <div>
+                <Label htmlFor="card-number">Card Number</Label>
+                <Input
+                  id="card-number"
+                  placeholder="1234 5678 9012 3456"
+                />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="expiry">Expiry Date</Label>
+                  <Input id="expiry" placeholder="MM/YY" />
+                </div>
+                <div>
+                  <Label htmlFor="cvv">CVV</Label>
+                  <Input id="cvv" placeholder="123" />
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <DialogFooter>
+            <Button onClick={handleCompleteBooking}>
+              Complete Booking
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
