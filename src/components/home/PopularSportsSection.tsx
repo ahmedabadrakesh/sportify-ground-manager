@@ -53,7 +53,7 @@ const PopularSportsSection = () => {
 
   return (
     <div className="mb-16">
-      <div className="flex flex-col md:flex-row md:items-center justify-between mb-8">
+      <div className="flex flex-col md:flex-row md:items-center justify-between mb-12"> {/* Increased bottom margin */}
         <motion.div
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
@@ -99,10 +99,8 @@ const PopularSportsSection = () => {
                       alt={sport.name}
                       className="w-full h-full object-cover object-center"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
-                    <div className="absolute bottom-0 left-0 w-full p-4">
-                      <h3 className={`text-3xl font-bold ${sport.textColor}`}>{sport.name}</h3>
-                    </div>
+                    {/* Removed text overlay div */}
+                    {/* Removed the gradient overlay as well to fully hide the text */}
                   </div>
                 </motion.div>
               </CarouselItem>
