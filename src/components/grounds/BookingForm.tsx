@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { format } from "date-fns";
 import { Calendar as CalendarIcon, Clock } from "lucide-react";
@@ -57,6 +56,7 @@ const BookingForm: React.FC<BookingFormProps> = ({ ground }) => {
       }
     };
     loadTimeSlots();
+    setSelectedSlots([]);
   }, [formattedDate, ground.id]);
 
   const handleSelectSlot = (slotId: string) => {
@@ -110,8 +110,7 @@ const BookingForm: React.FC<BookingFormProps> = ({ ground }) => {
     <div className="bg-white rounded-lg shadow-sm border p-6 h-fit sticky top-6">
       <h2 className="text-xl font-semibold mb-4">Book This Ground</h2>
 
-      {/* Moved the Date Selector to always be visible above slots */}
-      <div className="mb-6">
+      <div className="mb-4">
         <Label htmlFor="date" className="block mb-2 text-gray-700 font-medium">
           Select Date
         </Label>
@@ -130,9 +129,9 @@ const BookingForm: React.FC<BookingFormProps> = ({ ground }) => {
             <Calendar
               mode="single"
               selected={date}
-              onSelect={(date) => date && setDate(date)}
+              onSelect={newDate => newDate && setDate(newDate)}
               initialFocus
-              disabled={(date) => date < new Date()}
+              disabled={d => d < new Date()}
             />
           </PopoverContent>
         </Popover>
@@ -191,11 +190,21 @@ const BookingForm: React.FC<BookingFormProps> = ({ ground }) => {
                       <p className="text-gray-500">Loading available slots...</p>
                     </div>
                   ) : (
-                    <TimeSlotPicker
-                      slots={availableSlots}
-                      selectedSlots={selectedSlots}
-                      onSelectSlot={handleSelectSlot}
-                    />
+                    <>
+                      {(availableSlots.length === 0) ? (
+                        <div className="text-center py-6">
+                          <p className="text-gray-500">
+                            No available slots for the selected date.
+                          </p>
+                        </div>
+                      ) : (
+                        <TimeSlotPicker
+                          slots={availableSlots}
+                          selectedSlots={selectedSlots}
+                          onSelectSlot={handleSelectSlot}
+                        />
+                      )}
+                    </>
                   )}
 
                   <div className="flex justify-end">
@@ -233,7 +242,6 @@ const BookingForm: React.FC<BookingFormProps> = ({ ground }) => {
                       </div>
                     </div>
                   </div>
-
                   <div className="p-4 bg-gray-50 rounded-lg">
                     <h3 className="font-medium text-lg mb-3">Payment Details</h3>
                     <div className="space-y-4">
@@ -256,7 +264,6 @@ const BookingForm: React.FC<BookingFormProps> = ({ ground }) => {
                       </div>
                     </div>
                   </div>
-
                   <div className="flex justify-end space-x-2">
                     <Button variant="outline" onClick={() => setBookingStep(1)}>
                       Back
