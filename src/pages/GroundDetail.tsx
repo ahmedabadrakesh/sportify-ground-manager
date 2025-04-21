@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import GroundHeader from "@/components/grounds/GroundHeader";
 import GroundTabs from "@/components/grounds/GroundTabs";
 import BookingForm from "@/components/grounds/BookingForm";
+import { fetchGroundById } from "@/services/groundsService";
 import { Ground } from "@/types/models";
 import { toast } from "sonner";
 
@@ -16,31 +17,24 @@ const GroundDetail: React.FC = () => {
   const [loading, setLoading] = useState(true);
   
   useEffect(() => {
-    const fetchGround = async () => {
+    const loadGroundDetails = async () => {
       try {
-        // In a real app, this would be an API call
-        // For demo, we'll simulate API fetch with timeout
-        setTimeout(() => {
-          import("@/data/mockData").then(({ grounds }) => {
-            const foundGround = grounds.find((g) => g.id === id);
-            setGround(foundGround || null);
-            setLoading(false);
-            
-            if (!foundGround) {
-              toast.error("Ground not found");
-            }
-          });
-        }, 500);
+        if (!id) {
+          setLoading(false);
+          return;
+        }
+        
+        const groundData = await fetchGroundById(id);
+        setGround(groundData);
       } catch (error) {
         console.error("Error fetching ground details:", error);
         toast.error("Failed to load ground details");
+      } finally {
         setLoading(false);
       }
     };
     
-    if (id) {
-      fetchGround();
-    }
+    loadGroundDetails();
   }, [id]);
   
   if (loading) {

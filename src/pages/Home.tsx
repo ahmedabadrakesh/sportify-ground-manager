@@ -1,8 +1,6 @@
 
 import React, { useState } from "react";
 import MainLayout from "@/components/layouts/MainLayout";
-import { getAvailableGrounds } from "@/utils/booking";
-import { Ground } from "@/types/models";
 
 // Import all the component sections
 import HeroSection from "@/components/home/HeroSection";
@@ -17,25 +15,22 @@ import StatBanner from "@/components/home/StatBanner";
 
 const Home: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState("");
-  const [filteredGrounds, setFilteredGrounds] = useState<Ground[]>([]);
   const [hasSearched, setHasSearched] = useState(false);
 
-  const onSearch = () => {
-    if (searchTerm.trim()) {
-      const grounds = getAvailableGrounds(searchTerm);
-      setFilteredGrounds(grounds);
+  const onSearch = (term: string) => {
+    if (term.trim()) {
+      setSearchTerm(term);
       setHasSearched(true);
     }
   };
 
   return (
     <MainLayout>
-      <HeroSection />
+      <HeroSection onSearch={onSearch} />
       <StatBanner />
       <PopularSportsSection />
       <SearchResultsSection 
         searchTerm={searchTerm} 
-        filteredGrounds={filteredGrounds} 
         hasSearched={hasSearched} 
       />
       <FeaturedGroundsSection />

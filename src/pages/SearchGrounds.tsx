@@ -35,25 +35,46 @@ const SearchGrounds: React.FC = () => {
   const [selectedSport, setSelectedSport] = useState<string>(initialSport);
   const [grounds, setGrounds] = useState<Ground[]>([]);
   const [selectedFacilities, setSelectedFacilities] = useState<string[]>([]);
+  const [allFacilities, setAllFacilities] = useState<string[]>([]);
+  const [allSports, setAllSports] = useState<string[]>([]);
+  const [loading, setLoading] = useState(true);
   
-  // Get all unique facilities from all grounds
-  const allFacilities = Array.from(
-    new Set(
-      getAvailableGrounds()
-        .flatMap((ground) => ground.facilities)
-    )
-  );
-  
-  // Get all unique sports from all grounds
-  const allSports = Array.from(
-    new Set(
-      getAvailableGrounds()
-        .flatMap((ground) => ground.games)
-    )
-  );
+  useEffect(() => {
+    // Load all grounds to get the unique facilities and sports
+    const loadInitialData = async () => {
+      try {
+        setLoading(true);
+        const allGrounds = await getAvailableGrounds();
+        
+        // Get all unique facilities from all grounds
+        const facilitiesSet = new Set<string>();
+        allGrounds.forEach(ground => {
+          ground.facilities.forEach(facility => facilitiesSet.add(facility));
+        });
+        
+        // Get all unique sports from all grounds
+        const sportsSet = new Set<string>();
+        allGrounds.forEach(ground => {
+          ground.games.forEach(game => sportsSet.add(game));
+        });
+        
+        setAllFacilities(Array.from(facilitiesSet));
+        setAllSports(Array.from(sportsSet));
+        
+        // Apply any initial filters
+        applyFilters(searchTerm, selectedSport, selectedFacilities);
+      } catch (error) {
+        console.error("Error loading initial data:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    loadInitialData();
+  }, []);
 
   useEffect(() => {
-    // Initial load or when URL params change
+    // When URL params change
     const sportParam = searchParams.get('sport');
     const queryParam = searchParams.get('q');
     
@@ -68,38 +89,36 @@ const SearchGrounds: React.FC = () => {
     applyFilters(queryParam || searchTerm, sportParam || selectedSport, selectedFacilities);
   }, [searchParams]);
 
-  const applyFilters = (query: string, sport: string, facilities: string[]) => {
-    let filtered = getAvailableGrounds();
-    
-    // Filter by search term
-    if (query) {
-      filtered = filtered.filter(
-        (ground) =>
-          ground.name.toLowerCase().includes(query.toLowerCase()) ||
-          ground.address.toLowerCase().includes(query.toLowerCase()) ||
-          ground.games.some((game) =>
-            game.toLowerCase().includes(query.toLowerCase())
-          )
-      );
+  const applyFilters = async (query: string, sport: string, facilities: string[]) => {
+    try {
+      setLoading(true);
+      let filteredGrounds = await getAvailableGrounds(sport !== "all-sports" ? sport : undefined);
+      
+      // Filter by search term
+      if (query) {
+        filteredGrounds = filteredGrounds.filter(
+          (ground) =>
+            ground.name.toLowerCase().includes(query.toLowerCase()) ||
+            ground.address.toLowerCase().includes(query.toLowerCase()) ||
+            ground.games.some((game) =>
+              game.toLowerCase().includes(query.toLowerCase())
+            )
+        );
+      }
+      
+      // Filter by facilities
+      if (facilities.length > 0) {
+        filteredGrounds = filteredGrounds.filter((ground) =>
+          facilities.every((facility) => ground.facilities.includes(facility))
+        );
+      }
+      
+      setGrounds(filteredGrounds);
+    } catch (error) {
+      console.error("Error applying filters:", error);
+    } finally {
+      setLoading(false);
     }
-    
-    // Filter by sport
-    if (sport && sport !== "all-sports") {
-      filtered = filtered.filter((ground) =>
-        ground.games.some((game) =>
-          game.toLowerCase() === sport.toLowerCase()
-        )
-      );
-    }
-    
-    // Filter by facilities
-    if (facilities.length > 0) {
-      filtered = filtered.filter((ground) =>
-        facilities.every((facility) => ground.facilities.includes(facility))
-      );
-    }
-    
-    setGrounds(filtered);
   };
 
   const handleSearch = () => {
@@ -134,12 +153,21 @@ const SearchGrounds: React.FC = () => {
     handleSearch();
   };
 
-  const clearFilters = () => {
+  const clearFilters = async () => {
     setSearchTerm("");
     setSelectedSport("");
     setSelectedFacilities([]);
     setSearchParams({});
-    setGrounds(getAvailableGrounds());
+    
+    try {
+      setLoading(true);
+      const allGrounds = await getAvailableGrounds();
+      setGrounds(allGrounds);
+    } catch (error) {
+      console.error("Error clearing filters:", error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -233,7 +261,9 @@ const SearchGrounds: React.FC = () => {
 
       <div className="mb-4 flex items-center justify-between">
         <div>
-          {grounds.length > 0 ? (
+          {loading ? (
+            <p className="text-gray-600">Loading grounds...</p>
+          ) : grounds.length > 0 ? (
             <p className="text-gray-600">Showing {grounds.length} results</p>
           ) : (
             <p className="text-gray-600">No grounds found</p>
@@ -245,13 +275,21 @@ const SearchGrounds: React.FC = () => {
         </Button>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-        {grounds.map((ground) => (
-          <GroundCard key={ground.id} ground={ground} />
-        ))}
-      </div>
+      {loading ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+          {[1, 2, 3, 4, 5, 6].map((i) => (
+            <div key={i} className="bg-gray-100 rounded-lg h-64 animate-pulse"></div>
+          ))}
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+          {grounds.map((ground) => (
+            <GroundCard key={ground.id} ground={ground} />
+          ))}
+        </div>
+      )}
 
-      {grounds.length === 0 && (
+      {!loading && grounds.length === 0 && (
         <div className="text-center py-16 bg-gray-50 rounded-lg">
           <p className="text-gray-600 mb-4">
             No grounds found matching your criteria. Try adjusting your filters.

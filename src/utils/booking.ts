@@ -1,162 +1,480 @@
-import { Booking, Ground, TimeSlot, User } from "@/types/models";
-import { bookings, grounds, timeSlots } from "@/data/mockData";
+
+import { Booking, Ground, TimeSlot } from "@/types/models";
+import { supabase } from "@/integrations/supabase/client";
 import { getCurrentUserSync } from "./auth";
 import { useInventoryItems } from "./inventory";
+import { toast } from "sonner";
 
-// Generate unique ID
+// Generate unique ID for bookings
 const generateId = () => `booking-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
 
 // Get available grounds
-export const getAvailableGrounds = (
+export const getAvailableGrounds = async (
   game?: string,
   date?: string,
   location?: { lat: number; lng: number; radius: number }
-): Ground[] => {
-  let filteredGrounds = [...grounds];
-  
-  // Filter by game
-  if (game) {
-    filteredGrounds = filteredGrounds.filter(ground => 
-      ground.games.some(g => g.toLowerCase().includes(game.toLowerCase()))
-    );
+): Promise<Ground[]> => {
+  try {
+    let query = supabase
+      .from('grounds')
+      .select(`
+        id,
+        name,
+        description,
+        address,
+        location,
+        owner_id,
+        games,
+        facilities,
+        images,
+        rating,
+        review_count,
+        users(name, phone, whatsapp)
+      `);
+    
+    // Filter by game
+    if (game) {
+      // Using containedBy for array search
+      query = query.contains('games', [game]);
+    }
+    
+    const { data, error } = await query;
+    
+    if (error) {
+      console.error("Error fetching available grounds:", error);
+      throw error;
+    }
+    
+    let grounds = data.map(ground => ({
+      id: ground.id,
+      name: ground.name,
+      description: ground.description || '',
+      address: ground.address,
+      location: ground.location || { lat: 0, lng: 0 },
+      ownerId: ground.owner_id,
+      ownerName: ground.users ? ground.users.name : 'Unknown Owner',
+      ownerContact: ground.users ? ground.users.phone || '' : '',
+      ownerWhatsapp: ground.users ? ground.users.whatsapp || '' : '',
+      games: ground.games || [],
+      facilities: ground.facilities || [],
+      images: ground.images || [],
+      rating: ground.rating || 0,
+      reviewCount: ground.review_count || 0
+    }));
+    
+    // Filter by location (if provided) - this would ideally be done in the database
+    // but we're implementing it in JS for simplicity
+    if (location) {
+      grounds = grounds.filter(ground => {
+        // Simple distance calculation (this is a simplification)
+        const distance = Math.sqrt(
+          Math.pow(ground.location.lat - location.lat, 2) + 
+          Math.pow(ground.location.lng - location.lng, 2)
+        );
+        return distance <= location.radius;
+      });
+    }
+    
+    return grounds;
+  } catch (error) {
+    console.error("Error in getAvailableGrounds:", error);
+    toast.error("Failed to load grounds");
+    return [];
   }
-  
-  // Filter by location (if provided)
-  if (location) {
-    filteredGrounds = filteredGrounds.filter(ground => {
-      // Simple distance calculation (this is a simplification)
-      const distance = Math.sqrt(
-        Math.pow(ground.location.lat - location.lat, 2) + 
-        Math.pow(ground.location.lng - location.lng, 2)
-      );
-      return distance <= location.radius;
-    });
-  }
-  
-  return filteredGrounds;
 };
 
 // Get available time slots for a ground on a specific date
-export const getAvailableTimeSlots = (groundId: string, date: string): TimeSlot[] => {
-  return timeSlots.filter(
-    slot => slot.groundId === groundId && slot.date === date && !slot.isBooked
-  );
+export const getAvailableTimeSlots = async (groundId: string, date: string): Promise<TimeSlot[]> => {
+  try {
+    const { data, error } = await supabase
+      .from('time_slots')
+      .select('*')
+      .eq('ground_id', groundId)
+      .eq('date', date)
+      .eq('is_booked', false);
+    
+    if (error) {
+      console.error("Error fetching time slots:", error);
+      throw error;
+    }
+    
+    return data.map(slot => ({
+      id: slot.id,
+      groundId: slot.ground_id,
+      date: slot.date,
+      startTime: slot.start_time,
+      endTime: slot.end_time,
+      price: slot.price,
+      isBooked: slot.is_booked
+    }));
+  } catch (error) {
+    console.error("Error in getAvailableTimeSlots:", error);
+    toast.error("Failed to load time slots");
+    return [];
+  }
 };
 
 // Create a new booking
-export const createBooking = (
+export const createBooking = async (
   groundId: string,
   date: string,
   slotIds: string[],
   userName: string,
   userPhone: string
-): Booking | null => {
-  const user = getCurrentUserSync();
-  if (!user && !userName) return null;
-  
-  const ground = grounds.find(g => g.id === groundId);
-  if (!ground) {
-    console.error(`Ground with ID ${groundId} not found`);
+): Promise<Booking | null> => {
+  try {
+    const user = getCurrentUserSync();
+    if (!user && !userName) return null;
+    
+    // Get the ground info
+    const { data: groundData, error: groundError } = await supabase
+      .from('grounds')
+      .select('name')
+      .eq('id', groundId)
+      .single();
+    
+    if (groundError) {
+      console.error(`Ground with ID ${groundId} not found:`, groundError);
+      return null;
+    }
+    
+    // Get the selected time slots
+    const { data: slotsData, error: slotsError } = await supabase
+      .from('time_slots')
+      .select('*')
+      .in('id', slotIds)
+      .eq('ground_id', groundId)
+      .eq('date', date)
+      .eq('is_booked', false);
+    
+    if (slotsError || !slotsData || slotsData.length !== slotIds.length) {
+      console.error("Error fetching slots or some slots unavailable:", slotsError);
+      return null;
+    }
+    
+    // Calculate total amount
+    const totalAmount = slotsData.reduce((sum, slot) => sum + slot.price, 0);
+    
+    // Begin a transaction to create booking and update slots
+    const { data: bookingData, error: bookingError } = await supabase
+      .from('bookings')
+      .insert({
+        user_id: user?.id || 'guest',
+        ground_id: groundId,
+        date,
+        total_amount: totalAmount,
+        booking_status: 'pending',
+        payment_status: 'pending'
+      })
+      .select()
+      .single();
+    
+    if (bookingError) {
+      console.error("Error creating booking:", bookingError);
+      return null;
+    }
+    
+    // Link the slots to the booking
+    const bookingSlots = slotIds.map(slotId => ({
+      booking_id: bookingData.id,
+      slot_id: slotId
+    }));
+    
+    const { error: linkError } = await supabase
+      .from('booking_slots')
+      .insert(bookingSlots);
+    
+    if (linkError) {
+      console.error("Error linking slots to booking:", linkError);
+      return null;
+    }
+    
+    // Mark the slots as booked
+    const { error: updateError } = await supabase
+      .from('time_slots')
+      .update({ is_booked: true })
+      .in('id', slotIds);
+    
+    if (updateError) {
+      console.error("Error updating slots as booked:", updateError);
+    }
+    
+    // Use some inventory items for each booked slot (if needed)
+    const inventoryUsed = useInventoryItems(groundId, "item-1", 1); // Example inventory usage
+    console.log("Inventory used:", inventoryUsed);
+    
+    // Format the slots for the return data
+    const slots = slotsData.map(slot => ({
+      id: slot.id,
+      groundId: slot.ground_id,
+      startTime: slot.start_time,
+      endTime: slot.end_time,
+      date: slot.date,
+      isBooked: true,
+      price: slot.price
+    }));
+    
+    // Create the booking object to return
+    const newBooking: Booking = {
+      id: bookingData.id,
+      userId: user?.id || 'guest',
+      userName: user?.name || userName,
+      userPhone: user?.phone || userPhone,
+      groundId,
+      groundName: groundData.name,
+      date,
+      slots,
+      totalAmount,
+      paymentStatus: 'pending',
+      bookingStatus: 'pending',
+      createdAt: bookingData.created_at,
+    };
+    
+    return newBooking;
+  } catch (error) {
+    console.error("Error in createBooking:", error);
+    toast.error("Failed to create booking");
     return null;
   }
-  
-  // Get the selected time slots
-  const selectedSlots = timeSlots.filter(
-    slot => slotIds.includes(slot.id) && slot.groundId === groundId && slot.date === date && !slot.isBooked
-  );
-  
-  if (selectedSlots.length !== slotIds.length) {
-    console.log("Some slots are not available for booking");
-    return null; // Some slots are not available
-  }
-  
-  // Calculate total amount
-  const totalAmount = selectedSlots.reduce((sum, slot) => sum + slot.price, 0);
-  
-  // Mark slots as booked
-  selectedSlots.forEach(slot => {
-    const index = timeSlots.findIndex(s => s.id === slot.id);
-    if (index !== -1) {
-      timeSlots[index] = { ...timeSlots[index], isBooked: true };
-    }
-  });
-  
-  // Use some inventory items for each booked slot (if needed)
-  const inventoryUsed = useInventoryItems(groundId, "item-1", 1); // Example inventory usage
-  console.log("Inventory used:", inventoryUsed);
-  
-  // Create new booking object
-  const newBooking: Booking = {
-    id: generateId(),
-    userId: user?.id || 'guest',
-    userName: user?.name || userName,
-    userPhone: user?.phone || userPhone,
-    groundId: ground.id,
-    groundName: ground.name,
-    date,
-    slots: selectedSlots,
-    totalAmount,
-    paymentStatus: 'pending',
-    bookingStatus: 'pending',
-    createdAt: new Date().toISOString(),
-  };
-  
-  // Add to bookings
-  bookings.push(newBooking);
-  console.log("New booking created:", newBooking);
-  
-  return newBooking;
 };
 
 // Get bookings for a user
-export const getUserBookings = (userId: string): Booking[] => {
-  return bookings.filter(booking => booking.userId === userId);
+export const getUserBookings = async (userId: string): Promise<Booking[]> => {
+  try {
+    // First get the basic booking data
+    const { data: bookingsData, error: bookingsError } = await supabase
+      .from('bookings')
+      .select(`
+        id, 
+        user_id,
+        ground_id,
+        date,
+        total_amount,
+        booking_status,
+        payment_status,
+        created_at,
+        grounds(name)
+      `)
+      .eq('user_id', userId);
+    
+    if (bookingsError) {
+      console.error("Error fetching user bookings:", bookingsError);
+      return [];
+    }
+    
+    // For each booking, get the linked slots
+    const bookings: Booking[] = [];
+    
+    for (const booking of bookingsData) {
+      // Get slots for this booking
+      const { data: slotLinks, error: linkError } = await supabase
+        .from('booking_slots')
+        .select('slot_id')
+        .eq('booking_id', booking.id);
+        
+      if (linkError) {
+        console.error(`Error fetching slots for booking ${booking.id}:`, linkError);
+        continue;
+      }
+      
+      let slots: TimeSlot[] = [];
+      
+      if (slotLinks && slotLinks.length > 0) {
+        const slotIds = slotLinks.map(link => link.slot_id);
+        
+        const { data: slotsData, error: slotsError } = await supabase
+          .from('time_slots')
+          .select('*')
+          .in('id', slotIds);
+          
+        if (!slotsError && slotsData) {
+          slots = slotsData.map(slot => ({
+            id: slot.id,
+            groundId: slot.ground_id,
+            startTime: slot.start_time,
+            endTime: slot.end_time,
+            date: slot.date,
+            isBooked: true,
+            price: slot.price
+          }));
+        }
+      }
+      
+      bookings.push({
+        id: booking.id,
+        userId: booking.user_id,
+        groundId: booking.ground_id,
+        groundName: booking.grounds?.name || 'Unknown Ground',
+        date: booking.date,
+        totalAmount: booking.total_amount,
+        bookingStatus: booking.booking_status,
+        paymentStatus: booking.payment_status,
+        createdAt: booking.created_at,
+        slots
+      });
+    }
+    
+    return bookings;
+  } catch (error) {
+    console.error("Error in getUserBookings:", error);
+    toast.error("Failed to load bookings");
+    return [];
+  }
 };
 
 // Get bookings for a ground
-export const getGroundBookings = (groundId: string): Booking[] => {
-  return bookings.filter(booking => booking.groundId === groundId);
+export const getGroundBookings = async (groundId: string): Promise<Booking[]> => {
+  try {
+    // First get the basic booking data
+    const { data: bookingsData, error: bookingsError } = await supabase
+      .from('bookings')
+      .select(`
+        id, 
+        user_id,
+        ground_id,
+        date,
+        total_amount,
+        booking_status,
+        payment_status,
+        created_at,
+        users(name, phone)
+      `)
+      .eq('ground_id', groundId);
+    
+    if (bookingsError) {
+      console.error("Error fetching ground bookings:", bookingsError);
+      return [];
+    }
+    
+    // For each booking, get the linked slots
+    const bookings: Booking[] = [];
+    
+    for (const booking of bookingsData) {
+      // Get slots for this booking
+      const { data: slotLinks, error: linkError } = await supabase
+        .from('booking_slots')
+        .select('slot_id')
+        .eq('booking_id', booking.id);
+        
+      if (linkError) {
+        console.error(`Error fetching slots for booking ${booking.id}:`, linkError);
+        continue;
+      }
+      
+      let slots: TimeSlot[] = [];
+      
+      if (slotLinks && slotLinks.length > 0) {
+        const slotIds = slotLinks.map(link => link.slot_id);
+        
+        const { data: slotsData, error: slotsError } = await supabase
+          .from('time_slots')
+          .select('*')
+          .in('id', slotIds);
+          
+        if (!slotsError && slotsData) {
+          slots = slotsData.map(slot => ({
+            id: slot.id,
+            groundId: slot.ground_id,
+            startTime: slot.start_time,
+            endTime: slot.end_time,
+            date: slot.date,
+            isBooked: true,
+            price: slot.price
+          }));
+        }
+      }
+      
+      bookings.push({
+        id: booking.id,
+        userId: booking.user_id,
+        userName: booking.users?.name || 'Unknown User',
+        userPhone: booking.users?.phone || '',
+        groundId: booking.ground_id,
+        date: booking.date,
+        totalAmount: booking.total_amount,
+        bookingStatus: booking.booking_status,
+        paymentStatus: booking.payment_status,
+        createdAt: booking.created_at,
+        slots
+      });
+    }
+    
+    return bookings;
+  } catch (error) {
+    console.error("Error in getGroundBookings:", error);
+    toast.error("Failed to load bookings");
+    return [];
+  }
 };
 
 // Complete payment for a booking
-export const completePayment = (bookingId: string): boolean => {
-  const index = bookings.findIndex(booking => booking.id === bookingId);
-  if (index === -1) {
-    console.error(`Booking with ID ${bookingId} not found`);
+export const completePayment = async (bookingId: string): Promise<boolean> => {
+  try {
+    const { error } = await supabase
+      .from('bookings')
+      .update({
+        payment_status: 'completed',
+        booking_status: 'confirmed'
+      })
+      .eq('id', bookingId);
+    
+    if (error) {
+      console.error(`Error updating payment for booking ${bookingId}:`, error);
+      return false;
+    }
+    
+    return true;
+  } catch (error) {
+    console.error("Error in completePayment:", error);
     return false;
   }
-  
-  bookings[index] = {
-    ...bookings[index],
-    paymentStatus: 'completed',
-    bookingStatus: 'confirmed',
-  };
-  
-  return true;
 };
 
 // Cancel a booking
-export const cancelBooking = (bookingId: string): boolean => {
-  const index = bookings.findIndex(booking => booking.id === bookingId);
-  if (index === -1) {
-    console.error(`Booking with ID ${bookingId} not found`);
+export const cancelBooking = async (bookingId: string): Promise<boolean> => {
+  try {
+    // Get the slots linked to this booking
+    const { data: slotLinks, error: linkError } = await supabase
+      .from('booking_slots')
+      .select('slot_id')
+      .eq('booking_id', bookingId);
+      
+    if (linkError) {
+      console.error("Error fetching slots for cancellation:", linkError);
+      return false;
+    }
+    
+    if (slotLinks && slotLinks.length > 0) {
+      const slotIds = slotLinks.map(link => link.slot_id);
+      
+      // Mark the slots as not booked
+      const { error: updateError } = await supabase
+        .from('time_slots')
+        .update({ is_booked: false })
+        .in('id', slotIds);
+      
+      if (updateError) {
+        console.error("Error unmarking slots as booked:", updateError);
+      }
+    }
+    
+    // Update the booking status
+    const { error: bookingError } = await supabase
+      .from('bookings')
+      .update({
+        payment_status: 'cancelled',
+        booking_status: 'cancelled'
+      })
+      .eq('id', bookingId);
+    
+    if (bookingError) {
+      console.error("Error updating booking status:", bookingError);
+      return false;
+    }
+    
+    return true;
+  } catch (error) {
+    console.error("Error in cancelBooking:", error);
     return false;
   }
-  
-  // Unmark slots as booked
-  bookings[index].slots.forEach(slot => {
-    const slotIndex = timeSlots.findIndex(s => s.id === slot.id);
-    if (slotIndex !== -1) {
-      timeSlots[slotIndex] = { ...timeSlots[slotIndex], isBooked: false };
-    }
-  });
-  
-  bookings[index] = {
-    ...bookings[index],
-    paymentStatus: 'cancelled',
-    bookingStatus: 'cancelled',
-  };
-  
-  console.log("Booking cancelled:", bookings[index]);
-  return true;
 };

@@ -70,4 +70,3 @@ const MobileHeader: React.FC<MobileHeaderProps> = ({
 };
 
 export default MobileHeader;
-

@@ -1,13 +1,34 @@
 
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import GroundCard from "@/components/grounds/GroundCard";
 import { getAvailableGrounds } from "@/utils/booking";
+import { Ground } from "@/types/models";
 import { motion } from "framer-motion";
 
 const FeaturedGroundsSection = () => {
   const navigate = useNavigate();
-  const grounds = getAvailableGrounds().slice(0, 3);
+  const [grounds, setGrounds] = useState<Ground[]>([]);
+  const [loading, setLoading] = useState(true);
+  
+  useEffect(() => {
+    const loadFeaturedGrounds = async () => {
+      try {
+        setLoading(true);
+        // In a real app, we'd have an API endpoint to get featured grounds
+        // For now, we'll just get the first 3 grounds
+        const allGrounds = await getAvailableGrounds();
+        setGrounds(allGrounds.slice(0, 3));
+      } catch (error) {
+        console.error("Error loading featured grounds:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    loadFeaturedGrounds();
+  }, []);
   
   return (
     <div className="mb-16">
@@ -36,18 +57,26 @@ const FeaturedGroundsSection = () => {
         </motion.div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {grounds.map((ground, index) => (
-          <motion.div
-            key={ground.id}
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: index * 0.1 }}
-          >
-            <GroundCard ground={ground} />
-          </motion.div>
-        ))}
-      </div>
+      {loading ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {[1, 2, 3].map(i => (
+            <div key={i} className="bg-gray-100 rounded-md h-64 animate-pulse"></div>
+          ))}
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {grounds.map((ground, index) => (
+            <motion.div
+              key={ground.id}
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: index * 0.1 }}
+            >
+              <GroundCard ground={ground} />
+            </motion.div>
+          ))}
+        </div>
+      )}
 
       <div className="mt-10 text-center">
         <p className="text-gray-600 mb-4">Looking for more options? Explore all venues in your area.</p>

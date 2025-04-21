@@ -4,36 +4,65 @@ import MainLayout from "@/components/layouts/MainLayout";
 import { Card, CardContent } from "@/components/ui/card";
 import { ShoppingBag } from "lucide-react";
 import { getCart } from "@/utils/cart";
-import { products } from "@/data/mockData";
-import { CartItem as CartItemType } from "@/types/models";
+import { getProductById } from "@/utils/ecommerce";
+import { CartItem as CartItemType, Product } from "@/types/models";
 import CartItem from "@/components/cart/CartItem";
 import CartSummary from "@/components/cart/CartSummary";
 import EmptyCart from "@/components/cart/EmptyCart";
 
 const Cart: React.FC = () => {
   const [cart, setCart] = useState<CartItemType[]>([]);
+  const [products, setProducts] = useState<Record<string, Product>>({});
   const [loading, setLoading] = useState(true);
 
-  const loadCart = () => {
-    setCart(getCart());
-  };
-
   useEffect(() => {
+    const loadCart = async () => {
+      try {
+        setLoading(true);
+        const cartItems = getCart();
+        setCart(cartItems);
+        
+        // Load product details for each cart item
+        const productDetails: Record<string, Product> = {};
+        for (const item of cartItems) {
+          try {
+            const product = await getProductById(item.productId);
+            if (product) {
+              productDetails[item.productId] = product;
+            }
+          } catch (error) {
+            console.error(`Error loading product ${item.productId}:`, error);
+          }
+        }
+        
+        setProducts(productDetails);
+      } catch (error) {
+        console.error("Error loading cart:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    
     loadCart();
-    setLoading(false);
   }, []);
 
   // Get product details for cart items
-  const cartItems = cart.map(item => {
-    const product = products.find(p => p.id === item.productId);
-    return { 
-      ...item, 
-      product,
-      subtotal: product ? product.price * item.quantity : 0
-    };
-  }).filter(item => item.product); // Filter out any items where product wasn't found
+  const cartItems = cart
+    .map(item => {
+      const product = products[item.productId];
+      return product ? { 
+        ...item, 
+        product,
+        subtotal: product.price * item.quantity
+      } : null;
+    })
+    .filter(Boolean); // Filter out any items where product wasn't found
 
-  const totalAmount = cartItems.reduce((sum, item) => sum + item.subtotal, 0);
+  const totalAmount = cartItems.reduce((sum, item) => sum + (item?.subtotal || 0), 0);
+
+  const handleCartUpdate = () => {
+    setCart(getCart());
+  };
 
   if (loading) {
     return (
@@ -60,13 +89,13 @@ const Cart: React.FC = () => {
               <Card>
                 <CardContent className="p-6">
                   <div className="space-y-4">
-                    {cartItems.map(item => (
+                    {cartItems.map(item => item && (
                       <CartItem 
                         key={item.productId} 
                         productId={item.productId}
                         quantity={item.quantity}
-                        product={item.product!}
-                        onUpdate={loadCart}
+                        product={item.product}
+                        onUpdate={handleCartUpdate}
                       />
                     ))}
                   </div>
