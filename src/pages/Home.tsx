@@ -1,8 +1,6 @@
 
 import React, { useState } from "react";
 import MainLayout from "@/components/layouts/MainLayout";
-
-// Import all the component sections
 import HeroSection from "@/components/home/HeroSection";
 import PopularSportsSection from "@/components/home/PopularSportsSection";
 import SearchResultsSection from "@/components/home/SearchResultsSection";
@@ -12,6 +10,7 @@ import TestimonialsSection from "@/components/home/TestimonialsSection";
 import ShopPromotionSection from "@/components/home/ShopPromotionSection";
 import WhyChooseUsSection from "@/components/home/WhyChooseUsSection";
 import StatBanner from "@/components/home/StatBanner";
+import SportsProfessionalsPromotion from "@/components/home/SportsProfessionalsPromotion";
 
 const Home: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -27,17 +26,20 @@ const Home: React.FC = () => {
   return (
     <MainLayout>
       <HeroSection onSearch={handleSearch} />
-      <StatBanner />
-      <PopularSportsSection />
-      <SearchResultsSection 
-        searchTerm={searchTerm} 
-        hasSearched={hasSearched} 
-      />
-      <FeaturedGroundsSection />
-      <HowItWorksSection />
-      <TestimonialsSection />
-      <ShopPromotionSection />
-      <WhyChooseUsSection />
+      <div className="container mx-auto px-4">
+        <StatBanner />
+        <PopularSportsSection />
+        <SearchResultsSection 
+          searchTerm={searchTerm} 
+          hasSearched={hasSearched} 
+        />
+        <SportsProfessionalsPromotion />
+        <FeaturedGroundsSection />
+        <HowItWorksSection />
+        <TestimonialsSection />
+        <ShopPromotionSection />
+        <WhyChooseUsSection />
+      </div>
     </MainLayout>
   );
 };
