@@ -387,6 +387,65 @@ export type Database = {
           },
         ]
       }
+      sports_professionals: {
+        Row: {
+          address: string
+          city: string
+          comments: string | null
+          contact_number: string
+          created_at: string
+          fee: number
+          fee_type: Database["public"]["Enums"]["fee_type"]
+          game_id: string
+          id: string
+          name: string
+          photo: string | null
+          profession_type: Database["public"]["Enums"]["sport_profession_type"]
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          address: string
+          city: string
+          comments?: string | null
+          contact_number: string
+          created_at?: string
+          fee: number
+          fee_type: Database["public"]["Enums"]["fee_type"]
+          game_id: string
+          id?: string
+          name: string
+          photo?: string | null
+          profession_type: Database["public"]["Enums"]["sport_profession_type"]
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          address?: string
+          city?: string
+          comments?: string | null
+          contact_number?: string
+          created_at?: string
+          fee?: number
+          fee_type?: Database["public"]["Enums"]["fee_type"]
+          game_id?: string
+          id?: string
+          name?: string
+          photo?: string | null
+          profession_type?: Database["public"]["Enums"]["sport_profession_type"]
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sports_professionals_game_id_fkey"
+            columns: ["game_id"]
+            isOneToOne: false
+            referencedRelation: "games"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       time_slots: {
         Row: {
           created_at: string
@@ -522,7 +581,15 @@ export type Database = {
       }
     }
     Enums: {
-      [_ in never]: never
+      fee_type: "Per Hour" | "Per Day" | "Per Match"
+      sport_profession_type:
+        | "Athlete"
+        | "Coach"
+        | "Trainer"
+        | "Sports Manager"
+        | "Support Staff"
+        | "Player"
+        | "Umpire"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -637,6 +704,17 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      fee_type: ["Per Hour", "Per Day", "Per Match"],
+      sport_profession_type: [
+        "Athlete",
+        "Coach",
+        "Trainer",
+        "Sports Manager",
+        "Support Staff",
+        "Player",
+        "Umpire",
+      ],
+    },
   },
 } as const

@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Home, Search, Calendar, User, LogOut, ShoppingBag, ShoppingCart } from "lucide-react";
@@ -41,6 +40,9 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
             <span className="text-2xl font-bold text-primary-800">JOKOVA</span>
           </Link>
           <div className="flex items-center gap-4">
+            <Link to="/sports-professionals" className="text-gray-700 hover:text-primary-600">
+              Sports Professionals
+            </Link>
             <Link to="/shop" className="text-gray-700 hover:text-primary-600">
               <div className="flex items-center">
                 <ShoppingBag className="h-5 w-5 mr-1" />
@@ -184,4 +186,3 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
 };
 
 export default MainLayout;
-
