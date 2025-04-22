@@ -27,11 +27,11 @@ const RegisterProfessionalDialog = ({ open, onOpenChange }: RegisterProfessional
     resolver: zodResolver(professionalFormSchema),
     defaultValues: {
       name: "",
-      profession_type: "Athlete" as ProfessionType, // Default to a valid enum value
+      profession_type: "Athlete",
       game_id: "",
       contact_number: "",
-      fee: "0", // Will be transformed to number by the schema
-      fee_type: "Per Hour" as FeeType, // Default to a valid enum value
+      fee: "0",
+      fee_type: "Per Hour",
       city: "",
       address: "",
       comments: "",
@@ -41,10 +41,23 @@ const RegisterProfessionalDialog = ({ open, onOpenChange }: RegisterProfessional
 
   const registerMutation = useMutation({
     mutationFn: async (values: ProfessionalFormValues) => {
-      // Fee is already transformed to a number by zod schema
+      // Ensure all required fields are present with their correct types
+      const professionalData = {
+        name: values.name,
+        profession_type: values.profession_type,
+        game_id: values.game_id,
+        contact_number: values.contact_number,
+        fee: values.fee, // Already transformed to number by zod schema
+        fee_type: values.fee_type,
+        city: values.city,
+        address: values.address,
+        comments: values.comments || null,
+        photo: values.photo || null
+      };
+      
       const { error } = await supabase
         .from('sports_professionals')
-        .insert(values);
+        .insert(professionalData);
       
       if (error) throw error;
     },

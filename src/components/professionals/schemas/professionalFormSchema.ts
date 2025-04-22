@@ -8,13 +8,13 @@ type FeeType = Database["public"]["Enums"]["fee_type"];
 
 export const professionalFormSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
-  profession_type: z.string() as z.ZodType<ProfessionType>,
-  game_id: z.string(),
-  contact_number: z.string(),
-  fee: z.string().transform((val) => Number(val)),
-  fee_type: z.string() as z.ZodType<FeeType>,
-  city: z.string(),
-  address: z.string(),
+  profession_type: z.enum(["Athlete", "Coach", "Trainer", "Sports Manager", "Support Staff", "Player", "Umpire"] as const),
+  game_id: z.string().min(1, "Please select a game"),
+  contact_number: z.string().min(1, "Contact number is required"),
+  fee: z.string().transform((val) => Number(val) || 0),
+  fee_type: z.enum(["Per Hour", "Per Day", "Per Match"] as const),
+  city: z.string().min(1, "City is required"),
+  address: z.string().min(1, "Address is required"),
   comments: z.string().optional(),
   photo: z.string().optional(),
 });
