@@ -11,6 +11,10 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { PhotoUpload } from "./components/PhotoUpload";
 import { ProfessionalFormFields } from "./components/ProfessionalFormFields";
 import { professionalFormSchema, type ProfessionalFormValues } from "./schemas/professionalFormSchema";
+import { Database } from "@/integrations/supabase/types";
+
+type ProfessionType = Database["public"]["Enums"]["sport_profession_type"];
+type FeeType = Database["public"]["Enums"]["fee_type"];
 
 interface RegisterProfessionalProps {
   open: boolean;
@@ -23,11 +27,11 @@ const RegisterProfessionalDialog = ({ open, onOpenChange }: RegisterProfessional
     resolver: zodResolver(professionalFormSchema),
     defaultValues: {
       name: "",
-      profession_type: "",
+      profession_type: "Athlete" as ProfessionType, // Default to a valid enum value
       game_id: "",
       contact_number: "",
-      fee: "",
-      fee_type: "",
+      fee: "0", // Will be transformed to number by the schema
+      fee_type: "Per Hour" as FeeType, // Default to a valid enum value
       city: "",
       address: "",
       comments: "",
@@ -37,15 +41,10 @@ const RegisterProfessionalDialog = ({ open, onOpenChange }: RegisterProfessional
 
   const registerMutation = useMutation({
     mutationFn: async (values: ProfessionalFormValues) => {
-      // Convert the string fee to a number before sending to Supabase
-      const professionalData = {
-        ...values,
-        // Fee is already transformed by zod schema
-      };
-      
+      // Fee is already transformed to a number by zod schema
       const { error } = await supabase
         .from('sports_professionals')
-        .insert(professionalData);
+        .insert(values);
       
       if (error) throw error;
     },
