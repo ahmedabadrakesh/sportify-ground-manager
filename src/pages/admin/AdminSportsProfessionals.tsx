@@ -4,7 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import AdminLayout from "@/components/layouts/AdminLayout";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { Plus } from "lucide-react";
+import { Plus, edit, trash2 } from "lucide-react";
 import { 
   Table, 
   TableHeader, 
@@ -13,10 +13,13 @@ import {
   TableHead, 
   TableCell 
 } from "@/components/ui/table";
+import { toast } from "sonner";
 import RegisterProfessionalDialog from "@/components/professionals/RegisterProfessionalDialog";
+import EditProfessionalDialog from "@/components/admin/professionals/EditProfessionalDialog";
 
 const AdminSportsProfessionals = () => {
   const [isRegisterDialogOpen, setIsRegisterDialogOpen] = React.useState(false);
+  const [editingProfessional, setEditingProfessional] = React.useState<any>(null);
 
   const { data: professionals, isLoading } = useQuery({
     queryKey: ["admin-sports-professionals"],
@@ -35,6 +38,21 @@ const AdminSportsProfessionals = () => {
       return data;
     },
   });
+
+  const handleDelete = async (id: string) => {
+    try {
+      const { error } = await supabase
+        .from('sports_professionals')
+        .delete()
+        .eq('id', id);
+
+      if (error) throw error;
+      toast.success("Professional deleted successfully");
+    } catch (error) {
+      console.error("Error deleting professional:", error);
+      toast.error("Failed to delete professional");
+    }
+  };
 
   if (isLoading) {
     return (
@@ -68,6 +86,7 @@ const AdminSportsProfessionals = () => {
               <TableHead>Fee</TableHead>
               <TableHead>City</TableHead>
               <TableHead>Contact</TableHead>
+              <TableHead>Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -86,6 +105,26 @@ const AdminSportsProfessionals = () => {
                 <TableCell>₹{professional.fee} {professional.fee_type}</TableCell>
                 <TableCell>{professional.city}</TableCell>
                 <TableCell>{professional.contact_number}</TableCell>
+                <TableCell>
+                  <div className="flex gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setEditingProfessional(professional)}
+                    >
+                      <edit className="h-4 w-4" />
+                      <span className="sr-only">Edit</span>
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleDelete(professional.id)}
+                    >
+                      <trash2 className="h-4 w-4 text-destructive" />
+                      <span className="sr-only">Delete</span>
+                    </Button>
+                  </div>
+                </TableCell>
               </TableRow>
             ))}
           </TableBody>
@@ -96,6 +135,14 @@ const AdminSportsProfessionals = () => {
         open={isRegisterDialogOpen}
         onOpenChange={setIsRegisterDialogOpen}
       />
+
+      {editingProfessional && (
+        <EditProfessionalDialog
+          open={!!editingProfessional}
+          onOpenChange={() => setEditingProfessional(null)}
+          professional={editingProfessional}
+        />
+      )}
     </AdminLayout>
   );
 };
