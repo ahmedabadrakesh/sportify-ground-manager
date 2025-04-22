@@ -1,4 +1,3 @@
-
 import React from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -11,10 +10,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { PhotoUpload } from "./components/PhotoUpload";
 import { ProfessionalFormFields } from "./components/ProfessionalFormFields";
 import { professionalFormSchema, type ProfessionalFormValues } from "./schemas/professionalFormSchema";
-import { Database } from "@/integrations/supabase/types";
-
-type ProfessionType = Database["public"]["Enums"]["sport_profession_type"];
-type FeeType = Database["public"]["Enums"]["fee_type"];
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface RegisterProfessionalProps {
   open: boolean;
@@ -30,7 +26,7 @@ const RegisterProfessionalDialog = ({ open, onOpenChange }: RegisterProfessional
       profession_type: "Athlete",
       game_id: "",
       contact_number: "",
-      fee: "0",
+      fee: 0,
       fee_type: "Per Hour",
       city: "",
       address: "",
@@ -41,13 +37,12 @@ const RegisterProfessionalDialog = ({ open, onOpenChange }: RegisterProfessional
 
   const registerMutation = useMutation({
     mutationFn: async (values: ProfessionalFormValues) => {
-      // Ensure all required fields are present with their correct types
       const professionalData = {
         name: values.name,
         profession_type: values.profession_type,
         game_id: values.game_id,
         contact_number: values.contact_number,
-        fee: values.fee, // Already transformed to number by zod schema
+        fee: values.fee,
         fee_type: values.fee_type,
         city: values.city,
         address: values.address,
@@ -79,20 +74,22 @@ const RegisterProfessionalDialog = ({ open, onOpenChange }: RegisterProfessional
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl">
+      <DialogContent className="max-w-2xl max-h-[90vh]">
         <DialogHeader>
           <DialogTitle>Register as Sports Professional</DialogTitle>
         </DialogHeader>
 
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-            <PhotoUpload form={form} />
-            <ProfessionalFormFields form={form} />
-            <Button type="submit" className="w-full">
-              Register
-            </Button>
-          </form>
-        </Form>
+        <ScrollArea className="h-[calc(90vh-120px)] px-1">
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+              <PhotoUpload form={form} />
+              <ProfessionalFormFields form={form} />
+              <Button type="submit" className="w-full">
+                Register
+              </Button>
+            </form>
+          </Form>
+        </ScrollArea>
       </DialogContent>
     </Dialog>
   );
