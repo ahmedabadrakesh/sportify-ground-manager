@@ -10,7 +10,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Ground } from "@/types/models";
-import { groundSchema } from "./groundFormSchema";
+import { groundSchema, GroundFormValues } from "./groundFormSchema";
 import GroundBasicDetails from "./GroundBasicDetails";
 import GroundFeatures from "./GroundFeatures";
 import GroundOwnerSelect from "./GroundOwnerSelect";
@@ -32,7 +32,7 @@ const EditGroundDialog = ({
   isSuperAdmin 
 }: EditGroundDialogProps) => {
   const queryClient = useQueryClient();
-  const form = useForm({
+  const form = useForm<GroundFormValues>({
     resolver: zodResolver(groundSchema),
     defaultValues: {
       name: ground.name,
@@ -45,7 +45,7 @@ const EditGroundDialog = ({
   });
 
   const updateMutation = useMutation({
-    mutationFn: async (values: any) => {
+    mutationFn: async (values: GroundFormValues) => {
       const facilitiesArray = values.facilities
         ? values.facilities.split(",").map((f: string) => f.trim())
         : [];
@@ -75,7 +75,7 @@ const EditGroundDialog = ({
     }
   });
 
-  const onSubmit = (values: any) => {
+  const onSubmit = (values: GroundFormValues) => {
     updateMutation.mutate(values);
   };
 

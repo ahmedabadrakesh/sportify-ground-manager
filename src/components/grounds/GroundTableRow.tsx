@@ -6,7 +6,7 @@ import { AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle,
   AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, 
   AlertDialogAction } from "@/components/ui/alert-dialog";
 import { Ground } from "@/types/models";
-import { edit, trash2 } from "lucide-react";
+import { Edit, Trash2 } from "lucide-react";
 import EditGroundDialog from "../admin/grounds/EditGroundDialog";
 
 interface GroundTableRowProps {
@@ -34,7 +34,7 @@ const GroundTableRow = ({ ground, isSuperAdmin, onDelete }: GroundTableRowProps)
               size="sm"
               onClick={() => setShowEditDialog(true)}
             >
-              <edit className="h-4 w-4" />
+              <Edit className="h-4 w-4" />
               <span className="sr-only">Edit</span>
             </Button>
             <Button 
@@ -42,7 +42,7 @@ const GroundTableRow = ({ ground, isSuperAdmin, onDelete }: GroundTableRowProps)
               size="sm"
               onClick={() => setShowDeleteDialog(true)}
             >
-              <trash2 className="h-4 w-4 text-destructive" />
+              <Trash2 className="h-4 w-4 text-destructive" />
               <span className="sr-only">Delete</span>
             </Button>
           </div>

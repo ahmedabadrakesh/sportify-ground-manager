@@ -4,7 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import AdminLayout from "@/components/layouts/AdminLayout";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { Plus, edit, trash2 } from "lucide-react";
+import { Plus, Edit, Trash2 } from "lucide-react";
 import { 
   Table, 
   TableHeader, 
@@ -112,7 +112,7 @@ const AdminSportsProfessionals = () => {
                       size="sm"
                       onClick={() => setEditingProfessional(professional)}
                     >
-                      <edit className="h-4 w-4" />
+                      <Edit className="h-4 w-4" />
                       <span className="sr-only">Edit</span>
                     </Button>
                     <Button
@@ -120,7 +120,7 @@ const AdminSportsProfessionals = () => {
                       size="sm"
                       onClick={() => handleDelete(professional.id)}
                     >
-                      <trash2 className="h-4 w-4 text-destructive" />
+                      <Trash2 className="h-4 w-4 text-destructive" />
                       <span className="sr-only">Delete</span>
                     </Button>
                   </div>

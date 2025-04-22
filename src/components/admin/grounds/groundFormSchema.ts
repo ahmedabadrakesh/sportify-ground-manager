@@ -7,7 +7,7 @@ export const groundSchema = z.object({
   description: z.string().min(10, "Description must be at least 10 characters"),
   address: z.string().min(5, "Address must be at least 5 characters"),
   ownerId: z.string().uuid("Please select a ground owner"),
-  games: z.array(z.string().min(1, "Please select at least one game")), // Updated to array of game ids
+  games: z.array(z.string().min(1, "Please select at least one game")), 
   facilities: z.string().min(1, "Please enter at least one facility"),
 });
 
