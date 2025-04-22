@@ -37,9 +37,15 @@ const RegisterProfessionalDialog = ({ open, onOpenChange }: RegisterProfessional
 
   const registerMutation = useMutation({
     mutationFn: async (values: ProfessionalFormValues) => {
+      // Convert the string fee to a number before sending to Supabase
+      const professionalData = {
+        ...values,
+        // Fee is already transformed by zod schema
+      };
+      
       const { error } = await supabase
         .from('sports_professionals')
-        .insert([values]);
+        .insert(professionalData);
       
       if (error) throw error;
     },

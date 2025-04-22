@@ -6,6 +6,11 @@ import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/comp
 import { UseFormReturn } from "react-hook-form";
 import { ProfessionalFormValues } from "../schemas/professionalFormSchema";
 import { useGames } from "@/hooks/useGames";
+import { Database } from "@/integrations/supabase/types";
+
+// Get the enum types from the database types
+type ProfessionType = Database["public"]["Enums"]["sport_profession_type"];
+type FeeType = Database["public"]["Enums"]["fee_type"];
 
 interface ProfessionalFormFieldsProps {
   form: UseFormReturn<ProfessionalFormValues>;
@@ -13,6 +18,15 @@ interface ProfessionalFormFieldsProps {
 
 export const ProfessionalFormFields = ({ form }: ProfessionalFormFieldsProps) => {
   const { games } = useGames();
+  
+  // Use the actual enum values from the database
+  const professionTypes: ProfessionType[] = [
+    "Athlete", "Coach", "Trainer", "Sports Manager", "Support Staff", "Player", "Umpire"
+  ];
+  
+  const feeTypes: FeeType[] = [
+    "Per Hour", "Per Day", "Per Match"
+  ];
 
   return (
     <>
@@ -43,7 +57,7 @@ export const ProfessionalFormFields = ({ form }: ProfessionalFormFieldsProps) =>
                 </SelectTrigger>
               </FormControl>
               <SelectContent>
-                {["Athlete", "Coach", "Trainer", "Sports Manager", "Support Staff", "Player", "Umpire"].map((type) => (
+                {professionTypes.map((type) => (
                   <SelectItem key={type} value={type}>
                     {type}
                   </SelectItem>
@@ -108,7 +122,7 @@ export const ProfessionalFormFields = ({ form }: ProfessionalFormFieldsProps) =>
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
-                  {["Per Hour", "Per Day", "Per Match"].map((type) => (
+                  {feeTypes.map((type) => (
                     <SelectItem key={type} value={type}>
                       {type}
                     </SelectItem>
