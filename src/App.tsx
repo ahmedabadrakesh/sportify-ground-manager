@@ -26,9 +26,9 @@ import AdminBookings from "./pages/admin/AdminBookings";
 import AdminInventory from "./pages/admin/AdminInventory";
 import InventoryAllocate from "./pages/admin/InventoryAllocate";
 import EcommerceManager from "./pages/admin/EcommerceManager";
+import AdminSportsProfessionals from "./pages/admin/AdminSportsProfessionals";
 
 const App = () => {
-  // Create a client inside the component
   const queryClient = new QueryClient();
 
   return (
@@ -55,6 +55,7 @@ const App = () => {
             {/* Admin Routes */}
             <Route path="/admin" element={<AdminDashboard />} />
             <Route path="/admin/ground-owners" element={<GroundOwners />} />
+            <Route path="/admin/sports-professionals" element={<AdminSportsProfessionals />} />
             <Route path="/admin/grounds" element={<AdminGrounds />} />
             <Route path="/admin/grounds/add" element={<AddGround />} />
             <Route path="/admin/bookings" element={<AdminBookings />} />

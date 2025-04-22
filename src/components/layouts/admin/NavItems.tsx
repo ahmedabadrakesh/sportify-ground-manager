@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Link } from "react-router-dom";
 import { 
@@ -28,17 +27,31 @@ const NavItems: React.FC<NavItemsProps> = ({ isSuperAdmin }) => {
       </Link>
       
       {isSuperAdmin && (
-        <Link
-          to="/admin/ground-owners"
-          className={`flex items-center px-3 py-2 text-sm rounded-md ${
-            location.pathname === "/admin/ground-owners"
-              ? "bg-primary/10 text-primary font-medium"
-              : "text-gray-700 hover:bg-gray-100"
-          }`}
-        >
-          <Users className="mr-2 h-4 w-4" />
-          Ground Owners
-        </Link>
+        <>
+          <Link
+            to="/admin/ground-owners"
+            className={`flex items-center px-3 py-2 text-sm rounded-md ${
+              location.pathname === "/admin/ground-owners"
+                ? "bg-primary/10 text-primary font-medium"
+                : "text-gray-700 hover:bg-gray-100"
+            }`}
+          >
+            <Users className="mr-2 h-4 w-4" />
+            Ground Owners
+          </Link>
+
+          <Link
+            to="/admin/sports-professionals"
+            className={`flex items-center px-3 py-2 text-sm rounded-md ${
+              location.pathname === "/admin/sports-professionals"
+                ? "bg-primary/10 text-primary font-medium"
+                : "text-gray-700 hover:bg-gray-100"
+            }`}
+          >
+            <Users className="mr-2 h-4 w-4" />
+            Sports Professionals
+          </Link>
+        </>
       )}
       
       <Link
