@@ -1,7 +1,6 @@
 
 import React, { useState } from 'react';
 import { Upload, X } from 'lucide-react';
-import { useFormContext } from 'react-hook-form';
 import { Input } from '@/components/ui/input';
 import { FormItem, FormLabel, FormControl, FormDescription, FormMessage } from '@/components/ui/form';
 import { Button } from '@/components/ui/button';
@@ -13,7 +12,6 @@ interface GroundImageUploadProps {
 const GroundImageUpload: React.FC<GroundImageUploadProps> = ({ onImagesChange }) => {
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [previews, setPreviews] = useState<string[]>([]);
-  const form = useFormContext();
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
@@ -34,14 +32,14 @@ const GroundImageUpload: React.FC<GroundImageUploadProps> = ({ onImagesChange })
   const removeFile = (index: number) => {
     // Revoke the object URL to avoid memory leaks
     URL.revokeObjectURL(previews[index]);
-    
+
     setSelectedFiles(prev => {
       const updated = [...prev];
       updated.splice(index, 1);
       onImagesChange(updated);
       return updated;
     });
-    
+
     setPreviews(prev => {
       const updated = [...prev];
       updated.splice(index, 1);
@@ -51,10 +49,10 @@ const GroundImageUpload: React.FC<GroundImageUploadProps> = ({ onImagesChange })
 
   return (
     <FormItem>
-      <FormLabel>Ground Images</FormLabel>
+      <FormLabel>Add Images</FormLabel>
       <FormControl>
         <div className="space-y-4">
-          <div 
+          <div
             className="border-2 border-dashed rounded-md p-6 flex flex-col items-center justify-center cursor-pointer hover:bg-gray-50"
             onClick={() => document.getElementById('image-upload')?.click()}
           >
@@ -65,10 +63,10 @@ const GroundImageUpload: React.FC<GroundImageUploadProps> = ({ onImagesChange })
             <p className="text-xs text-gray-500">
               SVG, PNG, JPG or GIF (max. 5MB)
             </p>
-            <Input 
+            <Input
               id="image-upload"
-              type="file" 
-              className="hidden" 
+              type="file"
+              className="hidden"
               accept="image/*"
               multiple
               onChange={handleFileChange}
@@ -79,17 +77,17 @@ const GroundImageUpload: React.FC<GroundImageUploadProps> = ({ onImagesChange })
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 mt-3">
               {previews.map((preview, index) => (
                 <div key={index} className="relative group">
-                  <img 
-                    src={preview} 
-                    alt={`Preview ${index + 1}`} 
-                    className="h-24 w-full object-cover rounded-md" 
+                  <img
+                    src={preview}
+                    alt={`Preview ${index + 1}`}
+                    className="h-24 w-full object-cover rounded-md"
                   />
                   <Button
                     type="button"
                     variant="destructive"
                     size="icon"
                     className="absolute top-1 right-1 h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
-                    onClick={(e) => {
+                    onClick={e => {
                       e.stopPropagation();
                       removeFile(index);
                     }}

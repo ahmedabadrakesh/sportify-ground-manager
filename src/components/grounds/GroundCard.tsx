@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/tooltip";
 
 interface GroundCardProps {
-  ground: Ground;
+  ground: Ground & { games?: string[] };
 }
 
 const GroundCard: React.FC<GroundCardProps> = ({ ground }) => {
@@ -80,7 +80,6 @@ const GroundCard: React.FC<GroundCardProps> = ({ ground }) => {
   const renderFacility = (facility: string) => {
     const icon = getFacilityIcon(facility);
     if (!icon) return null;
-    
     return icon;
   };
 
@@ -102,30 +101,30 @@ const GroundCard: React.FC<GroundCardProps> = ({ ground }) => {
           </div>
         )}
       </div>
-      
+
       <div className="p-4">
         <h3 className="font-semibold text-gray-900 group-hover:text-primary-600 truncate">
           {ground.name}
         </h3>
-        
+
         <div className="flex items-center mt-1 text-gray-500 text-sm">
           <MapPin className="h-3.5 w-3.5 mr-1 flex-shrink-0" />
           <span className="truncate">{ground.address}</span>
         </div>
-        
+
         <div className="mt-3 flex flex-wrap gap-1">
-          {ground.games.slice(0, 3).map((game) => (
+          {(ground.games || []).slice(0, 3).map((game) => (
             <Badge key={game} variant="secondary" className="font-normal">
               {game}
             </Badge>
           ))}
-          {ground.games.length > 3 && (
+          {(ground.games && ground.games.length > 3) && (
             <Badge variant="outline" className="font-normal">
               +{ground.games.length - 3} more
             </Badge>
           )}
         </div>
-        
+
         <div className="mt-4 flex items-center justify-between">
           <div className="text-xs text-gray-500 flex flex-wrap items-center">
             {ground.facilities.map(renderFacility)}
@@ -138,4 +137,3 @@ const GroundCard: React.FC<GroundCardProps> = ({ ground }) => {
 };
 
 export default GroundCard;
-

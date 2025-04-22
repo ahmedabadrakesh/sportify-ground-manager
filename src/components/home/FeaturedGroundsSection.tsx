@@ -6,18 +6,18 @@ import GroundCard from "@/components/grounds/GroundCard";
 import { getAvailableGrounds } from "@/utils/booking";
 import { Ground } from "@/types/models";
 import { motion } from "framer-motion";
+import { useGames } from "@/hooks/useGames";
 
 const FeaturedGroundsSection = () => {
   const navigate = useNavigate();
   const [grounds, setGrounds] = useState<Ground[]>([]);
   const [loading, setLoading] = useState(true);
-  
+  const { games, loading: gamesLoading } = useGames();
+
   useEffect(() => {
     const loadFeaturedGrounds = async () => {
       try {
         setLoading(true);
-        // In a real app, we'd have an API endpoint to get featured grounds
-        // For now, we'll just get the first 3 grounds
         const allGrounds = await getAvailableGrounds();
         setGrounds(allGrounds.slice(0, 3));
       } catch (error) {
@@ -26,10 +26,19 @@ const FeaturedGroundsSection = () => {
         setLoading(false);
       }
     };
-    
+
     loadFeaturedGrounds();
   }, []);
-  
+
+  const getGameNames = (gameIds: string[]) => {
+    return gameIds
+      .map(id => {
+        const game = games.find(g => g.id === id);
+        return game ? game.name : id;
+      })
+      .filter(Boolean);
+  };
+
   return (
     <div className="mb-16">
       <div className="flex flex-col md:flex-row md:items-center justify-between mb-8">
@@ -41,7 +50,7 @@ const FeaturedGroundsSection = () => {
           <h2 className="text-3xl font-bold text-gray-900">Featured Grounds</h2>
           <p className="text-gray-600 mt-1">Top-rated venues recommended for you</p>
         </motion.div>
-        
+
         <motion.div
           initial={{ opacity: 0, x: 20 }}
           animate={{ opacity: 1, x: 0 }}
@@ -57,7 +66,7 @@ const FeaturedGroundsSection = () => {
         </motion.div>
       </div>
 
-      {loading ? (
+      {loading || gamesLoading ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {[1, 2, 3].map(i => (
             <div key={i} className="bg-gray-100 rounded-md h-64 animate-pulse"></div>
@@ -72,7 +81,7 @@ const FeaturedGroundsSection = () => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: index * 0.1 }}
             >
-              <GroundCard ground={ground} />
+              <GroundCard ground={{ ...ground, games: getGameNames(ground.games) }} />
             </motion.div>
           ))}
         </div>
