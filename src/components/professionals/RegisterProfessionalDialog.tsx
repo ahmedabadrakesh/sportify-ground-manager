@@ -1,5 +1,4 @@
-
-import React from "react";
+import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
@@ -11,6 +10,7 @@ import { useGames } from "@/hooks/useGames";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { Upload } from "lucide-react";
 
 interface RegisterProfessionalProps {
   open: boolean;
@@ -21,6 +21,43 @@ const RegisterProfessionalDialog = ({ open, onOpenChange }: RegisterProfessional
   const { games } = useGames();
   const queryClient = useQueryClient();
   const form = useForm();
+  const [photoPreview, setPhotoPreview] = useState<string | null>(null);
+  const [uploading, setUploading] = useState(false);
+
+  const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    try {
+      if (!event.target.files || event.target.files.length === 0) {
+        return;
+      }
+      setUploading(true);
+
+      const file = event.target.files[0];
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${Math.random()}.${fileExt}`;
+      const filePath = `${fileName}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('professionals')
+        .upload(filePath, file);
+
+      if (uploadError) {
+        throw uploadError;
+      }
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('professionals')
+        .getPublicUrl(filePath);
+
+      setPhotoPreview(publicUrl);
+      form.setValue('photo', publicUrl);
+      toast.success('Photo uploaded successfully');
+    } catch (error) {
+      toast.error('Error uploading photo');
+      console.error('Error uploading photo:', error);
+    } finally {
+      setUploading(false);
+    }
+  };
 
   const registerMutation = useMutation({
     mutationFn: async (values: any) => {
@@ -35,6 +72,7 @@ const RegisterProfessionalDialog = ({ open, onOpenChange }: RegisterProfessional
       queryClient.invalidateQueries({ queryKey: ["sports-professionals"] });
       onOpenChange(false);
       form.reset();
+      setPhotoPreview(null);
     },
     onError: (error) => {
       toast.error("Failed to register. Please try again.");
@@ -56,6 +94,64 @@ const RegisterProfessionalDialog = ({ open, onOpenChange }: RegisterProfessional
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
+              <div className="col-span-2">
+                <FormField
+                  name="photo"
+                  control={form.control}
+                  render={() => (
+                    <FormItem>
+                      <FormLabel>Photo</FormLabel>
+                      <FormControl>
+                        <div className="flex flex-col items-center space-y-4">
+                          {photoPreview ? (
+                            <div className="relative w-32 h-32">
+                              <img
+                                src={photoPreview}
+                                alt="Preview"
+                                className="w-full h-full object-cover rounded-lg"
+                              />
+                              <Button
+                                type="button"
+                                variant="secondary"
+                                size="sm"
+                                className="absolute bottom-2 right-2"
+                                onClick={() => {
+                                  setPhotoPreview(null);
+                                  form.setValue('photo', null);
+                                }}
+                              >
+                                Change
+                              </Button>
+                            </div>
+                          ) : (
+                            <div className="flex flex-col items-center">
+                              <label
+                                htmlFor="photo-upload"
+                                className="flex flex-col items-center justify-center w-32 h-32 border-2 border-dashed rounded-lg cursor-pointer hover:border-primary"
+                              >
+                                <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                                  <Upload className="w-8 h-8 mb-2 text-gray-500" />
+                                  <p className="text-xs text-gray-500">Upload photo</p>
+                                </div>
+                                <input
+                                  id="photo-upload"
+                                  type="file"
+                                  className="hidden"
+                                  accept="image/*"
+                                  onChange={handleImageUpload}
+                                  disabled={uploading}
+                                />
+                              </label>
+                            </div>
+                          )}
+                        </div>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
               <FormField
                 name="name"
                 control={form.control}
@@ -216,7 +312,9 @@ const RegisterProfessionalDialog = ({ open, onOpenChange }: RegisterProfessional
               )}
             />
 
-            <Button type="submit" className="w-full">Register</Button>
+            <Button type="submit" className="w-full" disabled={uploading}>
+              {uploading ? "Uploading..." : "Register"}
+            </Button>
           </form>
         </Form>
       </DialogContent>
