@@ -31,7 +31,8 @@ const StatCard: React.FC<StatCardProps> = ({
               <CountUp 
                 start={0} 
                 end={value} 
-                duration={getAnimationDuration(value)} 
+                decimals={0}
+                delay={0}
               />
             ) : (
               0

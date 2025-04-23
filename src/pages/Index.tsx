@@ -46,7 +46,7 @@ const Index = () => {
         <div className="w-20 h-20 bg-white/20 rounded-full flex items-center justify-center mb-4">
           <div className="w-16 h-16 bg-white/30 rounded-full flex items-center justify-center">
             <div className="text-4xl font-bold text-white">
-              {visible ? <CountUp end={100} duration={2.5} /> : 0}
+              {visible ? <CountUp end={100} decimals={0} delay={0} /> : 0}
             </div>
           </div>
         </div>

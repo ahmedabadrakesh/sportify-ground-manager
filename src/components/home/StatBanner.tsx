@@ -59,7 +59,8 @@ const StatBanner = () => {
                   {isVisible && (
                     <CountUp 
                       end={stat.value} 
-                      duration={2.5} 
+                      decimals={0}
+                      delay={0}
                       separator="," 
                       suffix={stat.label === "Hours Support" ? "h" : ""} 
                     />
