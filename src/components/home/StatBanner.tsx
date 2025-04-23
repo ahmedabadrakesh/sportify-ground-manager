@@ -8,22 +8,26 @@ const stats = [
   {
     value: 150,
     label: "Sports Venues",
-    icon: <MapPin className="h-5 w-5" />
+    icon: <MapPin className="h-5 w-5" />,
+    formatter: (value: number) => value.toLocaleString()
   },
   {
     value: 10000,
-    label: "Monthly Bookings",
-    icon: <Calendar className="h-5 w-5" />
+    label: "Monthly Bookings", 
+    icon: <Calendar className="h-5 w-5" />,
+    formatter: (value: number) => value.toLocaleString()
   },
   {
     value: 30,
     label: "Cities Available",
-    icon: <Users className="h-5 w-5" />
+    icon: <Users className="h-5 w-5" />,
+    formatter: (value: number) => value.toLocaleString()
   },
   {
     value: 24,
     label: "Hours Support",
-    icon: <Clock className="h-5 w-5" />
+    icon: <Clock className="h-5 w-5" />,
+    formatter: (value: number) => `${value}h`
   }
 ];
 
@@ -61,9 +65,7 @@ const StatBanner = () => {
                       end={stat.value} 
                       decimals={0}
                       delay={0}
-                      formatterFn={(value) => 
-                        `${value.toLocaleString()}${stat.label === "Hours Support" ? "h" : ""}`
-                      }
+                      formatterFn={(value) => stat.formatter(value)}
                     />
                   )}
                 </div>
