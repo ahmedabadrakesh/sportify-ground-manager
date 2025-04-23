@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import MainLayout from "@/components/layouts/MainLayout";
 import HeroSection from "@/components/home/HeroSection";
 import PopularSportsSection from "@/components/home/PopularSportsSection";
@@ -16,6 +16,10 @@ const Home: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [hasSearched, setHasSearched] = useState(false);
 
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
   const handleSearch = (term: string) => {
     if (term.trim()) {
       setSearchTerm(term);
@@ -27,13 +31,13 @@ const Home: React.FC = () => {
     <MainLayout>
       <HeroSection onSearch={handleSearch} />
       <div className="container mx-auto px-4">
-        <StatBanner />
         <PopularSportsSection />
         <SearchResultsSection 
           searchTerm={searchTerm} 
           hasSearched={hasSearched} 
         />
         <SportsProfessionalsPromotion />
+        <StatBanner />
         <FeaturedGroundsSection />
         <HowItWorksSection />
         <TestimonialsSection />
