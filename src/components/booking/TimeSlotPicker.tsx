@@ -1,14 +1,24 @@
 
-import React from "react";
+import React, { useState } from "react";
 import { TimeSlot } from "@/types/models";
 import TimeSlotGroup from "./TimeSlotGroup";
 import MockSlotsAlert from "./MockSlotsAlert";
+import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogCancel,
+  AlertDialogAction,
+} from "@/components/ui/alert-dialog";
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
-} from "@/components/ui/accordion"
+} from "@/components/ui/accordion";
 
 interface TimeSlotPickerProps {
   slots: TimeSlot[];
@@ -21,6 +31,9 @@ const TimeSlotPicker: React.FC<TimeSlotPickerProps> = ({
   selectedSlots,
   onSelectSlot,
 }) => {
+  const [showNonConsecutiveAlert, setShowNonConsecutiveAlert] = useState(false);
+  const [pendingSlotSelection, setPendingSlotSelection] = useState<string | null>(null);
+  
   const hasMockSlots = slots.length > 0 && slots[0].id.startsWith('mock-');
 
   const groupedByTimeOfDay = {
@@ -44,6 +57,48 @@ const TimeSlotPicker: React.FC<TimeSlotPickerProps> = ({
     evening: "Evening (5 PM - 10 PM)"
   };
 
+  const areConsecutiveSlots = (currentSlots: string[]) => {
+    if (currentSlots.length <= 1) return true;
+    
+    const sortedSlots = slots
+      .filter(slot => currentSlots.includes(slot.id))
+      .sort((a, b) => {
+        const timeA = parseInt(a.startTime.split(':')[0]);
+        const timeB = parseInt(b.startTime.split(':')[0]);
+        return timeA - timeB;
+      });
+
+    for (let i = 1; i < sortedSlots.length; i++) {
+      const prevTime = parseInt(sortedSlots[i-1].endTime.split(':')[0]);
+      const currTime = parseInt(sortedSlots[i].startTime.split(':')[0]);
+      if (currTime !== prevTime) {
+        return false;
+      }
+    }
+    return true;
+  };
+
+  const handleSlotSelect = (slotId: string) => {
+    const newSelection = selectedSlots.includes(slotId)
+      ? selectedSlots.filter(id => id !== slotId)
+      : [...selectedSlots, slotId];
+
+    if (!areConsecutiveSlots(newSelection)) {
+      setPendingSlotSelection(slotId);
+      setShowNonConsecutiveAlert(true);
+    } else {
+      onSelectSlot(slotId);
+    }
+  };
+
+  const handleConfirmNonConsecutive = () => {
+    if (pendingSlotSelection) {
+      onSelectSlot(pendingSlotSelection);
+    }
+    setShowNonConsecutiveAlert(false);
+    setPendingSlotSelection(null);
+  };
+
   return (
     <div className="space-y-6">
       <h3 className="text-lg font-medium text-gray-900">Available Time Slots</h3>
@@ -61,7 +116,7 @@ const TimeSlotPicker: React.FC<TimeSlotPickerProps> = ({
                 <TimeSlotGroup
                   slots={timeSlots}
                   selectedSlots={selectedSlots}
-                  onSelectSlot={onSelectSlot}
+                  onSelectSlot={handleSlotSelect}
                 />
               </AccordionContent>
             </AccordionItem>
@@ -82,6 +137,28 @@ const TimeSlotPicker: React.FC<TimeSlotPickerProps> = ({
           </p>
         </div>
       )}
+
+      <AlertDialog open={showNonConsecutiveAlert} onOpenChange={setShowNonConsecutiveAlert}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Non-Consecutive Time Slots</AlertDialogTitle>
+            <AlertDialogDescription>
+              You are selecting non-consecutive time slots. This might lead to gaps in your booking. Are you sure you want to continue?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => {
+              setShowNonConsecutiveAlert(false);
+              setPendingSlotSelection(null);
+            }}>
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction onClick={handleConfirmNonConsecutive}>
+              Continue Anyway
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
