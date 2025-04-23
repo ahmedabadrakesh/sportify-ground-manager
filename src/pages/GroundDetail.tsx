@@ -4,11 +4,12 @@ import { useParams, useNavigate } from "react-router-dom";
 import MainLayout from "@/components/layouts/MainLayout";
 import { Button } from "@/components/ui/button";
 import GroundHeader from "@/components/grounds/GroundHeader";
-import GroundTabs from "@/components/grounds/GroundTabs";
+import GroundInfo from "@/components/grounds/GroundInfo";
 import BookingForm from "@/components/grounds/BookingForm";
 import { fetchGroundById } from "@/services/groundsService";
 import { Ground } from "@/types/models";
 import { toast } from "sonner";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 
 const GroundDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -61,16 +62,44 @@ const GroundDetail: React.FC = () => {
     );
   }
 
-  // Instead of grid/columns, stack info and then booking form beneath (full width)
   return (
     <MainLayout>
-      <div className="mb-8">
-        <GroundHeader ground={ground} />
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="mb-8">
+          <GroundHeader ground={ground} />
+        </div>
+        
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <div className="lg:col-span-2">
+            <GroundInfo ground={ground} />
+          </div>
+          
+          <div className="lg:col-span-1">
+            <div className="sticky top-8">
+              <Sheet>
+                <SheetTrigger asChild>
+                  <Button className="w-full" size="lg">
+                    Book Now
+                  </Button>
+                </SheetTrigger>
+                <SheetContent side="right" className="w-full sm:max-w-xl overflow-y-auto">
+                  <BookingForm ground={ground} />
+                </SheetContent>
+              </Sheet>
+              
+              <div className="mt-4 p-4 bg-gray-50 rounded-lg">
+                <div className="flex justify-between mb-2">
+                  <span className="text-gray-700">Price per hour:</span>
+                  <span className="font-semibold">₹500 - ₹800</span>
+                </div>
+                <p className="text-xs text-gray-500">
+                  *Prices may vary based on time slot and day of the week
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
-      <div className="mb-8">
-        <GroundTabs ground={ground} />
-      </div>
-      <BookingForm ground={ground} />
     </MainLayout>
   );
 };
