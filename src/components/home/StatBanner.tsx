@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import CountUp from "react-countup";
@@ -39,7 +38,7 @@ const StatBanner = () => {
   }, []);
 
   return (
-    <div className="mb-16 mt-16">
+    <div className="mb-16">
       <motion.div 
         className="bg-gradient-to-r from-primary-700 to-primary-800 rounded-2xl overflow-hidden"
         initial={{ y: 50, opacity: 0 }}

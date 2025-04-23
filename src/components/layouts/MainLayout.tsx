@@ -1,5 +1,4 @@
-
-import React, { useEffect } from "react";
+import React from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Home, Search, Calendar, User, LogOut, ShoppingBag, ShoppingCart } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -20,10 +19,6 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
   const currentUser = getCurrentUserSync();
   const cartItemsCount = getCartItemsCount();
 
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, [location.pathname]);
-
   const handleLogout = () => {
     logout();
     toast.success("Logged out successfully");
@@ -32,16 +27,17 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
+      {/* Header */}
       <header className="bg-white shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
           <Link to="/" className="flex items-center">
             <img
               src={LOGO_PATH}
-              alt="JOKOVO Logo"
+              alt="JOKOVA Logo"
               className="h-10 w-auto mr-2 rounded"
               style={{ background: "#fff" }}
             />
-            <span className="text-2xl font-bold text-primary-800">JOKOVO</span>
+            <span className="text-2xl font-bold text-primary-800">JOKOVA</span>
           </Link>
           <div className="flex items-center gap-4">
             <Link to="/sports-professionals" className="text-gray-700 hover:text-primary-600">
@@ -93,12 +89,14 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
         </div>
       </header>
 
+      {/* Main content */}
       <main className="flex-1">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           {children}
         </div>
       </main>
 
+      {/* Mobile bottom navigation */}
       <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white shadow-top border-t border-gray-200">
         <div className="grid grid-cols-5 h-16">
           <Link
@@ -157,6 +155,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
         </div>
       </div>
 
+      {/* Footer */}
       <footer className="bg-white border-t border-gray-200 py-6 md:py-8 mt-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row justify-between items-center">
