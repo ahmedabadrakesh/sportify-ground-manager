@@ -61,7 +61,7 @@ const StatBanner = () => {
                       end={stat.value} 
                       decimals={0}
                       delay={0}
-                      formattingFn={(value) => 
+                      formatterFn={(value) => 
                         `${value.toLocaleString()}${stat.label === "Hours Support" ? "h" : ""}`
                       }
                     />
