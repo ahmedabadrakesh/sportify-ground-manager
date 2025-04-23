@@ -3,6 +3,12 @@ import React from "react";
 import { TimeSlot } from "@/types/models";
 import TimeSlotGroup from "./TimeSlotGroup";
 import MockSlotsAlert from "./MockSlotsAlert";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion"
 
 interface TimeSlotPickerProps {
   slots: TimeSlot[];
@@ -15,10 +21,8 @@ const TimeSlotPicker: React.FC<TimeSlotPickerProps> = ({
   selectedSlots,
   onSelectSlot,
 }) => {
-  // Check if slots are mock data
   const hasMockSlots = slots.length > 0 && slots[0].id.startsWith('mock-');
 
-  // Group slots by time of day (morning, afternoon, evening)
   const groupedByTimeOfDay = {
     morning: slots.filter(slot => {
       const hour = parseInt(slot.startTime.split(":")[0]);
@@ -46,15 +50,24 @@ const TimeSlotPicker: React.FC<TimeSlotPickerProps> = ({
       
       {hasMockSlots && <MockSlotsAlert />}
       
-      {Object.entries(groupedByTimeOfDay).map(([timeOfDay, timeSlots]) => (
-        <TimeSlotGroup
-          key={timeOfDay}
-          title={timeOfDayLabels[timeOfDay as keyof typeof timeOfDayLabels]}
-          slots={timeSlots}
-          selectedSlots={selectedSlots}
-          onSelectSlot={onSelectSlot}
-        />
-      ))}
+      <Accordion type="single" collapsible className="w-full space-y-4">
+        {Object.entries(groupedByTimeOfDay).map(([timeOfDay, timeSlots]) => (
+          timeSlots.length > 0 && (
+            <AccordionItem key={timeOfDay} value={timeOfDay}>
+              <AccordionTrigger className="text-left font-medium text-gray-700">
+                {timeOfDayLabels[timeOfDay as keyof typeof timeOfDayLabels]}
+              </AccordionTrigger>
+              <AccordionContent>
+                <TimeSlotGroup
+                  slots={timeSlots}
+                  selectedSlots={selectedSlots}
+                  onSelectSlot={onSelectSlot}
+                />
+              </AccordionContent>
+            </AccordionItem>
+          )
+        ))}
+      </Accordion>
 
       {slots.length === 0 && (
         <div className="text-center py-6">
