@@ -65,7 +65,7 @@ const StatBanner = () => {
                       end={stat.value} 
                       decimals={0}
                       delay={0}
-                      formatterFn={(value) => stat.formatter(value)}
+                      formatterFn={stat.formatter}
                     />
                   )}
                 </div>
