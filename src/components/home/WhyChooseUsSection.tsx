@@ -45,7 +45,7 @@ const WhyChooseUsSection = () => {
         transition={{ duration: 0.5 }}
       >
         <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-          Why Choose SportifyGround?
+          Why Choose JOKOVO?
         </h2>
         <p className="text-gray-600 max-w-2xl mx-auto">
           We're committed to providing the best booking experience for sports enthusiasts
