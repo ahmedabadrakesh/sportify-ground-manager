@@ -1,4 +1,3 @@
-
 import { Button } from "@/components/ui/button";
 import { Search, Calendar, Check, ArrowRight, MapPin } from "lucide-react";
 import { useNavigate } from "react-router-dom";
@@ -33,28 +32,29 @@ const HowItWorksSection = () => {
   return (
     <div className="mb-16">
       <motion.div
-        className="rounded-xl overflow-hidden bg-white shadow-xl relative py-16"
+        className="rounded-3xl overflow-hidden bg-gradient-to-br from-primary-900 to-primary-700 relative"
         initial={{ opacity: 0, y: 40 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
       >
-        <div className="absolute top-0 left-0 w-full h-1">
-          <div className="bg-gradient-to-r from-blue-500 via-blue-600 to-indigo-600 h-full"></div>
+        {/* Background Pattern */}
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute top-0 left-0 w-40 h-40 bg-white rounded-full -translate-x-1/2 -translate-y-1/2"></div>
+          <div className="absolute bottom-0 right-0 w-60 h-60 bg-white rounded-full translate-x-1/2 translate-y-1/2"></div>
         </div>
         
-        <div className="container mx-auto px-4 relative z-10">
+        <div className="container mx-auto px-4 py-16 relative z-10">
           <div className="text-center mb-14">
             <motion.h2 
-              className="text-3xl md:text-4xl font-bold text-gray-900 mb-4"
+              className="text-3xl md:text-4xl font-bold text-white mb-4"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5 }}
             >
               How JOKOVO Works
             </motion.h2>
-            <div className="w-20 h-1 bg-blue-600 mx-auto mb-4"></div>
             <motion.p 
-              className="text-gray-600 max-w-2xl mx-auto"
+              className="text-white/90 max-w-2xl mx-auto"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.1 }}
@@ -72,11 +72,11 @@ const HowItWorksSection = () => {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: 0.1 * (index + 2) }}
               >
-                <div className="bg-white rounded-xl p-6 h-full border border-gray-100 shadow-lg hover:shadow-xl transition-shadow">
-                  <div className="w-16 h-16 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center mb-6">
+                <div className="bg-white rounded-xl p-6 h-full shadow-lg">
+                  <div className="w-12 h-12 bg-primary-100 text-primary-600 rounded-full flex items-center justify-center mb-4">
                     {step.icon}
                   </div>
-                  <div className="absolute -top-3 -right-3 w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold text-sm">
+                  <div className="absolute -top-3 -right-3 w-8 h-8 bg-primary-600 text-white rounded-full flex items-center justify-center font-bold text-sm">
                     {index + 1}
                   </div>
                   <h3 className="text-xl font-semibold mb-3 text-gray-900">{step.title}</h3>
@@ -84,8 +84,8 @@ const HowItWorksSection = () => {
                 </div>
                 
                 {index < steps.length - 1 && (
-                  <div className="hidden lg:flex absolute top-1/2 right-0 translate-x-1/2 -translate-y-1/2 transform z-0 text-blue-300">
-                    <ArrowRight className="h-6 w-6" />
+                  <div className="hidden lg:flex absolute top-1/2 right-0 translate-x-1/2 -translate-y-1/2 transform z-0 text-primary-400">
+                    <ArrowRight className="h-5 w-5" />
                   </div>
                 )}
               </motion.div>
@@ -100,7 +100,7 @@ const HowItWorksSection = () => {
           >
             <Button 
               onClick={() => navigate("/search")} 
-              className="px-8 bg-blue-600 hover:bg-blue-700 text-white rounded-full"
+              className="px-8 bg-white text-primary-700 hover:bg-white/90"
               size="lg"
             >
               Find Your Ground Now <ArrowRight className="ml-2 h-4 w-4" />

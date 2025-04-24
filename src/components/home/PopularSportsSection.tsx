@@ -52,20 +52,19 @@ const PopularSportsSection = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="mb-16 py-8">
-      <div className="flex flex-col md:flex-row md:items-center justify-between mb-12">
+    <div className="mb-16">
+      <div className="flex flex-col md:flex-row md:items-center justify-between mb-12"> {/* Increased bottom margin */}
         <motion.div
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.5 }}
         >
           <h2 className="text-3xl font-bold text-gray-900">Popular Sports</h2>
-          <div className="w-20 h-1 bg-blue-600 mt-2 mb-3"></div>
           <p className="text-gray-600 mt-1">Find the perfect venue for your favorite sport</p>
         </motion.div>
         
         <motion.button
-          className="text-blue-600 font-medium flex items-center mt-2 md:mt-0 hover:text-blue-700 transition-colors"
+          className="text-primary-600 font-medium flex items-center mt-2 md:mt-0 hover:text-primary-700 transition-colors"
           onClick={() => navigate("/search")}
           initial={{ opacity: 0, x: 20 }}
           animate={{ opacity: 1, x: 0 }}
@@ -87,38 +86,29 @@ const PopularSportsSection = () => {
             {sports.map((sport, index) => (
               <CarouselItem key={index} className="pl-2 md:pl-4 basis-full sm:basis-1/2 md:basis-1/3 lg:basis-1/4">
                 <motion.div
-                  className="cursor-pointer overflow-hidden rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"
+                  className="cursor-pointer overflow-hidden rounded-2xl shadow-sm hover:shadow-md transition-all duration-300"
                   onClick={() => navigate(`/search?sport=${sport.name}`)}
                   whileHover={{ scale: 1.03 }}
                   initial={{ opacity: 0, y: 30 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.5, delay: index * 0.1 }}
                 >
-                  <div className={`relative aspect-square bg-gradient-to-br from-blue-500 to-blue-700 overflow-hidden`}>
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <img 
-                        src={sport.image} 
-                        alt={sport.name}
-                        className="w-3/4 h-3/4 object-contain mix-blend-luminosity brightness-[1.25] z-10"
-                      />
-                    </div>
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent flex items-end z-20">
-                      <div className="p-4 w-full">
-                        <h3 className="text-xl font-bold text-white">{sport.name}</h3>
-                        <div className="flex items-center mt-1">
-                          <div className="bg-blue-400 h-1 w-6 rounded-full"></div>
-                          <span className="text-xs text-blue-200 ml-2">View venues</span>
-                        </div>
-                      </div>
-                    </div>
+                  <div className={`relative aspect-[4/5] ${sport.color} overflow-hidden`}>
+                    <img 
+                      src={sport.image} 
+                      alt={sport.name}
+                      className="w-full h-full object-cover object-center"
+                    />
+                    {/* Removed text overlay div */}
+                    {/* Removed the gradient overlay as well to fully hide the text */}
                   </div>
                 </motion.div>
               </CarouselItem>
             ))}
           </CarouselContent>
           <div className="hidden md:block">
-            <CarouselPrevious className="left-0 bg-white shadow-lg border-0 text-blue-600 hover:bg-blue-50" />
-            <CarouselNext className="right-0 bg-white shadow-lg border-0 text-blue-600 hover:bg-blue-50" />
+            <CarouselPrevious className="left-0" />
+            <CarouselNext className="right-0" />
           </div>
         </Carousel>
       </div>
