@@ -26,9 +26,9 @@ const Home: React.FC = () => {
   return (
     <MainLayout>
       <HeroSection onSearch={handleSearch} />
+      <PopularSportsSection />
       <div className="container mx-auto px-4">
         <StatBanner />
-        <PopularSportsSection />
         <SearchResultsSection 
           searchTerm={searchTerm} 
           hasSearched={hasSearched} 
@@ -45,3 +45,4 @@ const Home: React.FC = () => {
 };
 
 export default Home;
+
