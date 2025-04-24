@@ -65,6 +65,7 @@ const StatBanner = () => {
                       end={stat.value} 
                       decimals={0}
                       delay={0}
+                      // Use the correct prop name 'formattingFn'
                       formattingFn={stat.formatter}
                     />
                   )}
