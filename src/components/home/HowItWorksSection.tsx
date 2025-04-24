@@ -1,4 +1,3 @@
-
 import { Button } from "@/components/ui/button";
 import { Search, Calendar, Check, ArrowRight, MapPin } from "lucide-react";
 import { useNavigate } from "react-router-dom";
@@ -52,7 +51,7 @@ const HowItWorksSection = () => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5 }}
             >
-              How SportifyGround Works
+              How JOKOVO Works
             </motion.h2>
             <motion.p 
               className="text-white/90 max-w-2xl mx-auto"
