@@ -41,7 +41,7 @@ const StatBanner = () => {
   return (
     <div className="mb-16">
       <motion.div 
-        className="bg-gradient-to-r from-primary-700 to-primary-800 rounded-2xl overflow-hidden shadow-xl"
+        className="bg-gradient-to-r from-primary-700 to-primary-800 rounded-2xl overflow-hidden"
         initial={{ y: 50, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.6 }}
@@ -65,7 +65,7 @@ const StatBanner = () => {
                       end={stat.value} 
                       decimals={0}
                       delay={0}
-                      formattingFn={(value) => stat.formatter(value)}
+                      formatterFn={stat.formatter}
                     />
                   )}
                 </div>
