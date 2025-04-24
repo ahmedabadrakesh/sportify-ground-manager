@@ -1,3 +1,4 @@
+
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { GroundFormValues } from "@/components/admin/grounds/groundFormSchema";
@@ -35,7 +36,7 @@ export const createGround = async ({
   try {
     // Parse games from array of ids instead of comma-separated string
     const gamesArray = Array.isArray(values.games) ? values.games : [];
-    const facilitiesArray = values.facilities ? values.facilities.split(',').map((item: string) => item.trim()) : [];
+    const facilitiesArray = Array.isArray(values.facilities) ? values.facilities : [];
 
     // Determine owner ID (if not super admin, use current user's ID)
     const ownerId = isSuperAdmin ? values.ownerId : currentUserId;

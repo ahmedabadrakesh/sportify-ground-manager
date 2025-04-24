@@ -45,7 +45,7 @@ const EditGroundDialog = ({
       address: ground.address,
       ownerId: ground.ownerId,
       games: ground.games || [],
-      facilities: ground.facilities?.join(", ") || "",
+      facilities: ground.facilities || [],
     },
   });
 
@@ -75,10 +75,6 @@ const EditGroundDialog = ({
 
   const updateMutation = useMutation({
     mutationFn: async (values: GroundFormValues) => {
-      const facilitiesArray = values.facilities
-        ? values.facilities.split(",").map((f: string) => f.trim())
-        : [];
-
       // Remove images from storage if flagged for deletion
       for (const url of removedImages) {
         const path = url.startsWith("public/") ? url.substring(7) : url;
@@ -113,12 +109,35 @@ const EditGroundDialog = ({
           address: values.address,
           owner_id: isSuperAdmin ? values.ownerId : ground.ownerId,
           games: values.games,
-          facilities: facilitiesArray,
+          facilities: values.facilities,
           images: finalImages
         })
         .eq('id', ground.id);
 
       if (error) throw error;
+
+      // Update ground-facility relationships
+      // First delete existing relationships
+      const { error: deleteError } = await supabase
+        .from('ground_facilities')
+        .delete()
+        .eq('ground_id', ground.id);
+
+      if (deleteError) throw deleteError;
+
+      // Now insert new relationships
+      if (values.facilities && values.facilities.length > 0) {
+        const facilityRelations = values.facilities.map((facilityId: string) => ({
+          ground_id: ground.id,
+          facility_id: facilityId
+        }));
+
+        const { error: relationError } = await supabase
+          .from('ground_facilities')
+          .insert(facilityRelations);
+
+        if (relationError) throw relationError;
+      }
     },
     onSuccess: () => {
       toast.success("Ground updated successfully");
@@ -168,12 +187,6 @@ const EditGroundDialog = ({
                         >
                           ×
                         </Button>
-                        {/* Optionally: Replace existing image */}
-                        {/* <input type="file" className="hidden" onChange={e => {
-                          if (e.target.files && e.target.files.length > 0) {
-                            handleReplaceExistingImage(imgUrl, e.target.files[0]);
-                          }
-                        }} /> */}
                       </div>
                     ))}
                   </div>
