@@ -7,27 +7,29 @@ import {
   FormLabel,
   FormMessage
 } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
+import { Checkbox } from "@/components/ui/checkbox";
 import { UseFormReturn } from "react-hook-form";
 import { GroundFormValues } from "./groundFormSchema";
 import { useGames } from "@/hooks/useGames";
-import { Select, SelectItem, SelectTrigger, SelectValue, SelectContent } from "@/components/ui/select";
+import { useFacilities } from "@/hooks/useFacilities";
 
 interface GroundFeaturesProps {
   form: UseFormReturn<GroundFormValues>;
 }
 
 const GroundFeatures: React.FC<GroundFeaturesProps> = ({ form }) => {
-  const { games, loading } = useGames();
+  const { games, loading: gamesLoading } = useGames();
+  const { data: facilities = [], isLoading: facilitiesLoading } = useFacilities();
 
-  // Handle multi-select for games
-  const selectedGames: string[] = form.watch("games") || [];
+  const selectedGames = form.watch("games") || [];
+  const selectedFacilities = form.watch("facilities") || [];
 
-  const handleMultiSelect = (gameId: string) => {
-    if (selectedGames.includes(gameId)) {
-      form.setValue("games", selectedGames.filter(id => id !== gameId));
+  const handleMultiSelect = (field: "games" | "facilities", id: string) => {
+    const currentValues = form.getValues(field) || [];
+    if (currentValues.includes(id)) {
+      form.setValue(field, currentValues.filter(v => v !== id));
     } else {
-      form.setValue("games", [...selectedGames, gameId]);
+      form.setValue(field, [...currentValues, id]);
     }
   };
 
@@ -40,16 +42,14 @@ const GroundFeatures: React.FC<GroundFeaturesProps> = ({ form }) => {
           <FormItem>
             <FormLabel>Games</FormLabel>
             <div className="flex flex-col gap-2">
-              {loading && <div className="text-xs text-gray-500">Loading games...</div>}
-              {!loading && games.length === 0 && <div className="text-xs text-red-500">No games found</div>}
+              {gamesLoading && <div className="text-xs text-gray-500">Loading games...</div>}
+              {!gamesLoading && games.length === 0 && <div className="text-xs text-red-500">No games found</div>}
               <div className="flex flex-wrap gap-2 max-h-28 overflow-y-auto border rounded p-2 bg-gray-50">
                 {games.map((game) => (
                   <label key={game.id} className="flex items-center gap-2 cursor-pointer">
-                    <input
-                      type="checkbox"
+                    <Checkbox
                       checked={selectedGames.includes(game.id)}
-                      onChange={() => handleMultiSelect(game.id)}
-                      className="accent-primary"
+                      onCheckedChange={() => handleMultiSelect("games", game.id)}
                     />
                     <span className="text-sm">{game.name}</span>
                   </label>
@@ -64,15 +64,24 @@ const GroundFeatures: React.FC<GroundFeaturesProps> = ({ form }) => {
       <FormField
         control={form.control}
         name="facilities"
-        render={({ field }) => (
+        render={() => (
           <FormItem>
             <FormLabel>Facilities</FormLabel>
-            <FormControl>
-              <Input 
-                placeholder="e.g. Changing Room, Parking, Floodlights (comma separated)" 
-                {...field} 
-              />
-            </FormControl>
+            <div className="flex flex-col gap-2">
+              {facilitiesLoading && <div className="text-xs text-gray-500">Loading facilities...</div>}
+              {!facilitiesLoading && facilities.length === 0 && <div className="text-xs text-red-500">No facilities found</div>}
+              <div className="flex flex-wrap gap-2 max-h-28 overflow-y-auto border rounded p-2 bg-gray-50">
+                {facilities.map((facility) => (
+                  <label key={facility.id} className="flex items-center gap-2 cursor-pointer">
+                    <Checkbox
+                      checked={selectedFacilities.includes(facility.id)}
+                      onCheckedChange={() => handleMultiSelect("facilities", facility.id)}
+                    />
+                    <span className="text-sm">{facility.name}</span>
+                  </label>
+                ))}
+              </div>
+            </div>
             <FormMessage />
           </FormItem>
         )}

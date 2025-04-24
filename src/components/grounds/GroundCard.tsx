@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Link } from "react-router-dom";
 import { MapPin, Star, CupSoda, Toilet } from "lucide-react";
@@ -10,12 +9,15 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import FacilityIcon from "./FacilityIcon";
+import { useFacilities } from "@/hooks/useFacilities";
 
 interface GroundCardProps {
   ground: Ground & { games?: string[] };
 }
 
 const GroundCard: React.FC<GroundCardProps> = ({ ground }) => {
+  const { data: facilities = [] } = useFacilities();
   // Get the correct image path for display
   const imagePath = ground.images[0] || "/placeholder.svg";
   // Remove the "public/" prefix if it exists (for correct browser display)
@@ -83,6 +85,24 @@ const GroundCard: React.FC<GroundCardProps> = ({ ground }) => {
     return icon;
   };
 
+  const renderFacilities = () => {
+    if (!ground.facilities) return null;
+    
+    return ground.facilities.map(facilityId => {
+      const facility = facilities.find(f => f.id === facilityId);
+      if (!facility) return null;
+      
+      return (
+        <FacilityIcon
+          key={facility.id}
+          icon={facility.icon}
+          name={facility.name}
+          className="text-gray-600"
+        />
+      );
+    });
+  };
+
   return (
     <Link
       to={`/grounds/${ground.id}`}
@@ -126,8 +146,8 @@ const GroundCard: React.FC<GroundCardProps> = ({ ground }) => {
         </div>
 
         <div className="mt-4 flex items-center justify-between">
-          <div className="text-xs text-gray-500 flex flex-wrap items-center">
-            {ground.facilities.map(renderFacility)}
+          <div className="flex items-center gap-2">
+            {renderFacilities()}
           </div>
           <div className="text-sm font-medium text-primary-600">Book Now</div>
         </div>

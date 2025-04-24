@@ -96,6 +96,30 @@ export type Database = {
           },
         ]
       }
+      facilities: {
+        Row: {
+          created_at: string
+          icon: string
+          id: string
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          icon: string
+          id?: string
+          name: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          icon?: string
+          id?: string
+          name?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       games: {
         Row: {
           id: string
@@ -110,6 +134,42 @@ export type Database = {
           name?: string
         }
         Relationships: []
+      }
+      ground_facilities: {
+        Row: {
+          created_at: string
+          facility_id: string
+          ground_id: string
+          id: string
+        }
+        Insert: {
+          created_at?: string
+          facility_id: string
+          ground_id: string
+          id?: string
+        }
+        Update: {
+          created_at?: string
+          facility_id?: string
+          ground_id?: string
+          id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ground_facilities_facility_id_fkey"
+            columns: ["facility_id"]
+            isOneToOne: false
+            referencedRelation: "facilities"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ground_facilities_ground_id_fkey"
+            columns: ["ground_id"]
+            isOneToOne: false
+            referencedRelation: "grounds"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       ground_inventory: {
         Row: {

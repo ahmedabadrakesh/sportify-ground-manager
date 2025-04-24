@@ -27,7 +27,7 @@ export const createGround = async ({
   currentUserId,
   images = []
 }: { 
-  values: any, // Accept any/unknown due to form casting
+  values: any,
   isSuperAdmin: boolean, 
   currentUserId?: string,
   images?: File[]
@@ -64,7 +64,7 @@ export const createGround = async ({
       }
     }
 
-    // Create ground record
+    // Create ground record with facilities
     const { data, error } = await supabase
       .from('grounds')
       .insert({
@@ -72,8 +72,8 @@ export const createGround = async ({
         description: values.description,
         address: values.address,
         owner_id: ownerId,
-        games: gamesArray,
-        facilities: facilitiesArray,
+        games: values.games,
+        facilities: values.facilities,
         images: imageUrls
       })
       .select()
@@ -82,6 +82,23 @@ export const createGround = async ({
     if (error) {
       console.error("Error creating ground:", error);
       throw error;
+    }
+
+    // Create ground-facility relationships
+    if (values.facilities && values.facilities.length > 0) {
+      const facilityRelations = values.facilities.map((facilityId: string) => ({
+        ground_id: data.id,
+        facility_id: facilityId
+      }));
+
+      const { error: relationError } = await supabase
+        .from('ground_facilities')
+        .insert(facilityRelations);
+
+      if (relationError) {
+        console.error("Error creating facility relations:", relationError);
+        throw relationError;
+      }
     }
 
     return data;
