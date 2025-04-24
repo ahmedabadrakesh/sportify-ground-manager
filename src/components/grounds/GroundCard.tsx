@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/tooltip";
 import FacilityIcon from "./FacilityIcon";
 import { useFacilities } from "@/hooks/useFacilities";
+import { useGameNames } from "@/hooks/useGameNames";
 
 interface GroundCardProps {
   ground: Ground & { games?: string[] };
@@ -18,6 +19,8 @@ interface GroundCardProps {
 
 const GroundCard: React.FC<GroundCardProps> = ({ ground }) => {
   const { data: facilities = [] } = useFacilities();
+  const { getGameNames } = useGameNames();
+  
   // Get the correct image path for display
   const imagePath = ground.images[0] || "/placeholder.svg";
   // Remove the "public/" prefix if it exists (for correct browser display)
@@ -103,6 +106,8 @@ const GroundCard: React.FC<GroundCardProps> = ({ ground }) => {
     });
   };
 
+  const gameNames = getGameNames(ground.games || []);
+
   return (
     <Link
       to={`/grounds/${ground.id}`}
@@ -133,14 +138,14 @@ const GroundCard: React.FC<GroundCardProps> = ({ ground }) => {
         </div>
 
         <div className="mt-3 flex flex-wrap gap-1">
-          {(ground.games || []).slice(0, 3).map((game) => (
+          {gameNames.slice(0, 3).map((game) => (
             <Badge key={game} variant="secondary" className="font-normal">
               {game}
             </Badge>
           ))}
-          {(ground.games && ground.games.length > 3) && (
+          {gameNames.length > 3 && (
             <Badge variant="outline" className="font-normal">
-              +{ground.games.length - 3} more
+              +{gameNames.length - 3} more
             </Badge>
           )}
         </div>

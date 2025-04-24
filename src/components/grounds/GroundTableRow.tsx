@@ -8,6 +8,7 @@ import { AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle,
 import { Ground } from "@/types/models";
 import { Edit, Trash2 } from "lucide-react";
 import EditGroundDialog from "../admin/grounds/EditGroundDialog";
+import { useGameNames } from "@/hooks/useGameNames";
 
 interface GroundTableRowProps {
   ground: Ground;
@@ -18,13 +19,14 @@ interface GroundTableRowProps {
 const GroundTableRow = ({ ground, isSuperAdmin, onDelete }: GroundTableRowProps) => {
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [showEditDialog, setShowEditDialog] = useState(false);
+  const { getGameNames } = useGameNames();
 
   return (
     <>
       <TableRow>
         <TableCell>{ground.name}</TableCell>
         <TableCell>{ground.address}</TableCell>
-        <TableCell>{ground.games?.join(", ")}</TableCell>
+        <TableCell>{getGameNames(ground.games).join(", ")}</TableCell>
         {isSuperAdmin && <TableCell>{ground.ownerName}</TableCell>}
         <TableCell>{ground.facilities?.join(", ")}</TableCell>
         <TableCell>
@@ -72,7 +74,7 @@ const GroundTableRow = ({ ground, isSuperAdmin, onDelete }: GroundTableRowProps)
           open={showEditDialog}
           onOpenChange={setShowEditDialog}
           ground={ground}
-          owners={[]} // This will be populated from parent component
+          owners={[]}
           isSuperAdmin={isSuperAdmin}
         />
       )}
