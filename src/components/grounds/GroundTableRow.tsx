@@ -9,6 +9,7 @@ import { Ground } from "@/types/models";
 import { Edit, Trash2 } from "lucide-react";
 import EditGroundDialog from "../admin/grounds/EditGroundDialog";
 import { useGameNames } from "@/hooks/useGameNames";
+import { useFacilities } from "@/hooks/useFacilities";
 
 interface GroundTableRowProps {
   ground: Ground;
@@ -20,6 +21,14 @@ const GroundTableRow = ({ ground, isSuperAdmin, onDelete }: GroundTableRowProps)
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [showEditDialog, setShowEditDialog] = useState(false);
   const { getGameNames } = useGameNames();
+  const { data: facilities = [] } = useFacilities();
+
+  const getFacilityNames = (facilityIds: string[] = []) => {
+    return facilityIds.map(id => {
+      const facility = facilities.find(f => f.id === id);
+      return facility ? facility.name : '';
+    }).filter(Boolean).join(", ");
+  };
 
   return (
     <>
@@ -28,7 +37,7 @@ const GroundTableRow = ({ ground, isSuperAdmin, onDelete }: GroundTableRowProps)
         <TableCell>{ground.address}</TableCell>
         <TableCell>{getGameNames(ground.games).join(", ")}</TableCell>
         {isSuperAdmin && <TableCell>{ground.ownerName}</TableCell>}
-        <TableCell>{ground.facilities?.join(", ")}</TableCell>
+        <TableCell>{getFacilityNames(ground.facilities)}</TableCell>
         <TableCell>
           <div className="flex gap-2">
             <Button 
