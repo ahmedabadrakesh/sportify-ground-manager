@@ -37,7 +37,7 @@ const features = [
 
 const WhyChooseUsSection = () => {
   return (
-    <div className="mb-16">
+    <div className="mb-16 py-16 bg-gray-50">
       <motion.div 
         className="text-center mb-12"
         initial={{ opacity: 0, y: 20 }}
@@ -47,28 +47,31 @@ const WhyChooseUsSection = () => {
         <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
           Why Choose JOKOVO?
         </h2>
+        <div className="w-20 h-1 bg-primary-600 mx-auto mb-6"></div>
         <p className="text-gray-600 max-w-2xl mx-auto">
           We're committed to providing the best booking experience for sports enthusiasts
         </p>
       </motion.div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        {features.map((feature, index) => (
-          <motion.div 
-            key={index}
-            className="bg-white rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow p-6"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: index * 0.1 }}
-            whileHover={{ y: -5 }}
-          >
-            <div className="w-12 h-12 bg-primary-100 text-primary-600 rounded-full flex items-center justify-center mb-4">
-              {feature.icon}
-            </div>
-            <h3 className="text-xl font-semibold mb-3 text-gray-900">{feature.title}</h3>
-            <p className="text-gray-600">{feature.description}</p>
-          </motion.div>
-        ))}
+      <div className="max-w-7xl mx-auto px-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {features.map((feature, index) => (
+            <motion.div 
+              key={index}
+              className="bg-white rounded-lg border-0 shadow-lg hover:shadow-xl transition-shadow p-8"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: index * 0.1 }}
+              whileHover={{ y: -5 }}
+            >
+              <div className="w-14 h-14 bg-primary-50 text-primary-600 rounded-full flex items-center justify-center mb-6">
+                {feature.icon}
+              </div>
+              <h3 className="text-xl font-semibold mb-4 text-gray-900">{feature.title}</h3>
+              <p className="text-gray-600">{feature.description}</p>
+            </motion.div>
+          ))}
+        </div>
       </div>
 
       <motion.div 
@@ -77,7 +80,7 @@ const WhyChooseUsSection = () => {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.6 }}
       >
-        <div className="inline-flex items-center gap-2 text-primary-600 font-medium">
+        <div className="inline-flex items-center gap-2 text-primary-600 font-medium bg-primary-50 px-6 py-3 rounded-full">
           <ThumbsUp size={20} />
           <span>Over 98% customer satisfaction rate</span>
         </div>
