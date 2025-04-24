@@ -33,7 +33,7 @@ const HowItWorksSection = () => {
   return (
     <div className="mb-16">
       <motion.div
-        className="rounded-3xl overflow-hidden bg-gradient-to-br from-primary-900 to-primary-700 relative"
+        className="rounded-3xl overflow-hidden bg-gradient-to-br from-primary-900 to-primary-700 relative shadow-2xl"
         initial={{ opacity: 0, y: 40 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
@@ -73,7 +73,7 @@ const HowItWorksSection = () => {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: 0.1 * (index + 2) }}
               >
-                <div className="bg-white rounded-xl p-6 h-full shadow-lg">
+                <div className="bg-white rounded-xl p-6 h-full shadow-lg hover:shadow-xl transition-shadow duration-300">
                   <div className="w-12 h-12 bg-primary-100 text-primary-600 rounded-full flex items-center justify-center mb-4">
                     {step.icon}
                   </div>
@@ -101,7 +101,7 @@ const HowItWorksSection = () => {
           >
             <Button 
               onClick={() => navigate("/search")} 
-              className="px-8 bg-white text-primary-700 hover:bg-white/90"
+              className="px-8 bg-white text-primary-700 hover:bg-white/90 font-semibold shadow-lg"
               size="lg"
             >
               Find Your Ground Now <ArrowRight className="ml-2 h-4 w-4" />
