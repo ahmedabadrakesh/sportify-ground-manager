@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -16,6 +17,7 @@ import Checkout from "./pages/Checkout";
 import OrderConfirmation from "./pages/OrderConfirmation";
 import Index from "./pages/Index";
 import SportsProfessionals from "./pages/SportsProfessionals";
+import Events from "./pages/Events";
 
 // Admin routes
 import AdminDashboard from "./pages/admin/AdminDashboard";
@@ -27,6 +29,7 @@ import AdminInventory from "./pages/admin/AdminInventory";
 import InventoryAllocate from "./pages/admin/InventoryAllocate";
 import EcommerceManager from "./pages/admin/EcommerceManager";
 import AdminSportsProfessionals from "./pages/admin/AdminSportsProfessionals";
+import AdminEvents from "./pages/admin/AdminEvents";
 
 const App = () => {
   const queryClient = new QueryClient();
@@ -51,6 +54,7 @@ const App = () => {
             <Route path="/checkout" element={<Checkout />} />
             <Route path="/order-confirmation" element={<OrderConfirmation />} />
             <Route path="/sports-professionals" element={<SportsProfessionals />} />
+            <Route path="/events" element={<Events />} />
             
             {/* Admin Routes */}
             <Route path="/admin" element={<AdminDashboard />} />
@@ -62,6 +66,7 @@ const App = () => {
             <Route path="/admin/inventory" element={<AdminInventory />} />
             <Route path="/admin/inventory/allocate" element={<InventoryAllocate />} />
             <Route path="/admin/ecommerce" element={<EcommerceManager />} />
+            <Route path="/admin/events" element={<AdminEvents />} />
             
             {/* 404 Route */}
             <Route path="*" element={<NotFound />} />

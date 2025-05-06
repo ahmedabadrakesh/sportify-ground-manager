@@ -1,9 +1,18 @@
+
 import React from "react";
-import { Link } from "react-router-dom";
-import { 
-  LayoutDashboard, Users, Map, Calendar, Package, ShoppingBag 
+import { Link, useLocation } from "react-router-dom";
+import {
+  BookOpenText,
+  CalendarDays,
+  CircleUser,
+  Cog,
+  LayoutGrid,
+  Package,
+  ShoppingBag,
+  Users,
+  Activity,
+  CalendarDays as EventsIcon
 } from "lucide-react";
-import { useLocation } from "react-router-dom";
 
 interface NavItemsProps {
   isSuperAdmin: boolean;
@@ -12,98 +21,87 @@ interface NavItemsProps {
 const NavItems: React.FC<NavItemsProps> = ({ isSuperAdmin }) => {
   const location = useLocation();
 
-  return (
-    <div className="space-y-1">
-      <Link
-        to="/admin"
-        className={`flex items-center px-3 py-2 text-sm rounded-md ${
-          location.pathname === "/admin"
-            ? "bg-primary/10 text-primary font-medium"
-            : "text-gray-700 hover:bg-gray-100"
-        }`}
-      >
-        <LayoutDashboard className="mr-2 h-4 w-4" />
-        Dashboard
-      </Link>
-      
-      {isSuperAdmin && (
-        <>
-          <Link
-            to="/admin/ground-owners"
-            className={`flex items-center px-3 py-2 text-sm rounded-md ${
-              location.pathname === "/admin/ground-owners"
-                ? "bg-primary/10 text-primary font-medium"
-                : "text-gray-700 hover:bg-gray-100"
-            }`}
-          >
-            <Users className="mr-2 h-4 w-4" />
-            Ground Owners
-          </Link>
+  const isActive = (path: string) => {
+    return location.pathname.startsWith(path);
+  };
 
-          <Link
-            to="/admin/sports-professionals"
-            className={`flex items-center px-3 py-2 text-sm rounded-md ${
-              location.pathname === "/admin/sports-professionals"
-                ? "bg-primary/10 text-primary font-medium"
-                : "text-gray-700 hover:bg-gray-100"
-            }`}
-          >
-            <Users className="mr-2 h-4 w-4" />
-            Sports Professionals
-          </Link>
-        </>
-      )}
-      
-      <Link
-        to="/admin/grounds"
-        className={`flex items-center px-3 py-2 text-sm rounded-md ${
-          location.pathname === "/admin/grounds"
-            ? "bg-primary/10 text-primary font-medium"
-            : "text-gray-700 hover:bg-gray-100"
-        }`}
-      >
-        <Map className="mr-2 h-4 w-4" />
-        Grounds
-      </Link>
-      
-      <Link
-        to="/admin/bookings"
-        className={`flex items-center px-3 py-2 text-sm rounded-md ${
-          location.pathname === "/admin/bookings"
-            ? "bg-primary/10 text-primary font-medium"
-            : "text-gray-700 hover:bg-gray-100"
-        }`}
-      >
-        <Calendar className="mr-2 h-4 w-4" />
-        Bookings
-      </Link>
-      
-      <Link
-        to="/admin/inventory"
-        className={`flex items-center px-3 py-2 text-sm rounded-md ${
-          location.pathname === "/admin/inventory" || location.pathname === "/admin/inventory/allocate"
-            ? "bg-primary/10 text-primary font-medium"
-            : "text-gray-700 hover:bg-gray-100"
-        }`}
-      >
-        <Package className="mr-2 h-4 w-4" />
-        Inventory
-      </Link>
-      
-      {isSuperAdmin && (
+  const navItems = [
+    {
+      name: "Dashboard",
+      href: "/admin",
+      icon: <LayoutGrid size={18} />,
+      active: location.pathname === "/admin",
+    },
+    {
+      name: "Grounds",
+      href: "/admin/grounds",
+      icon: <Package size={18} />,
+      active: isActive("/admin/grounds"),
+    },
+    {
+      name: "Bookings",
+      href: "/admin/bookings",
+      icon: <CalendarDays size={18} />,
+      active: isActive("/admin/bookings"),
+    },
+    {
+      name: "Events",
+      href: "/admin/events",
+      icon: <EventsIcon size={18} />,
+      active: isActive("/admin/events"),
+    },
+    {
+      name: "Inventory",
+      href: "/admin/inventory",
+      icon: <BookOpenText size={18} />,
+      active: isActive("/admin/inventory"),
+    },
+    {
+      name: "Sports Professionals",
+      href: "/admin/sports-professionals",
+      icon: <Activity size={18} />,
+      active: isActive("/admin/sports-professionals"),
+    },
+    {
+      name: "E-commerce",
+      href: "/admin/ecommerce",
+      icon: <ShoppingBag size={18} />,
+      active: isActive("/admin/ecommerce"),
+    },
+  ];
+
+  if (isSuperAdmin) {
+    navItems.splice(1, 0, {
+      name: "Ground Owners",
+      href: "/admin/ground-owners",
+      icon: <Users size={18} />,
+      active: isActive("/admin/ground-owners"),
+    });
+  }
+
+  return (
+    <nav className="space-y-1 px-2">
+      {navItems.map((item) => (
         <Link
-          to="/admin/ecommerce"
-          className={`flex items-center px-3 py-2 text-sm rounded-md ${
-            location.pathname === "/admin/ecommerce"
-              ? "bg-primary/10 text-primary font-medium"
-              : "text-gray-700 hover:bg-gray-100"
-          }`}
+          key={item.name}
+          to={item.href}
+          className={`${
+            item.active
+              ? "bg-gray-100 text-primary"
+              : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+          } group flex items-center px-2 py-2 text-sm font-medium rounded-md`}
         >
-          <ShoppingBag className="mr-2 h-4 w-4" />
-          E-commerce
+          <span
+            className={`${
+              item.active ? "text-primary" : "text-gray-400 group-hover:text-gray-500"
+            } mr-3`}
+          >
+            {item.icon}
+          </span>
+          {item.name}
         </Link>
-      )}
-    </div>
+      ))}
+    </nav>
   );
 };
 

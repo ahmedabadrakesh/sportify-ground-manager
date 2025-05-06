@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import CountUp from "react-countup";
@@ -64,7 +65,7 @@ const StatBanner = () => {
                       end={stat.value} 
                       decimals={0}
                       delay={0}
-                      formattingFn={stat.format}
+                      formatter={stat.format}
                     />
                   )}
                 </div>

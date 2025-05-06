@@ -1,4 +1,3 @@
-
 export interface InventoryItem {
   id: string;
   name: string;
@@ -98,4 +97,20 @@ export interface CartItem {
   price: number;
   quantity: number;
   image?: string;
+}
+
+export interface Event {
+  id: string;
+  eventName: string;
+  address: string;
+  city: string;
+  location?: { lat: number; lng: number };
+  eventDate: string;
+  eventTime: string;
+  registrationUrl?: string;
+  sportId?: string;
+  image?: string;
+  qrCode?: string;
+  createdAt: string;
+  updatedAt: string;
 }

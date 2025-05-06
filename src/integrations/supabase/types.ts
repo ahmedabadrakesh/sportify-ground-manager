@@ -96,6 +96,62 @@ export type Database = {
           },
         ]
       }
+      events: {
+        Row: {
+          address: string
+          city: string
+          created_at: string
+          event_date: string
+          event_name: string
+          event_time: string
+          id: string
+          image: string | null
+          location: Json | null
+          qr_code: string | null
+          registration_url: string | null
+          sport_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          address: string
+          city: string
+          created_at?: string
+          event_date: string
+          event_name: string
+          event_time: string
+          id?: string
+          image?: string | null
+          location?: Json | null
+          qr_code?: string | null
+          registration_url?: string | null
+          sport_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          address?: string
+          city?: string
+          created_at?: string
+          event_date?: string
+          event_name?: string
+          event_time?: string
+          id?: string
+          image?: string | null
+          location?: Json | null
+          qr_code?: string | null
+          registration_url?: string | null
+          sport_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "events_sport_id_fkey"
+            columns: ["sport_id"]
+            isOneToOne: false
+            referencedRelation: "games"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       facilities: {
         Row: {
           created_at: string
