@@ -1,3 +1,4 @@
+
 export interface InventoryItem {
   id: string;
   name: string;
@@ -109,8 +110,9 @@ export interface Event {
   eventTime: string;
   registrationUrl?: string;
   sportId?: string;
+  sportName?: string;
   image?: string;
   qrCode?: string;
   createdAt: string;
-  updatedAt: string;
+  updatedAt?: string;
 }

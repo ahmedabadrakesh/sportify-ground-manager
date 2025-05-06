@@ -45,7 +45,7 @@ export const useEvents = () => {
       eventName: item.event_name,
       address: item.address,
       city: item.city,
-      location: item.location,
+      location: item.location as { lat: number; lng: number } | undefined,
       eventDate: item.event_date,
       eventTime: item.event_time,
       registrationUrl: item.registration_url,

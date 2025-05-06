@@ -7,7 +7,6 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { useEvents } from "@/hooks/useEvents";
 import { useGames } from "@/hooks/useGames";
 import { Event } from "@/types/models";
@@ -28,7 +27,7 @@ const eventFormSchema = z.object({
   eventDate: z.string().min(1, "Date is required"),
   eventTime: z.string().min(1, "Time is required"),
   registrationUrl: z.string().url("Invalid URL").optional().or(z.literal("")),
-  sportId: z.string().optional(),
+  sportId: z.string().optional().or(z.literal("")),
   image: z.string().url("Invalid image URL").optional().or(z.literal("")),
   qrCode: z.string().url("Invalid QR code URL").optional().or(z.literal(""))
 });
@@ -67,7 +66,18 @@ const EventDialog = ({ open, onOpenChange, mode, event }: EventDialogProps) => {
     try {
       setIsSubmitting(true);
       if (mode === "create") {
-        await createEvent(values);
+        // Ensure required fields are present for new events
+        await createEvent({
+          eventName: values.eventName,
+          address: values.address,
+          city: values.city,
+          eventDate: values.eventDate,
+          eventTime: values.eventTime,
+          registrationUrl: values.registrationUrl || undefined,
+          sportId: values.sportId || undefined,
+          image: values.image || undefined,
+          qrCode: values.qrCode || undefined,
+        });
       } else if (mode === "edit" && event) {
         await updateEvent(event.id, values);
       }
@@ -178,7 +188,7 @@ const EventDialog = ({ open, onOpenChange, mode, event }: EventDialogProps) => {
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      <SelectItem value="">General</SelectItem>
+                      <SelectItem value="general">General</SelectItem>
                       {games.map((game) => (
                         <SelectItem key={game.id} value={game.id}>
                           {game.name}

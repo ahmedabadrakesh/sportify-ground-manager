@@ -63,9 +63,8 @@ const StatBanner = () => {
                   {isVisible && (
                     <CountUp 
                       end={stat.value} 
-                      decimals={0}
-                      delay={0}
-                      formatter={stat.format}
+                      duration={2}
+                      formattingFn={stat.format}
                     />
                   )}
                 </div>

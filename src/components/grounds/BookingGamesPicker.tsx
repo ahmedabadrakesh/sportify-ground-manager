@@ -49,7 +49,7 @@ const BookingGamesPicker: React.FC<BookingGamesPickerProps> = ({
         </SelectTrigger>
         <SelectContent>
           {games.map((game) => (
-            <SelectItem key={game} value={game}>
+            <SelectItem key={game} value={game || "default-game"}>
               {gameNameMap[game] || game}
             </SelectItem>
           ))}
