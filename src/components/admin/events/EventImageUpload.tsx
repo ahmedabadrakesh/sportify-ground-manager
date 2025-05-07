@@ -28,19 +28,24 @@ const EventImageUpload = ({ form }: EventImageUploadProps) => {
       const fileName = `event-${Date.now()}.${fileExt}`;
       const filePath = `${fileName}`;
 
-      // Check if the events bucket exists, create it if it doesn't
-      const { data: bucketData, error: bucketError } = await supabase
-        .storage
-        .getBucket('events');
-      
-      if (bucketError && bucketError.message.includes('The resource was not found')) {
-        // Create the bucket if it doesn't exist
+      // First, try to create the bucket if it doesn't exist
+      try {
         await supabase.storage.createBucket('events', {
           public: true,
           fileSizeLimit: 5242880, // 5MB
         });
+        console.log("Bucket created or already exists");
+      } catch (bucketError: any) {
+        // If the bucket already exists, this will error but we can proceed
+        if (!bucketError.message?.includes('duplicate key value')) {
+          console.log("Bucket error but proceeding:", bucketError);
+        }
       }
 
+      // Small delay to ensure bucket is ready
+      await new Promise(resolve => setTimeout(resolve, 500));
+
+      // Try to upload the file
       const { error: uploadError } = await supabase.storage
         .from('events')
         .upload(filePath, file);
