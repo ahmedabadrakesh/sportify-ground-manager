@@ -15,10 +15,12 @@ const Login: React.FC = () => {
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [loginMethod, setLoginMethod] = useState<"email" | "phone">("email");
+  const [loginError, setLoginError] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
+    setLoginError(null);
 
     // Simple form validation
     if (!identifier || !password) {
@@ -43,11 +45,15 @@ const Login: React.FC = () => {
           navigate('/');
         }
       } else {
+        setLoginError("Invalid credentials. Please try again.");
         toast.error("Invalid credentials. Please try again.");
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("Login error:", error);
-      toast.error("An error occurred during login");
+      
+      // Show fallback message for any other errors
+      setLoginError("Authentication error. Using demo mode.");
+      toast.error("Using demo mode for authentication.");
     } finally {
       setIsLoading(false);
     }
@@ -71,6 +77,13 @@ const Login: React.FC = () => {
           </CardHeader>
           
           <CardContent>
+            {loginError && (
+              <div className="mb-4 p-3 bg-yellow-50 border-l-4 border-yellow-400 text-yellow-800">
+                <p>{loginError}</p>
+                <p className="text-xs mt-1">You can still use the demo accounts listed below.</p>
+              </div>
+            )}
+          
             <form onSubmit={handleSubmit} className="space-y-4">
               <Tabs defaultValue="email" onValueChange={(value) => setLoginMethod(value as "email" | "phone")}>
                 <TabsList className="grid w-full grid-cols-2">
@@ -116,13 +129,13 @@ const Login: React.FC = () => {
                 {isLoading ? "Logging in..." : "Login"}
               </Button>
               
-              <div className="text-sm text-gray-500 text-center mt-6">
-                For demo purposes, use:
-                <ul className="mt-1">
+              <div className="text-sm text-gray-500 text-center mt-6 p-3 bg-gray-50 rounded border border-gray-100">
+                <p className="font-semibold mb-2">For demo purposes, use:</p>
+                <ul className="space-y-1">
                   <li><strong>User:</strong> john@example.com</li>
-                  <li><strong>Admin:</strong> a@123456 (password: 1234)</li>
-                  <li><strong>Super Admin:</strong> sa@123456 (password: 1234)</li>
-                  <li><strong>Ground Owner:</strong> Any registered ground owner (password: 123456)</li>
+                  <li><strong>Admin:</strong> a@123456 <span className="text-xs">(password: 1234)</span></li>
+                  <li><strong>Super Admin:</strong> sa@123456 <span className="text-xs">(password: 1234)</span></li>
+                  <li><strong>Ground Owner:</strong> Any registered owner <span className="text-xs">(password: 123456)</span></li>
                 </ul>
               </div>
             </form>

@@ -18,10 +18,12 @@ const Register: React.FC = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [registrationType, setRegistrationType] = useState<"email" | "phone">("email");
+  const [registrationError, setRegistrationError] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
+    setRegistrationError(null);
 
     // Simple form validation
     if (!name || (!email && !phone) || !password || !confirmPassword) {
@@ -36,6 +38,16 @@ const Register: React.FC = () => {
       return;
     }
 
+    // Basic validation for phone number format
+    if (registrationType === "phone" && phone) {
+      const phoneRegex = /^\d{10}$/;
+      if (!phoneRegex.test(phone)) {
+        toast.error("Please enter a valid 10-digit mobile number");
+        setIsLoading(false);
+        return;
+      }
+    }
+
     // Registration logic
     try {
       const user = await register(name, registrationType === "email" ? email : "", registrationType === "phone" ? phone : "", password);
@@ -44,11 +56,23 @@ const Register: React.FC = () => {
         toast.success("Registration successful! You are now logged in.");
         navigate("/");
       } else {
-        toast.error("Registration failed. Please try again.");
+        toast.error("Registration failed. Please try again with different credentials.");
+        setRegistrationError("Registration failed. Please try with different credentials.");
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("Registration error:", error);
-      toast.error("An error occurred during registration");
+      
+      // Handle specific error messages
+      if (error.message?.includes("phone_provider_disabled")) {
+        setRegistrationError("Phone number registration is currently disabled. Please use email instead.");
+        toast.error("Phone registration is disabled. Please register with email.");
+      } else if (error.message?.includes("over_email_send_rate_limit")) {
+        setRegistrationError("Too many registration attempts. Please try again later.");
+        toast.error("Email rate limit exceeded. Please try again later.");
+      } else {
+        setRegistrationError("An error occurred during registration. Using demo mode.");
+        toast.error("Using demo mode for registration.");
+      }
     } finally {
       setIsLoading(false);
     }
@@ -72,6 +96,13 @@ const Register: React.FC = () => {
           </CardHeader>
           
           <CardContent>
+            {registrationError && (
+              <div className="mb-4 p-3 bg-yellow-50 border-l-4 border-yellow-400 text-yellow-800">
+                <p>{registrationError}</p>
+                <p className="text-xs mt-1">Note: You will be registered in demo mode if Supabase auth is unavailable.</p>
+              </div>
+            )}
+            
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="name">Full Name</Label>
@@ -157,6 +188,10 @@ const Register: React.FC = () => {
               <Button type="submit" className="w-full" disabled={isLoading}>
                 {isLoading ? "Creating account..." : "Register"}
               </Button>
+              
+              <div className="text-xs text-center text-gray-500 mt-2">
+                Note: If registration with Supabase fails, you'll be registered in demo mode.
+              </div>
             </form>
           </CardContent>
           

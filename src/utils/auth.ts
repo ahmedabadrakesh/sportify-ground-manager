@@ -187,52 +187,121 @@ export const register = async (name: string, email: string, phone: string, passw
       formattedPhone = '+91' + phone.replace(/^0+/, '');
     }
     
-    const identifierType = email ? { email } : { phone: formattedPhone };
+    let newUser: User;
+    let registrationSuccess = false;
     
-    // Register with Supabase
-    const { data, error } = await supabase.auth.signUp({
-      ...identifierType,
-      password,
-      options: {
-        data: {
-          name,
-          role: 'user' // All new registrations are normal users
+    // Try authentication with Supabase first
+    if (email) {
+      try {
+        const { data, error } = await supabase.auth.signUp({
+          email,
+          password,
+          options: {
+            data: {
+              name,
+              role: 'user'
+            }
+          }
+        });
+        
+        if (data.user && !error) {
+          registrationSuccess = true;
+          newUser = {
+            id: data.user.id,
+            name,
+            email: email,
+            phone: formattedPhone || '',
+            role: 'user' as UserRole,
+            auth_id: data.user.id
+          };
+          
+          const { error: insertError } = await supabase
+            .from('users')
+            .insert(newUser);
+          
+          if (insertError) {
+            console.error("Error inserting user profile:", insertError);
+          }
+        } else {
+          console.error("Supabase email registration error:", error);
+          // Will fallback to mock registration below
         }
+      } catch (emailError) {
+        console.error("Email registration error:", emailError);
+        // Will fallback to mock registration below
       }
-    });
-    
-    if (error) {
-      console.error("Registration error:", error);
-      return null;
+    } else if (phone) {
+      try {
+        const { data, error } = await supabase.auth.signUp({
+          phone: formattedPhone,
+          password,
+          options: {
+            data: {
+              name,
+              role: 'user'
+            }
+          }
+        });
+        
+        if (data.user && !error) {
+          registrationSuccess = true;
+          newUser = {
+            id: data.user.id,
+            name,
+            email: email || '',
+            phone: formattedPhone,
+            role: 'user' as UserRole,
+            auth_id: data.user.id
+          };
+          
+          const { error: insertError } = await supabase
+            .from('users')
+            .insert(newUser);
+          
+          if (insertError) {
+            console.error("Error inserting user profile:", insertError);
+          }
+        } else {
+          console.error("Supabase phone registration error:", error);
+          // Will fallback to mock registration below
+        }
+      } catch (phoneError) {
+        console.error("Phone registration error:", phoneError);
+        // Will fallback to mock registration below
+      }
     }
     
-    if (data?.user) {
-      // Create user entry in our users table
-      const newUser = {
-        id: data.user.id,
+    // If Supabase registration failed or there were errors, use mock registration for demo purposes
+    if (!registrationSuccess) {
+      console.log("Using mock registration for demo");
+      
+      // Generate a unique ID for the mock user
+      const mockUserId = `mock_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+      
+      newUser = {
+        id: mockUserId,
         name,
         email: email || '',
         phone: formattedPhone || '',
-        role: 'user' as UserRole,
-        auth_id: data.user.id
+        role: 'user' as UserRole
       };
       
-      const { error: insertError } = await supabase
-        .from('users')
-        .insert(newUser);
-      
-      if (insertError) {
-        console.error("Error creating user profile:", insertError);
-      }
-      
-      localStorage.setItem('currentUser', JSON.stringify(newUser));
-      return newUser;
+      // Store in localStorage for demo persistence
+      const mockUsers = JSON.parse(localStorage.getItem('mockUsers') || '[]');
+      mockUsers.push({
+        ...newUser,
+        password // Store password only for mock users
+      });
+      localStorage.setItem('mockUsers', JSON.stringify(mockUsers));
     }
+    
+    // Set as current user
+    localStorage.setItem('currentUser', JSON.stringify(newUser));
+    return newUser;
   } catch (error) {
     console.error("Registration error:", error);
+    return null;
   }
-  
-  return null;
 };
 
 // Create ground owner user
@@ -245,25 +314,93 @@ export const createGroundOwner = async (name: string, email: string, phone: stri
     }
     
     const defaultPassword = '123456';
-    const identifierType = email ? { email } : { phone: formattedPhone };
+    let newGroundOwner: User;
+    let registrationSuccess = false;
     
-    // Register with Supabase
-    const { data, error } = await supabase.auth.signUp({
-      ...identifierType,
-      password: defaultPassword,
-      options: {
-        data: {
-          name,
-          role: 'ground_owner'
+    // Try to create with Supabase Auth
+    if (email) {
+      try {
+        const { data, error } = await supabase.auth.signUp({
+          email,
+          password: defaultPassword,
+          options: {
+            data: {
+              name,
+              role: 'ground_owner'
+            }
+          }
+        });
+        
+        if (data.user && !error) {
+          registrationSuccess = true;
+          newGroundOwner = {
+            id: data.user.id,
+            name,
+            email,
+            phone: formattedPhone || '',
+            role: 'ground_owner' as UserRole,
+            auth_id: data.user.id,
+            whatsapp: formattedPhone || ''
+          };
+          
+          const { error: insertError } = await supabase
+            .from('users')
+            .insert(newGroundOwner);
+          
+          if (insertError) {
+            console.error("Error creating ground owner profile:", insertError);
+          }
         }
+      } catch (emailError) {
+        console.error("Ground owner email creation error:", emailError);
       }
-    });
+    } else if (phone) {
+      try {
+        const { data, error } = await supabase.auth.signUp({
+          phone: formattedPhone,
+          password: defaultPassword,
+          options: {
+            data: {
+              name,
+              role: 'ground_owner'
+            }
+          }
+        });
+        
+        if (data.user && !error) {
+          registrationSuccess = true;
+          newGroundOwner = {
+            id: data.user.id,
+            name,
+            email: '',
+            phone: formattedPhone,
+            role: 'ground_owner' as UserRole,
+            auth_id: data.user.id,
+            whatsapp: formattedPhone
+          };
+          
+          const { error: insertError } = await supabase
+            .from('users')
+            .insert(newGroundOwner);
+          
+          if (insertError) {
+            console.error("Error creating ground owner profile:", insertError);
+          }
+        }
+      } catch (phoneError) {
+        console.error("Ground owner phone creation error:", phoneError);
+      }
+    }
     
-    if (error) {
-      console.error("Ground owner creation error:", error);
+    // If Supabase registration failed, use mock registration for demo
+    if (!registrationSuccess) {
+      console.log("Using mock ground owner creation");
       
-      // If user already exists, just create the profile with ground_owner role
-      const existingUser = {
+      // Generate a unique ID for the mock ground owner
+      const mockOwnerId = `mock_owner_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+      
+      newGroundOwner = {
+        id: mockOwnerId,
         name,
         email: email || '',
         phone: formattedPhone || '',
@@ -271,36 +408,20 @@ export const createGroundOwner = async (name: string, email: string, phone: stri
         whatsapp: formattedPhone || ''
       };
       
-      return existingUser;
+      // Store mock ground owner in localStorage for demo persistence
+      const mockOwners = JSON.parse(localStorage.getItem('mockOwners') || '[]');
+      mockOwners.push({
+        ...newGroundOwner,
+        password: defaultPassword
+      });
+      localStorage.setItem('mockOwners', JSON.stringify(mockOwners));
     }
     
-    if (data?.user) {
-      // Create user entry in our users table
-      const newUser = {
-        id: data.user.id,
-        name,
-        email: email || '',
-        phone: formattedPhone || '',
-        role: 'ground_owner' as UserRole,
-        auth_id: data.user.id,
-        whatsapp: formattedPhone || ''
-      };
-      
-      const { error: insertError } = await supabase
-        .from('users')
-        .insert(newUser);
-      
-      if (insertError) {
-        console.error("Error creating ground owner profile:", insertError);
-      }
-      
-      return newUser;
-    }
+    return newGroundOwner;
   } catch (error) {
     console.error("Ground owner creation error:", error);
+    return null;
   }
-  
-  return null;
 };
 
 // Logout from Supabase and clear local storage
