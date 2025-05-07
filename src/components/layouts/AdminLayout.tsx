@@ -1,11 +1,9 @@
-
 import React from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { getCurrentUserSync } from "@/utils/auth";
+import { getCurrentUserSync, hasRoleSync } from "@/utils/auth";
 import Sidebar from "./admin/Sidebar";
 import MobileHeader from "./admin/MobileHeader";
 import MobileBreadcrumb from "./admin/MobileBreadcrumb";
-import { hasRoleSync } from "@/utils/auth";
 
 interface AdminLayoutProps {
   children: React.ReactNode;
