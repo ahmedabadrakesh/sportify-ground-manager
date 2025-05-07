@@ -70,6 +70,7 @@ const EventDialog = ({ open, onOpenChange, mode, event }: EventDialogProps) => {
           </DialogTitle>
           <DialogDescription>
             Fill in the details to {mode === "create" ? "create a new" : "update the"} event.
+            Images will be uploaded to AWS S3.
           </DialogDescription>
         </DialogHeader>
         
