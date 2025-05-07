@@ -30,6 +30,12 @@ const EventsPromotion = () => {
     }
   };
 
+  const handleEventClick = (url?: string) => {
+    if (url) {
+      window.open(url, "_blank");
+    }
+  };
+
   if (isLoading || upcomingEvents.length === 0) {
     return null;
   }
@@ -38,7 +44,11 @@ const EventsPromotion = () => {
     <div className="container mx-auto px-4">
       <div className="grid gap-6 md:grid-cols-3">
         {upcomingEvents.map((event) => (
-          <Card key={event.id} className="overflow-hidden hover:shadow-lg transition-shadow duration-300">
+          <Card 
+            key={event.id} 
+            className={`overflow-hidden hover:shadow-lg transition-all duration-300 ${event.registrationUrl ? 'cursor-pointer hover:-translate-y-1 hover:bg-gray-50' : ''}`}
+            onClick={() => event.registrationUrl && handleEventClick(event.registrationUrl)}
+          >
             {event.image ? (
               <div className="h-48 overflow-hidden">
                 <img 
@@ -76,7 +86,10 @@ const EventsPromotion = () => {
                 <Button 
                   variant="ghost" 
                   className="w-full"
-                  onClick={() => window.open(event.registrationUrl, "_blank")}
+                  onClick={(e) => {
+                    e.stopPropagation(); // Prevent the card click from triggering
+                    window.open(event.registrationUrl, "_blank");
+                  }}
                 >
                   Register
                 </Button>

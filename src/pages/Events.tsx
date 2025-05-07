@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Calendar, MapPin, Link as LinkIcon, Plus } from "lucide-react";
@@ -80,6 +81,12 @@ const Events = () => {
     }
   };
 
+  const handleEventClick = (url?: string) => {
+    if (url) {
+      window.open(url, "_blank");
+    }
+  };
+
   return (
     <MainLayout>
       <div className="container mx-auto py-8">
@@ -144,7 +151,11 @@ const Events = () => {
         ) : (
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {currentEvents.map((event) => (
-              <Card key={event.id} className="overflow-hidden hover:shadow-lg transition-shadow duration-300">
+              <Card 
+                key={event.id} 
+                className={`overflow-hidden hover:shadow-lg transition-all duration-300 ${event.registrationUrl ? 'cursor-pointer hover:-translate-y-1 hover:bg-gray-50' : ''}`}
+                onClick={() => event.registrationUrl && handleEventClick(event.registrationUrl)}
+              >
                 {event.image ? (
                   <div className="h-48 overflow-hidden">
                     <img 
@@ -183,7 +194,10 @@ const Events = () => {
                     <Button 
                       variant="outline" 
                       className="w-full flex items-center justify-center gap-2"
-                      onClick={() => window.open(event.registrationUrl, "_blank")}
+                      onClick={(e) => {
+                        e.stopPropagation(); // Prevent the card click from triggering
+                        window.open(event.registrationUrl, "_blank");
+                      }}
                     >
                       <LinkIcon className="h-4 w-4" />
                       Register Now
