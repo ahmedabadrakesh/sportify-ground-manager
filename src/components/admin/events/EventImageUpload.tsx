@@ -4,20 +4,9 @@ import { Upload } from "lucide-react";
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { UseFormReturn } from "react-hook-form";
 import { useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { EventFormValues } from "./eventFormSchema";
-import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
-
-// AWS S3 configuration
-const s3Client = new S3Client({
-  region: "us-east-1", // Replace with your S3 bucket region
-  credentials: {
-    accessKeyId: process.env.VITE_AWS_ACCESS_KEY_ID || "",
-    secretAccessKey: process.env.VITE_AWS_SECRET_ACCESS_KEY || "",
-  },
-});
-
-const BUCKET_NAME = "zotest123456";
 
 interface EventImageUploadProps {
   form: UseFormReturn<EventFormValues>;
@@ -26,7 +15,6 @@ interface EventImageUploadProps {
 const EventImageUpload = ({ form }: EventImageUploadProps) => {
   const [imagePreview, setImagePreview] = useState<string | null>(form.getValues("image") || null);
   const [uploading, setUploading] = useState(false);
-  const [uploadProgress, setUploadProgress] = useState(0);
 
   const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     try {
@@ -34,41 +22,48 @@ const EventImageUpload = ({ form }: EventImageUploadProps) => {
         return;
       }
       setUploading(true);
-      setUploadProgress(0);
 
       const file = event.target.files[0];
       const fileExt = file.name.split('.').pop();
       const fileName = `event-${Date.now()}.${fileExt}`;
-      
-      // Convert file to buffer
-      const fileArrayBuffer = await file.arrayBuffer();
-      
-      // Create upload command
-      const uploadCommand = new PutObjectCommand({
-        Bucket: BUCKET_NAME,
-        Key: fileName,
-        Body: fileArrayBuffer,
-        ContentType: file.type,
-        ACL: "public-read", // Make the file publicly readable
-      });
-      
-      // Upload to S3
-      const uploadResult = await s3Client.send(uploadCommand);
-      
-      if (uploadResult.$metadata.httpStatusCode === 200) {
-        // Construct the image URL based on bucket name and region
-        const publicUrl = `https://${BUCKET_NAME}.s3.amazonaws.com/${fileName}`;
-        
-        setImagePreview(publicUrl);
-        form.setValue('image', publicUrl);
-        toast.success('Image uploaded successfully');
-        setUploadProgress(100);
-      } else {
-        throw new Error("Upload failed");
+      const filePath = `${fileName}`;
+
+      // First, try to create the bucket if it doesn't exist
+      try {
+        await supabase.storage.createBucket('events', {
+          public: true,
+          fileSizeLimit: 5242880, // 5MB
+        });
+        console.log("Bucket created or already exists");
+      } catch (bucketError: any) {
+        // If the bucket already exists, this will error but we can proceed
+        if (!bucketError.message?.includes('duplicate key value')) {
+          console.log("Bucket error but proceeding:", bucketError);
+        }
       }
+
+      // Small delay to ensure bucket is ready
+      await new Promise(resolve => setTimeout(resolve, 500));
+
+      // Try to upload the file
+      const { error: uploadError } = await supabase.storage
+        .from('events')
+        .upload(filePath, file);
+
+      if (uploadError) {
+        throw uploadError;
+      }
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('events')
+        .getPublicUrl(filePath);
+
+      setImagePreview(publicUrl);
+      form.setValue('image', publicUrl);
+      toast.success('Image uploaded successfully');
     } catch (error: any) {
-      console.error('Error uploading image:', error);
       toast.error('Error uploading image: ' + (error.message || 'Unknown error'));
+      console.error('Error uploading image:', error);
     } finally {
       setUploading(false);
     }
@@ -123,20 +118,7 @@ const EventImageUpload = ({ form }: EventImageUploadProps) => {
                       disabled={uploading}
                     />
                   </label>
-                  {uploading && (
-                    <div className="w-full mt-2">
-                      <div className="flex items-center justify-between mb-1">
-                        <p className="text-sm text-gray-500">Uploading...</p>
-                        <p className="text-sm text-gray-500">{uploadProgress}%</p>
-                      </div>
-                      <div className="w-full bg-gray-200 rounded-full h-2.5">
-                        <div 
-                          className="bg-primary h-2.5 rounded-full transition-all duration-300" 
-                          style={{ width: `${uploadProgress}%` }}
-                        ></div>
-                      </div>
-                    </div>
-                  )}
+                  {uploading && <p className="text-sm text-gray-500 mt-2">Uploading...</p>}
                 </div>
               )}
             </div>
