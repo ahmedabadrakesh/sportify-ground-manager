@@ -1,11 +1,21 @@
+
 import React from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { Home, Search, Calendar, User, LogOut, ShoppingBag, ShoppingCart } from "lucide-react";
+import { Home, Search, Calendar, User, LogOut, ShoppingBag, ShoppingCart, MapPin, Users, Book, Store, CalendarDays } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { getCurrentUserSync, logout, hasRoleSync } from "@/utils/auth";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { getCartItemsCount } from "@/utils/cart";
+import { 
+  NavigationMenu,
+  NavigationMenuContent,
+  NavigationMenuItem,
+  NavigationMenuLink,
+  NavigationMenuList,
+  NavigationMenuTrigger,
+  navigationMenuTriggerStyle 
+} from "@/components/ui/navigation-menu";
 
 interface MainLayoutProps {
   children: React.ReactNode;
@@ -27,6 +37,56 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
+      {/* Navigation Bar */}
+      <div className="bg-primary text-white py-2">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <NavigationMenu>
+            <NavigationMenuList className="w-full flex justify-center">
+              <NavigationMenuItem>
+                <Link to="/search">
+                  <NavigationMenuLink className="group inline-flex h-9 w-max items-center justify-center rounded-md bg-transparent px-4 py-2 text-sm font-medium text-white hover:bg-primary-700 hover:text-white focus:bg-primary-700 focus:text-white focus:outline-none">
+                    <Book className="mr-2 h-4 w-4" />
+                    Book a Ground
+                  </NavigationMenuLink>
+                </Link>
+              </NavigationMenuItem>
+              <NavigationMenuItem>
+                <Link to="/grounds">
+                  <NavigationMenuLink className="group inline-flex h-9 w-max items-center justify-center rounded-md bg-transparent px-4 py-2 text-sm font-medium text-white hover:bg-primary-700 hover:text-white focus:bg-primary-700 focus:text-white focus:outline-none">
+                    <MapPin className="mr-2 h-4 w-4" />
+                    Grounds
+                  </NavigationMenuLink>
+                </Link>
+              </NavigationMenuItem>
+              <NavigationMenuItem>
+                <Link to="/sports-professionals">
+                  <NavigationMenuLink className="group inline-flex h-9 w-max items-center justify-center rounded-md bg-transparent px-4 py-2 text-sm font-medium text-white hover:bg-primary-700 hover:text-white focus:bg-primary-700 focus:text-white focus:outline-none">
+                    <Users className="mr-2 h-4 w-4" />
+                    Sports Professionals
+                  </NavigationMenuLink>
+                </Link>
+              </NavigationMenuItem>
+              <NavigationMenuItem>
+                <Link to="/events">
+                  <NavigationMenuLink className="group inline-flex h-9 w-max items-center justify-center rounded-md bg-transparent px-4 py-2 text-sm font-medium text-white hover:bg-primary-700 hover:text-white focus:bg-primary-700 focus:text-white focus:outline-none">
+                    <CalendarDays className="mr-2 h-4 w-4" />
+                    Events
+                  </NavigationMenuLink>
+                </Link>
+              </NavigationMenuItem>
+              <NavigationMenuItem>
+                <Link to="/shop">
+                  <NavigationMenuLink className="group inline-flex h-9 w-max items-center justify-center rounded-md bg-transparent px-4 py-2 text-sm font-medium text-white hover:bg-primary-700 hover:text-white focus:bg-primary-700 focus:text-white focus:outline-none">
+                    <Store className="mr-2 h-4 w-4" />
+                    Jokova's Store
+                  </NavigationMenuLink>
+                </Link>
+              </NavigationMenuItem>
+            </NavigationMenuList>
+          </NavigationMenu>
+        </div>
+      </div>
+      
       {/* Header */}
       <header className="bg-white shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
