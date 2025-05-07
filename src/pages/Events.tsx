@@ -1,7 +1,6 @@
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Calendar, MapPin } from "lucide-react";
+import { Calendar, MapPin, Link as LinkIcon } from "lucide-react";
 import { format, parseISO } from "date-fns";
 import MainLayout from "@/components/layouts/MainLayout";
 import { Button } from "@/components/ui/button";
@@ -10,6 +9,7 @@ import { useEvents } from "@/hooks/useEvents";
 import { useGames } from "@/hooks/useGames";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination";
 
 const Events = () => {
   const navigate = useNavigate();
@@ -18,6 +18,8 @@ const Events = () => {
   const [search, setSearch] = useState("");
   const [filterCity, setFilterCity] = useState("");
   const [filterSport, setFilterSport] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const eventsPerPage = 6;
 
   const cities = [...new Set(events.map(event => event.city))];
   
@@ -29,6 +31,12 @@ const Events = () => {
     
     return matchesSearch && matchesCity && matchesSport;
   });
+
+  // Pagination logic
+  const indexOfLastEvent = currentPage * eventsPerPage;
+  const indexOfFirstEvent = indexOfLastEvent - eventsPerPage;
+  const currentEvents = filteredEvents.slice(indexOfFirstEvent, indexOfLastEvent);
+  const totalPages = Math.ceil(filteredEvents.length / eventsPerPage);
 
   const getSportName = (sportId?: string) => {
     if (!sportId) return "General";
@@ -44,6 +52,21 @@ const Events = () => {
     }
   };
 
+  const handleFilterCityChange = (value: string) => {
+    setFilterCity(value === "all" ? "" : value);
+    setCurrentPage(1); // Reset to first page when filter changes
+  };
+
+  const handleFilterSportChange = (value: string) => {
+    setFilterSport(value === "all" ? "" : value);
+    setCurrentPage(1); // Reset to first page when filter changes
+  };
+
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearch(e.target.value);
+    setCurrentPage(1); // Reset to first page when search changes
+  };
+
   return (
     <MainLayout>
       <div className="container mx-auto py-8">
@@ -54,13 +77,13 @@ const Events = () => {
             <Input
               placeholder="Search events..."
               value={search}
-              onChange={(e) => setSearch(e.target.value)}
+              onChange={handleSearchChange}
               className="w-full"
             />
           </div>
           
           <div>
-            <Select value={filterCity} onValueChange={setFilterCity}>
+            <Select value={filterCity} onValueChange={handleFilterCityChange}>
               <SelectTrigger>
                 <SelectValue placeholder="Filter by city" />
               </SelectTrigger>
@@ -74,7 +97,7 @@ const Events = () => {
           </div>
           
           <div>
-            <Select value={filterSport} onValueChange={setFilterSport}>
+            <Select value={filterSport} onValueChange={handleFilterSportChange}>
               <SelectTrigger>
                 <SelectValue placeholder="Filter by sport" />
               </SelectTrigger>
@@ -99,14 +122,14 @@ const Events = () => {
           </div>
         ) : (
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {filteredEvents.map((event) => (
-              <Card key={event.id} className="overflow-hidden">
+            {currentEvents.map((event) => (
+              <Card key={event.id} className="overflow-hidden hover:shadow-lg transition-shadow duration-300">
                 {event.image ? (
                   <div className="h-48 overflow-hidden">
                     <img 
                       src={event.image} 
                       alt={event.eventName} 
-                      className="w-full h-full object-cover"
+                      className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
                     />
                   </div>
                 ) : (
@@ -135,18 +158,73 @@ const Events = () => {
                     <span className="text-sm text-muted-foreground">{event.eventTime}</span>
                   </div>
                   
-                  {event.registrationUrl && (
+                  {event.registrationUrl ? (
                     <Button 
                       variant="outline" 
-                      className="w-full"
+                      className="w-full flex items-center justify-center gap-2"
                       onClick={() => window.open(event.registrationUrl, "_blank")}
                     >
+                      <LinkIcon className="h-4 w-4" />
                       Register Now
                     </Button>
+                  ) : (
+                    <div className="w-full px-4 py-2 text-center text-sm text-gray-500">
+                      Registration not available
+                    </div>
                   )}
                 </CardContent>
               </Card>
             ))}
+          </div>
+        )}
+        
+        {/* Pagination */}
+        {filteredEvents.length > eventsPerPage && (
+          <div className="mt-8">
+            <Pagination>
+              <PaginationContent>
+                <PaginationItem>
+                  <PaginationPrevious 
+                    onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                    className={currentPage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                  />
+                </PaginationItem>
+                
+                {Array.from({ length: Math.min(totalPages, 5) }).map((_, idx) => {
+                  // Calculate the page number based on current page
+                  let pageNum = idx + 1;
+                  if (currentPage > 3 && totalPages > 5) {
+                    // If we're past page 3 and there are more than 5 pages,
+                    // shift the pagination window to keep current page in middle
+                    if (currentPage > totalPages - 2) {
+                      // Near the end
+                      pageNum = totalPages - 4 + idx;
+                    } else {
+                      // Middle
+                      pageNum = currentPage - 2 + idx;
+                    }
+                  }
+                  
+                  return (
+                    <PaginationItem key={idx}>
+                      <PaginationLink
+                        isActive={pageNum === currentPage}
+                        onClick={() => setCurrentPage(pageNum)}
+                      >
+                        {pageNum}
+                      </PaginationLink>
+                    </PaginationItem>
+                  );
+                })}
+                
+                <PaginationItem>
+                  <PaginationNext 
+                    onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                    className={currentPage === totalPages ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                  />
+                </PaginationItem>
+              </PaginationContent>
+            </Pagination>
           </div>
         )}
       </div>

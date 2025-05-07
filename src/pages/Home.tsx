@@ -11,6 +11,7 @@ import ShopPromotionSection from "@/components/home/ShopPromotionSection";
 import WhyChooseUsSection from "@/components/home/WhyChooseUsSection";
 import StatBanner from "@/components/home/StatBanner";
 import SportsProfessionalsPromotion from "@/components/home/SportsProfessionalsPromotion";
+import EventsPromotion from "@/components/home/EventsPromotion";
 
 const Home: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -35,6 +36,9 @@ const Home: React.FC = () => {
         />
         <SportsProfessionalsPromotion />
         <FeaturedGroundsSection />
+      </div>
+      <EventsPromotion />
+      <div className="container mx-auto px-4">
         <HowItWorksSection />
         <TestimonialsSection />
         <ShopPromotionSection />
@@ -45,4 +49,3 @@ const Home: React.FC = () => {
 };
 
 export default Home;
-
