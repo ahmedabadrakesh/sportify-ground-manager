@@ -6,6 +6,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
+import { register } from "@/utils/auth";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const Register: React.FC = () => {
   const navigate = useNavigate();
@@ -15,14 +17,15 @@ const Register: React.FC = () => {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [registrationType, setRegistrationType] = useState<"email" | "phone">("email");
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
 
     // Simple form validation
-    if (!name || !email || !phone || !password || !confirmPassword) {
-      toast.error("Please fill in all fields");
+    if (!name || (!email && !phone) || !password || !confirmPassword) {
+      toast.error("Please fill in all required fields");
       setIsLoading(false);
       return;
     }
@@ -33,13 +36,22 @@ const Register: React.FC = () => {
       return;
     }
 
-    // Demo registration functionality
-    // In a real app, we would call an API to register the user
-    setTimeout(() => {
-      toast.success("Registration successful! Please log in.");
-      navigate("/login");
+    // Registration logic
+    try {
+      const user = await register(name, registrationType === "email" ? email : "", registrationType === "phone" ? phone : "", password);
+      
+      if (user) {
+        toast.success("Registration successful! You are now logged in.");
+        navigate("/");
+      } else {
+        toast.error("Registration failed. Please try again.");
+      }
+    } catch (error) {
+      console.error("Registration error:", error);
+      toast.error("An error occurred during registration");
+    } finally {
       setIsLoading(false);
-    }, 1000);
+    }
   };
 
   return (
@@ -68,29 +80,43 @@ const Register: React.FC = () => {
                   placeholder="John Smith"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
+                  required
                 />
               </div>
               
-              <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="you@example.com"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                />
-              </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="phone">Phone Number</Label>
-                <Input
-                  id="phone"
-                  placeholder="e.g., 555-123-4567"
-                  value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
-                />
-              </div>
+              <Tabs defaultValue="email" onValueChange={(value) => setRegistrationType(value as "email" | "phone")}>
+                <TabsList className="grid w-full grid-cols-2">
+                  <TabsTrigger value="email">Email</TabsTrigger>
+                  <TabsTrigger value="phone">Phone</TabsTrigger>
+                </TabsList>
+                
+                <TabsContent value="email" className="space-y-2">
+                  <Label htmlFor="email">Email</Label>
+                  <Input
+                    id="email"
+                    type="email"
+                    placeholder="you@example.com"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required={registrationType === "email"}
+                  />
+                </TabsContent>
+                
+                <TabsContent value="phone" className="space-y-2">
+                  <Label htmlFor="phone">Phone Number</Label>
+                  <Input
+                    id="phone"
+                    type="tel"
+                    placeholder="10-digit mobile number"
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
+                    required={registrationType === "phone"}
+                  />
+                  <p className="text-xs text-gray-500">
+                    Enter your 10-digit mobile number without country code
+                  </p>
+                </TabsContent>
+              </Tabs>
               
               <div className="space-y-2">
                 <Label htmlFor="password">Password</Label>
@@ -100,6 +126,7 @@ const Register: React.FC = () => {
                   placeholder="Create a password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
+                  required
                 />
               </div>
               
@@ -111,6 +138,7 @@ const Register: React.FC = () => {
                   placeholder="Confirm your password"
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
+                  required
                 />
               </div>
               

@@ -7,27 +7,29 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { login } from "@/utils/auth";
 import { toast } from "sonner";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const Login: React.FC = () => {
   const navigate = useNavigate();
-  const [email, setEmail] = useState("");
+  const [identifier, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [loginMethod, setLoginMethod] = useState<"email" | "phone">("email");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
 
     // Simple form validation
-    if (!email || !password) {
+    if (!identifier || !password) {
       toast.error("Please fill in all fields");
       setIsLoading(false);
       return;
     }
 
-    // Demo login functionality
+    // Login functionality
     try {
-      const user = await login(email, "password");
+      const user = await login(identifier, password);
       
       if (user) {
         toast.success(`Welcome back, ${user.name}!`);
@@ -35,6 +37,8 @@ const Login: React.FC = () => {
         // Redirect based on user role
         if (user.role === 'admin' || user.role === 'super_admin') {
           navigate('/admin');
+        } else if (user.role === 'ground_owner') {
+          navigate('/admin/grounds'); // Ground owners go to grounds page
         } else {
           navigate('/');
         }
@@ -62,23 +66,32 @@ const Login: React.FC = () => {
           <CardHeader>
             <CardTitle className="text-2xl">Login</CardTitle>
             <CardDescription>
-              Enter your email and password to access your account
+              Enter your credentials to access your account
             </CardDescription>
           </CardHeader>
           
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="you@example.com"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  autoComplete="email"
-                />
-              </div>
+              <Tabs defaultValue="email" onValueChange={(value) => setLoginMethod(value as "email" | "phone")}>
+                <TabsList className="grid w-full grid-cols-2">
+                  <TabsTrigger value="email">Email</TabsTrigger>
+                  <TabsTrigger value="phone">Phone</TabsTrigger>
+                </TabsList>
+                
+                <div className="mt-4 space-y-2">
+                  <Label htmlFor="identifier">
+                    {loginMethod === "email" ? "Email" : "Phone Number"}
+                  </Label>
+                  <Input
+                    id="identifier"
+                    type={loginMethod === "email" ? "email" : "tel"}
+                    placeholder={loginMethod === "email" ? "you@example.com" : "10-digit mobile number"}
+                    value={identifier}
+                    onChange={(e) => setIdentifier(e.target.value)}
+                    autoComplete={loginMethod === "email" ? "email" : "tel"}
+                  />
+                </div>
+              </Tabs>
               
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
@@ -107,9 +120,9 @@ const Login: React.FC = () => {
                 For demo purposes, use:
                 <ul className="mt-1">
                   <li><strong>User:</strong> john@example.com</li>
-                  <li><strong>Admin:</strong> david@example.com</li>
-                  <li><strong>Super Admin:</strong> admin@example.com</li>
-                  <li>Any password will work</li>
+                  <li><strong>Admin:</strong> a@123456 (password: 1234)</li>
+                  <li><strong>Super Admin:</strong> sa@123456 (password: 1234)</li>
+                  <li><strong>Ground Owner:</strong> Any registered ground owner (password: 123456)</li>
                 </ul>
               </div>
             </form>

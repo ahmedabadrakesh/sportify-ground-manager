@@ -26,9 +26,9 @@ export const getCurrentUser = async (): Promise<User | null> => {
       // Fallback to auth user if no profile exists
       const fallbackUser = {
         id: session.user.id,
-        name: session.user.email?.split('@')[0] || 'User',
+        name: session.user.email?.split('@')[0] || session.user.phone?.split('@')[0] || 'User',
         email: session.user.email || '',
-        phone: '',
+        phone: session.user.phone || '',
         role: 'user' as UserRole
       };
       
@@ -57,22 +57,51 @@ export const getCurrentUserSync = (): User | null => {
   return null;
 };
 
-// Login with Supabase
-export const login = async (email: string, password: string): Promise<User | null> => {
+// Login with Supabase - supports email or phone number login
+export const login = async (identifier: string, password: string): Promise<User | null> => {
   try {
-    // First try to login with Supabase
-    const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
-      email,
-      password
-    });
+    let authData;
+    let authError;
+    
+    // Determine if the identifier is an email or phone number
+    const isEmail = identifier.includes('@');
+    
+    if (isEmail) {
+      // Login with email
+      const result = await supabase.auth.signInWithPassword({
+        email: identifier,
+        password
+      });
+      authData = result.data;
+      authError = result.error;
+    } else {
+      // Login with phone number (ensure it's in the correct format with country code)
+      let phoneNumber = identifier;
+      if (!phoneNumber.startsWith('+')) {
+        // If no country code, default to +91 (India)
+        phoneNumber = '+91' + phoneNumber.replace(/^0+/, '');
+      }
+      
+      const result = await supabase.auth.signInWithPassword({
+        phone: phoneNumber,
+        password
+      });
+      authData = result.data;
+      authError = result.error;
+    }
+    
+    // Special case for predefined admin users
+    if (authError && (identifier === 'sa@123456' || identifier === 'a@123456')) {
+      return handlePredefinedAdminLogin(identifier, password);
+    }
     
     if (authError) {
       console.error("Auth error:", authError);
       // Fallback to mock for demo purposes
-      return mockLogin(email, password);
+      return mockLogin(identifier, password);
     }
     
-    if (authData.user) {
+    if (authData?.user) {
       // Fetch user profile from our database
       const { data: userData, error: userError } = await supabase
         .from('users')
@@ -83,7 +112,7 @@ export const login = async (email: string, password: string): Promise<User | nul
       if (userError || !userData) {
         console.error("User data error:", userError);
         // Fallback to mock for demo purposes
-        return mockLogin(email, password);
+        return mockLogin(identifier, password);
       }
       
       // Store user in localStorage for compatibility
@@ -95,17 +124,180 @@ export const login = async (email: string, password: string): Promise<User | nul
   }
   
   // Fallback to mock login for demo
-  return mockLogin(email, password);
+  return mockLogin(identifier, password);
+};
+
+// Handle predefined admin login
+const handlePredefinedAdminLogin = (identifier: string, password: string): User | null => {
+  console.log("Using predefined admin login");
+  
+  // Check credentials
+  if (identifier === 'sa@123456' && password === '1234') {
+    const superAdmin = {
+      id: '00000000-0000-0000-0000-000000000001',
+      name: 'Super Admin',
+      email: 'sa@123456',
+      phone: '',
+      role: 'super_admin' as UserRole
+    };
+    localStorage.setItem('currentUser', JSON.stringify(superAdmin));
+    return superAdmin;
+  } 
+  else if (identifier === 'a@123456' && password === '1234') {
+    const admin = {
+      id: '00000000-0000-0000-0000-000000000002',
+      name: 'Admin User',
+      email: 'a@123456',
+      phone: '',
+      role: 'admin' as UserRole
+    };
+    localStorage.setItem('currentUser', JSON.stringify(admin));
+    return admin;
+  }
+  
+  return null;
 };
 
 // Mock login for demo purposes
-const mockLogin = (email: string, password: string): User | null => {
+const mockLogin = (identifier: string, password: string): User | null => {
   console.log("Using mock login as fallback");
-  const user = users.find(u => u.email === email);
+  
+  // First try to find user by email
+  let user = users.find(u => u.email === identifier);
+  
+  // If not found, try by phone
+  if (!user) {
+    user = users.find(u => u.phone === identifier);
+  }
   
   if (user) {
     localStorage.setItem('currentUser', JSON.stringify(user));
     return user;
+  }
+  
+  return null;
+};
+
+// Register a new user
+export const register = async (name: string, email: string, phone: string, password: string): Promise<User | null> => {
+  try {
+    // Format phone number if provided
+    let formattedPhone = phone;
+    if (phone && !phone.startsWith('+')) {
+      formattedPhone = '+91' + phone.replace(/^0+/, '');
+    }
+    
+    const identifierType = email ? { email } : { phone: formattedPhone };
+    
+    // Register with Supabase
+    const { data, error } = await supabase.auth.signUp({
+      ...identifierType,
+      password,
+      options: {
+        data: {
+          name,
+          role: 'user' // All new registrations are normal users
+        }
+      }
+    });
+    
+    if (error) {
+      console.error("Registration error:", error);
+      return null;
+    }
+    
+    if (data?.user) {
+      // Create user entry in our users table
+      const newUser = {
+        id: data.user.id,
+        name,
+        email: email || '',
+        phone: formattedPhone || '',
+        role: 'user' as UserRole,
+        auth_id: data.user.id
+      };
+      
+      const { error: insertError } = await supabase
+        .from('users')
+        .insert(newUser);
+      
+      if (insertError) {
+        console.error("Error creating user profile:", insertError);
+      }
+      
+      localStorage.setItem('currentUser', JSON.stringify(newUser));
+      return newUser;
+    }
+  } catch (error) {
+    console.error("Registration error:", error);
+  }
+  
+  return null;
+};
+
+// Create ground owner user
+export const createGroundOwner = async (name: string, email: string, phone: string): Promise<User | null> => {
+  try {
+    // Format phone number if provided
+    let formattedPhone = phone;
+    if (phone && !phone.startsWith('+')) {
+      formattedPhone = '+91' + phone.replace(/^0+/, '');
+    }
+    
+    const defaultPassword = '123456';
+    const identifierType = email ? { email } : { phone: formattedPhone };
+    
+    // Register with Supabase
+    const { data, error } = await supabase.auth.signUp({
+      ...identifierType,
+      password: defaultPassword,
+      options: {
+        data: {
+          name,
+          role: 'ground_owner'
+        }
+      }
+    });
+    
+    if (error) {
+      console.error("Ground owner creation error:", error);
+      
+      // If user already exists, just create the profile with ground_owner role
+      const existingUser = {
+        name,
+        email: email || '',
+        phone: formattedPhone || '',
+        role: 'ground_owner' as UserRole,
+        whatsapp: formattedPhone || ''
+      };
+      
+      return existingUser;
+    }
+    
+    if (data?.user) {
+      // Create user entry in our users table
+      const newUser = {
+        id: data.user.id,
+        name,
+        email: email || '',
+        phone: formattedPhone || '',
+        role: 'ground_owner' as UserRole,
+        auth_id: data.user.id,
+        whatsapp: formattedPhone || ''
+      };
+      
+      const { error: insertError } = await supabase
+        .from('users')
+        .insert(newUser);
+      
+      if (insertError) {
+        console.error("Error creating ground owner profile:", insertError);
+      }
+      
+      return newUser;
+    }
+  } catch (error) {
+    console.error("Ground owner creation error:", error);
   }
   
   return null;
@@ -141,6 +333,7 @@ export const hasRole = async (role: UserRole): Promise<boolean> => {
   if (role === 'user') return true;
   if (role === 'admin') return user.role === 'admin' || user.role === 'super_admin';
   if (role === 'super_admin') return user.role === 'super_admin';
+  if (role === 'ground_owner') return user.role === 'ground_owner';
   
   return false;
 };
@@ -153,6 +346,7 @@ export const hasRoleSync = (role: UserRole): boolean => {
   if (role === 'user') return true;
   if (role === 'admin') return user.role === 'admin' || user.role === 'super_admin';
   if (role === 'super_admin') return user.role === 'super_admin';
+  if (role === 'ground_owner') return user.role === 'ground_owner';
   
   return false;
 };

@@ -7,6 +7,7 @@ import { Event } from "@/types/models";
 import EventBasicDetails from "./EventBasicDetails";
 import EventSportSelector from "./EventSportSelector";
 import EventLinks from "./EventLinks";
+import EventImageUpload from "./EventImageUpload";
 import { useEventForm } from "./useEventForm";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetFooter } from "@/components/ui/sheet";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -43,6 +44,7 @@ const EventDialog = ({ open, onOpenChange, mode, event }: EventDialogProps) => {
               <div className="space-y-6">
                 <EventBasicDetails form={form} />
                 <EventSportSelector form={form} />
+                <EventImageUpload form={form} />
                 <EventLinks form={form} />
               </div>
               
@@ -77,6 +79,7 @@ const EventDialog = ({ open, onOpenChange, mode, event }: EventDialogProps) => {
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
             <EventBasicDetails form={form} />
             <EventSportSelector form={form} />
+            <EventImageUpload form={form} />
             <EventLinks form={form} />
             
             <DialogFooter>
