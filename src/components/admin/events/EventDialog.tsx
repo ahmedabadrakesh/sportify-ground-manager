@@ -1,6 +1,6 @@
 
 import React from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
 import { Form } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
 import { Event } from "@/types/models";
@@ -68,6 +68,9 @@ const EventDialog = ({ open, onOpenChange, mode, event }: EventDialogProps) => {
           <DialogTitle>
             {mode === "create" ? "Create New Event" : "Edit Event"}
           </DialogTitle>
+          <DialogDescription>
+            Fill in the details to {mode === "create" ? "create a new" : "update the"} event.
+          </DialogDescription>
         </DialogHeader>
         
         <Form {...form}>

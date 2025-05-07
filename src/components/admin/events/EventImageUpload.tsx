@@ -28,6 +28,19 @@ const EventImageUpload = ({ form }: EventImageUploadProps) => {
       const fileName = `event-${Date.now()}.${fileExt}`;
       const filePath = `${fileName}`;
 
+      // Check if the events bucket exists, create it if it doesn't
+      const { data: bucketData, error: bucketError } = await supabase
+        .storage
+        .getBucket('events');
+      
+      if (bucketError && bucketError.message.includes('The resource was not found')) {
+        // Create the bucket if it doesn't exist
+        await supabase.storage.createBucket('events', {
+          public: true,
+          fileSizeLimit: 5242880, // 5MB
+        });
+      }
+
       const { error: uploadError } = await supabase.storage
         .from('events')
         .upload(filePath, file);
@@ -43,8 +56,8 @@ const EventImageUpload = ({ form }: EventImageUploadProps) => {
       setImagePreview(publicUrl);
       form.setValue('image', publicUrl);
       toast.success('Image uploaded successfully');
-    } catch (error) {
-      toast.error('Error uploading image');
+    } catch (error: any) {
+      toast.error('Error uploading image: ' + (error.message || 'Unknown error'));
       console.error('Error uploading image:', error);
     } finally {
       setUploading(false);
@@ -100,6 +113,7 @@ const EventImageUpload = ({ form }: EventImageUploadProps) => {
                       disabled={uploading}
                     />
                   </label>
+                  {uploading && <p className="text-sm text-gray-500 mt-2">Uploading...</p>}
                 </div>
               )}
             </div>
