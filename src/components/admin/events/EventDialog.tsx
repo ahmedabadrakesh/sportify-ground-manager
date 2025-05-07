@@ -9,7 +9,7 @@ import EventSportSelector from "./EventSportSelector";
 import EventLinks from "./EventLinks";
 import { useEventForm } from "./useEventForm";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetFooter } from "@/components/ui/sheet";
-import { useMediaQuery } from "@/hooks/use-mobile";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface EventDialogProps {
   open: boolean;
@@ -25,7 +25,7 @@ const EventDialog = ({ open, onOpenChange, mode, event }: EventDialogProps) => {
     onSuccess: () => onOpenChange(false)
   });
   
-  const isMobile = useMediaQuery("(max-width: 640px)");
+  const isMobile = useIsMobile();
   
   // For mobile devices, use a Sheet (side drawer) instead of a Dialog
   if (isMobile) {
