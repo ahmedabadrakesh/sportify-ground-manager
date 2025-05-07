@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Calendar, MapPin, Link as LinkIcon } from "lucide-react";
+import { Calendar, MapPin, Link as LinkIcon, Plus } from "lucide-react";
 import { format, parseISO } from "date-fns";
 import MainLayout from "@/components/layouts/MainLayout";
 import { Button } from "@/components/ui/button";
@@ -10,6 +10,9 @@ import { useGames } from "@/hooks/useGames";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination";
+import { isAuthenticatedSync } from "@/utils/auth";
+import AuthRequiredDialog from "@/components/auth/AuthRequiredDialog";
+import EventDialog from "@/components/admin/events/EventDialog";
 
 const Events = () => {
   const navigate = useNavigate();
@@ -19,6 +22,8 @@ const Events = () => {
   const [filterCity, setFilterCity] = useState("");
   const [filterSport, setFilterSport] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
+  const [authDialogOpen, setAuthDialogOpen] = useState(false);
+  const [eventDialogOpen, setEventDialogOpen] = useState(false);
   const eventsPerPage = 6;
 
   const cities = [...new Set(events.map(event => event.city))];
@@ -67,10 +72,26 @@ const Events = () => {
     setCurrentPage(1); // Reset to first page when search changes
   };
 
+  const handleAddEvent = () => {
+    if (isAuthenticatedSync()) {
+      setEventDialogOpen(true);
+    } else {
+      setAuthDialogOpen(true);
+    }
+  };
+
   return (
     <MainLayout>
       <div className="container mx-auto py-8">
-        <h1 className="text-3xl font-bold mb-6">Upcoming Sports Events</h1>
+        <div className="flex flex-col md:flex-row justify-between items-center mb-6">
+          <h1 className="text-3xl font-bold">Upcoming Sports Events</h1>
+          <Button 
+            className="mt-4 md:mt-0 flex items-center gap-2" 
+            onClick={handleAddEvent}
+          >
+            <Plus className="h-4 w-4" /> Add Event
+          </Button>
+        </div>
         
         <div className="mb-8 grid gap-4 md:grid-cols-3">
           <div>
@@ -228,6 +249,21 @@ const Events = () => {
           </div>
         )}
       </div>
+
+      {/* Authentication Required Dialog */}
+      <AuthRequiredDialog 
+        open={authDialogOpen}
+        onOpenChange={setAuthDialogOpen}
+        title="Authentication Required"
+        description="You need to be logged in to create events. Please login or register to continue."
+      />
+
+      {/* Event Creation Dialog */}
+      <EventDialog
+        open={eventDialogOpen}
+        onOpenChange={setEventDialogOpen}
+        mode="create"
+      />
     </MainLayout>
   );
 };
