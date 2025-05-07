@@ -212,7 +212,7 @@ export const register = async (name: string, email: string, phone: string, passw
             email: email,
             phone: formattedPhone || '',
             role: 'user' as UserRole,
-            auth_id: data.user.id
+            authId: data.user.id // Fixed: Changed auth_id to authId
           };
           
           const { error: insertError } = await supabase
@@ -251,7 +251,7 @@ export const register = async (name: string, email: string, phone: string, passw
             email: email || '',
             phone: formattedPhone,
             role: 'user' as UserRole,
-            auth_id: data.user.id
+            authId: data.user.id // Fixed: Changed auth_id to authId
           };
           
           const { error: insertError } = await supabase
@@ -339,7 +339,7 @@ export const createGroundOwner = async (name: string, email: string, phone: stri
             email,
             phone: formattedPhone || '',
             role: 'ground_owner' as UserRole,
-            auth_id: data.user.id,
+            authId: data.user.id, // Fixed: Changed auth_id to authId
             whatsapp: formattedPhone || ''
           };
           
@@ -375,7 +375,7 @@ export const createGroundOwner = async (name: string, email: string, phone: stri
             email: '',
             phone: formattedPhone,
             role: 'ground_owner' as UserRole,
-            auth_id: data.user.id,
+            authId: data.user.id, // Fixed: Changed auth_id to authId
             whatsapp: formattedPhone
           };
           
@@ -471,3 +471,4 @@ export const hasRoleSync = (role: UserRole): boolean => {
   
   return false;
 };
+
