@@ -1,243 +1,304 @@
 
-import React from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
-import { Home, Search, Calendar, User, LogOut, ShoppingBag, ShoppingCart, MapPin, Users, Book, Store, CalendarDays } from "lucide-react";
+import React, { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { ShoppingCart, Menu, X, LogIn, UserPlus, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { getCurrentUserSync, logout, hasRoleSync } from "@/utils/auth";
-import { toast } from "sonner";
-import { Badge } from "@/components/ui/badge";
-import { getCartItemsCount } from "@/utils/cart";
-import { 
-  NavigationMenu,
-  NavigationMenuContent,
-  NavigationMenuItem,
-  NavigationMenuLink,
-  NavigationMenuList,
-  NavigationMenuTrigger,
-  navigationMenuTriggerStyle 
-} from "@/components/ui/navigation-menu";
+import { isAuthenticated, logout } from "@/utils/auth";
+import { Toaster } from "@/components/ui/toaster";
 
 interface MainLayoutProps {
   children: React.ReactNode;
 }
 
-const LOGO_PATH = "/lovable-uploads/c9d204d2-6de6-4a97-855d-f2acf0bd0180.png";
-
-const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
-  const location = useLocation();
+const MainLayout = ({ children }: MainLayoutProps) => {
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const navigate = useNavigate();
-  const currentUser = getCurrentUserSync();
-  const cartItemsCount = getCartItemsCount();
+  const authenticated = isAuthenticated();
 
   const handleLogout = () => {
     logout();
-    toast.success("Logged out successfully");
     navigate("/");
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-gray-50">
-      {/* Header */}
-      <header className="bg-white shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
-          <Link to="/" className="flex items-center">
-            <img
-              src={LOGO_PATH}
-              alt="JOKOVA Logo"
-              className="h-10 w-auto mr-2 rounded"
-              style={{ background: "#fff" }}
-            />
-            <span className="text-2xl font-bold text-primary-800">JOKOVA</span>
-          </Link>
-          <div className="flex items-center gap-4">
-            {currentUser ? (
-              <>
-                <span className="text-sm text-gray-700">Hello, {currentUser.name}</span>
-                <Button variant="ghost" size="sm" onClick={handleLogout}>
-                  <LogOut className="h-4 w-4 mr-2" /> Logout
+    <div className="flex flex-col min-h-screen">
+      <header className="bg-white shadow">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="flex h-16 justify-between items-center">
+            <div className="flex items-center">
+              <Link to="/" className="text-2xl font-bold text-primary">
+                SportsArena
+              </Link>
+            </div>
+
+            {/* Desktop Navigation */}
+            <nav className="hidden md:flex space-x-8">
+              <Link to="/search" className="text-gray-700 hover:text-primary">
+                Grounds
+              </Link>
+              <Link to="/bookings" className="text-gray-700 hover:text-primary">
+                Bookings
+              </Link>
+              <Link to="/sports-professionals" className="text-gray-700 hover:text-primary">
+                Professionals
+              </Link>
+              <Link to="/events" className="text-gray-700 hover:text-primary">
+                Events
+              </Link>
+              <Link to="/shop" className="text-gray-700 hover:text-primary">
+                Shop
+              </Link>
+              <Link to="/api-documentation" className="text-gray-700 hover:text-primary">
+                API Docs
+              </Link>
+            </nav>
+
+            {/* Desktop Actions */}
+            <div className="hidden md:flex items-center space-x-4">
+              <Link to="/cart">
+                <Button variant="ghost" size="icon">
+                  <ShoppingCart className="h-5 w-5" />
                 </Button>
-                {(currentUser.role === 'admin' || currentUser.role === 'super_admin') && (
-                  <Button variant="outline" size="sm" onClick={() => navigate('/admin')}>
-                    Dashboard
+              </Link>
+              {authenticated ? (
+                <div className="flex items-center space-x-4">
+                  <Link to="/admin/dashboard">
+                    <Button variant="outline">Dashboard</Button>
+                  </Link>
+                  <Button variant="outline" onClick={handleLogout}>
+                    Logout
                   </Button>
-                )}
-              </>
-            ) : (
-              <>
-                <Button variant="ghost" size="sm" onClick={() => navigate('/login')}>
-                  Login
-                </Button>
-                <Button variant="outline" size="sm" onClick={() => navigate('/register')}>
-                  Register
-                </Button>
-              </>
-            )}
+                </div>
+              ) : (
+                <div className="flex items-center space-x-4">
+                  <Link to="/login">
+                    <Button variant="ghost" className="flex items-center">
+                      <LogIn className="mr-2 h-4 w-4" /> Login
+                    </Button>
+                  </Link>
+                  <Link to="/register">
+                    <Button variant="default" className="flex items-center">
+                      <UserPlus className="mr-2 h-4 w-4" /> Register
+                    </Button>
+                  </Link>
+                </div>
+              )}
+            </div>
+
+            {/* Mobile menu button */}
+            <div className="md:hidden">
+              <Button variant="ghost" size="icon" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
+                {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+              </Button>
+            </div>
           </div>
         </div>
+
+        {/* Mobile menu */}
+        {mobileMenuOpen && (
+          <div className="md:hidden">
+            <div className="space-y-1 px-4 py-4">
+              <Link
+                to="/search"
+                className="block py-2 hover:bg-gray-100 rounded-md"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Grounds
+              </Link>
+              <Link
+                to="/bookings"
+                className="block py-2 hover:bg-gray-100 rounded-md"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Bookings
+              </Link>
+              <Link
+                to="/sports-professionals"
+                className="block py-2 hover:bg-gray-100 rounded-md"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Professionals
+              </Link>
+              <Link
+                to="/events"
+                className="block py-2 hover:bg-gray-100 rounded-md"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Events
+              </Link>
+              <Link
+                to="/shop"
+                className="block py-2 hover:bg-gray-100 rounded-md"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Shop
+              </Link>
+              <Link
+                to="/api-documentation"
+                className="block py-2 hover:bg-gray-100 rounded-md"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                API Docs
+              </Link>
+              <Link
+                to="/cart"
+                className="block py-2 hover:bg-gray-100 rounded-md"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Cart
+              </Link>
+              {authenticated ? (
+                <>
+                  <Link
+                    to="/admin/dashboard"
+                    className="block py-2 hover:bg-gray-100 rounded-md"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    Dashboard
+                  </Link>
+                  <button
+                    onClick={() => {
+                      handleLogout();
+                      setMobileMenuOpen(false);
+                    }}
+                    className="block w-full text-left py-2 hover:bg-gray-100 rounded-md"
+                  >
+                    Logout
+                  </button>
+                </>
+              ) : (
+                <>
+                  <Link
+                    to="/login"
+                    className="block py-2 hover:bg-gray-100 rounded-md"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    Login
+                  </Link>
+                  <Link
+                    to="/register"
+                    className="block py-2 hover:bg-gray-100 rounded-md"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    Register
+                  </Link>
+                </>
+              )}
+            </div>
+          </div>
+        )}
       </header>
 
-      {/* Navigation Bar - Sticky and includes cart on the right */}
-      <div className="sticky top-0 z-50 bg-primary text-white py-2 shadow-md">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <NavigationMenu className="w-full">
-            <NavigationMenuList className="w-full flex justify-between">
-              <div className="flex">
-                <NavigationMenuItem>
-                  <Link to="/search">
-                    <NavigationMenuLink className="group inline-flex h-9 w-max items-center justify-center rounded-md bg-transparent px-4 py-2 text-sm font-medium text-white hover:bg-primary-700 hover:text-white focus:bg-primary-700 focus:text-white focus:outline-none">
-                      <Book className="mr-2 h-4 w-4" />
-                      Book a Ground
-                    </NavigationMenuLink>
-                  </Link>
-                </NavigationMenuItem>
-                <NavigationMenuItem>
-                  <Link to="/grounds">
-                    <NavigationMenuLink className="group inline-flex h-9 w-max items-center justify-center rounded-md bg-transparent px-4 py-2 text-sm font-medium text-white hover:bg-primary-700 hover:text-white focus:bg-primary-700 focus:text-white focus:outline-none">
-                      <MapPin className="mr-2 h-4 w-4" />
-                      Grounds
-                    </NavigationMenuLink>
-                  </Link>
-                </NavigationMenuItem>
-                <NavigationMenuItem>
-                  <Link to="/sports-professionals">
-                    <NavigationMenuLink className="group inline-flex h-9 w-max items-center justify-center rounded-md bg-transparent px-4 py-2 text-sm font-medium text-white hover:bg-primary-700 hover:text-white focus:bg-primary-700 focus:text-white focus:outline-none">
-                      <Users className="mr-2 h-4 w-4" />
-                      Sports Professionals
-                    </NavigationMenuLink>
-                  </Link>
-                </NavigationMenuItem>
-                <NavigationMenuItem>
-                  <Link to="/events">
-                    <NavigationMenuLink className="group inline-flex h-9 w-max items-center justify-center rounded-md bg-transparent px-4 py-2 text-sm font-medium text-white hover:bg-primary-700 hover:text-white focus:bg-primary-700 focus:text-white focus:outline-none">
-                      <CalendarDays className="mr-2 h-4 w-4" />
-                      Events
-                    </NavigationMenuLink>
-                  </Link>
-                </NavigationMenuItem>
-                <NavigationMenuItem>
-                  <Link to="/shop">
-                    <NavigationMenuLink className="group inline-flex h-9 w-max items-center justify-center rounded-md bg-transparent px-4 py-2 text-sm font-medium text-white hover:bg-primary-700 hover:text-white focus:bg-primary-700 focus:text-white focus:outline-none">
-                      <Store className="mr-2 h-4 w-4" />
-                      Jokova's Store
-                    </NavigationMenuLink>
-                  </Link>
-                </NavigationMenuItem>
-              </div>
-              
-              {/* Cart in navigation bar */}
-              <NavigationMenuItem>
-                <Link to="/cart">
-                  <NavigationMenuLink className="group inline-flex h-9 w-max items-center justify-center rounded-md bg-transparent px-4 py-2 text-sm font-medium text-white hover:bg-primary-700 hover:text-white focus:bg-primary-700 focus:text-white focus:outline-none relative">
-                    <ShoppingCart className="mr-2 h-4 w-4" />
-                    Cart
-                    {cartItemsCount > 0 && (
-                      <Badge
-                        variant="destructive"
-                        className="absolute -top-2 -right-2 h-5 w-5 flex items-center justify-center p-0 text-xs"
-                      >
-                        {cartItemsCount}
-                      </Badge>
-                    )}
-                  </NavigationMenuLink>
-                </Link>
-              </NavigationMenuItem>
-            </NavigationMenuList>
-          </NavigationMenu>
-        </div>
-      </div>
+      <main className="flex-1">{children}</main>
 
-      {/* Main content */}
-      <main className="flex-1">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          {children}
-        </div>
-      </main>
-
-      {/* Mobile bottom navigation */}
-      <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white shadow-top border-t border-gray-200">
-        <div className="grid grid-cols-5 h-16">
-          <Link
-            to="/"
-            className={`flex flex-col items-center justify-center ${
-              location.pathname === "/" ? "text-primary-600" : "text-gray-500"
-            }`}
-          >
-            <Home size={20} />
-            <span className="text-xs mt-1">Home</span>
-          </Link>
-          <Link
-            to="/search"
-            className={`flex flex-col items-center justify-center ${
-              location.pathname === "/search" ? "text-primary-600" : "text-gray-500"
-            }`}
-          >
-            <Search size={20} />
-            <span className="text-xs mt-1">Search</span>
-          </Link>
-          <Link
-            to="/bookings"
-            className={`flex flex-col items-center justify-center ${
-              location.pathname === "/bookings" ? "text-primary-600" : "text-gray-500"
-            }`}
-          >
-            <Calendar size={20} />
-            <span className="text-xs mt-1">Bookings</span>
-          </Link>
-          <Link
-            to="/shop"
-            className={`flex flex-col items-center justify-center ${
-              location.pathname === "/shop" ? "text-primary-600" : "text-gray-500"
-            }`}
-          >
-            <ShoppingBag size={20} />
-            <span className="text-xs mt-1">Shop</span>
-          </Link>
-          <Link
-            to="/cart"
-            className={`flex flex-col items-center justify-center relative ${
-              location.pathname === "/cart" ? "text-primary-600" : "text-gray-500"
-            }`}
-          >
-            <ShoppingCart size={20} />
-            {cartItemsCount > 0 && (
-              <Badge
-                variant="destructive"
-                className="absolute -top-1 right-1 h-4 w-4 flex items-center justify-center p-0 text-[10px]"
-              >
-                {cartItemsCount}
-              </Badge>
-            )}
-            <span className="text-xs mt-1">Cart</span>
-          </Link>
-        </div>
-      </div>
-
-      {/* Footer */}
-      <footer className="bg-white border-t border-gray-200 py-6 md:py-8 mt-8">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col md:flex-row justify-between items-center">
-            <div className="text-center md:text-left mb-4 md:mb-0">
-              <p className="text-sm text-gray-500">
-                &copy; {new Date().getFullYear()} JOKOVA. All rights reserved.
+      <footer className="bg-gray-100 mt-auto">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
+          <div className="md:flex md:justify-between">
+            <div className="mb-6 md:mb-0">
+              <Link to="/" className="text-xl font-bold text-primary">
+                SportsArena
+              </Link>
+              <p className="mt-2 text-sm text-gray-600">
+                Book sports grounds, equipment, and find professionals.
               </p>
             </div>
-            <div className="flex space-x-6">
-              <a href="#" className="text-gray-500 hover:text-gray-700">
-                About
+            <div className="grid grid-cols-2 gap-8 sm:grid-cols-3">
+              <div>
+                <h3 className="text-sm font-semibold uppercase text-gray-500">Platform</h3>
+                <ul className="mt-4 space-y-2">
+                  <li>
+                    <Link to="/search" className="text-sm text-gray-600 hover:text-primary">
+                      Find Grounds
+                    </Link>
+                  </li>
+                  <li>
+                    <Link to="/bookings" className="text-sm text-gray-600 hover:text-primary">
+                      My Bookings
+                    </Link>
+                  </li>
+                  <li>
+                    <Link to="/events" className="text-sm text-gray-600 hover:text-primary">
+                      Events
+                    </Link>
+                  </li>
+                </ul>
+              </div>
+              <div>
+                <h3 className="text-sm font-semibold uppercase text-gray-500">Support</h3>
+                <ul className="mt-4 space-y-2">
+                  <li>
+                    <a href="#" className="text-sm text-gray-600 hover:text-primary">
+                      Help Center
+                    </a>
+                  </li>
+                  <li>
+                    <a href="#" className="text-sm text-gray-600 hover:text-primary">
+                      Contact Us
+                    </a>
+                  </li>
+                  <li>
+                    <a href="#" className="text-sm text-gray-600 hover:text-primary">
+                      Privacy Policy
+                    </a>
+                  </li>
+                </ul>
+              </div>
+              <div>
+                <h3 className="text-sm font-semibold uppercase text-gray-500">Legal</h3>
+                <ul className="mt-4 space-y-2">
+                  <li>
+                    <a href="#" className="text-sm text-gray-600 hover:text-primary">
+                      Terms of Service
+                    </a>
+                  </li>
+                  <li>
+                    <a href="#" className="text-sm text-gray-600 hover:text-primary">
+                      Privacy Policy
+                    </a>
+                  </li>
+                  <li>
+                    <Link to="/api-documentation" className="text-sm text-gray-600 hover:text-primary">
+                      API Documentation
+                    </Link>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+          <div className="mt-8 border-t border-gray-200 pt-8 md:flex md:items-center md:justify-between">
+            <p className="text-sm text-gray-500">&copy; 2025 SportsArena. All rights reserved.</p>
+            <div className="flex space-x-6 md:mt-0">
+              <a href="#" className="text-gray-500 hover:text-primary">
+                <span className="sr-only">Facebook</span>
+                <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
+                  <path
+                    fillRule="evenodd"
+                    d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z"
+                    clipRule="evenodd"
+                  />
+                </svg>
               </a>
-              <a href="#" className="text-gray-500 hover:text-gray-700">
-                Terms
+              <a href="#" className="text-gray-500 hover:text-primary">
+                <span className="sr-only">Instagram</span>
+                <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
+                  <path
+                    fillRule="evenodd"
+                    d="M12.315 2c2.43 0 2.784.013 3.808.06 1.064.049 1.791.218 2.427.465a4.902 4.902 0 011.772 1.153 4.902 4.902 0 011.153 1.772c.247.636.416 1.363.465 2.427.048 1.067.06 1.407.06 4.123v.08c0 2.643-.012 2.987-.06 4.043-.049 1.064-.218 1.791-.465 2.427a4.902 4.902 0 01-1.153 1.772 4.902 4.902 0 01-1.772 1.153c-.636.247-1.363.416-2.427.465-1.067.048-1.407.06-4.123.06h-.08c-2.643 0-2.987-.012-4.043-.06-1.064-.049-1.791-.218-2.427-.465a4.902 4.902 0 01-1.772-1.153 4.902 4.902 0 01-1.153-1.772c-.247-.636-.416-1.363-.465-2.427-.047-1.024-.06-1.379-.06-3.808v-.63c0-2.43.013-2.784.06-3.808.049-1.064.218-1.791.465-2.427a4.902 4.902 0 011.153-1.772A4.902 4.902 0 015.45 2.525c.636-.247 1.363-.416 2.427-.465C8.901 2.013 9.256 2 11.685 2h.63zm-.081 1.802h-.468c-2.456 0-2.784.011-3.807.058-.975.045-1.504.207-1.857.344-.467.182-.8.398-1.15.748-.35.35-.566.683-.748 1.15-.137.353-.3.882-.344 1.857-.047 1.023-.058 1.351-.058 3.807v.468c0 2.456.011 2.784.058 3.807.045.975.207 1.504.344 1.857.182.466.399.8.748 1.15.35.35.683.566 1.15.748.353.137.882.3 1.857.344 1.054.048 1.37.058 4.041.058h.08c2.597 0 2.917-.01 3.96-.058.976-.045 1.505-.207 1.858-.344.466-.182.8-.398 1.15-.748.35-.35.566-.683.748-1.15.137-.353.3-.882.344-1.857.048-1.055.058-1.37.058-4.041v-.08c0-2.597-.01-2.917-.058-3.96-.045-.976-.207-1.505-.344-1.858a3.097 3.097 0 00-.748-1.15 3.098 3.098 0 00-1.15-.748c-.353-.137-.882-.3-1.857-.344-1.023-.047-1.351-.058-3.807-.058zM12 6.865a5.135 5.135 0 110 10.27 5.135 5.135 0 010-10.27zm0 1.802a3.333 3.333 0 100 6.666 3.333 3.333 0 000-6.666zm5.338-3.205a1.2 1.2 0 110 2.4 1.2 1.2 0 010-2.4z"
+                    clipRule="evenodd"
+                  />
+                </svg>
               </a>
-              <a href="#" className="text-gray-500 hover:text-gray-700">
-                Privacy
-              </a>
-              <a href="#" className="text-gray-500 hover:text-gray-700">
-                Contact
+              <a href="#" className="text-gray-500 hover:text-primary">
+                <span className="sr-only">Twitter</span>
+                <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84" />
+                </svg>
               </a>
             </div>
           </div>
         </div>
       </footer>
+      <Toaster />
     </div>
   );
 };
