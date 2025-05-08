@@ -4,63 +4,41 @@ export const swaggerDefinition = {
   info: {
     title: "Sports Platform API",
     version: "1.0.0",
-    description: "API documentation for the Sports Platform",
-    contact: {
-      email: "info@sportsplatform.com"
-    }
+    description: "API documentation for the Sports Platform"
   },
   servers: [
     {
       url: "https://qlrnxgyvplzrkzhhjhab.supabase.co/rest/v1",
-      description: "Production server"
+      description: "Production API Server"
     }
   ],
   components: {
     securitySchemes: {
       apiKey: {
         type: "apiKey",
-        in: "header",
         name: "apikey",
-        description: "Supabase anonymous key for API access"
+        in: "header"
       }
     }
   },
-  security: [
-    {
-      apiKey: []
-    }
-  ],
   paths: {
     "/events": {
       get: {
-        summary: "Returns all events",
-        description: "Retrieves a list of all sports events",
-        operationId: "getEvents",
+        summary: "Get all events",
+        tags: ["Events"],
         parameters: [
           {
             name: "select",
             in: "query",
-            description: "Fields to return",
-            required: false,
             schema: {
-              type: "string",
-              example: "*"
-            }
-          },
-          {
-            name: "order",
-            in: "query",
-            description: "Order results by column",
-            required: false,
-            schema: {
-              type: "string",
-              example: "event_date.asc"
-            }
+              type: "string"
+            },
+            description: "Fields to select (e.g., *)"
           }
         ],
         responses: {
           "200": {
-            description: "Successful response",
+            description: "List of all events",
             content: {
               "application/json": {
                 schema: {
@@ -72,70 +50,31 @@ export const swaggerDefinition = {
               }
             }
           }
-        }
-      }
-    },
-    "/events/{id}": {
-      get: {
-        summary: "Returns a single event",
-        description: "Retrieves details of a specific event by ID",
-        operationId: "getEventById",
-        parameters: [
+        },
+        security: [
           {
-            name: "id",
-            in: "path",
-            description: "Event ID",
-            required: true,
-            schema: {
-              type: "string",
-              format: "uuid"
-            }
+            apiKey: []
           }
-        ],
-        responses: {
-          "200": {
-            description: "Successful response",
-            content: {
-              "application/json": {
-                schema: {
-                  $ref: "#/components/schemas/Event"
-                }
-              }
-            }
-          }
-        }
+        ]
       }
     },
     "/games": {
       get: {
-        summary: "Returns all games/sports",
-        description: "Retrieves a list of all available games/sports",
-        operationId: "getGames",
+        summary: "Get all games/sports",
+        tags: ["Games"],
         parameters: [
           {
             name: "select",
             in: "query",
-            description: "Fields to return",
-            required: false,
             schema: {
-              type: "string",
-              example: "*"
-            }
-          },
-          {
-            name: "order",
-            in: "query",
-            description: "Order results by column",
-            required: false,
-            schema: {
-              type: "string",
-              example: "name.asc"
-            }
+              type: "string"
+            },
+            description: "Fields to select (e.g., *)"
           }
         ],
         responses: {
           "200": {
-            description: "Successful response",
+            description: "List of all games/sports",
             content: {
               "application/json": {
                 schema: {
@@ -147,39 +86,31 @@ export const swaggerDefinition = {
               }
             }
           }
-        }
+        },
+        security: [
+          {
+            apiKey: []
+          }
+        ]
       }
     },
     "/grounds": {
       get: {
-        summary: "Returns all grounds",
-        description: "Retrieves a list of all sports grounds/venues",
-        operationId: "getGrounds",
+        summary: "Get all grounds",
+        tags: ["Grounds"],
         parameters: [
           {
             name: "select",
             in: "query",
-            description: "Fields to return",
-            required: false,
             schema: {
-              type: "string",
-              example: "*"
-            }
-          },
-          {
-            name: "order",
-            in: "query",
-            description: "Order results by column",
-            required: false,
-            schema: {
-              type: "string",
-              example: "name.asc"
-            }
+              type: "string"
+            },
+            description: "Fields to select (e.g., *)"
           }
         ],
         responses: {
           "200": {
-            description: "Successful response",
+            description: "List of all grounds",
             content: {
               "application/json": {
                 schema: {
@@ -191,70 +122,31 @@ export const swaggerDefinition = {
               }
             }
           }
-        }
-      }
-    },
-    "/grounds/{id}": {
-      get: {
-        summary: "Returns a single ground",
-        description: "Retrieves details of a specific ground by ID",
-        operationId: "getGroundById",
-        parameters: [
+        },
+        security: [
           {
-            name: "id",
-            in: "path",
-            description: "Ground ID",
-            required: true,
-            schema: {
-              type: "string",
-              format: "uuid"
-            }
+            apiKey: []
           }
-        ],
-        responses: {
-          "200": {
-            description: "Successful response",
-            content: {
-              "application/json": {
-                schema: {
-                  $ref: "#/components/schemas/Ground"
-                }
-              }
-            }
-          }
-        }
+        ]
       }
     },
     "/bookings": {
       get: {
-        summary: "Returns all bookings",
-        description: "Retrieves a list of all bookings",
-        operationId: "getBookings",
+        summary: "Get all bookings",
+        tags: ["Bookings"],
         parameters: [
           {
             name: "select",
             in: "query",
-            description: "Fields to return",
-            required: false,
             schema: {
-              type: "string",
-              example: "*"
-            }
-          },
-          {
-            name: "order",
-            in: "query",
-            description: "Order results by column",
-            required: false,
-            schema: {
-              type: "string",
-              example: "date.desc"
-            }
+              type: "string"
+            },
+            description: "Fields to select (e.g., *)"
           }
         ],
         responses: {
           "200": {
-            description: "Successful response",
+            description: "List of all bookings",
             content: {
               "application/json": {
                 schema: {
@@ -266,39 +158,31 @@ export const swaggerDefinition = {
               }
             }
           }
-        }
+        },
+        security: [
+          {
+            apiKey: []
+          }
+        ]
       }
     },
     "/sports_professionals": {
       get: {
-        summary: "Returns all sports professionals",
-        description: "Retrieves a list of all sports professionals",
-        operationId: "getSportsProfessionals",
+        summary: "Get all sports professionals",
+        tags: ["Sports Professionals"],
         parameters: [
           {
             name: "select",
             in: "query",
-            description: "Fields to return",
-            required: false,
             schema: {
-              type: "string",
-              example: "*"
-            }
-          },
-          {
-            name: "order",
-            in: "query",
-            description: "Order results by column",
-            required: false,
-            schema: {
-              type: "string",
-              example: "name.asc"
-            }
+              type: "string"
+            },
+            description: "Fields to select (e.g., *)"
           }
         ],
         responses: {
           "200": {
-            description: "Successful response",
+            description: "List of all sports professionals",
             content: {
               "application/json": {
                 schema: {
@@ -310,7 +194,12 @@ export const swaggerDefinition = {
               }
             }
           }
-        }
+        },
+        security: [
+          {
+            apiKey: []
+          }
+        ]
       }
     }
   },
@@ -319,236 +208,65 @@ export const swaggerDefinition = {
       Event: {
         type: "object",
         properties: {
-          id: {
-            type: "string",
-            format: "uuid"
-          },
-          event_name: {
-            type: "string"
-          },
-          address: {
-            type: "string"
-          },
-          city: {
-            type: "string"
-          },
-          location: {
-            type: "object",
-            properties: {
-              lat: { type: "number" },
-              lng: { type: "number" }
-            }
-          },
-          event_date: {
-            type: "string",
-            format: "date"
-          },
-          event_time: {
-            type: "string",
-            format: "time"
-          },
-          registration_url: {
-            type: "string",
-            nullable: true
-          },
-          sport_id: {
-            type: "string",
-            format: "uuid",
-            nullable: true
-          },
-          image: {
-            type: "string",
-            nullable: true
-          },
-          qr_code: {
-            type: "string",
-            nullable: true
-          },
-          created_at: {
-            type: "string",
-            format: "date-time"
-          },
-          updated_at: {
-            type: "string",
-            format: "date-time"
-          }
+          id: { type: "string" },
+          event_name: { type: "string" },
+          address: { type: "string" },
+          city: { type: "string" },
+          event_date: { type: "string", format: "date" },
+          event_time: { type: "string" },
+          registration_url: { type: "string" },
+          sport_id: { type: "string" },
+          image: { type: "string" },
+          created_at: { type: "string", format: "date-time" }
         }
       },
       Game: {
         type: "object",
         properties: {
-          id: {
-            type: "string",
-            format: "uuid"
-          },
-          name: {
-            type: "string"
-          }
+          id: { type: "string" },
+          name: { type: "string" },
+          icon: { type: "string" },
+          created_at: { type: "string", format: "date-time" }
         }
       },
       Ground: {
         type: "object",
         properties: {
-          id: {
-            type: "string",
-            format: "uuid"
-          },
-          name: {
-            type: "string"
-          },
-          description: {
-            type: "string",
-            nullable: true
-          },
-          address: {
-            type: "string"
-          },
-          location: {
-            type: "object",
-            nullable: true,
-            properties: {
-              lat: { type: "number" },
-              lng: { type: "number" }
-            }
-          },
-          owner_id: {
-            type: "string",
-            format: "uuid"
-          },
-          games: {
-            type: "array",
-            items: { type: "string" },
-            nullable: true
-          },
-          facilities: {
-            type: "array",
-            items: { type: "string" },
-            nullable: true
-          },
-          images: {
-            type: "array",
-            items: { type: "string" },
-            nullable: true
-          },
-          rating: {
-            type: "number",
-            nullable: true
-          },
-          review_count: {
-            type: "integer",
-            nullable: true
-          },
-          created_at: {
-            type: "string",
-            format: "date-time"
-          },
-          updated_at: {
-            type: "string",
-            format: "date-time"
-          }
+          id: { type: "string" },
+          name: { type: "string" },
+          address: { type: "string" },
+          city: { type: "string" },
+          description: { type: "string" },
+          owner_id: { type: "string" },
+          featured: { type: "boolean" },
+          created_at: { type: "string", format: "date-time" }
         }
       },
       Booking: {
         type: "object",
         properties: {
-          id: {
-            type: "string",
-            format: "uuid"
-          },
-          user_id: {
-            type: "string",
-            format: "uuid"
-          },
-          ground_id: {
-            type: "string",
-            format: "uuid"
-          },
-          date: {
-            type: "string"
-          },
-          total_amount: {
-            type: "number"
-          },
-          booking_status: {
-            type: "string"
-          },
-          payment_status: {
-            type: "string"
-          },
-          sports_area_id: {
-            type: "string",
-            nullable: true
-          },
-          game_ids: {
-            type: "array",
-            items: { type: "string" },
-            nullable: true
-          },
-          created_at: {
-            type: "string",
-            format: "date-time"
-          },
-          updated_at: {
-            type: "string",
-            format: "date-time"
-          }
+          id: { type: "string" },
+          ground_id: { type: "string" },
+          user_id: { type: "string" },
+          date: { type: "string", format: "date" },
+          start_time: { type: "string" },
+          end_time: { type: "string" },
+          status: { type: "string", enum: ["confirmed", "pending", "cancelled"] },
+          created_at: { type: "string", format: "date-time" }
         }
       },
       SportsProfessional: {
         type: "object",
         properties: {
-          id: {
-            type: "string",
-            format: "uuid"
-          },
-          name: {
-            type: "string"
-          },
-          profession_type: {
-            type: "string",
-            enum: ["Athlete", "Coach", "Trainer", "Sports Manager", "Support Staff", "Player", "Umpire"]
-          },
-          fee: {
-            type: "number"
-          },
-          fee_type: {
-            type: "string",
-            enum: ["Per Hour", "Per Day", "Per Match"]
-          },
-          game_id: {
-            type: "string",
-            format: "uuid"
-          },
-          address: {
-            type: "string"
-          },
-          city: {
-            type: "string"
-          },
-          contact_number: {
-            type: "string"
-          },
-          comments: {
-            type: "string",
-            nullable: true
-          },
-          photo: {
-            type: "string",
-            nullable: true
-          },
-          user_id: {
-            type: "string",
-            format: "uuid",
-            nullable: true
-          },
-          created_at: {
-            type: "string",
-            format: "date-time"
-          },
-          updated_at: {
-            type: "string",
-            format: "date-time"
-          }
+          id: { type: "string" },
+          name: { type: "string" },
+          profession_type: { type: "string" },
+          game_id: { type: "string" },
+          fee: { type: "number" },
+          fee_type: { type: "string" },
+          city: { type: "string" },
+          contact_number: { type: "string" },
+          created_at: { type: "string", format: "date-time" }
         }
       }
     }
