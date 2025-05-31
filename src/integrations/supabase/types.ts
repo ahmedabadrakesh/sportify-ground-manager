@@ -505,52 +505,91 @@ export type Database = {
       }
       sports_professionals: {
         Row: {
+          accomplishments: string[] | null
           address: string
+          awards: string[] | null
+          certifications: string[] | null
           city: string
+          coaching_availability: string[] | null
           comments: string | null
           contact_number: string
           created_at: string
+          facebook_link: string | null
           fee: number
           fee_type: Database["public"]["Enums"]["fee_type"]
           game_id: string
           id: string
+          images: string[] | null
+          instagram_link: string | null
+          level: string | null
+          linkedin_link: string | null
           name: string
           photo: string | null
           profession_type: Database["public"]["Enums"]["sport_profession_type"]
+          punch_line: string | null
+          training_locations: string[] | null
           updated_at: string
           user_id: string | null
+          videos: string[] | null
+          website: string | null
         }
         Insert: {
+          accomplishments?: string[] | null
           address: string
+          awards?: string[] | null
+          certifications?: string[] | null
           city: string
+          coaching_availability?: string[] | null
           comments?: string | null
           contact_number: string
           created_at?: string
+          facebook_link?: string | null
           fee: number
           fee_type: Database["public"]["Enums"]["fee_type"]
           game_id: string
           id?: string
+          images?: string[] | null
+          instagram_link?: string | null
+          level?: string | null
+          linkedin_link?: string | null
           name: string
           photo?: string | null
           profession_type: Database["public"]["Enums"]["sport_profession_type"]
+          punch_line?: string | null
+          training_locations?: string[] | null
           updated_at?: string
           user_id?: string | null
+          videos?: string[] | null
+          website?: string | null
         }
         Update: {
+          accomplishments?: string[] | null
           address?: string
+          awards?: string[] | null
+          certifications?: string[] | null
           city?: string
+          coaching_availability?: string[] | null
           comments?: string | null
           contact_number?: string
           created_at?: string
+          facebook_link?: string | null
           fee?: number
           fee_type?: Database["public"]["Enums"]["fee_type"]
           game_id?: string
           id?: string
+          images?: string[] | null
+          instagram_link?: string | null
+          level?: string | null
+          linkedin_link?: string | null
           name?: string
           photo?: string | null
           profession_type?: Database["public"]["Enums"]["sport_profession_type"]
+          punch_line?: string | null
+          training_locations?: string[] | null
           updated_at?: string
           user_id?: string | null
+          videos?: string[] | null
+          website?: string | null
         }
         Relationships: [
           {

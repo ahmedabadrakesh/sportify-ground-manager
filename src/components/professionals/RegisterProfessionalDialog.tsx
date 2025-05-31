@@ -1,3 +1,4 @@
+
 import React from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -32,6 +33,19 @@ const RegisterProfessionalDialog = ({ open, onOpenChange }: RegisterProfessional
       address: "",
       comments: "",
       photo: "",
+      awards: [],
+      accomplishments: [],
+      certifications: [],
+      training_locations: [],
+      videos: [],
+      images: [],
+      punch_line: "",
+      instagram_link: "",
+      facebook_link: "",
+      linkedin_link: "",
+      website: "",
+      level: undefined,
+      coaching_availability: [],
     },
   });
 
@@ -47,7 +61,20 @@ const RegisterProfessionalDialog = ({ open, onOpenChange }: RegisterProfessional
         city: values.city,
         address: values.address,
         comments: values.comments || null,
-        photo: values.photo || null
+        photo: values.photo || null,
+        awards: values.awards || [],
+        accomplishments: values.accomplishments || [],
+        certifications: values.certifications || [],
+        training_locations: values.training_locations || [],
+        videos: values.videos || [],
+        images: values.images || [],
+        punch_line: values.punch_line || null,
+        instagram_link: values.instagram_link || null,
+        facebook_link: values.facebook_link || null,
+        linkedin_link: values.linkedin_link || null,
+        website: values.website || null,
+        level: values.level || null,
+        coaching_availability: values.coaching_availability || [],
       };
       
       const { error } = await supabase
@@ -74,18 +101,22 @@ const RegisterProfessionalDialog = ({ open, onOpenChange }: RegisterProfessional
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[90vh]">
+      <DialogContent className="max-w-4xl max-h-[90vh]">
         <DialogHeader>
           <DialogTitle>Register as Sports Professional</DialogTitle>
         </DialogHeader>
 
         <ScrollArea className="h-[calc(90vh-120px)] px-1">
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
               <PhotoUpload form={form} />
               <ProfessionalFormFields form={form} />
-              <Button type="submit" className="w-full">
-                Register
+              <Button 
+                type="submit" 
+                className="w-full" 
+                disabled={registerMutation.isPending}
+              >
+                {registerMutation.isPending ? "Registering..." : "Register"}
               </Button>
             </form>
           </Form>

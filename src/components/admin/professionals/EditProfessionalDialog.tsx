@@ -34,6 +34,19 @@ const EditProfessionalDialog = ({ open, onOpenChange, professional }: EditProfes
       address: professional.address,
       comments: professional.comments || "",
       photo: professional.photo || "",
+      awards: professional.awards || [],
+      accomplishments: professional.accomplishments || [],
+      certifications: professional.certifications || [],
+      training_locations: professional.training_locations || [],
+      videos: professional.videos || [],
+      images: professional.images || [],
+      punch_line: professional.punch_line || "",
+      instagram_link: professional.instagram_link || "",
+      facebook_link: professional.facebook_link || "",
+      linkedin_link: professional.linkedin_link || "",
+      website: professional.website || "",
+      level: professional.level || undefined,
+      coaching_availability: professional.coaching_availability || [],
     },
   });
 
@@ -51,7 +64,20 @@ const EditProfessionalDialog = ({ open, onOpenChange, professional }: EditProfes
           city: values.city,
           address: values.address,
           comments: values.comments || null,
-          photo: values.photo || null
+          photo: values.photo || null,
+          awards: values.awards || [],
+          accomplishments: values.accomplishments || [],
+          certifications: values.certifications || [],
+          training_locations: values.training_locations || [],
+          videos: values.videos || [],
+          images: values.images || [],
+          punch_line: values.punch_line || null,
+          instagram_link: values.instagram_link || null,
+          facebook_link: values.facebook_link || null,
+          linkedin_link: values.linkedin_link || null,
+          website: values.website || null,
+          level: values.level || null,
+          coaching_availability: values.coaching_availability || [],
         })
         .eq('id', professional.id);
       
@@ -74,17 +100,21 @@ const EditProfessionalDialog = ({ open, onOpenChange, professional }: EditProfes
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[90vh]">
+      <DialogContent className="max-w-4xl max-h-[90vh]">
         <DialogHeader>
           <DialogTitle>Edit Professional Details</DialogTitle>
         </DialogHeader>
         <ScrollArea className="h-[calc(90vh-120px)] px-1">
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
               <PhotoUpload form={form} />
               <ProfessionalFormFields form={form} />
-              <Button type="submit" className="w-full">
-                Update Professional
+              <Button 
+                type="submit" 
+                className="w-full"
+                disabled={updateMutation.isPending}
+              >
+                {updateMutation.isPending ? "Updating..." : "Update Professional"}
               </Button>
             </form>
           </Form>

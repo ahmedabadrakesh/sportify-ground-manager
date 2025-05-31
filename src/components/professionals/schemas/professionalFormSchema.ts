@@ -17,6 +17,20 @@ export const professionalFormSchema = z.object({
   address: z.string().min(1, "Address is required"),
   comments: z.string().optional(),
   photo: z.string().optional(),
+  // New fields
+  awards: z.array(z.string()).optional(),
+  accomplishments: z.array(z.string()).optional(),
+  certifications: z.array(z.string()).optional(),
+  training_locations: z.array(z.string()).optional(),
+  videos: z.array(z.string()).optional(),
+  images: z.array(z.string()).optional(),
+  punch_line: z.string().optional(),
+  instagram_link: z.string().optional(),
+  facebook_link: z.string().optional(),
+  linkedin_link: z.string().optional(),
+  website: z.string().optional(),
+  level: z.enum(["Beginner", "Intermediate", "Professional"]).optional(),
+  coaching_availability: z.array(z.enum(["Personal", "Group", "Home", "Out of City"])).optional(),
 });
 
 export type ProfessionalFormValues = z.infer<typeof professionalFormSchema>;
