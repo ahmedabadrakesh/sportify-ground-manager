@@ -12,6 +12,7 @@ import Events from "./pages/Events";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import SportsProfessionals from "./pages/SportsProfessionals";
+import ProfessionalProfile from "./pages/ProfessionalProfile";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminGrounds from "./pages/admin/AdminGrounds";
 import AdminBookings from "./pages/admin/AdminBookings";
@@ -44,6 +45,7 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/sports-professionals" element={<SportsProfessionals />} />
+        <Route path="/professional/:id" element={<ProfessionalProfile />} />
         <Route path="/api-documentation" element={<APIDoc />} />
 
         {/* Admin routes */}

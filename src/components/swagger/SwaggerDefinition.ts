@@ -19,6 +19,72 @@ export const swaggerDefinition = {
         name: "apikey",
         in: "header"
       }
+    },
+    schemas: {
+      Event: {
+        type: "object",
+        properties: {
+          id: { type: "string" },
+          event_name: { type: "string" },
+          address: { type: "string" },
+          city: { type: "string" },
+          event_date: { type: "string", format: "date" },
+          event_time: { type: "string" },
+          registration_url: { type: "string" },
+          sport_id: { type: "string" },
+          image: { type: "string" },
+          created_at: { type: "string", format: "date-time" }
+        }
+      },
+      Game: {
+        type: "object",
+        properties: {
+          id: { type: "string" },
+          name: { type: "string" },
+          icon: { type: "string" },
+          created_at: { type: "string", format: "date-time" }
+        }
+      },
+      Ground: {
+        type: "object",
+        properties: {
+          id: { type: "string" },
+          name: { type: "string" },
+          address: { type: "string" },
+          city: { type: "string" },
+          description: { type: "string" },
+          owner_id: { type: "string" },
+          featured: { type: "boolean" },
+          created_at: { type: "string", format: "date-time" }
+        }
+      },
+      Booking: {
+        type: "object",
+        properties: {
+          id: { type: "string" },
+          ground_id: { type: "string" },
+          user_id: { type: "string" },
+          date: { type: "string", format: "date" },
+          start_time: { type: "string" },
+          end_time: { type: "string" },
+          status: { type: "string", enum: ["confirmed", "pending", "cancelled"] },
+          created_at: { type: "string", format: "date-time" }
+        }
+      },
+      SportsProfessional: {
+        type: "object",
+        properties: {
+          id: { type: "string" },
+          name: { type: "string" },
+          profession_type: { type: "string" },
+          game_id: { type: "string" },
+          fee: { type: "number" },
+          fee_type: { type: "string" },
+          city: { type: "string" },
+          contact_number: { type: "string" },
+          created_at: { type: "string", format: "date-time" }
+        }
+      }
     }
   },
   paths: {
@@ -200,74 +266,6 @@ export const swaggerDefinition = {
             apiKey: []
           }
         ]
-      }
-    }
-  },
-  components: {
-    schemas: {
-      Event: {
-        type: "object",
-        properties: {
-          id: { type: "string" },
-          event_name: { type: "string" },
-          address: { type: "string" },
-          city: { type: "string" },
-          event_date: { type: "string", format: "date" },
-          event_time: { type: "string" },
-          registration_url: { type: "string" },
-          sport_id: { type: "string" },
-          image: { type: "string" },
-          created_at: { type: "string", format: "date-time" }
-        }
-      },
-      Game: {
-        type: "object",
-        properties: {
-          id: { type: "string" },
-          name: { type: "string" },
-          icon: { type: "string" },
-          created_at: { type: "string", format: "date-time" }
-        }
-      },
-      Ground: {
-        type: "object",
-        properties: {
-          id: { type: "string" },
-          name: { type: "string" },
-          address: { type: "string" },
-          city: { type: "string" },
-          description: { type: "string" },
-          owner_id: { type: "string" },
-          featured: { type: "boolean" },
-          created_at: { type: "string", format: "date-time" }
-        }
-      },
-      Booking: {
-        type: "object",
-        properties: {
-          id: { type: "string" },
-          ground_id: { type: "string" },
-          user_id: { type: "string" },
-          date: { type: "string", format: "date" },
-          start_time: { type: "string" },
-          end_time: { type: "string" },
-          status: { type: "string", enum: ["confirmed", "pending", "cancelled"] },
-          created_at: { type: "string", format: "date-time" }
-        }
-      },
-      SportsProfessional: {
-        type: "object",
-        properties: {
-          id: { type: "string" },
-          name: { type: "string" },
-          profession_type: { type: "string" },
-          game_id: { type: "string" },
-          fee: { type: "number" },
-          fee_type: { type: "string" },
-          city: { type: "string" },
-          contact_number: { type: "string" },
-          created_at: { type: "string", format: "date-time" }
-        }
       }
     }
   }
