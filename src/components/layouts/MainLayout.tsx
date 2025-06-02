@@ -48,8 +48,16 @@ const MainLayout = ({ children }: MainLayoutProps) => {
               <Link to="/shop" className="text-gray-700 hover:text-primary">
                 Shop
               </Link>
+<<<<<<< Updated upstream
               <Link to="/api-documentation" className="text-gray-700 hover:text-primary">
                 API Docs
+=======
+              <Link
+                to="/api-documentation"
+                className="text-gray-700 hover:text-primary"
+              >
+                API
+>>>>>>> Stashed changes
               </Link>
             </nav>
 
