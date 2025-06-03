@@ -1,3 +1,4 @@
+
 import React from "react";
 import { useParams, Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
@@ -34,7 +35,7 @@ import {
   TrophyIcon,
 } from "lucide-react";
 import About from "@/components/professionals/components/About";
-import VideoGallery from "@/components/professionals/components/videoGallery";
+import VideoGallery from "@/components/professionals/components/VideoGallery";
 import ImageGallery from "@/components/professionals/components/ImageGallery";
 import ContactDetails from "@/components/professionals/components/ContactDetails";
 
