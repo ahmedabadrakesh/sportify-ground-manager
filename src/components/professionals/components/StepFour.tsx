@@ -4,7 +4,7 @@ import { UseFormReturn } from "react-hook-form";
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { ProfessionalFormValues } from "../schemas/professionalFormSchema";
-import { Globe, Instagram, Youtube, Facebook, Linkedin } from "lucide-react";
+import { Phone, Mail, MapPin, Building } from "lucide-react";
 
 interface StepFourProps {
   form: UseFormReturn<ProfessionalFormValues>;
@@ -14,22 +14,25 @@ export const StepFour = ({ form }: StepFourProps) => {
   return (
     <div className="space-y-6">
       <div className="text-center mb-6">
-        <h2 className="text-2xl font-bold">Social Profile</h2>
-        <p className="text-muted-foreground">Connect your social media accounts</p>
+        <h2 className="text-2xl font-bold flex items-center justify-center gap-2">
+          <Phone className="w-6 h-6" />
+          Contact Information
+        </h2>
+        <p className="text-muted-foreground">How can people reach you?</p>
       </div>
 
-      <div className="space-y-4">
+      <div className="grid md:grid-cols-2 gap-4">
         <FormField
-          name="website"
+          name="contact_number"
           control={form.control}
           render={({ field }) => (
             <FormItem>
               <FormLabel className="flex items-center gap-2">
-                <Globe className="w-4 h-4" />
-                Website
+                <Phone className="w-4 h-4" />
+                Contact Number *
               </FormLabel>
               <FormControl>
-                <Input {...field} placeholder="https://yourwebsite.com" />
+                <Input {...field} placeholder="Enter phone number" />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -37,65 +40,65 @@ export const StepFour = ({ form }: StepFourProps) => {
         />
 
         <FormField
-          name="instagram_link"
+          name="email"
           control={form.control}
           render={({ field }) => (
             <FormItem>
               <FormLabel className="flex items-center gap-2">
-                <Instagram className="w-4 h-4" />
-                Instagram
+                <Mail className="w-4 h-4" />
+                Email
               </FormLabel>
               <FormControl>
-                <Input {...field} placeholder="https://instagram.com/yourusername" />
+                <Input {...field} type="email" placeholder="Enter your email address" />
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
+      </div>
 
-        <FormField
-          name="facebook_link"
-          control={form.control}
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel className="flex items-center gap-2">
-                <Facebook className="w-4 h-4" />
-                Facebook
-              </FormLabel>
-              <FormControl>
-                <Input {...field} placeholder="https://facebook.com/yourpage" />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+      <FormField
+        name="address"
+        control={form.control}
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel className="flex items-center gap-2">
+              <MapPin className="w-4 h-4" />
+              Address
+            </FormLabel>
+            <FormControl>
+              <Input {...field} placeholder="Enter your full address" />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
 
-        <FormField
-          name="linkedin_link"
-          control={form.control}
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel className="flex items-center gap-2">
-                <Linkedin className="w-4 h-4" />
-                LinkedIn
-              </FormLabel>
-              <FormControl>
-                <Input {...field} placeholder="https://linkedin.com/in/yourprofile" />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+      <FormField
+        name="city"
+        control={form.control}
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel className="flex items-center gap-2">
+              <Building className="w-4 h-4" />
+              City *
+            </FormLabel>
+            <FormControl>
+              <Input {...field} placeholder="Enter your city" />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
 
-        <div className="p-4 bg-muted rounded-lg">
-          <h3 className="text-sm font-semibold mb-2 flex items-center gap-2">
-            <Youtube className="w-4 h-4" />
-            YouTube Channel
-          </h3>
-          <p className="text-sm text-muted-foreground mb-3">
-            If you have a YouTube channel, you can add individual video links in the next step.
-          </p>
-        </div>
+      <div className="p-4 bg-gradient-to-r from-blue/10 to-blue/5 rounded-lg border border-blue/20">
+        <h3 className="text-sm font-semibold mb-2 flex items-center gap-2">
+          <Phone className="w-4 h-4" />
+          Contact Tip
+        </h3>
+        <p className="text-sm text-muted-foreground">
+          Make sure your contact information is accurate so potential clients can easily reach out to you.
+        </p>
       </div>
     </div>
   );

@@ -8,9 +8,10 @@ interface MultiSelectFieldProps {
   value: string[];
   onChange: (value: string[]) => void;
   label: string;
+  icon?: React.ReactNode;
 }
 
-export const MultiSelectField = ({ options, value = [], onChange, label }: MultiSelectFieldProps) => {
+export const MultiSelectField = ({ options, value = [], onChange, label, icon }: MultiSelectFieldProps) => {
   const handleToggle = (option: string) => {
     const newValue = value.includes(option)
       ? value.filter(item => item !== option)
@@ -20,7 +21,10 @@ export const MultiSelectField = ({ options, value = [], onChange, label }: Multi
 
   return (
     <div className="space-y-3">
-      <FormLabel>{label}</FormLabel>
+      <FormLabel className="flex items-center gap-2">
+        {icon}
+        {label}
+      </FormLabel>
       <div className="grid grid-cols-2 gap-3">
         {options.map((option) => (
           <div key={option} className="flex items-center space-x-2">

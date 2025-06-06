@@ -16,6 +16,7 @@ import { StepTwo } from "./components/StepTwo";
 import { StepThree } from "./components/StepThree";
 import { StepFour } from "./components/StepFour";
 import { StepFive } from "./components/StepFive";
+import { StepSix } from "./components/StepSix";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
 interface RegisterProfessionalProps {
@@ -25,8 +26,8 @@ interface RegisterProfessionalProps {
 
 const RegisterProfessionalDialog = ({ open, onOpenChange }: RegisterProfessionalProps) => {
   const [currentStep, setCurrentStep] = useState(1);
-  const totalSteps = 5;
-  const stepTitles = ["Basic Info", "Professional", "Contact", "Social", "Media"];
+  const totalSteps = 6;
+  const stepTitles = ["Basic Info", "Professional", "Training", "Contact", "Social", "Media"];
   
   const queryClient = useQueryClient();
   const form = useForm<ProfessionalFormValues>({
@@ -36,12 +37,15 @@ const RegisterProfessionalDialog = ({ open, onOpenChange }: RegisterProfessional
       profession_type: "Athlete",
       game_id: "",
       contact_number: "",
+      email: "",
       fee: 0,
       fee_type: "Per Hour",
       city: "",
       address: "",
       comments: "",
       photo: "",
+      years_of_experience: 0,
+      total_match_played: 0,
       awards: [],
       accomplishments: [],
       certifications: [],
@@ -53,6 +57,7 @@ const RegisterProfessionalDialog = ({ open, onOpenChange }: RegisterProfessional
       facebook_link: "",
       linkedin_link: "",
       website: "",
+      youtube_link: "",
       level: undefined,
       coaching_availability: [],
     },
@@ -114,14 +119,16 @@ const RegisterProfessionalDialog = ({ open, onOpenChange }: RegisterProfessional
   const getFieldsForStep = (step: number): (keyof ProfessionalFormValues)[] => {
     switch (step) {
       case 1:
-        return ["name", "profession_type", "game_id"];
+        return ["name", "profession_type"];
       case 2:
         return [];
       case 3:
-        return ["contact_number", "city"];
+        return ["game_id"];
       case 4:
-        return [];
+        return ["contact_number", "city"];
       case 5:
+        return [];
+      case 6:
         return [];
       default:
         return [];
@@ -157,6 +164,8 @@ const RegisterProfessionalDialog = ({ open, onOpenChange }: RegisterProfessional
         return <StepFour form={form} />;
       case 5:
         return <StepFive form={form} />;
+      case 6:
+        return <StepSix form={form} />;
       default:
         return null;
     }

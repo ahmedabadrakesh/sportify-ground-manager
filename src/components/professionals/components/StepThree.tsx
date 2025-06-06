@@ -4,8 +4,12 @@ import { UseFormReturn } from "react-hook-form";
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useGames } from "@/hooks/useGames";
 import { ProfessionalFormValues } from "../schemas/professionalFormSchema";
+import { ArrayFieldInput } from "./ArrayFieldInput";
+import { MultiSelectField } from "./MultiSelectField";
 import { Database } from "@/integrations/supabase/types";
+import { Gamepad2, Target, Users, MapPin, DollarSign } from "lucide-react";
 
 type FeeType = Database["public"]["Enums"]["fee_type"];
 
@@ -14,39 +18,70 @@ interface StepThreeProps {
 }
 
 export const StepThree = ({ form }: StepThreeProps) => {
+  const { games } = useGames();
   const feeTypes: FeeType[] = ["Per Hour", "Per Day", "Per Match"];
+  const levelOptions = ["Beginner", "Intermediate", "Professional"];
+  const coachingAvailabilityOptions = ["Personal", "Group", "Home", "Out of City"];
 
   return (
     <div className="space-y-6">
       <div className="text-center mb-6">
-        <h2 className="text-2xl font-bold">Contact Information</h2>
-        <p className="text-muted-foreground">How can people reach you?</p>
+        <h2 className="text-2xl font-bold flex items-center justify-center gap-2">
+          <Target className="w-6 h-6" />
+          Training Details
+        </h2>
+        <p className="text-muted-foreground">Tell us about your sport and training approach</p>
       </div>
 
       <div className="grid md:grid-cols-2 gap-4">
         <FormField
-          name="contact_number"
+          name="game_id"
           control={form.control}
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Contact Number *</FormLabel>
-              <FormControl>
-                <Input {...field} placeholder="Enter phone number" />
-              </FormControl>
+              <FormLabel className="flex items-center gap-2">
+                <Gamepad2 className="w-4 h-4" />
+                Game/Sport *
+              </FormLabel>
+              <Select onValueChange={field.onChange} value={field.value}>
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select your primary sport" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  {games.map((game) => (
+                    <SelectItem key={game.id} value={game.id}>
+                      {game.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
               <FormMessage />
             </FormItem>
           )}
         />
 
         <FormField
-          name="city"
+          name="level"
           control={form.control}
           render={({ field }) => (
             <FormItem>
-              <FormLabel>City *</FormLabel>
-              <FormControl>
-                <Input {...field} placeholder="Enter your city" />
-              </FormControl>
+              <FormLabel>Level</FormLabel>
+              <Select onValueChange={field.onChange} value={field.value}>
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select your level" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  {levelOptions.map((level) => (
+                    <SelectItem key={level} value={level}>
+                      {level}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
               <FormMessage />
             </FormItem>
           )}
@@ -54,13 +89,38 @@ export const StepThree = ({ form }: StepThreeProps) => {
       </div>
 
       <FormField
-        name="address"
+        name="coaching_availability"
         control={form.control}
         render={({ field }) => (
           <FormItem>
-            <FormLabel>Address</FormLabel>
+            <MultiSelectField
+              options={coachingAvailabilityOptions}
+              value={field.value || []}
+              onChange={field.onChange}
+              label="Coaching Availability"
+              icon={<Users className="w-4 h-4" />}
+            />
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+
+      <FormField
+        name="training_locations"
+        control={form.control}
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel className="flex items-center gap-2">
+              <MapPin className="w-4 h-4" />
+              Training Locations
+            </FormLabel>
             <FormControl>
-              <Input {...field} placeholder="Enter your full address" />
+              <ArrayFieldInput
+                value={field.value || []}
+                onChange={field.onChange}
+                placeholder="Add training location"
+                label="Training Locations"
+              />
             </FormControl>
             <FormMessage />
           </FormItem>
@@ -68,7 +128,10 @@ export const StepThree = ({ form }: StepThreeProps) => {
       />
 
       <div className="space-y-4">
-        <h3 className="text-lg font-semibold">Fee Information</h3>
+        <h3 className="text-lg font-semibold flex items-center gap-2">
+          <DollarSign className="w-5 h-5" />
+          Fee Information
+        </h3>
         
         <div className="grid md:grid-cols-2 gap-4">
           <FormField

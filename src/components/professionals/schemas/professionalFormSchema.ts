@@ -11,6 +11,7 @@ export const professionalFormSchema = z.object({
   profession_type: z.enum(["Athlete", "Coach", "Trainer", "Sports Manager", "Support Staff", "Player", "Umpire"] as const),
   game_id: z.string().min(1, "Please select a game"),
   contact_number: z.string().min(1, "Contact number is required"),
+  email: z.string().email("Please enter a valid email address").optional(),
   fee: z.string().transform((val) => Number(val) || 0),
   fee_type: z.enum(["Per Hour", "Per Day", "Per Match"] as const),
   city: z.string().min(1, "City is required"),
@@ -18,6 +19,8 @@ export const professionalFormSchema = z.object({
   comments: z.string().optional(),
   photo: z.string().optional(),
   // New fields
+  years_of_experience: z.string().transform((val) => Number(val) || 0).optional(),
+  total_match_played: z.string().transform((val) => Number(val) || 0).optional(),
   awards: z.array(z.string()).optional(),
   accomplishments: z.array(z.string()).optional(),
   certifications: z.array(z.string()).optional(),
@@ -29,6 +32,7 @@ export const professionalFormSchema = z.object({
   facebook_link: z.string().optional(),
   linkedin_link: z.string().optional(),
   website: z.string().optional(),
+  youtube_link: z.string().optional(),
   level: z.enum(["Beginner", "Intermediate", "Professional"]).optional(),
   coaching_availability: z.array(z.enum(["Personal", "Group", "Home", "Out of City"])).optional(),
 });
