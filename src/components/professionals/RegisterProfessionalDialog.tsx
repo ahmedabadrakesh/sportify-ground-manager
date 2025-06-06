@@ -112,7 +112,9 @@ const RegisterProfessionalDialog = ({ open, onOpenChange }: RegisterProfessional
 
   const validateCurrentStep = async () => {
     const fieldsToValidate = getFieldsForStep(currentStep);
+    console.log(`Validating step ${currentStep} with fields:`, fieldsToValidate);
     const isValid = await form.trigger(fieldsToValidate);
+    console.log(`Step ${currentStep} validation result:`, isValid);
     return isValid;
   };
 
@@ -121,15 +123,15 @@ const RegisterProfessionalDialog = ({ open, onOpenChange }: RegisterProfessional
       case 1:
         return ["name", "profession_type"];
       case 2:
-        return [];
+        return []; // Step 2 has no required fields
       case 3:
-        return ["game_id"];
+        return ["game_id"]; // Only game_id is required in step 3
       case 4:
-        return ["contact_number", "city"];
+        return ["contact_number", "city", "address"]; // Required fields in step 4
       case 5:
-        return [];
+        return []; // Step 5 has no required fields
       case 6:
-        return [];
+        return []; // Step 6 has no required fields
       default:
         return [];
     }
@@ -139,6 +141,8 @@ const RegisterProfessionalDialog = ({ open, onOpenChange }: RegisterProfessional
     const isValid = await validateCurrentStep();
     if (isValid && currentStep < totalSteps) {
       setCurrentStep(currentStep + 1);
+    } else if (!isValid) {
+      toast.error("Please fill in all required fields before proceeding.");
     }
   };
 

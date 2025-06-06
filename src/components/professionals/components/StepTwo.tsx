@@ -4,7 +4,7 @@ import { UseFormReturn } from "react-hook-form";
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
 import { ProfessionalFormValues } from "../schemas/professionalFormSchema";
 import { ArrayFieldInput } from "./ArrayFieldInput";
-import { Award, Star, Certificate } from "lucide-react";
+import { Award, Star } from "lucide-react";
 
 interface StepTwoProps {
   form: UseFormReturn<ProfessionalFormValues>;
@@ -71,7 +71,7 @@ export const StepTwo = ({ form }: StepTwoProps) => {
         render={({ field }) => (
           <FormItem>
             <FormLabel className="flex items-center gap-2">
-              <Certificate className="w-4 h-4" />
+              <Award className="w-4 h-4" />
               Certifications
             </FormLabel>
             <FormControl>
@@ -89,7 +89,7 @@ export const StepTwo = ({ form }: StepTwoProps) => {
 
       <div className="p-4 bg-gradient-to-r from-primary/10 to-primary/5 rounded-lg border border-primary/20">
         <h3 className="text-sm font-semibold mb-2 flex items-center gap-2">
-          <Certificate className="w-4 h-4" />
+          <Award className="w-4 h-4" />
           Professional Tip
         </h3>
         <p className="text-sm text-muted-foreground">
