@@ -1,5 +1,4 @@
-
-import React from "react";
+import React, { useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -33,6 +32,11 @@ import {
   Gamepad,
   LandPlot,
   TrophyIcon,
+  CirclePlus,
+  Quote,
+  Youtube,
+  BadgeIndianRupee,
+  LucideTextQuote,
 } from "lucide-react";
 import About from "@/components/professionals/components/About";
 import VideoGallery from "@/components/professionals/components/VideoGallery";
@@ -41,7 +45,8 @@ import ContactDetails from "@/components/professionals/components/ContactDetails
 
 const ProfessionalProfile = () => {
   const { id } = useParams<{ id: string }>();
-
+  const [isAboutRReadMoreOpened, setIsAboutRReadMoreOpened] =
+    useState<boolean>(false);
   const { data: professional, isLoading } = useQuery({
     queryKey: ["professional", id],
     queryFn: async () => {
@@ -63,7 +68,6 @@ const ProfessionalProfile = () => {
     },
     enabled: !!id,
   });
-
   if (isLoading) {
     return (
       <MainLayout>
@@ -105,22 +109,10 @@ const ProfessionalProfile = () => {
     if (!items || items.length === 0) return null;
     return (
       <Card className="flex-auto ">
-        <CardHeader className="pb-3">
-          <CardTitle className="block items-center gap-2 text-lg">
-            <div
-              className={`inline-flex p-4 gap-6 rounded-xl bg-gradient-to-r from-yellow-500 to-orange-600 text-white mb-6 group-hover:scale-110 transition-transform duration-300`}
-            >
-              {icon}
-              <h3 className="text-lg font-bold text-center">{title}</h3>
-            </div>
-          </CardTitle>
-        </CardHeader>
         <CardContent>
           {items.map((achievement, index) => (
             <div className="flex">
-              <h3 className="text-lg font-bold text-center">{`${
-                index + 1
-              }.   ${achievement}`}</h3>
+              {achievement}
               {/* <span className="text-sm bg-white/20 px-3 py-1 rounded-full">
                         {achievement.year}
                       </span>
@@ -140,25 +132,33 @@ const ProfessionalProfile = () => {
         url: professional.instagram_link,
         icon: <Instagram className="h-5 w-5" />,
         name: "Instagram",
-        color: "text-pink-600",
+        color: "pink-600",
       },
       {
         url: professional.facebook_link,
         icon: <Facebook className="h-5 w-5" />,
         name: "Facebook",
-        color: "text-blue-600",
+        color: "blue-600",
       },
       {
         url: professional.linkedin_link,
         icon: <Linkedin className="h-5 w-5" />,
         name: "LinkedIn",
-        color: "text-blue-700",
+        color: "blue-600",
       },
       {
         url: professional.website,
         icon: <Globe className="h-5 w-5" />,
         name: "Website",
-        color: "text-gray-600",
+        color: "green-600",
+      },
+      {
+        name: "YouTube",
+        icon: <Youtube className="h-5 w-5" />,
+        url: "https://youtube.com/@jokova.official",
+        followers: "8.2K",
+        color: "red-600",
+        description: "Free training videos",
       },
     ];
 
@@ -167,30 +167,24 @@ const ProfessionalProfile = () => {
     if (activeLinks.length === 0) return null;
 
     return (
-      <Card>
-        <CardHeader className="pb-3">
-          <CardTitle className="flex items-center gap-2 text-lg">
-            <Globe className="h-5 w-5" />
-            Social Links
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-3">
-            {activeLinks.map((link, index) => (
-              <a
-                key={index}
-                href={link.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-50 transition-colors"
+      <div className="flex flex-wrap items-baseline gap-4">
+        {activeLinks.map((link, index) => (
+          <a
+            key={index}
+            href={link.url}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <div className="flex items-center justify-center">
+              <div
+                className={`p-3 rounded-xl bg-${link.color} text-white group-hover:scale-110`}
               >
-                <span className={link.color}>{link.icon}</span>
-                <span className="font-medium text-gray-700">{link.name}</span>
-              </a>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
+                {link.icon}
+              </div>
+            </div>
+          </a>
+        ))}
+      </div>
     );
   };
 
@@ -240,6 +234,19 @@ const ProfessionalProfile = () => {
     }
   };
 
+  const getFiftyWords = (str, count) => {
+    return str.split(" ").slice(0, count).join(" ") + " ... ";
+  };
+
+  const showOrangeDividerLine = () => {
+    return (
+      <div className="pb-6 pt-6">
+        {
+          <hr className="w-48 h-1 mx-auto my-2 bg-orange-300 border-0 rounded-sm md:my-4 dark:bg-gray-700" />
+        }
+      </div>
+    );
+  };
   return (
     <MainLayout>
       <div className="container mx-auto py-8">
@@ -254,255 +261,319 @@ const ProfessionalProfile = () => {
         </div>
         <div className="">
           <div>
-            <div className="w-full h-[250px]">
-              <img
-                src="https://vojislavd.com/ta-template-demo/assets/img/profile-background.jpg"
-                className="w-full h-full rounded-tl-lg rounded-tr-lg"
-              />
-            </div>
-            <div className="flex flex-col items-center -mt-20">
-              {/* <img
-              src="https://vojislavd.com/ta-template-demo/assets/img/profile.jpg"
-              className="w-40 border-4 border-white rounded-full"
-            /> */}
-              <Avatar className="w-32 h-32">
-                {professional.photo && (
-                  <AvatarImage
-                    src={professional.photo || "/placeholder.svg"}
-                    alt={professional.name}
-                  />
-                )}
-                <AvatarFallback className="text-6xl">
-                  {professional.name.charAt(0)}
-                </AvatarFallback>
-              </Avatar>
-              <div className="flex items-center space-x-2 mt-2">
-                <p className="text-2xl">{professional.name}</p>
-                <span className="bg-blue-500 rounded-full p-1" title="Verified">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="text-gray-100 h-2.5 w-2.5"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="4"
-                      d="M5 13l4 4L19 7"
-                    ></path>
-                  </svg>
-                </span>
+            <div className="flex lg:flex-row flex-col items-center lg:gap-16">
+              <div className="flex place-content-center items-center">
+                <Avatar className="w-64 h-64">
+                  {professional.photo && (
+                    <AvatarImage
+                      src={professional.photo || "/placeholder.svg"}
+                      alt={professional.name}
+                    />
+                  )}
+                  <AvatarFallback className="text-6xl">
+                    {professional.name.charAt(0)}
+                  </AvatarFallback>
+                </Avatar>
               </div>
-              <p className="text-xl sm:text-xl italic lg:text-2xl font-light mb-6">
-                {professional.punch_line}
-              </p>
-              <div className="flex flex-wrap gap-2 mb-4">
-                <Badge
-                  variant="default"
-                  className="flex items-center gap-2 px-4 py-2"
-                >
-                  <MapPin className="w-4 h-4" />
-                  <span>{professional.city}</span>
-                </Badge>
-                {professional.profession_type && (
-                  <Badge
-                    variant="secondary"
-                    className="flex items-center gap-2 px-4 py-2 ring-1 ring-green-700 ring-inset"
-                  >
-                    <Star className="h-3 w-3" />
-                    {professional.profession_type}
-                  </Badge>
-                )}
-                <Badge
-                  variant="outline"
-                  className="flex items-center gap-2 px-4 py-2 ring-1 ring-green-700 ring-inset"
-                >
-                  <LandPlot className="w-4 h-4 text-green-400" />
-                  {professional.games?.name}
-                </Badge>
-                {professional.level && (
-                  <Badge
-                    variant="secondary"
-                    className="flex items-center gap-2 px-4 py-2 ring-1 ring-green-700 ring-inset"
-                  >
-                    <Star className="h-3 w-3" />
-                    {professional.level}
-                  </Badge>
-                )}
-              </div>
-            </div>
-          </div>
-
-          <div className="space-y-6">
-            {/* <Card>
-              <CardContent className="p-6">
-                <div className="flex flex-col md:flex-row gap-6">
-                  <div className="flex-shrink-0">
-                    <Avatar className="w-32 h-32">
-                      <AvatarImage
-                        src={professional.photo || "/placeholder.svg"}
-                        alt={professional.name}
-                      />
-                      <AvatarFallback className="text-2xl">
-                        {professional.name.charAt(0)}
-                      </AvatarFallback>
-                    </Avatar>
-                  </div>
-                  <div className="flex-1">
-                    <div className="space-y-4">
-                      <div>
-                        <h1 className="text-3xl font-bold text-gray-900">
-                          {professional.name}
-                        </h1>
-                        {professional.punch_line && (
-                          <p className="text-lg text-gray-600 italic mt-1">
-                            {professional.punch_line}
-                          </p>
-                        )}
-                      </div>
-
-                      <div className="flex flex-wrap gap-2">
-                        <Badge
-                          variant="default"
-                          className="flex items-center gap-1"
+              <div className="lg:flex-col md:flex-col  items-center">
+                <div className="lg:flex md:inline-flex flex-row lg:content-left lg:items-left space-x-2 mt-2">
+                  <p className="text-2xl ">
+                    {`${professional.name} `}
+                    <div className="inline-flex items-center">
+                      <span
+                        className="bg-blue-500 rounded-full p-1"
+                        title="Verified"
+                      >
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          className="text-gray-100 h-2.5 w-2.5"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
                         >
-                          <Award className="h-3 w-3" />
-                          {professional.profession_type}
-                        </Badge>
-                        <Badge variant="outline">
-                          {professional.games?.name}
-                        </Badge>
-                        {professional.level && (
-                          <Badge
-                            variant="secondary"
-                            className="flex items-center gap-1"
-                          >
-                            <Star className="h-3 w-3" />
-                            {professional.level}
-                          </Badge>
-                        )}
-                      </div>
-
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-                        <div className="flex items-center gap-2 text-gray-600">
-                          <MapPin className="h-4 w-4" />
-                          <span>{professional.city}</span>
-                        </div>
-                        <div className="flex items-center gap-2 text-gray-600">
-                          <Phone className="h-4 w-4" />
-                          <span>{professional.contact_number}</span>
-                        </div>
-                        <div className="flex items-center gap-2 text-gray-600">
-                          <Calendar className="h-4 w-4" />
-                          <span>
-                            Member since{" "}
-                            {new Date(professional.created_at).getFullYear()}
-                          </span>
-                        </div>
-                        <div className="flex items-center gap-2 text-gray-600">
-                          <span className="text-2xl font-bold text-primary">
-                            ₹{professional.fee}
-                          </span>
-                          <span className="text-gray-500">
-                            / {professional.fee_type}
-                          </span>
-                        </div>
-                      </div>
+                          <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="4"
+                            d="M5 13l4 4L19 7"
+                          ></path>
+                        </svg>
+                      </span>
                     </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card> */}
-            <About professional={professional} />
-            <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-slate-900 to-blue-900 text-white">
-              <div className="max-w-6xl mx-auto">
-                <div className="text-center mb-16">
-                  <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-6">
-                    Achievements
-                  </h2>
-                  <div className="w-24 h-1 bg-gradient-to-r from-yellow-400 to-orange-500 mx-auto mb-4"></div>
-                  <p className="text-xl text-blue-100 max-w-3xl mx-auto">
-                    A track record of excellence in competition and coaching
                   </p>
                 </div>
-                <div className="grid md:grid-cols-2 gap-4">
-                  {renderArrayField(
-                    professional.awards,
-                    <Trophy className="h-5 w-5" />,
-                    "Awards"
+                <div className="flex items-left space-x-2 mt-2">
+                  <p className="flex text-xl sm:text-xl italic lg:text-2xl items-center font-light mb-6">
+                    <Quote size={16} color="#6260e2" fill="#111" />
+                    {professional.punch_line}
+                    <Quote size={16} color="#6260e2" fill="#111" />
+                  </p>
+                </div>
+                <div className="lg:flex md:grid items-center flex-wrap gap-2 mb-4">
+                  <Badge
+                    variant="default"
+                    className="flex items-center gap-2 px-4 py-2 mb-4"
+                  >
+                    <MapPin className="w-4 h-4" />
+                    <span>{professional.city}</span>
+                  </Badge>
+                  {professional.profession_type && (
+                    <Badge
+                      variant="secondary"
+                      className="flex items-center gap-2 px-4 py-2 ring-1 ring-green-700 ring-inset mb-4"
+                    >
+                      <Star className="h-3 w-3" />
+                      {professional.profession_type}
+                    </Badge>
                   )}
-                  {/* Accomplishments */}
-                  {renderArrayField(
-                    professional.accomplishments,
-                    <Star className="h-5 w-5" />,
-                    "Accomplishments"
-                  )}
-                  {/* Certifications */}
-                  {renderArrayField(
-                    professional.certifications,
-                    <GraduationCap className="h-5 w-5" />,
-                    "Certifications"
+                  <Badge
+                    variant="outline"
+                    className="flex items-left gap-2 px-4 py-2 ring-1 ring-green-700 ring-inset mb-4"
+                  >
+                    <LandPlot className="w-4 h-4 text-green-400" />
+                    {professional.games?.name}
+                  </Badge>
+                  {professional.level && (
+                    <Badge
+                      variant="secondary"
+                      className="flex items-left gap-2 px-4 py-2 ring-1 ring-green-700 ring-inset mb-4"
+                    >
+                      <Star className="h-3 w-3" />
+                      {professional.level}
+                    </Badge>
                   )}
                 </div>
+                <div>
+                  <div className="lg:grid lg:col-span-5 md:flex leading-relaxed align-left text-left">
+                    {renderSocialLinks()}
+                  </div>
+                </div>
               </div>
-            </section>
-            <ImageGallery images={professional.images} />
-            <VideoGallery videos={professional.videos} />
-            <ContactDetails professional={professional} />
-            {/* Training Locations */}
-            {/* {renderArrayField(
-              professional.training_locations,
-              <MapPin className="h-5 w-5" />,
-              "Training Locations"
-            )} */}
-            {/* Address
-            {professional.address && (
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <MapPinIcon className="h-5 w-5" />
-                    Address
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-gray-700">{professional.address}</p>
-                </CardContent>
-              </Card>
-            )} */}
-            {/* Coaching Availability */}
-            {/* {professional.coaching_availability &&
-              professional.coaching_availability.length > 0 && (
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <Users className="h-5 w-5" />
-                      Coaching Availability
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                      {professional.coaching_availability.map((type, index) => (
-                        <div
-                          key={index}
-                          className="flex items-center gap-2 p-3 bg-gray-50 rounded-lg"
-                        >
-                          {getCoachingAvailabilityIcon(type)}
-                          <span className="text-sm font-medium">{type}</span>
+            </div>
+            <div className="pb-6 pt-6">
+              <hr className="w-48 h-1 mx-auto my-4 bg-blue-400 border-0 rounded-sm md:my-10 dark:bg-gray-700" />
+            </div>
+            {professional.comments && (
+              <div>
+                <div className="lg:grid lg:grid-cols-6 gap-4 md:flex-flow-row">
+                  <div className="lg:col-span-1 md:col-span-1 text-left uppercase">
+                    About me
+                  </div>
+                  <div className="lg:col-span-5  md:col-span-1 leading-relaxed align-left text-justify">
+                    {isAboutRReadMoreOpened
+                      ? `${professional.comments} `
+                      : getFiftyWords(professional.comments, 50)}
+                    <a
+                      onClick={() =>
+                        setIsAboutRReadMoreOpened(!isAboutRReadMoreOpened)
+                      }
+                      className="cursor-pointer inline-flex items-center font-medium text-blue-600 dark:text-blue-500 hover:underline"
+                    >
+                      {isAboutRReadMoreOpened ? "Read Less" : "Read More"}
+                      <svg
+                        className="w-4 h-4 ms-2 rtl:rotate-180"
+                        aria-hidden="true"
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 14 10"
+                      >
+                        <path
+                          stroke="currentColor"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M1 5h12m0 0L9 1m4 4L9 9"
+                        />
+                      </svg>
+                    </a>
+                  </div>
+                </div>
+                {showOrangeDividerLine()}
+              </div>
+            )}
+
+            {professional.awards.length !== 0 && (
+              <>
+                <div className="grid lg:grid-cols-6 gap-4">
+                  <div className="grid col-span-1 md:col-span-1 text-left uppercase">
+                    Awads
+                  </div>
+                  <div className="lg:col-span-5 md:col-span-1 leading-relaxed align-left text-justify">
+                    {professional.awards.map((item, index) => {
+                      return (
+                        <div className="flex items-center">
+                          <CirclePlus
+                            color="#6260e2"
+                            className="mr-2 "
+                            size={20}
+                          />
+                          {item}
                         </div>
-                      ))}
-                    </div>
-                  </CardContent>
-                </Card>
-              )} */}
-            {/* Images Gallery */}
-            {/* {renderImages()} */}
-            {/* Videos */}
-            {/* {renderVideoLinks()} */}
-            {/* Social Links */}
-            {/* {renderSocialLinks()} */}
-            {/* Contact Actions */}
+                      );
+                    })}
+                  </div>
+                </div>
+                {showOrangeDividerLine()}
+              </>
+            )}
+            {professional.accomplishments.length !== 0 && (
+              <>
+                <div className="grid lg:grid-cols-6 gap-4 md:grid-flow-row">
+                  <div className="grid col-span-1 text-left uppercase">
+                    Accomplishments
+                  </div>
+                  <div className="lg:col-span-5 md:col-span-1 leading-relaxed align-left text-justify">
+                    {professional.accomplishments.map((item, index) => {
+                      return (
+                        <div className="flex items-center">
+                          <CirclePlus
+                            color="#6260e2"
+                            className="mr-2 "
+                            size={20}
+                          />
+                          {item}
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+                {showOrangeDividerLine()}
+              </>
+            )}
+
+            {professional.certifications.length !== 0 && (
+              <>
+                <div className="grid lg:grid-cols-6 gap-4">
+                  <div className="grid col-span-1 text-left uppercase">
+                    Certifications
+                  </div>
+                  <div className="lg:col-span-5 gap-2 leading-relaxed align-left text-justify">
+                    {professional.certifications.map((item, index) => {
+                      return (
+                        <div className="flex items-center">
+                          <CirclePlus
+                            color="#6260e2"
+                            className="mr-2 "
+                            size={20}
+                          />
+                          {item}
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+                {showOrangeDividerLine()}
+              </>
+            )}
+            {professional.training_locations.length !== 0 && (
+              <>
+                <div className="grid lg:grid-cols-6 gap-4">
+                  <div className="grid col-span-1 text-left uppercase">
+                    Training locations
+                  </div>
+                  <div className="grid col-span-5 leading-relaxed align-left text-justify">
+                    {professional.training_locations.map((item, index) => {
+                      return (
+                        <div className="flex items-center">
+                          <CirclePlus
+                            color="#6260e2"
+                            className="mr-2 "
+                            size={20}
+                          />
+                          {item}
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+                {showOrangeDividerLine()}
+              </>
+            )}
+
+            <div>
+              <div className="grid lg:grid-cols-6 gap-4">
+                <div className="grid col-span-1 text-left uppercase">
+                  Charges
+                </div>
+                <div className="lg:col-span-5 leading-relaxed align-left text-justify">
+                  <div className="flex items-center gap-2">
+                    <BadgeIndianRupee size={16} color="#6260e2 " />
+                    {`${professional.fee}/- ${professional.fee_type}`}
+                  </div>
+                </div>
+              </div>
+              {showOrangeDividerLine()}
+            </div>
+
+            {professional.coaching_availability.length !== 0 && (
+              <>
+                <div className="grid lg:grid-cols-6 gap-4">
+                  <div className="grid col-span-1 text-left uppercase">
+                    coaching availability
+                  </div>
+                  <div className="grid col-span-5 leading-relaxed align-left text-justify">
+                    {professional.coaching_availability.map((item, index) => {
+                      return (
+                        <div className="flex items-center">
+                          <CirclePlus
+                            color="#6260e2"
+                            className="mr-2 "
+                            size={20}
+                          />
+                          {item}
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+                {showOrangeDividerLine()}
+              </>
+            )}
+            <div>
+              <div className="grid lg:grid-cols-6 md:grid-cols-1 gap-4 md:grid-flow-row">
+                <div className="grid lg:col-span-1 text-left uppercase">
+                  Featured Gallery
+                </div>
+                <div className="grid lg:col-span-5 text-left leading-relaxed align-left">
+                  Moments from training sessions, tournaments, and student
+                  achievements
+                  <ImageGallery images={professional.images} />
+                </div>
+              </div>
+              {showOrangeDividerLine()}
+            </div>
+
+            <div>
+              <div className="grid lg:grid-cols-6 gap-2 md:grid-flow-row">
+                <div className="grid col-span-1 text-left uppercase">
+                  Featured Videos
+                </div>
+                <div className="grid lg:col-span-5 text-left leading-relaxed align-left">
+                  Free training content to help you improve your game
+                  <VideoGallery videos={professional.videos} />
+                </div>
+              </div>
+              {showOrangeDividerLine()}
+            </div>
+
+            <div className="grid lg:grid-cols-6 gap-4">
+              <div className="grid col-span-1 text-left uppercase">
+                Contact Details
+              </div>
+              <div className="grid col-span-5 leading-relaxed align-left text-justify">
+                <ContactDetails professional={professional} />
+              </div>
+            </div>
+
+            <div className="grid lg:grid-cols-6 gap-4">
+              <div className="grid col-span-1 text-left uppercase"></div>
+              <div className="grid col-span-5 leading-relaxed align-left text-justify"></div>
+            </div>
+
+            <div className="grid lg:grid-cols-6 gap-4">
+              <div className="grid col-span-1 text-left uppercase"></div>
+              <div className="grid col-span-5 leading-relaxed align-left text-justify"></div>
+            </div>
           </div>
         </div>
       </div>
