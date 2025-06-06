@@ -9,36 +9,24 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import {
   ArrowLeft,
-  Phone,
   MapPin,
-  Calendar,
-  User,
-  Award,
   Star,
   Instagram,
   Facebook,
   Linkedin,
   Globe,
-  Video,
   Camera,
-  MapPinIcon,
   Users,
   Home,
   Plane,
   UserCheck,
-  Trophy,
-  GraduationCap,
   Target,
-  Gamepad,
   LandPlot,
-  TrophyIcon,
   CirclePlus,
   Quote,
   Youtube,
   BadgeIndianRupee,
-  LucideTextQuote,
 } from "lucide-react";
-import About from "@/components/professionals/components/About";
 import VideoGallery from "@/components/professionals/components/VideoGallery";
 import ImageGallery from "@/components/professionals/components/ImageGallery";
 import ContactDetails from "@/components/professionals/components/ContactDetails";
@@ -156,9 +144,7 @@ const ProfessionalProfile = () => {
         name: "YouTube",
         icon: <Youtube className="h-5 w-5" />,
         url: "https://youtube.com/@jokova.official",
-        followers: "8.2K",
         color: "red-600",
-        description: "Free training videos",
       },
     ];
 
@@ -169,20 +155,20 @@ const ProfessionalProfile = () => {
     return (
       <div className="flex flex-wrap items-baseline gap-4">
         {activeLinks.map((link, index) => (
-          <a
-            key={index}
-            href={link.url}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <div className="flex items-center justify-center">
+          <div className="flex items-center justify-center">
+            <a
+              key={index}
+              href={link.url}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
               <div
-                className={`p-3 rounded-xl bg-${link.color} text-white group-hover:scale-110`}
+                className={`p-2 bg-${link.color} border-2 border-solid rounded-lg text-white group-hover:scale-110`}
               >
                 {link.icon}
               </div>
-            </div>
-          </a>
+            </a>
+          </div>
         ))}
       </div>
     );
