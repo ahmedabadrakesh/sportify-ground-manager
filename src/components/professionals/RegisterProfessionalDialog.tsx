@@ -1,5 +1,5 @@
 
-import React from "react";
+import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -8,10 +8,14 @@ import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { PhotoUpload } from "./components/PhotoUpload";
-import { ProfessionalFormFields } from "./components/ProfessionalFormFields";
 import { professionalFormSchema, type ProfessionalFormValues } from "./schemas/professionalFormSchema";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { StepperForm } from "./components/StepperForm";
+import { StepOne } from "./components/StepOne";
+import { StepTwo } from "./components/StepTwo";
+import { StepThree } from "./components/StepThree";
+import { StepFour } from "./components/StepFour";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 
 interface RegisterProfessionalProps {
   open: boolean;
@@ -19,6 +23,10 @@ interface RegisterProfessionalProps {
 }
 
 const RegisterProfessionalDialog = ({ open, onOpenChange }: RegisterProfessionalProps) => {
+  const [currentStep, setCurrentStep] = useState(1);
+  const totalSteps = 4;
+  const stepTitles = ["Basic Info", "Professional", "Contact", "Media"];
+  
   const queryClient = useQueryClient();
   const form = useForm<ProfessionalFormValues>({
     resolver: zodResolver(professionalFormSchema),
@@ -88,6 +96,7 @@ const RegisterProfessionalDialog = ({ open, onOpenChange }: RegisterProfessional
       queryClient.invalidateQueries({ queryKey: ["sports-professionals"] });
       onOpenChange(false);
       form.reset();
+      setCurrentStep(1);
     },
     onError: (error) => {
       toast.error("Failed to register. Please try again.");
@@ -95,12 +104,69 @@ const RegisterProfessionalDialog = ({ open, onOpenChange }: RegisterProfessional
     }
   });
 
+  const validateCurrentStep = async () => {
+    const fieldsToValidate = getFieldsForStep(currentStep);
+    const isValid = await form.trigger(fieldsToValidate);
+    return isValid;
+  };
+
+  const getFieldsForStep = (step: number): (keyof ProfessionalFormValues)[] => {
+    switch (step) {
+      case 1:
+        return ["name", "game_id"];
+      case 2:
+        return [];
+      case 3:
+        return ["contact_number", "city"];
+      case 4:
+        return [];
+      default:
+        return [];
+    }
+  };
+
+  const handleNext = async () => {
+    const isValid = await validateCurrentStep();
+    if (isValid && currentStep < totalSteps) {
+      setCurrentStep(currentStep + 1);
+    }
+  };
+
+  const handlePrevious = () => {
+    if (currentStep > 1) {
+      setCurrentStep(currentStep - 1);
+    }
+  };
+
   const onSubmit = (values: ProfessionalFormValues) => {
     registerMutation.mutate(values);
   };
 
+  const renderCurrentStep = () => {
+    switch (currentStep) {
+      case 1:
+        return <StepOne form={form} />;
+      case 2:
+        return <StepTwo form={form} />;
+      case 3:
+        return <StepThree form={form} />;
+      case 4:
+        return <StepFour form={form} />;
+      default:
+        return null;
+    }
+  };
+
+  const handleDialogClose = (open: boolean) => {
+    if (!open) {
+      setCurrentStep(1);
+      form.reset();
+    }
+    onOpenChange(open);
+  };
+
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={open} onOpenChange={handleDialogClose}>
       <DialogContent className="max-w-4xl max-h-[90vh]">
         <DialogHeader>
           <DialogTitle>Register as Sports Professional</DialogTitle>
@@ -109,15 +175,45 @@ const RegisterProfessionalDialog = ({ open, onOpenChange }: RegisterProfessional
         <ScrollArea className="h-[calc(90vh-120px)] px-1">
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-              <PhotoUpload form={form} />
-              <ProfessionalFormFields form={form} />
-              <Button 
-                type="submit" 
-                className="w-full" 
-                disabled={registerMutation.isPending}
-              >
-                {registerMutation.isPending ? "Registering..." : "Register"}
-              </Button>
+              <StepperForm 
+                currentStep={currentStep} 
+                totalSteps={totalSteps} 
+                stepTitles={stepTitles}
+              />
+              
+              {renderCurrentStep()}
+
+              <div className="flex justify-between pt-6">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={handlePrevious}
+                  disabled={currentStep === 1}
+                  className="flex items-center gap-2"
+                >
+                  <ChevronLeft className="w-4 h-4" />
+                  Previous
+                </Button>
+
+                {currentStep < totalSteps ? (
+                  <Button
+                    type="button"
+                    onClick={handleNext}
+                    className="flex items-center gap-2"
+                  >
+                    Next
+                    <ChevronRight className="w-4 h-4" />
+                  </Button>
+                ) : (
+                  <Button 
+                    type="submit" 
+                    disabled={registerMutation.isPending}
+                    className="flex items-center gap-2"
+                  >
+                    {registerMutation.isPending ? "Registering..." : "Complete Registration"}
+                  </Button>
+                )}
+              </div>
             </form>
           </Form>
         </ScrollArea>

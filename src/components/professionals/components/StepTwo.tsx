@@ -1,0 +1,116 @@
+
+import React from "react";
+import { UseFormReturn } from "react-hook-form";
+import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
+import { ProfessionalFormValues } from "../schemas/professionalFormSchema";
+import { ArrayFieldInput } from "./ArrayFieldInput";
+import { MultiSelectField } from "./MultiSelectField";
+
+interface StepTwoProps {
+  form: UseFormReturn<ProfessionalFormValues>;
+}
+
+export const StepTwo = ({ form }: StepTwoProps) => {
+  const coachingAvailabilityOptions = ["Personal", "Group", "Home", "Out of City"];
+
+  return (
+    <div className="space-y-6">
+      <div className="text-center mb-6">
+        <h2 className="text-2xl font-bold">Professional Details</h2>
+        <p className="text-muted-foreground">Share your achievements and capabilities</p>
+      </div>
+
+      <FormField
+        name="awards"
+        control={form.control}
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>Awards</FormLabel>
+            <FormControl>
+              <ArrayFieldInput
+                value={field.value || []}
+                onChange={field.onChange}
+                placeholder="Add award or recognition"
+                label="Awards"
+              />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+
+      <FormField
+        name="accomplishments"
+        control={form.control}
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>Accomplishments</FormLabel>
+            <FormControl>
+              <ArrayFieldInput
+                value={field.value || []}
+                onChange={field.onChange}
+                placeholder="Add accomplishment"
+                label="Accomplishments"
+              />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+
+      <FormField
+        name="certifications"
+        control={form.control}
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>Certifications</FormLabel>
+            <FormControl>
+              <ArrayFieldInput
+                value={field.value || []}
+                onChange={field.onChange}
+                placeholder="Add certification"
+                label="Certifications"
+              />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+
+      <FormField
+        name="coaching_availability"
+        control={form.control}
+        render={({ field }) => (
+          <FormItem>
+            <MultiSelectField
+              options={coachingAvailabilityOptions}
+              value={field.value || []}
+              onChange={field.onChange}
+              label="Coaching Availability"
+            />
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+
+      <FormField
+        name="training_locations"
+        control={form.control}
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>Training Locations</FormLabel>
+            <FormControl>
+              <ArrayFieldInput
+                value={field.value || []}
+                onChange={field.onChange}
+                placeholder="Add training location"
+                label="Training Locations"
+              />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+    </div>
+  );
+};
