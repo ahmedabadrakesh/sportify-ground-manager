@@ -15,6 +15,7 @@ import { StepOne } from "./components/StepOne";
 import { StepTwo } from "./components/StepTwo";
 import { StepThree } from "./components/StepThree";
 import { StepFour } from "./components/StepFour";
+import { StepFive } from "./components/StepFive";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
 interface RegisterProfessionalProps {
@@ -24,8 +25,8 @@ interface RegisterProfessionalProps {
 
 const RegisterProfessionalDialog = ({ open, onOpenChange }: RegisterProfessionalProps) => {
   const [currentStep, setCurrentStep] = useState(1);
-  const totalSteps = 4;
-  const stepTitles = ["Basic Info", "Professional", "Contact", "Media"];
+  const totalSteps = 5;
+  const stepTitles = ["Basic Info", "Professional", "Contact", "Social", "Media"];
   
   const queryClient = useQueryClient();
   const form = useForm<ProfessionalFormValues>({
@@ -113,12 +114,14 @@ const RegisterProfessionalDialog = ({ open, onOpenChange }: RegisterProfessional
   const getFieldsForStep = (step: number): (keyof ProfessionalFormValues)[] => {
     switch (step) {
       case 1:
-        return ["name", "game_id"];
+        return ["name", "profession_type", "game_id"];
       case 2:
         return [];
       case 3:
         return ["contact_number", "city"];
       case 4:
+        return [];
+      case 5:
         return [];
       default:
         return [];
@@ -152,6 +155,8 @@ const RegisterProfessionalDialog = ({ open, onOpenChange }: RegisterProfessional
         return <StepThree form={form} />;
       case 4:
         return <StepFour form={form} />;
+      case 5:
+        return <StepFive form={form} />;
       default:
         return null;
     }

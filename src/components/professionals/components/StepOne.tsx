@@ -7,7 +7,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useGames } from "@/hooks/useGames";
 import { ProfessionalFormValues } from "../schemas/professionalFormSchema";
 import { PhotoUpload } from "./PhotoUpload";
-import { MultiSelectField } from "./MultiSelectField";
 import { Database } from "@/integrations/supabase/types";
 
 type ProfessionType = Database["public"]["Enums"]["sport_profession_type"];

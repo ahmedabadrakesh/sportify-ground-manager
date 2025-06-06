@@ -3,7 +3,6 @@ import React from "react";
 import { UseFormReturn } from "react-hook-form";
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ProfessionalFormValues } from "../schemas/professionalFormSchema";
 import { Database } from "@/integrations/supabase/types";
@@ -20,7 +19,7 @@ export const StepThree = ({ form }: StepThreeProps) => {
   return (
     <div className="space-y-6">
       <div className="text-center mb-6">
-        <h2 className="text-2xl font-bold">Contact & Social Profile</h2>
+        <h2 className="text-2xl font-bold">Contact Information</h2>
         <p className="text-muted-foreground">How can people reach you?</p>
       </div>
 
@@ -61,74 +60,12 @@ export const StepThree = ({ form }: StepThreeProps) => {
           <FormItem>
             <FormLabel>Address</FormLabel>
             <FormControl>
-              <Textarea {...field} placeholder="Enter your full address" />
+              <Input {...field} placeholder="Enter your full address" />
             </FormControl>
             <FormMessage />
           </FormItem>
         )}
       />
-
-      <div className="space-y-4">
-        <h3 className="text-lg font-semibold">Social Media & Website</h3>
-        
-        <div className="grid md:grid-cols-2 gap-4">
-          <FormField
-            name="website"
-            control={form.control}
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Website</FormLabel>
-                <FormControl>
-                  <Input {...field} placeholder="https://yourwebsite.com" />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            name="instagram_link"
-            control={form.control}
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Instagram</FormLabel>
-                <FormControl>
-                  <Input {...field} placeholder="https://instagram.com/yourusername" />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            name="facebook_link"
-            control={form.control}
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Facebook</FormLabel>
-                <FormControl>
-                  <Input {...field} placeholder="https://facebook.com/yourpage" />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            name="linkedin_link"
-            control={form.control}
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>LinkedIn</FormLabel>
-                <FormControl>
-                  <Input {...field} placeholder="https://linkedin.com/in/yourprofile" />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </div>
-      </div>
 
       <div className="space-y-4">
         <h3 className="text-lg font-semibold">Fee Information</h3>

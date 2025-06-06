@@ -12,7 +12,7 @@ interface StepperFormProps {
 export const StepperForm = ({ currentStep, totalSteps, stepTitles }: StepperFormProps) => {
   return (
     <div className="w-full mb-8">
-      <div className="flex items-center">
+      <div className="flex items-center justify-between">
         {Array.from({ length: totalSteps }, (_, index) => {
           const stepNumber = index + 1;
           const isCompleted = stepNumber < currentStep;
@@ -20,7 +20,7 @@ export const StepperForm = ({ currentStep, totalSteps, stepTitles }: StepperForm
           
           return (
             <React.Fragment key={stepNumber}>
-              <div className="flex flex-col items-center">
+              <div className="flex flex-col items-center flex-1">
                 <div
                   className={cn(
                     "w-10 h-10 rounded-full flex items-center justify-center text-sm font-medium transition-colors",
@@ -37,7 +37,7 @@ export const StepperForm = ({ currentStep, totalSteps, stepTitles }: StepperForm
                     stepNumber
                   )}
                 </div>
-                <div className="mt-2 text-xs text-center max-w-20">
+                <div className="mt-2 text-xs text-center">
                   <span className={cn(
                     "font-medium",
                     isCurrent ? "text-primary" : "text-muted-foreground"
@@ -49,7 +49,7 @@ export const StepperForm = ({ currentStep, totalSteps, stepTitles }: StepperForm
               {stepNumber < totalSteps && (
                 <div
                   className={cn(
-                    "flex-1 h-px mx-4 transition-colors",
+                    "flex-1 h-px mx-2 transition-colors",
                     stepNumber < currentStep ? "bg-primary" : "bg-muted"
                   )}
                 />
