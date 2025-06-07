@@ -42,7 +42,7 @@ const ContactDetails = ({ professional }) => {
           href={contact.action}
           target={contact.label === "Location" ? "_blank" : undefined}
           rel={contact.label === "Location" ? "noopener noreferrer" : undefined}
-          className="flex items-center group hover:bg-white/10 p-4 rounded-xl transition-all duration-300"
+          className="flex items-center group hover:bg-white/10 p-1 rounded-xl transition-all duration-300"
         >
           <contact.icon className="w-5 h-5 text-blue-800 mr-4 group-hover:scale-110 transition-transform duration-300" />
           {contact.value}

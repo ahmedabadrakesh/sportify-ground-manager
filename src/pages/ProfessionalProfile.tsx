@@ -26,6 +26,7 @@ import {
   Quote,
   Youtube,
   BadgeIndianRupee,
+  ChevronsRight,
 } from "lucide-react";
 import VideoGallery from "@/components/professionals/components/VideoGallery";
 import ImageGallery from "@/components/professionals/components/ImageGallery";
@@ -153,9 +154,9 @@ const ProfessionalProfile = () => {
     if (activeLinks.length === 0) return null;
 
     return (
-      <div className="flex flex-wrap items-baseline gap-4">
+      <div className="flex lg:flex-col md:flex-row flex-wrap lg:items-end items-baseline gap-1">
         {activeLinks.map((link, index) => (
-          <div className="flex items-center justify-center">
+          <div className="flex items-end ">
             <a
               key={index}
               href={link.url}
@@ -227,9 +228,7 @@ const ProfessionalProfile = () => {
   const showOrangeDividerLine = () => {
     return (
       <div className="pb-6 pt-6">
-        {
-          <hr className="w-48 h-1 mx-auto my-2 bg-orange-300 border-0 rounded-sm md:my-4 dark:bg-gray-700" />
-        }
+        <hr className="w-49 h-0.5 mx-auto my-2 bg-orange-300 border-0 rounded-sm md:my-4" />
       </div>
     );
   };
@@ -329,11 +328,9 @@ const ProfessionalProfile = () => {
                     </Badge>
                   )}
                 </div>
-                <div>
-                  <div className="lg:grid lg:col-span-5 md:flex leading-relaxed align-left text-left">
-                    {renderSocialLinks()}
-                  </div>
-                </div>
+              </div>
+              <div className="grow leading-relaxed items-end  text-right">
+                {renderSocialLinks()}
               </div>
             </div>
             <div className="pb-6 pt-6">
@@ -342,7 +339,7 @@ const ProfessionalProfile = () => {
             {professional.comments && (
               <div>
                 <div className="lg:grid lg:grid-cols-6 gap-4 md:flex-flow-row">
-                  <div className="lg:col-span-1 md:col-span-1 text-left uppercase">
+                  <div className="lg:col-span-1 md:col-span-1 text-left uppercase font-bold">
                     About me
                   </div>
                   <div className="lg:col-span-5  md:col-span-1 leading-relaxed align-left text-justify">
@@ -381,14 +378,14 @@ const ProfessionalProfile = () => {
             {professional.awards.length !== 0 && (
               <>
                 <div className="grid lg:grid-cols-6 gap-4">
-                  <div className="grid col-span-1 md:col-span-1 text-left uppercase">
+                  <div className="grid col-span-1 md:col-span-1 text-left uppercase font-bold">
                     Awads
                   </div>
                   <div className="lg:col-span-5 md:col-span-1 leading-relaxed align-left text-justify">
                     {professional.awards.map((item, index) => {
                       return (
                         <div className="flex items-center">
-                          <CirclePlus
+                          <ChevronsRight
                             color="#6260e2"
                             className="mr-2 "
                             size={20}
@@ -405,14 +402,14 @@ const ProfessionalProfile = () => {
             {professional.accomplishments.length !== 0 && (
               <>
                 <div className="grid lg:grid-cols-6 gap-4 md:grid-flow-row">
-                  <div className="grid col-span-1 text-left uppercase">
+                  <div className="grid col-span-1 text-left uppercase font-bold">
                     Accomplishments
                   </div>
                   <div className="lg:col-span-5 md:col-span-1 leading-relaxed align-left text-justify">
                     {professional.accomplishments.map((item, index) => {
                       return (
                         <div className="flex items-center">
-                          <CirclePlus
+                          <ChevronsRight
                             color="#6260e2"
                             className="mr-2 "
                             size={20}
@@ -430,14 +427,14 @@ const ProfessionalProfile = () => {
             {professional.certifications.length !== 0 && (
               <>
                 <div className="grid lg:grid-cols-6 gap-4">
-                  <div className="grid col-span-1 text-left uppercase">
+                  <div className="grid col-span-1 text-left uppercase font-bold">
                     Certifications
                   </div>
                   <div className="lg:col-span-5 gap-2 leading-relaxed align-left text-justify">
                     {professional.certifications.map((item, index) => {
                       return (
                         <div className="flex items-center">
-                          <CirclePlus
+                          <ChevronsRight
                             color="#6260e2"
                             className="mr-2 "
                             size={20}
@@ -454,14 +451,14 @@ const ProfessionalProfile = () => {
             {professional.training_locations.length !== 0 && (
               <>
                 <div className="grid lg:grid-cols-6 gap-4">
-                  <div className="grid col-span-1 text-left uppercase">
+                  <div className="grid col-span-1 text-left uppercase font-bold ">
                     Training locations
                   </div>
                   <div className="grid col-span-5 leading-relaxed align-left text-justify">
                     {professional.training_locations.map((item, index) => {
                       return (
                         <div className="flex items-center">
-                          <CirclePlus
+                          <ChevronsRight
                             color="#6260e2"
                             className="mr-2 "
                             size={20}
@@ -478,7 +475,7 @@ const ProfessionalProfile = () => {
 
             <div>
               <div className="grid lg:grid-cols-6 gap-4">
-                <div className="grid col-span-1 text-left uppercase">
+                <div className="grid col-span-1 text-left uppercase font-bold">
                   Charges
                 </div>
                 <div className="lg:col-span-5 leading-relaxed align-left text-justify">
@@ -494,14 +491,14 @@ const ProfessionalProfile = () => {
             {professional.coaching_availability.length !== 0 && (
               <>
                 <div className="grid lg:grid-cols-6 gap-4">
-                  <div className="grid col-span-1 text-left uppercase">
+                  <div className="grid col-span-1 text-left uppercase font-bold">
                     coaching availability
                   </div>
                   <div className="grid col-span-5 leading-relaxed align-left text-justify">
                     {professional.coaching_availability.map((item, index) => {
                       return (
                         <div className="flex items-center">
-                          <CirclePlus
+                          <ChevronsRight
                             color="#6260e2"
                             className="mr-2 "
                             size={20}
@@ -517,7 +514,7 @@ const ProfessionalProfile = () => {
             )}
             <div>
               <div className="grid lg:grid-cols-6 md:grid-cols-1 gap-4 md:grid-flow-row">
-                <div className="grid lg:col-span-1 text-left uppercase">
+                <div className="grid lg:col-span-1 text-left uppercase font-bold">
                   Featured Gallery
                 </div>
                 <div className="grid lg:col-span-5 text-left leading-relaxed align-left">
@@ -531,7 +528,7 @@ const ProfessionalProfile = () => {
 
             <div>
               <div className="grid lg:grid-cols-6 gap-2 md:grid-flow-row">
-                <div className="grid col-span-1 text-left uppercase">
+                <div className="grid col-span-1 text-left uppercase font-bold">
                   Featured Videos
                 </div>
                 <div className="grid lg:col-span-5 text-left leading-relaxed align-left">
@@ -542,22 +539,22 @@ const ProfessionalProfile = () => {
               {showOrangeDividerLine()}
             </div>
 
-            <div className="grid lg:grid-cols-6 gap-4">
-              <div className="grid col-span-1 text-left uppercase">
+            <div className="grid lg:grid-cols-6 gap-1">
+              <div className="grid col-span-1 text-left uppercase font-bold">
                 Contact Details
               </div>
-              <div className="grid col-span-5 leading-relaxed align-left text-justify">
+              <div className="grid col-span-5 lg:flex-row leading-relaxed align-left text-justify">
                 <ContactDetails professional={professional} />
               </div>
             </div>
 
-            <div className="grid lg:grid-cols-6 gap-4">
-              <div className="grid col-span-1 text-left uppercase"></div>
+            <div className="grid lg:grid-cols-6 gap-2">
+              <div className="grid col-span-1 text-left uppercase font-bold"></div>
               <div className="grid col-span-5 leading-relaxed align-left text-justify"></div>
             </div>
 
-            <div className="grid lg:grid-cols-6 gap-4">
-              <div className="grid col-span-1 text-left uppercase"></div>
+            <div className="grid lg:grid-cols-6 gap-2">
+              <div className="grid col-span-1 text-left uppercase font-bold"></div>
               <div className="grid col-span-5 leading-relaxed align-left text-justify"></div>
             </div>
           </div>
