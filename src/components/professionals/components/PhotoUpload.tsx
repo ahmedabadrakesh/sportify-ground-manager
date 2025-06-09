@@ -1,7 +1,12 @@
-
 import { Button } from "@/components/ui/button";
 import { Upload } from "lucide-react";
-import { FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import {
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import { UseFormReturn } from "react-hook-form";
 import { ProfessionalFormValues } from "../schemas/professionalFormSchema";
 import { usePhotoUpload } from "../hooks/usePhotoUpload";
@@ -11,7 +16,8 @@ interface PhotoUploadProps {
 }
 
 export const PhotoUpload = ({ form }: PhotoUploadProps) => {
-  const { photoPreview, setPhotoPreview, uploading, handleImageUpload } = usePhotoUpload(form.setValue);
+  const { photoPreview, setPhotoPreview, uploading, handleImageUpload } =
+    usePhotoUpload(form.setValue);
 
   return (
     <FormField
@@ -36,7 +42,7 @@ export const PhotoUpload = ({ form }: PhotoUploadProps) => {
                     className="absolute bottom-2 right-2"
                     onClick={() => {
                       setPhotoPreview(null);
-                      form.setValue('photo', null);
+                      form.setValue("photo", null);
                     }}
                   >
                     Change
@@ -46,7 +52,7 @@ export const PhotoUpload = ({ form }: PhotoUploadProps) => {
                 <div className="flex flex-col items-center">
                   <label
                     htmlFor="photo-upload"
-                    className="flex flex-col items-center justify-center w-32 h-32 border-2 border-dashed rounded-lg cursor-pointer hover:border-primary"
+                    className="flex flex-col items-center justify-c enter w-32 h-32 border-2 border-dashed rounded-lg cursor-pointer hover:border-primary"
                   >
                     <div className="flex flex-col items-center justify-center pt-5 pb-6">
                       <Upload className="w-8 h-8 mb-2 text-gray-500" />

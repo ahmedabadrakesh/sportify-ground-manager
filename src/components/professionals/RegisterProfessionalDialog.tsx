@@ -49,7 +49,7 @@ const RegisterProfessionalDialog = ({
         <DialogHeader>
           <DialogTitle className="text-center">
             Register as Sports Professional
-            <div className="pb-1 pt-1">
+            <div className="pb-2 pt-2">
               <hr className="w-49 h-0.5 mx-auto my-2 bg-orange-300 border-0 rounded-sm md:my-4" />
             </div>
           </DialogTitle>

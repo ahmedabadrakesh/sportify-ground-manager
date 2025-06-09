@@ -45,8 +45,8 @@ export const StepperForm = ({
   stepTitles,
 }: StepperFormProps) => {
   return (
-    <div className="flex basis-full flex-row">
-      <div className="w-1/2 text-left mb-6">
+    <div className="lg:flex basis-full flex-row mb-8">
+      <div className="lg:w-1/2 md:-w-full text-left mb-6">
         <h2 className="text-2xl font-bold flex items-left justify-start gap-2">
           <Star className="w-6 h-6" />
           {stepperHeader[currentStep - 1].stepHeading}
@@ -56,7 +56,7 @@ export const StepperForm = ({
         </p>
       </div>
 
-      <div className="w-1/2 mb-8 items-center">
+      <div className="lg:w-1/2 md:-w-full mb-8 items-center">
         <div className="flex items-center justify-between">
           {Array.from({ length: totalSteps }, (_, index) => {
             const stepNumber = index + 1;

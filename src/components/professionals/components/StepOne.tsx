@@ -83,11 +83,11 @@ export const StepOne = ({ form }: StepOneProps) => {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-row gap-8">
-        <div className="w-1/2">
+      <div className="lg:flex lg:flex-row gap-8">
+        <div className="lg:w-1/2 md:-w-full">
           <PhotoUpload form={form} />
         </div>
-        <div className="flex-none flex-row w-1/2 gap-4 mr-6">
+        <div className="flex-none flex-row lg:w-1/2 md:-w-full gap-4 mr-6">
           <FormField
             name="name"
             control={form.control}
