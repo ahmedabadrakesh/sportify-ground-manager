@@ -45,61 +45,64 @@ export const StepperForm = ({
   stepTitles,
 }: StepperFormProps) => {
   return (
-    <div className="lg:flex basis-full flex-row mb-8">
-      <div className="lg:w-1/2 md:-w-full text-left mb-6">
-        <h2 className="text-2xl font-bold flex items-left justify-start gap-2">
-          <Star className="w-6 h-6" />
-          {stepperHeader[currentStep - 1].stepHeading}
-        </h2>
-        <p className="text-muted-foreground text-left">
-          {stepperHeader[currentStep - 1].subLine}
-        </p>
-      </div>
+    <div>
+      <div className="lg:flex basis-full flex-row mb-4">
+        <div className="lg:w-1/2 md:-w-full text-left">
+          <h2 className="text-2xl font-bold flex items-left justify-start gap-2">
+            <Star className="w-6 h-6" />
+            {stepperHeader[currentStep - 1].stepHeading}
+          </h2>
+          <p className="text-muted-foreground text-left">
+            {stepperHeader[currentStep - 1].subLine}
+          </p>
+        </div>
 
-      <div className="lg:w-1/2 md:-w-full mb-8 items-center">
-        <div className="flex items-center justify-between">
-          {Array.from({ length: totalSteps }, (_, index) => {
-            const stepNumber = index + 1;
-            const isCompleted = stepNumber < currentStep;
-            const isCurrent = stepNumber === currentStep;
+        <div className="lg:w-1/2 md:-w-full items-center">
+          <div className="flex items-center justify-between">
+            {Array.from({ length: totalSteps }, (_, index) => {
+              const stepNumber = index + 1;
+              const isCompleted = stepNumber < currentStep;
+              const isCurrent = stepNumber === currentStep;
 
-            return (
-              <React.Fragment key={stepNumber}>
-                <div className="flex flex-col items-center flex-1">
-                  <div
-                    className={cn(
-                      "w-7 h-7 rounded-full flex items-center justify-center text-xs font-medium transition-colors",
-                      isCompleted
-                        ? "bg-primary text-primary-foreground"
-                        : isCurrent
-                        ? "bg-primary text-primary-foreground"
-                        : "bg-orange-300 text-muted-foreground"
-                    )}
-                  >
-                    {isCompleted ? <Check className="w-4 h-4" /> : stepNumber}
-                  </div>
-                  <div className="mt-2 text-xs text-center">
-                    <span
+              return (
+                <React.Fragment key={stepNumber}>
+                  <div className="flex flex-col items-center flex-1">
+                    <div
                       className={cn(
-                        "font-medium",
-                        isCurrent ? "text-primary" : "text-muted-foreground"
+                        "w-7 h-7 rounded-full flex items-center justify-center text-xs font-medium transition-colors",
+                        isCompleted
+                          ? "bg-primary text-primary-foreground"
+                          : isCurrent
+                          ? "bg-primary text-primary-foreground"
+                          : "bg-orange-300 text-muted-foreground"
                       )}
-                    ></span>
+                    >
+                      {isCompleted ? <Check className="w-4 h-4" /> : stepNumber}
+                    </div>
+                    <div className="mt-2 text-xs text-center">
+                      <span
+                        className={cn(
+                          "font-medium",
+                          isCurrent ? "text-primary" : "text-muted-foreground"
+                        )}
+                      ></span>
+                    </div>
                   </div>
-                </div>
-                {stepNumber < totalSteps && (
-                  <div
-                    className={cn(
-                      "flex-1 h-px mx-2 transition-colors",
-                      stepNumber < currentStep ? "bg-primary" : "bg-muted"
-                    )}
-                  />
-                )}
-              </React.Fragment>
-            );
-          })}
+                  {stepNumber < totalSteps && (
+                    <div
+                      className={cn(
+                        "flex-1 h-px mx-2 transition-colors",
+                        stepNumber < currentStep ? "bg-primary" : "bg-muted"
+                      )}
+                    />
+                  )}
+                </React.Fragment>
+              );
+            })}
+          </div>
         </div>
       </div>
+      <hr className="w-49 h-0.5 mx-auto bg-orange-300 border-0 rounded-sm md:my-4" />
     </div>
   );
 };

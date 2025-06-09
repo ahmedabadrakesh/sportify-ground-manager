@@ -47,11 +47,8 @@ const RegisterProfessionalDialog = ({
     <Dialog open={open} onOpenChange={handleDialogClose}>
       <DialogContent className="max-w-4xl max-h-[90vh]">
         <DialogHeader>
-          <DialogTitle className="text-center">
+          <DialogTitle className="text-center pb-4 pt-4">
             Register as Sports Professional
-            <div className="pb-2 pt-2">
-              <hr className="w-49 h-0.5 mx-auto my-2 bg-orange-300 border-0 rounded-sm md:my-4" />
-            </div>
           </DialogTitle>
         </DialogHeader>
 

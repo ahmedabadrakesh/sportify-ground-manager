@@ -27,7 +27,7 @@ export const PhotoUpload = ({ form }: PhotoUploadProps) => {
         <FormItem>
           <FormLabel>Photo</FormLabel>
           <FormControl>
-            <div className="flex flex-col items-center space-y-4">
+            <div className="flex flex-col items-center space-y-4 border-2 border-primary  border-dashed">
               {photoPreview ? (
                 <div className="relative w-32 h-32">
                   <img
@@ -52,7 +52,7 @@ export const PhotoUpload = ({ form }: PhotoUploadProps) => {
                 <div className="flex flex-col items-center">
                   <label
                     htmlFor="photo-upload"
-                    className="flex flex-col items-center justify-c enter w-32 h-32 border-2 border-dashed rounded-lg cursor-pointer hover:border-primary"
+                    className="flex flex-col items-center justify-center w-32 h-32 rounded-lg cursor-pointer hover:border-primary"
                   >
                     <div className="flex flex-col items-center justify-center pt-5 pb-6">
                       <Upload className="w-8 h-8 mb-2 text-gray-500" />
