@@ -1,7 +1,12 @@
-
 import React from "react";
 import { UseFormReturn } from "react-hook-form";
-import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
+import {
+  FormField,
+  FormItem,
+  FormLabel,
+  FormControl,
+  FormMessage,
+} from "@/components/ui/form";
 import { Textarea } from "@/components/ui/textarea";
 import { ProfessionalFormValues } from "../schemas/professionalFormSchema";
 import { ArrayFieldInput } from "./ArrayFieldInput";
@@ -14,14 +19,6 @@ interface StepSixProps {
 export const StepSix = ({ form }: StepSixProps) => {
   return (
     <div className="space-y-6">
-      <div className="text-center mb-6">
-        <h2 className="text-2xl font-bold flex items-center justify-center gap-2">
-          <Video className="w-6 h-6" />
-          Media & Portfolio
-        </h2>
-        <p className="text-muted-foreground">Showcase your work and tell us about yourself</p>
-      </div>
-
       <FormField
         name="videos"
         control={form.control}
@@ -73,9 +70,9 @@ export const StepSix = ({ form }: StepSixProps) => {
           <FormItem>
             <FormLabel>About Me</FormLabel>
             <FormControl>
-              <Textarea 
-                {...field} 
-                placeholder="Tell us more about yourself, your experience, and what makes you unique..." 
+              <Textarea
+                {...field}
+                placeholder="Tell us more about yourself, your experience, and what makes you unique..."
                 className="min-h-[120px]"
               />
             </FormControl>
@@ -90,8 +87,9 @@ export const StepSix = ({ form }: StepSixProps) => {
           Ready to Submit?
         </h3>
         <p className="text-sm text-muted-foreground">
-          Please review all the information you've provided before submitting your registration. 
-          You can go back to previous steps to make any changes if needed.
+          Please review all the information you've provided before submitting
+          your registration. You can go back to previous steps to make any
+          changes if needed.
         </p>
       </div>
     </div>

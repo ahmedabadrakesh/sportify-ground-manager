@@ -1,13 +1,25 @@
-
-import React from "react";
+import React, { useState } from "react";
 import { UseFormReturn } from "react-hook-form";
-import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
+import {
+  FormField,
+  FormItem,
+  FormLabel,
+  FormControl,
+  FormMessage,
+} from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { ProfessionalFormValues } from "../schemas/professionalFormSchema";
 import { PhotoUpload } from "./PhotoUpload";
 import { Database } from "@/integrations/supabase/types";
 import { User, Award, Trophy } from "lucide-react";
+import TextSuggestionCarousel from "./TextSuggestionCarousel";
 
 type ProfessionType = Database["public"]["Enums"]["sport_profession_type"];
 
@@ -17,49 +29,103 @@ interface StepOneProps {
 
 export const StepOne = ({ form }: StepOneProps) => {
   const professionTypes: ProfessionType[] = [
-    "Athlete", "Coach", "Trainer", "Sports Manager", "Support Staff", "Player", "Umpire"
+    "Athlete",
+    "Coach",
+    "Trainer",
+    "Sports Manager",
+    "Support Staff",
+    "Player",
+    "Umpire",
+  ];
+
+  const [suggestedPunchLine, setSuggestedPunchLine] = useState();
+  const punchLineData = [
+    "I don’t build athletes—I build belief.",
+
+    "Greatness starts with guidance.",
+
+    "Coaching isn’t a job—it’s a mission.",
+
+    "Behind every champion is a coach who believed first.",
+
+    "We don’t train for trophies. We train for legacy.",
+
+    "I coach minds as much as muscles.",
+
+    "Fuel the fire. Focus the fight.",
+
+    "Push harder, think smarter, finish stronger.",
+
+    "I don’t promise wins—I promise work.",
+
+    "Strong bodies are built in the gym. Strong champions are built in the mind.",
+
+    "You don’t need easy. You need possible.",
+
+    "Comfort zones don’t raise champions.",
+
+    "Excuses don’t lift medals. Effort does.",
+
+    "No shortcuts. Just sweat and standards.",
+
+    "Discipline today. Glory tomorrow.",
+
+    "Coach. Mentor. Gamechanger.",
+
+    "Tough love. Real results.",
+
+    "More than drills—it's direction.",
+
+    "Where effort meets elevation.",
+
+    "Respect the grind. Trust the coach.",
   ];
 
   return (
     <div className="space-y-6">
-      <div className="text-center mb-6">
-        <h2 className="text-2xl font-bold flex items-center justify-center gap-2">
-          <User className="w-6 h-6" />
-          Basic Information
-        </h2>
-        <p className="text-muted-foreground">Let's start with your basic details</p>
-      </div>
-
-      <PhotoUpload form={form} />
-
-      <div className="grid md:grid-cols-2 gap-4">
-        <FormField
-          name="name"
-          control={form.control}
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Name *</FormLabel>
-              <FormControl>
-                <Input {...field} placeholder="Enter your full name" />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          name="punch_line"
-          control={form.control}
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Punch Line</FormLabel>
-              <FormControl>
-                <Input {...field} placeholder="A catchy phrase about yourself" />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+      <div className="flex flex-row gap-8">
+        <div className="w-1/2">
+          <PhotoUpload form={form} />
+        </div>
+        <div className="flex-none flex-row w-1/2 gap-4 mr-6">
+          <FormField
+            name="name"
+            control={form.control}
+            render={({ field }) => (
+              <FormItem className="flex flex-col mb-4">
+                <FormLabel>Name *</FormLabel>
+                <FormControl>
+                  <Input {...field} placeholder="Enter your full name" />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <div>
+            <FormField
+              name="punch_line"
+              control={form.control}
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Punch Line</FormLabel>
+                  <FormControl>
+                    <Input
+                      {...field}
+                      value={suggestedPunchLine}
+                      placeholder="A catchy phrase about yourself"
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <TextSuggestionCarousel
+              suggestions={punchLineData}
+              className="max-w-md mx-auto"
+              setSuggestedPunchLine={setSuggestedPunchLine}
+            />
+          </div>
+        </div>
       </div>
 
       <FormField
@@ -98,10 +164,10 @@ export const StepOne = ({ form }: StepOneProps) => {
                 Years of Experience
               </FormLabel>
               <FormControl>
-                <Input 
-                  type="number" 
-                  {...field} 
-                  placeholder="Enter years of experience" 
+                <Input
+                  type="number"
+                  {...field}
+                  placeholder="Enter years of experience"
                   min="0"
                 />
               </FormControl>
@@ -120,10 +186,10 @@ export const StepOne = ({ form }: StepOneProps) => {
                 Total Matches Played
               </FormLabel>
               <FormControl>
-                <Input 
-                  type="number" 
-                  {...field} 
-                  placeholder="Enter total matches played" 
+                <Input
+                  type="number"
+                  {...field}
+                  placeholder="Enter total matches played"
                   min="0"
                 />
               </FormControl>

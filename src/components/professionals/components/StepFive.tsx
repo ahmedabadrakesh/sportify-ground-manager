@@ -1,7 +1,12 @@
-
 import React from "react";
 import { UseFormReturn } from "react-hook-form";
-import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
+import {
+  FormField,
+  FormItem,
+  FormLabel,
+  FormControl,
+  FormMessage,
+} from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { ProfessionalFormValues } from "../schemas/professionalFormSchema";
 import { Globe, Instagram, Youtube, Facebook, Linkedin } from "lucide-react";
@@ -13,14 +18,6 @@ interface StepFiveProps {
 export const StepFive = ({ form }: StepFiveProps) => {
   return (
     <div className="space-y-6">
-      <div className="text-center mb-6">
-        <h2 className="text-2xl font-bold flex items-center justify-center gap-2">
-          <Globe className="w-6 h-6" />
-          Social Profile
-        </h2>
-        <p className="text-muted-foreground">Connect your social media accounts</p>
-      </div>
-
       <div className="space-y-4">
         <FormField
           name="website"
@@ -49,7 +46,10 @@ export const StepFive = ({ form }: StepFiveProps) => {
                 Instagram
               </FormLabel>
               <FormControl>
-                <Input {...field} placeholder="https://instagram.com/yourusername" />
+                <Input
+                  {...field}
+                  placeholder="https://instagram.com/yourusername"
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -66,7 +66,10 @@ export const StepFive = ({ form }: StepFiveProps) => {
                 YouTube
               </FormLabel>
               <FormControl>
-                <Input {...field} placeholder="https://youtube.com/yourchannel" />
+                <Input
+                  {...field}
+                  placeholder="https://youtube.com/yourchannel"
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -100,7 +103,10 @@ export const StepFive = ({ form }: StepFiveProps) => {
                 LinkedIn
               </FormLabel>
               <FormControl>
-                <Input {...field} placeholder="https://linkedin.com/in/yourprofile" />
+                <Input
+                  {...field}
+                  placeholder="https://linkedin.com/in/yourprofile"
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -114,7 +120,8 @@ export const StepFive = ({ form }: StepFiveProps) => {
           Social Media Benefits
         </h3>
         <p className="text-sm text-muted-foreground">
-          Connecting your social media accounts helps build trust and allows potential clients to learn more about your work and personality.
+          Connecting your social media accounts helps build trust and allows
+          potential clients to learn more about your work and personality.
         </p>
       </div>
     </div>

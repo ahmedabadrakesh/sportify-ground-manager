@@ -1,7 +1,12 @@
-
 import React from "react";
 import { UseFormReturn } from "react-hook-form";
-import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
+import {
+  FormField,
+  FormItem,
+  FormLabel,
+  FormControl,
+  FormMessage,
+} from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { ProfessionalFormValues } from "../schemas/professionalFormSchema";
 import { Phone, Mail, MapPin, Building } from "lucide-react";
@@ -13,14 +18,6 @@ interface StepFourProps {
 export const StepFour = ({ form }: StepFourProps) => {
   return (
     <div className="space-y-6">
-      <div className="text-center mb-6">
-        <h2 className="text-2xl font-bold flex items-center justify-center gap-2">
-          <Phone className="w-6 h-6" />
-          Contact Information
-        </h2>
-        <p className="text-muted-foreground">How can people reach you?</p>
-      </div>
-
       <div className="grid md:grid-cols-2 gap-4">
         <FormField
           name="contact_number"
@@ -49,7 +46,11 @@ export const StepFour = ({ form }: StepFourProps) => {
                 Email
               </FormLabel>
               <FormControl>
-                <Input {...field} type="email" placeholder="Enter your email address" />
+                <Input
+                  {...field}
+                  type="email"
+                  placeholder="Enter your email address"
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -97,7 +98,8 @@ export const StepFour = ({ form }: StepFourProps) => {
           Contact Tip
         </h3>
         <p className="text-sm text-muted-foreground">
-          Make sure your contact information is accurate so potential clients can easily reach out to you.
+          Make sure your contact information is accurate so potential clients
+          can easily reach out to you.
         </p>
       </div>
     </div>

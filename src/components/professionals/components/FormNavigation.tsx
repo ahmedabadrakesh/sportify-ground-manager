@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
@@ -11,15 +10,15 @@ interface FormNavigationProps {
   isSubmitting: boolean;
 }
 
-export const FormNavigation = ({ 
-  currentStep, 
-  totalSteps, 
-  onPrevious, 
-  onNext, 
-  isSubmitting 
+export const FormNavigation = ({
+  currentStep,
+  totalSteps,
+  onPrevious,
+  onNext,
+  isSubmitting,
 }: FormNavigationProps) => {
   return (
-    <div className="flex justify-between pt-6">
+    <div className="flex justify-between bottom-end pt-6">
       <Button
         type="button"
         variant="outline"
@@ -41,8 +40,8 @@ export const FormNavigation = ({
           <ChevronRight className="w-4 h-4" />
         </Button>
       ) : (
-        <Button 
-          type="submit" 
+        <Button
+          type="submit"
           disabled={isSubmitting}
           className="flex items-center gap-2"
         >

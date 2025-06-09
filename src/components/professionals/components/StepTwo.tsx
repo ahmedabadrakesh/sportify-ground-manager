@@ -1,7 +1,12 @@
-
 import React from "react";
 import { UseFormReturn } from "react-hook-form";
-import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
+import {
+  FormField,
+  FormItem,
+  FormLabel,
+  FormControl,
+  FormMessage,
+} from "@/components/ui/form";
 import { ProfessionalFormValues } from "../schemas/professionalFormSchema";
 import { ArrayFieldInput } from "./ArrayFieldInput";
 import { Award, Star } from "lucide-react";
@@ -13,14 +18,6 @@ interface StepTwoProps {
 export const StepTwo = ({ form }: StepTwoProps) => {
   return (
     <div className="space-y-6">
-      <div className="text-center mb-6">
-        <h2 className="text-2xl font-bold flex items-center justify-center gap-2">
-          <Star className="w-6 h-6" />
-          Professional Details
-        </h2>
-        <p className="text-muted-foreground">Share your achievements and qualifications</p>
-      </div>
-
       <FormField
         name="awards"
         control={form.control}
@@ -93,7 +90,8 @@ export const StepTwo = ({ form }: StepTwoProps) => {
           Professional Tip
         </h3>
         <p className="text-sm text-muted-foreground">
-          Adding your awards, accomplishments, and certifications helps build credibility and trust with potential clients.
+          Adding your awards, accomplishments, and certifications helps build
+          credibility and trust with potential clients.
         </p>
       </div>
     </div>

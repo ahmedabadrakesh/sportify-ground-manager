@@ -1,9 +1,20 @@
-
 import React from "react";
 import { UseFormReturn } from "react-hook-form";
-import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
+import {
+  FormField,
+  FormItem,
+  FormLabel,
+  FormControl,
+  FormMessage,
+} from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { useGames } from "@/hooks/useGames";
 import { ProfessionalFormValues } from "../schemas/professionalFormSchema";
 import { ArrayFieldInput } from "./ArrayFieldInput";
@@ -21,18 +32,15 @@ export const StepThree = ({ form }: StepThreeProps) => {
   const { games } = useGames();
   const feeTypes: FeeType[] = ["Per Hour", "Per Day", "Per Match"];
   const levelOptions = ["Beginner", "Intermediate", "Professional"];
-  const coachingAvailabilityOptions = ["Personal", "Group", "Home", "Out of City"];
+  const coachingAvailabilityOptions = [
+    "Personal",
+    "Group",
+    "Home",
+    "Out of City",
+  ];
 
   return (
     <div className="space-y-6">
-      <div className="text-center mb-6">
-        <h2 className="text-2xl font-bold flex items-center justify-center gap-2">
-          <Target className="w-6 h-6" />
-          Training Details
-        </h2>
-        <p className="text-muted-foreground">Tell us about your sport and training approach</p>
-      </div>
-
       <div className="grid md:grid-cols-2 gap-4">
         <FormField
           name="game_id"
@@ -132,7 +140,7 @@ export const StepThree = ({ form }: StepThreeProps) => {
           <DollarSign className="w-5 h-5" />
           Fee Information
         </h3>
-        
+
         <div className="grid md:grid-cols-2 gap-4">
           <FormField
             name="fee"
@@ -141,7 +149,11 @@ export const StepThree = ({ form }: StepThreeProps) => {
               <FormItem>
                 <FormLabel>Fee</FormLabel>
                 <FormControl>
-                  <Input type="number" {...field} placeholder="Enter your fee" />
+                  <Input
+                    type="number"
+                    {...field}
+                    placeholder="Enter your fee"
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
