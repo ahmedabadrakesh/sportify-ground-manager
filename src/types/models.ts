@@ -49,7 +49,7 @@ export interface Booking {
   createdAt: string;
   updatedAt?: string;
   sportsAreaId?: string;
-  gameIds?: string[]; // Add this new field to store multiple game IDs
+  gameIds?: string[];
   userName?: string;
   userPhone?: string;
   groundName?: string;
@@ -78,7 +78,7 @@ export interface User {
   avatar?: string;
 }
 
-export type UserRole = 'user' | 'admin' | 'super_admin' | 'ground_owner';
+export type UserRole = 'user' | 'sports_professional' | 'admin' | 'super_admin' | 'ground_owner';
 
 export interface Product {
   id: string;

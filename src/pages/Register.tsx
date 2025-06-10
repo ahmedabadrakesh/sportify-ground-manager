@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { toast } from "sonner";
 import { register } from "@/utils/auth";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -16,6 +17,7 @@ const Register: React.FC = () => {
   const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [userType, setUserType] = useState<'user' | 'sports_professional'>('user');
   const [isLoading, setIsLoading] = useState(false);
   const [registrationType, setRegistrationType] = useState<"email" | "phone">("email");
   const [registrationError, setRegistrationError] = useState<string | null>(null);
@@ -50,11 +52,23 @@ const Register: React.FC = () => {
 
     // Registration logic
     try {
-      const user = await register(name, registrationType === "email" ? email : "", registrationType === "phone" ? phone : "", password);
+      const user = await register(
+        name, 
+        registrationType === "email" ? email : "", 
+        registrationType === "phone" ? phone : "", 
+        password,
+        userType
+      );
       
       if (user) {
-        toast.success("Registration successful! You are now logged in.");
-        navigate("/");
+        toast.success("Registration successful! Please check your email to verify your account.");
+        
+        // Redirect based on user type
+        if (userType === 'sports_professional') {
+          navigate("/sports-professionals");
+        } else {
+          navigate("/");
+        }
       } else {
         toast.error("Registration failed. Please try again with different credentials.");
         setRegistrationError("Registration failed. Please try with different credentials.");
@@ -70,8 +84,8 @@ const Register: React.FC = () => {
         setRegistrationError("Too many registration attempts. Please try again later.");
         toast.error("Email rate limit exceeded. Please try again later.");
       } else {
-        setRegistrationError("An error occurred during registration. Using demo mode.");
-        toast.error("Using demo mode for registration.");
+        setRegistrationError("An error occurred during registration. Please try again.");
+        toast.error("Registration failed. Please try again.");
       }
     } finally {
       setIsLoading(false);
@@ -99,7 +113,6 @@ const Register: React.FC = () => {
             {registrationError && (
               <div className="mb-4 p-3 bg-yellow-50 border-l-4 border-yellow-400 text-yellow-800">
                 <p>{registrationError}</p>
-                <p className="text-xs mt-1">Note: You will be registered in demo mode if Supabase auth is unavailable.</p>
               </div>
             )}
             
@@ -113,6 +126,20 @@ const Register: React.FC = () => {
                   onChange={(e) => setName(e.target.value)}
                   required
                 />
+              </div>
+
+              <div className="space-y-2">
+                <Label>Account Type</Label>
+                <RadioGroup value={userType} onValueChange={(value: 'user' | 'sports_professional') => setUserType(value)}>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="user" id="user" />
+                    <Label htmlFor="user">Regular User</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="sports_professional" id="sports_professional" />
+                    <Label htmlFor="sports_professional">Sports Professional</Label>
+                  </div>
+                </RadioGroup>
               </div>
               
               <Tabs defaultValue="email" onValueChange={(value) => setRegistrationType(value as "email" | "phone")}>
@@ -188,10 +215,6 @@ const Register: React.FC = () => {
               <Button type="submit" className="w-full" disabled={isLoading}>
                 {isLoading ? "Creating account..." : "Register"}
               </Button>
-              
-              <div className="text-xs text-center text-gray-500 mt-2">
-                Note: If registration with Supabase fails, you'll be registered in demo mode.
-              </div>
             </form>
           </CardContent>
           

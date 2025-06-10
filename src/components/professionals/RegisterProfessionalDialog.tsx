@@ -1,4 +1,5 @@
-import React from "react";
+
+import React, { useEffect, useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -11,6 +12,8 @@ import { StepperForm } from "./components/StepperForm";
 import { FormNavigation } from "./components/FormNavigation";
 import { StepContentRenderer } from "./components/StepContentRenderer";
 import { useRegisterProfessionalForm } from "./hooks/useRegisterProfessionalForm";
+import { getCurrentUser } from "@/utils/auth";
+import { toast } from "sonner";
 
 interface RegisterProfessionalProps {
   open: boolean;
@@ -21,6 +24,24 @@ const RegisterProfessionalDialog = ({
   open,
   onOpenChange,
 }: RegisterProfessionalProps) => {
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      const user = await getCurrentUser();
+      setIsAuthenticated(!!user);
+      
+      if (!user && open) {
+        toast.error("Please log in to register as a sports professional");
+        onOpenChange(false);
+      }
+    };
+    
+    if (open) {
+      checkAuth();
+    }
+  }, [open, onOpenChange]);
+
   const {
     form,
     currentStep,
@@ -42,6 +63,16 @@ const RegisterProfessionalDialog = ({
     }
     onOpenChange(open);
   };
+
+  // Don't render the dialog if authentication status is still loading
+  if (isAuthenticated === null) {
+    return null;
+  }
+
+  // Don't render the dialog if user is not authenticated
+  if (!isAuthenticated) {
+    return null;
+  }
 
   return (
     <Dialog open={open} onOpenChange={handleDialogClose}>

@@ -21,18 +21,6 @@ export const getCurrentUser = async (): Promise<User | null> => {
         localStorage.setItem('currentUser', JSON.stringify(userData));
         return userData as User;
       }
-      
-      // Fallback to auth user if no profile exists
-      const fallbackUser = {
-        id: session.user.id,
-        name: session.user.email?.split('@')[0] || session.user.phone?.split('@')[0] || 'User',
-        email: session.user.email || '',
-        phone: session.user.phone || '',
-        role: 'user' as User['role']
-      };
-      
-      localStorage.setItem('currentUser', JSON.stringify(fallbackUser));
-      return fallbackUser;
     }
     
     // If no active session, check localStorage as fallback

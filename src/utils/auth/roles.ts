@@ -11,6 +11,7 @@ export const hasRole = async (role: User['role']): Promise<boolean> => {
   if (role === 'admin') return user.role === 'admin' || user.role === 'super_admin';
   if (role === 'super_admin') return user.role === 'super_admin';
   if (role === 'ground_owner') return user.role === 'ground_owner';
+  if (role === 'sports_professional') return user.role === 'sports_professional';
   
   return false;
 };
@@ -24,6 +25,7 @@ export const hasRoleSync = (role: User['role']): boolean => {
   if (role === 'admin') return user.role === 'admin' || user.role === 'super_admin';
   if (role === 'super_admin') return user.role === 'super_admin';
   if (role === 'ground_owner') return user.role === 'ground_owner';
+  if (role === 'sports_professional') return user.role === 'sports_professional';
   
   return false;
 };

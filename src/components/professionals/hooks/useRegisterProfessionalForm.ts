@@ -5,6 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { getCurrentUser } from "@/utils/auth";
 import { professionalFormSchema, type ProfessionalFormValues } from "../schemas/professionalFormSchema";
 
 export const useRegisterProfessionalForm = (onSuccess: () => void) => {
@@ -48,7 +49,14 @@ export const useRegisterProfessionalForm = (onSuccess: () => void) => {
 
   const registerMutation = useMutation({
     mutationFn: async (values: ProfessionalFormValues) => {
+      // Get current user
+      const currentUser = await getCurrentUser();
+      if (!currentUser) {
+        throw new Error("You must be logged in to register as a sports professional");
+      }
+
       const professionalData = {
+        user_id: currentUser.id,
         name: values.name,
         profession_type: values.profession_type,
         game_id: values.game_id,
@@ -79,6 +87,17 @@ export const useRegisterProfessionalForm = (onSuccess: () => void) => {
         .insert(professionalData);
       
       if (error) throw error;
+
+      // Update user role to sports_professional
+      const { error: userUpdateError } = await supabase
+        .from('users')
+        .update({ role: 'sports_professional' })
+        .eq('id', currentUser.id);
+
+      if (userUpdateError) {
+        console.error("Failed to update user role:", userUpdateError);
+        // Don't throw here as the professional profile was created successfully
+      }
     },
     onSuccess: () => {
       toast.success("Successfully registered as a sports professional");
