@@ -14,10 +14,15 @@ interface UserProfileProps {
 const UserProfile: React.FC<UserProfileProps> = ({ userName, userRole }) => {
   const navigate = useNavigate();
   
-  const handleLogout = () => {
-    logout();
-    toast.success("Logged out successfully");
-    navigate("/");
+  const handleLogout = async () => {
+    try {
+      await logout();
+      toast.success("Logged out successfully");
+      navigate("/");
+    } catch (error) {
+      console.error("Logout error:", error);
+      toast.error("Error logging out");
+    }
   };
 
   return (

@@ -55,6 +55,12 @@ export const login = async (identifier: string, password: string): Promise<User 
       
       // Store user in localStorage for compatibility
       localStorage.setItem('currentUser', JSON.stringify(userData));
+      
+      // Trigger a custom event to notify other components
+      window.dispatchEvent(new CustomEvent('authStateChanged', { 
+        detail: { user: userData, session: authData.session } 
+      }));
+      
       return userData as User;
     }
   } catch (error) {
@@ -111,6 +117,12 @@ export const register = async (
       
       if (userData && !userError) {
         localStorage.setItem('currentUser', JSON.stringify(userData));
+        
+        // Trigger a custom event to notify other components
+        window.dispatchEvent(new CustomEvent('authStateChanged', { 
+          detail: { user: userData, session: data.session } 
+        }));
+        
         return userData as User;
       }
     }
@@ -130,5 +142,11 @@ export const logout = async (): Promise<void> => {
     console.error("Error during logout:", error);
   }
   
+  // Clear local storage
   localStorage.removeItem('currentUser');
+  
+  // Trigger a custom event to notify other components
+  window.dispatchEvent(new CustomEvent('authStateChanged', { 
+    detail: { user: null, session: null } 
+  }));
 };

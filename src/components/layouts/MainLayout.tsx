@@ -1,9 +1,10 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { ShoppingCart, Menu, X, LogIn, UserPlus, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { isAuthenticated, logout } from "@/utils/auth";
+import { logout, getCurrentUserSync } from "@/utils/auth";
 import { Toaster } from "@/components/ui/toaster";
+import { toast } from "sonner";
 
 interface MainLayoutProps {
   children: React.ReactNode;
@@ -11,12 +12,40 @@ interface MainLayoutProps {
 
 const MainLayout = ({ children }: MainLayoutProps) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [authenticated, setAuthenticated] = useState(false);
   const navigate = useNavigate();
-  const authenticated = isAuthenticated();
 
-  const handleLogout = () => {
-    logout();
-    navigate("/");
+  // Check authentication status on mount and listen for changes
+  useEffect(() => {
+    const checkAuth = () => {
+      const user = getCurrentUserSync();
+      setAuthenticated(!!user);
+    };
+
+    // Check initial auth state
+    checkAuth();
+
+    // Listen for auth state changes
+    const handleAuthStateChange = () => {
+      checkAuth();
+    };
+
+    window.addEventListener('authStateChanged', handleAuthStateChange);
+
+    return () => {
+      window.removeEventListener('authStateChanged', handleAuthStateChange);
+    };
+  }, []);
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+      toast.success("Logged out successfully");
+      navigate("/");
+    } catch (error) {
+      console.error("Logout error:", error);
+      toast.error("Error logging out");
+    }
   };
 
   return (
@@ -50,9 +79,6 @@ const MainLayout = ({ children }: MainLayoutProps) => {
               <Link to="/shop" className="text-gray-700 hover:text-primary">
                 Shop
               </Link>
-              {/* <Link to="/api-documentation" className="text-gray-700 hover:text-primary">
-                API Docs
-              </Link> */}
             </nav>
 
             {/* Desktop Actions */}

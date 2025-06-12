@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import MainLayout from "@/components/layouts/MainLayout";
 import HeroSection from "@/components/home/HeroSection";
 import PopularSportsSection from "@/components/home/PopularSportsSection";
@@ -14,7 +14,7 @@ import SportsProfessionalsPromotion from "@/components/home/SportsProfessionalsP
 import EventsPromotion from "@/components/home/EventsPromotion";
 import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { isAuthenticatedSync } from "@/utils/auth";
+import { getCurrentUserSync } from "@/utils/auth";
 import AuthRequiredDialog from "@/components/auth/AuthRequiredDialog";
 import EventDialog from "@/components/admin/events/EventDialog";
 
@@ -23,6 +23,29 @@ const Home: React.FC = () => {
   const [hasSearched, setHasSearched] = useState(false);
   const [authDialogOpen, setAuthDialogOpen] = useState(false);
   const [eventDialogOpen, setEventDialogOpen] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  // Check authentication status on mount and listen for changes
+  useEffect(() => {
+    const checkAuth = () => {
+      const user = getCurrentUserSync();
+      setIsAuthenticated(!!user);
+    };
+
+    // Check initial auth state
+    checkAuth();
+
+    // Listen for auth state changes
+    const handleAuthStateChange = () => {
+      checkAuth();
+    };
+
+    window.addEventListener('authStateChanged', handleAuthStateChange);
+
+    return () => {
+      window.removeEventListener('authStateChanged', handleAuthStateChange);
+    };
+  }, []);
 
   const handleSearch = (term: string) => {
     if (term.trim()) {
@@ -32,7 +55,7 @@ const Home: React.FC = () => {
   };
 
   const handleAddEvent = () => {
-    if (isAuthenticatedSync()) {
+    if (isAuthenticated) {
       setEventDialogOpen(true);
     } else {
       setAuthDialogOpen(true);
