@@ -9,21 +9,45 @@ const ProfessionalsList = () => {
     queryKey: ["sports-professionals"],
     queryFn: async () => {
       console.log("Fetching sports professionals...");
+      
+      // First, let's try a simple query without joins to see if we can access the table
+      const { data: testData, error: testError } = await supabase
+        .from("sports_professionals")
+        .select("*")
+        .limit(1);
+      
+      console.log("Test query result:", { testData, testError });
+      
+      // Now try the full query with join
       const { data, error } = await supabase
         .from("sports_professionals")
         .select(`
           *,
-          games (
+          games!inner (
             name
           )
         `)
         .order("created_at", { ascending: false });
 
-      console.log("Sports professionals query result:", { data, error });
+      console.log("Full query result:", { data, error });
       
       if (error) {
         console.error("Error fetching sports professionals:", error);
-        throw error;
+        
+        // If the join fails, try without the join
+        console.log("Trying query without games join...");
+        const { data: fallbackData, error: fallbackError } = await supabase
+          .from("sports_professionals")
+          .select("*")
+          .order("created_at", { ascending: false });
+          
+        console.log("Fallback query result:", { fallbackData, fallbackError });
+        
+        if (fallbackError) {
+          throw fallbackError;
+        }
+        
+        return fallbackData;
       }
       
       console.log("Number of professionals found:", data?.length || 0);
@@ -48,6 +72,7 @@ const ProfessionalsList = () => {
     return (
       <div className="text-center py-8">
         <p className="text-red-600">Error loading sports professionals: {error.message}</p>
+        <p className="text-sm text-gray-500 mt-2">Check console for more details</p>
       </div>
     );
   }
@@ -56,6 +81,9 @@ const ProfessionalsList = () => {
     return (
       <div className="text-center py-8">
         <p className="text-gray-600">No sports professionals found. Be the first to register!</p>
+        <p className="text-sm text-gray-500 mt-2">
+          If you expect to see data here, there might be a permissions issue.
+        </p>
       </div>
     );
   }
