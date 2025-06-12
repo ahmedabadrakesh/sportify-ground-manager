@@ -1,10 +1,28 @@
 
 import { supabase } from "@/integrations/supabase/client";
 import { User } from "@/types/models";
+import { handlePredefinedAdminLogin } from "./adminAuth";
 
 // Login with Supabase - supports email or phone number login
 export const login = async (identifier: string, password: string): Promise<User | null> => {
   try {
+    console.log("Login attempt for:", identifier);
+    
+    // First, check if this is a predefined admin account
+    const adminUser = handlePredefinedAdminLogin(identifier, password);
+    if (adminUser) {
+      console.log("Predefined admin login successful:", adminUser);
+      
+      // Trigger a custom event to notify other components
+      window.dispatchEvent(new CustomEvent('authStateChanged', { 
+        detail: { user: adminUser, session: null } 
+      }));
+      
+      return adminUser;
+    }
+    
+    console.log("Not a predefined admin, trying Supabase auth...");
+    
     let authData;
     let authError;
     

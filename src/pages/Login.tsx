@@ -29,6 +29,8 @@ const Login: React.FC = () => {
       return;
     }
 
+    console.log("Attempting login with:", identifier);
+
     // Login functionality
     try {
       const user = await login(identifier, password);
@@ -45,15 +47,13 @@ const Login: React.FC = () => {
           navigate('/');
         }
       } else {
-        setLoginError("Invalid credentials. Please try again.");
+        setLoginError("Invalid credentials. Please check your username/email and password.");
         toast.error("Invalid credentials. Please try again.");
       }
     } catch (error: any) {
       console.error("Login error:", error);
-      
-      // Show fallback message for any other errors
-      setLoginError("Authentication error. Using demo mode.");
-      toast.error("Using demo mode for authentication.");
+      setLoginError("Authentication error. Please try again.");
+      toast.error("Authentication error. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -78,9 +78,8 @@ const Login: React.FC = () => {
           
           <CardContent>
             {loginError && (
-              <div className="mb-4 p-3 bg-yellow-50 border-l-4 border-yellow-400 text-yellow-800">
+              <div className="mb-4 p-3 bg-red-50 border-l-4 border-red-400 text-red-800">
                 <p>{loginError}</p>
-                <p className="text-xs mt-1">You can still use the demo accounts listed below.</p>
               </div>
             )}
           
@@ -130,13 +129,12 @@ const Login: React.FC = () => {
               </Button>
               
               <div className="text-sm text-gray-500 text-center mt-6 p-3 bg-gray-50 rounded border border-gray-100">
-                <p className="font-semibold mb-2">For demo purposes, use:</p>
+                <p className="font-semibold mb-2">Demo Accounts (Working):</p>
                 <ul className="space-y-1">
-                  <li><strong>User:</strong> john@example.com</li>
-                  <li><strong>Admin:</strong> a@123456 <span className="text-xs">(password: 1234)</span></li>
                   <li><strong>Super Admin:</strong> sa@123456 <span className="text-xs">(password: 1234)</span></li>
-                  <li><strong>Ground Owner:</strong> Any registered owner <span className="text-xs">(password: 123456)</span></li>
+                  <li><strong>Admin:</strong> a@123456 <span className="text-xs">(password: 1234)</span></li>
                 </ul>
+                <p className="text-xs mt-2 text-gray-400">Or register a new account below</p>
               </div>
             </form>
           </CardContent>
