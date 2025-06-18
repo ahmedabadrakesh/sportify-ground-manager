@@ -5,7 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { getCurrentUser } from "@/utils/auth";
+import { getCurrentUser, hasRoleSync } from "@/utils/auth";
 import { professionalFormSchema, type ProfessionalFormValues } from "../schemas/professionalFormSchema";
 
 export const useRegisterProfessionalForm = (onSuccess: () => void) => {
@@ -14,6 +14,8 @@ export const useRegisterProfessionalForm = (onSuccess: () => void) => {
   const stepTitles = ["Basic Info", "Professional", "Training", "Contact", "Social", "Media"];
   
   const queryClient = useQueryClient();
+  const isSuperAdmin = hasRoleSync('super_admin');
+  
   const form = useForm<ProfessionalFormValues>({
     resolver: zodResolver(professionalFormSchema),
     defaultValues: {
@@ -55,6 +57,19 @@ export const useRegisterProfessionalForm = (onSuccess: () => void) => {
         throw new Error("You must be logged in to register as a sports professional");
       }
 
+      // Check if user already has a professional profile (unless super admin)
+      if (!isSuperAdmin) {
+        const { data: existingProfile } = await supabase
+          .from('sports_professionals')
+          .select('id')
+          .eq('user_id', currentUser.id)
+          .single();
+
+        if (existingProfile) {
+          throw new Error("You already have a professional profile. You can only have one profile.");
+        }
+      }
+
       const professionalData = {
         user_id: currentUser.id,
         name: values.name,
@@ -88,20 +103,32 @@ export const useRegisterProfessionalForm = (onSuccess: () => void) => {
       
       if (error) throw error;
 
-      // Update user role to sports_professional
-      const { error: userUpdateError } = await supabase
-        .from('users')
-        .update({ role: 'sports_professional' })
-        .eq('id', currentUser.id);
+      // Update user role to sports_professional only if not already super admin
+      if (!isSuperAdmin) {
+        const { error: userUpdateError } = await supabase
+          .from('users')
+          .update({ role: 'sports_professional' })
+          .eq('id', currentUser.id);
 
-      if (userUpdateError) {
-        console.error("Failed to update user role:", userUpdateError);
-        // Don't throw here as the professional profile was created successfully
+        if (userUpdateError) {
+          console.error("Failed to update user role:", userUpdateError);
+          // Don't throw here as the professional profile was created successfully
+        }
+
+        // Update localStorage with new role
+        const updatedUser = { ...currentUser, role: 'sports_professional' as const };
+        localStorage.setItem('currentUser', JSON.stringify(updatedUser));
+        
+        // Trigger auth state change event
+        window.dispatchEvent(new CustomEvent('authStateChanged', { 
+          detail: { user: updatedUser, session: null } 
+        }));
       }
     },
     onSuccess: () => {
       toast.success("Successfully registered as a sports professional");
       queryClient.invalidateQueries({ queryKey: ["sports-professionals"] });
+      queryClient.invalidateQueries({ queryKey: ["admin-sports-professionals"] });
       onSuccess();
     },
     onError: (error) => {

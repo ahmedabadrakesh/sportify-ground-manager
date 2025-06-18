@@ -16,15 +16,20 @@ import {
 import { toast } from "sonner";
 import RegisterProfessionalDialog from "@/components/professionals/RegisterProfessionalDialog";
 import EditProfessionalDialog from "@/components/admin/professionals/EditProfessionalDialog";
+import { getCurrentUserSync, hasRoleSync } from "@/utils/auth";
 
 const AdminSportsProfessionals = () => {
   const [isRegisterDialogOpen, setIsRegisterDialogOpen] = React.useState(false);
   const [editingProfessional, setEditingProfessional] = React.useState<any>(null);
+  
+  const currentUser = getCurrentUserSync();
+  const isSuperAdmin = hasRoleSync('super_admin');
+  const isSportsProfessional = hasRoleSync('sports_professional');
 
   const { data: professionals, isLoading } = useQuery({
     queryKey: ["admin-sports-professionals"],
     queryFn: async () => {
-      const { data, error } = await supabase
+      let query = supabase
         .from("sports_professionals")
         .select(`
           *,
@@ -34,12 +39,23 @@ const AdminSportsProfessionals = () => {
         `)
         .order("created_at", { ascending: false });
 
+      // If user is a sports professional, only show their own profile
+      if (isSportsProfessional && !isSuperAdmin) {
+        query = query.eq('user_id', currentUser?.id);
+      }
+
+      const { data, error } = await query;
       if (error) throw error;
       return data;
     },
   });
 
   const handleDelete = async (id: string) => {
+    if (!isSuperAdmin) {
+      toast.error("Only super admins can delete professional profiles");
+      return;
+    }
+
     try {
       const { error } = await supabase
         .from('sports_professionals')
@@ -52,6 +68,23 @@ const AdminSportsProfessionals = () => {
       console.error("Error deleting professional:", error);
       toast.error("Failed to delete professional");
     }
+  };
+
+  const handleEdit = (professional: any) => {
+    // Check if user can edit this profile
+    if (!isSuperAdmin && professional.user_id !== currentUser?.id) {
+      toast.error("You can only edit your own profile");
+      return;
+    }
+    setEditingProfessional(professional);
+  };
+
+  const handleAddProfessional = () => {
+    if (!isSuperAdmin && !isSportsProfessional) {
+      toast.error("Only sports professionals can register profiles");
+      return;
+    }
+    setIsRegisterDialogOpen(true);
   };
 
   if (isLoading) {
@@ -68,10 +101,12 @@ const AdminSportsProfessionals = () => {
   return (
     <AdminLayout>
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">Sports Professionals</h1>
-        <Button onClick={() => setIsRegisterDialogOpen(true)}>
+        <h1 className="text-2xl font-bold">
+          {isSportsProfessional && !isSuperAdmin ? "My Profile" : "Sports Professionals"}
+        </h1>
+        <Button onClick={handleAddProfessional}>
           <Plus className="w-4 h-4 mr-2" />
-          Add Professional
+          {isSportsProfessional && !isSuperAdmin ? "Create My Profile" : "Add Professional"}
         </Button>
       </div>
 
@@ -110,19 +145,22 @@ const AdminSportsProfessionals = () => {
                     <Button
                       variant="outline"
                       size="sm"
-                      onClick={() => setEditingProfessional(professional)}
+                      onClick={() => handleEdit(professional)}
+                      disabled={!isSuperAdmin && professional.user_id !== currentUser?.id}
                     >
                       <Edit className="h-4 w-4" />
                       <span className="sr-only">Edit</span>
                     </Button>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => handleDelete(professional.id)}
-                    >
-                      <Trash2 className="h-4 w-4 text-destructive" />
-                      <span className="sr-only">Delete</span>
-                    </Button>
+                    {isSuperAdmin && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleDelete(professional.id)}
+                      >
+                        <Trash2 className="h-4 w-4 text-destructive" />
+                        <span className="sr-only">Delete</span>
+                      </Button>
+                    )}
                   </div>
                 </TableCell>
               </TableRow>

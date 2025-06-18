@@ -12,6 +12,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { PhotoUpload } from "../../professionals/components/PhotoUpload";
 import { ProfessionalFormFields } from "../../professionals/components/ProfessionalFormFields";
 import { professionalFormSchema, type ProfessionalFormValues } from "../../professionals/schemas/professionalFormSchema";
+import { getCurrentUserSync, hasRoleSync } from "@/utils/auth";
 
 interface EditProfessionalDialogProps {
   open: boolean;
@@ -21,6 +22,12 @@ interface EditProfessionalDialogProps {
 
 const EditProfessionalDialog = ({ open, onOpenChange, professional }: EditProfessionalDialogProps) => {
   const queryClient = useQueryClient();
+  const currentUser = getCurrentUserSync();
+  const isSuperAdmin = hasRoleSync('super_admin');
+  
+  // Check if user can edit this profile
+  const canEdit = isSuperAdmin || professional.user_id === currentUser?.id;
+
   const form = useForm<ProfessionalFormValues>({
     resolver: zodResolver(professionalFormSchema),
     defaultValues: {
@@ -52,6 +59,10 @@ const EditProfessionalDialog = ({ open, onOpenChange, professional }: EditProfes
 
   const updateMutation = useMutation({
     mutationFn: async (values: ProfessionalFormValues) => {
+      if (!canEdit) {
+        throw new Error("You don't have permission to edit this profile");
+      }
+
       const { error } = await supabase
         .from('sports_professionals')
         .update({
@@ -97,6 +108,20 @@ const EditProfessionalDialog = ({ open, onOpenChange, professional }: EditProfes
   const onSubmit = (values: ProfessionalFormValues) => {
     updateMutation.mutate(values);
   };
+
+  if (!canEdit) {
+    return (
+      <Dialog open={open} onOpenChange={onOpenChange}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Access Denied</DialogTitle>
+          </DialogHeader>
+          <p>You don't have permission to edit this professional profile.</p>
+          <Button onClick={() => onOpenChange(false)}>Close</Button>
+        </DialogContent>
+      </Dialog>
+    );
+  }
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
