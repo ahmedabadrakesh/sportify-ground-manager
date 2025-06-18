@@ -19,11 +19,13 @@ const SportsProfessionalsPromotion = () => {
           <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full transform translate-x-16 -translate-y-16" />
           <div className="relative z-10">
             <Search className="w-12 h-12 mb-4" />
-            <h3 className="text-2xl font-bold mb-4">Looking for Sports Professional?</h3>
+            <h3 className="text-2xl font-bold mb-4">
+              Looking for Sports Professional?
+            </h3>
             <p className="mb-6 text-white/90">
-              Find experienced coaches, trainers, and athletes for your sports journey
+              Find experienced coaches and trainers for your sports journey.
             </p>
-            <Button 
+            <Button
               onClick={() => navigate("/sports-professionals")}
               variant="secondary"
               className="bg-white text-primary-700 hover:bg-white/90"
@@ -44,11 +46,13 @@ const SportsProfessionalsPromotion = () => {
           <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full transform translate-x-16 -translate-y-16" />
           <div className="relative z-10">
             <UserPlus className="w-12 h-12 mb-4" />
-            <h3 className="text-2xl font-bold mb-4">Want to join JOKOVO's Professional Squad?</h3>
+            <h3 className="text-2xl font-bold mb-4">
+              Want to join JOKOVO's Professional Squad?
+            </h3>
             <p className="mb-6 text-white/90">
               Register with us and connect with sports enthusiasts in your area
             </p>
-            <Button 
+            <Button
               onClick={() => navigate("/sports-professionals")}
               variant="secondary"
               className="bg-white text-secondary-700 hover:bg-white/90"

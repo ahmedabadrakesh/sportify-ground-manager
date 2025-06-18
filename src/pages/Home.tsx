@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import MainLayout from "@/components/layouts/MainLayout";
 import HeroSection from "@/components/home/HeroSection";
@@ -40,10 +39,10 @@ const Home: React.FC = () => {
       checkAuth();
     };
 
-    window.addEventListener('authStateChanged', handleAuthStateChange);
+    window.addEventListener("authStateChanged", handleAuthStateChange);
 
     return () => {
-      window.removeEventListener('authStateChanged', handleAuthStateChange);
+      window.removeEventListener("authStateChanged", handleAuthStateChange);
     };
   }, []);
 
@@ -65,22 +64,22 @@ const Home: React.FC = () => {
   return (
     <MainLayout>
       <HeroSection onSearch={handleSearch} />
-      <PopularSportsSection />
-      <div className="container mx-auto px-4">
-        <StatBanner />
-        <SearchResultsSection 
-          searchTerm={searchTerm} 
-          hasSearched={hasSearched} 
-        />
+      <div>
         <SportsProfessionalsPromotion />
+        <PopularSportsSection />
+        <SearchResultsSection
+          searchTerm={searchTerm}
+          hasSearched={hasSearched}
+        />
         <FeaturedGroundsSection />
+        <StatBanner />
       </div>
       <div className="bg-gray-50 py-16">
         <div className="container mx-auto px-4 mb-8">
           <div className="flex flex-col md:flex-row justify-between items-center mb-8">
             <h2 className="text-3xl font-bold">Events</h2>
-            <Button 
-              onClick={handleAddEvent} 
+            <Button
+              onClick={handleAddEvent}
               className="mt-4 md:mt-0 flex items-center gap-2"
             >
               <Plus className="h-4 w-4" /> Add Event
@@ -97,7 +96,7 @@ const Home: React.FC = () => {
       </div>
 
       {/* Authentication Required Dialog */}
-      <AuthRequiredDialog 
+      <AuthRequiredDialog
         open={authDialogOpen}
         onOpenChange={setAuthDialogOpen}
         title="Authentication Required"

@@ -5,6 +5,8 @@ import { Button } from "@/components/ui/button";
 import { logout, getCurrentUserSync } from "@/utils/auth";
 import { Toaster } from "@/components/ui/toaster";
 import { toast } from "sonner";
+import jokovaLogoTextImage from "/public/green_text_only_logo.png";
+import jokovaLogoSymbolImage from "/public/green_jokova_symbol.png";
 
 interface MainLayoutProps {
   children: React.ReactNode;
@@ -30,10 +32,10 @@ const MainLayout = ({ children }: MainLayoutProps) => {
       checkAuth();
     };
 
-    window.addEventListener('authStateChanged', handleAuthStateChange);
+    window.addEventListener("authStateChanged", handleAuthStateChange);
 
     return () => {
-      window.removeEventListener('authStateChanged', handleAuthStateChange);
+      window.removeEventListener("authStateChanged", handleAuthStateChange);
     };
   }, []);
 
@@ -50,46 +52,63 @@ const MainLayout = ({ children }: MainLayoutProps) => {
 
   return (
     <div className="flex flex-col min-h-screen">
-      <header className="bg-white shadow">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <header className="bg-white">
+        <div className="mx-auto max-w-7xl">
           <div className="flex h-16 justify-between items-center">
             <div className="flex items-center">
-              <Link to="/" className="text-2xl font-bold text-primary">
-                SportsArena
+              <Link to="/" className="flex items-center">
+                <img
+                  src={jokovaLogoSymbolImage}
+                  width="80"
+                  className="mr-2 fill-red-50"
+                />
+                <img src={jokovaLogoTextImage} width="180" />
               </Link>
             </div>
 
             {/* Desktop Navigation */}
             <nav className="hidden md:flex space-x-8">
-              <Link to="/search" className="text-gray-700 hover:text-primary">
+              <Link
+                to="/search"
+                className="text-green-700 font-bold hover:text-primary"
+              >
                 Grounds
               </Link>
-              <Link to="/bookings" className="text-gray-700 hover:text-primary">
+              <Link
+                to="/bookings"
+                className="text-green-700 font-bold  hover:text-primary"
+              >
                 Bookings
               </Link>
               <Link
                 to="/sports-professionals"
-                className="text-gray-700 hover:text-primary"
+                className="text-green-700 font-bold  hover:text-primary"
               >
                 Professionals
               </Link>
-              <Link to="/events" className="text-gray-700 hover:text-primary">
+              <Link
+                to="/events"
+                className="text-green-700 font-bold  hover:text-primary"
+              >
                 Events
               </Link>
-              <Link to="/shop" className="text-gray-700 hover:text-primary">
+              <Link
+                to="/shop"
+                className="text-green-700 font-bold  hover:text-primary"
+              >
                 Shop
               </Link>
             </nav>
 
             {/* Desktop Actions */}
-            <div className="hidden md:flex items-center space-x-4">
+            <div className="hidden md:flex items-right space-x-1">
               <Link to="/cart">
                 <Button variant="ghost" size="icon">
                   <ShoppingCart className="h-5 w-5" />
                 </Button>
               </Link>
               {authenticated ? (
-                <div className="flex items-center space-x-4">
+                <div className="flex items-center space-x-1">
                   <Link to="/admin/dashboard">
                     <Button variant="outline">Dashboard</Button>
                   </Link>
@@ -98,14 +117,15 @@ const MainLayout = ({ children }: MainLayoutProps) => {
                   </Button>
                 </div>
               ) : (
-                <div className="flex items-center space-x-4">
+                <div className="flex items-center">
                   <Link to="/login">
                     <Button variant="ghost" className="flex items-center">
-                      <LogIn className="mr-2 h-4 w-4" /> Login
+                      <LogIn className="mr-2 h-4 w-4" />
+                      Login
                     </Button>
                   </Link>
                   <Link to="/register">
-                    <Button variant="default" className="flex items-center">
+                    <Button variant="default" className="flex items-flex-end">
                       <UserPlus className="mr-2 h-4 w-4" /> Register
                     </Button>
                   </Link>

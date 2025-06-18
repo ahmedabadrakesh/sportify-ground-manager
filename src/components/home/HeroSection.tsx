@@ -1,8 +1,8 @@
-
 import React, { useState } from "react";
 import { Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { useNavigate } from "react-router-dom";
 
 interface HeroSectionProps {
   onSearch: (term: string) => void;
@@ -10,7 +10,7 @@ interface HeroSectionProps {
 
 const HeroSection: React.FC<HeroSectionProps> = ({ onSearch }) => {
   const [searchInput, setSearchInput] = useState("");
-
+  const navigate = useNavigate();
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (searchInput.trim()) {
@@ -19,7 +19,8 @@ const HeroSection: React.FC<HeroSectionProps> = ({ onSearch }) => {
   };
 
   return (
-    <div className="relative overflow-hidden"> {/* Removed bottom margin */}
+    <div className="relative overflow-hidden mb-8">
+      {/* Removed bottom margin */}
       <video
         className="absolute top-0 left-0 w-full h-full object-cover z-0"
         autoPlay
@@ -28,20 +29,22 @@ const HeroSection: React.FC<HeroSectionProps> = ({ onSearch }) => {
         playsInline
         src="https://techitree.s3.ap-south-1.amazonaws.com/header_videdo.mp4"
       ></video>
-      
       <div className="absolute inset-0 bg-gradient-to-b from-black/70 to-black/50 z-10"></div>
-      
       <div className="relative z-20 py-24 md:py-32 container mx-auto px-4">
         <div className="max-w-3xl mx-auto text-center text-white">
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6">
-            Find and Book Sports Grounds Near You
+            Find Sports Professionals Near You
           </h1>
-          
+
           <p className="text-xl md:text-2xl mb-8 text-gray-200">
-            Discover the perfect venue for your game, book instantly, and play without hassle
+            {/* Discover the perfect venue for your game, book instantly, and play without hassle */}
+            Trusted Sports Experts, Right in Your Neighborhood.
           </p>
-          
-          <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-3 mb-8">
+
+          {/* <form
+            onSubmit={handleSubmit}
+            className="flex flex-col sm:flex-row gap-3 mb-8"
+          >
             <div className="relative flex-grow">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" />
               <Input
@@ -55,9 +58,9 @@ const HeroSection: React.FC<HeroSectionProps> = ({ onSearch }) => {
             <Button type="submit" size="lg" className="px-8 py-6 text-lg">
               Search
             </Button>
-          </form>
-          
-          <div className="flex flex-wrap justify-center gap-3 text-sm">
+          </form> */}
+
+          {/* <div className="flex flex-wrap justify-center gap-3 text-sm">
             <span className="text-gray-300">Popular searches:</span>
             <button
               onClick={() => {
@@ -95,7 +98,17 @@ const HeroSection: React.FC<HeroSectionProps> = ({ onSearch }) => {
             >
               Badminton
             </button>
-          </div>
+          </div> */}
+          <>
+            <Button
+              onClick={() => navigate("/sports-professionals")}
+              variant="secondary"
+              className="bg-white text-primary-700 hover:bg-white/90"
+            >
+              <Search className="mr-2 h-4 w-4" />
+              Find Professionals
+            </Button>
+          </>
         </div>
       </div>
     </div>
