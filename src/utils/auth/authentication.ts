@@ -97,6 +97,8 @@ export const register = async (
   userType: 'user' | 'sports_professional' = 'user'
 ): Promise<User | null> => {
   try {
+    console.log("Starting registration process for:", { name, email, phone, userType });
+    
     // Format phone number if provided
     let formattedPhone = phone;
     if (phone && !phone.startsWith('+')) {
@@ -118,13 +120,14 @@ export const register = async (
     
     if (error) {
       console.error("Registration error:", error);
-      return null;
+      throw error;
     }
     
+    console.log("Supabase auth registration successful:", data);
+    
     if (data.user) {
-      // The trigger will automatically create the user profile
       // Wait a moment for the trigger to execute
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      await new Promise(resolve => setTimeout(resolve, 1500));
       
       // Fetch the created user profile
       const { data: userData, error: userError } = await supabase
@@ -134,6 +137,7 @@ export const register = async (
         .single();
       
       if (userData && !userError) {
+        console.log("User profile created successfully:", userData);
         localStorage.setItem('currentUser', JSON.stringify(userData));
         
         // Trigger a custom event to notify other components
@@ -142,13 +146,43 @@ export const register = async (
         }));
         
         return userData as User;
+      } else {
+        console.error("Error fetching user profile:", userError);
+        // If the user profile wasn't created automatically, create it manually
+        console.log("Attempting to create user profile manually...");
+        
+        const { data: manualUserData, error: manualError } = await supabase
+          .from('users')
+          .insert({
+            auth_id: data.user.id,
+            name,
+            email,
+            phone: formattedPhone || null,
+            role: userType === 'sports_professional' ? 'sports_professional' : 'user'
+          })
+          .select()
+          .single();
+        
+        if (manualUserData && !manualError) {
+          console.log("Manual user profile creation successful:", manualUserData);
+          localStorage.setItem('currentUser', JSON.stringify(manualUserData));
+          
+          // Trigger a custom event to notify other components
+          window.dispatchEvent(new CustomEvent('authStateChanged', { 
+            detail: { user: manualUserData, session: data.session } 
+          }));
+          
+          return manualUserData as User;
+        } else {
+          console.error("Manual user profile creation failed:", manualError);
+        }
       }
     }
     
     return null;
   } catch (error) {
     console.error("Registration error:", error);
-    return null;
+    throw error;
   }
 };
 

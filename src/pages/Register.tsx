@@ -20,12 +20,10 @@ const Register: React.FC = () => {
   const [userType, setUserType] = useState<'user' | 'sports_professional'>('user');
   const [isLoading, setIsLoading] = useState(false);
   const [registrationType, setRegistrationType] = useState<"email" | "phone">("email");
-  const [registrationError, setRegistrationError] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    setRegistrationError(null);
 
     // Simple form validation
     if (!name || (!email && !phone) || !password || !confirmPassword) {
@@ -52,6 +50,8 @@ const Register: React.FC = () => {
 
     // Registration logic
     try {
+      console.log("Starting registration with:", { name, email, phone, userType });
+      
       const user = await register(
         name, 
         registrationType === "email" ? email : "", 
@@ -61,7 +61,8 @@ const Register: React.FC = () => {
       );
       
       if (user) {
-        toast.success("Registration successful! Please check your email to verify your account.");
+        toast.success("Registration successful! Welcome to SportifyGround!");
+        console.log("Registration successful, user:", user);
         
         // Redirect based on user type
         if (userType === 'sports_professional') {
@@ -70,22 +71,24 @@ const Register: React.FC = () => {
           navigate("/");
         }
       } else {
-        toast.error("Registration failed. Please try again with different credentials.");
-        setRegistrationError("Registration failed. Please try with different credentials.");
+        toast.error("Registration failed. Please try again.");
       }
     } catch (error: any) {
       console.error("Registration error:", error);
       
       // Handle specific error messages
-      if (error.message?.includes("phone_provider_disabled")) {
-        setRegistrationError("Phone number registration is currently disabled. Please use email instead.");
-        toast.error("Phone registration is disabled. Please register with email.");
+      if (error.message?.includes("User already registered")) {
+        toast.error("This email is already registered. Please use a different email or try logging in.");
+      } else if (error.message?.includes("email_address_invalid")) {
+        toast.error("Please enter a valid email address.");
+      } else if (error.message?.includes("password")) {
+        toast.error("Password must be at least 6 characters long.");
+      } else if (error.message?.includes("phone_provider_disabled")) {
+        toast.error("Phone number registration is currently disabled. Please use email instead.");
       } else if (error.message?.includes("over_email_send_rate_limit")) {
-        setRegistrationError("Too many registration attempts. Please try again later.");
-        toast.error("Email rate limit exceeded. Please try again later.");
+        toast.error("Too many registration attempts. Please try again later.");
       } else {
-        setRegistrationError("An error occurred during registration. Please try again.");
-        toast.error("Registration failed. Please try again.");
+        toast.error("Registration failed. Please check your details and try again.");
       }
     } finally {
       setIsLoading(false);
@@ -110,12 +113,6 @@ const Register: React.FC = () => {
           </CardHeader>
           
           <CardContent>
-            {registrationError && (
-              <div className="mb-4 p-3 bg-yellow-50 border-l-4 border-yellow-400 text-yellow-800">
-                <p>{registrationError}</p>
-              </div>
-            )}
-            
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="name">Full Name</Label>
