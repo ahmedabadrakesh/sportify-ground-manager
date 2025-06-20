@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -20,20 +20,23 @@ const Register: React.FC = () => {
   const [userType, setUserType] = useState<'user' | 'sports_professional'>('user');
   const [isLoading, setIsLoading] = useState(false);
   const [registrationType, setRegistrationType] = useState<"email" | "phone">("email");
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  
+  // Use a ref to track if submission is in progress
+  const isSubmittingRef = useRef(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     e.stopPropagation();
     
-    // Prevent multiple submissions
-    if (isLoading || isSubmitting) {
+    // Prevent multiple submissions using ref (more reliable than state)
+    if (isLoading || isSubmittingRef.current) {
       console.log("Registration already in progress, ignoring submission");
       return;
     }
 
+    // Set the ref immediately to block any other submissions
+    isSubmittingRef.current = true;
     setIsLoading(true);
-    setIsSubmitting(true);
 
     try {
       // Simple form validation
@@ -98,7 +101,7 @@ const Register: React.FC = () => {
       }
     } finally {
       setIsLoading(false);
-      setIsSubmitting(false);
+      isSubmittingRef.current = false;
     }
   };
 
@@ -228,7 +231,7 @@ const Register: React.FC = () => {
               <Button 
                 type="submit" 
                 className="w-full" 
-                disabled={isLoading || isSubmitting}
+                disabled={isLoading}
               >
                 {isLoading ? "Creating account..." : "Register"}
               </Button>

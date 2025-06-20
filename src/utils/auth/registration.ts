@@ -3,7 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { User } from "@/types/models";
 
 // Track ongoing registration attempts to prevent duplicates
-const ongoingRegistrations = new Set<string>();
+const ongoingRegistrations = new Map<string, Promise<User | null>>();
 
 // Register a new user
 export const register = async (
@@ -14,23 +14,40 @@ export const register = async (
   userType: 'user' | 'sports_professional' = 'user'
 ): Promise<User | null> => {
   // Create a unique key for this registration attempt
-  const registrationKey = `${email || phone}_${Date.now()}`;
+  const registrationKey = email || phone;
   
-  // Check if a similar registration is already in progress
-  const existingKey = Array.from(ongoingRegistrations).find(key => 
-    key.startsWith(email || phone)
-  );
-  
-  if (existingKey) {
-    console.log("Registration already in progress for this identifier");
-    throw new Error("Registration already in progress. Please wait.");
+  // Check if a registration is already in progress for this identifier
+  if (ongoingRegistrations.has(registrationKey)) {
+    console.log("Registration already in progress for:", registrationKey);
+    // Return the existing promise instead of creating a new one
+    return ongoingRegistrations.get(registrationKey)!;
   }
 
-  ongoingRegistrations.add(registrationKey);
+  console.log("Starting registration process for:", { name, email, phone, userType });
+  
+  // Create the registration promise
+  const registrationPromise = performRegistration(name, email, phone, password, userType);
+  
+  // Store the promise to prevent duplicates
+  ongoingRegistrations.set(registrationKey, registrationPromise);
+  
+  // Clean up when done (whether success or failure)
+  registrationPromise.finally(() => {
+    ongoingRegistrations.delete(registrationKey);
+  });
+  
+  return registrationPromise;
+};
 
+// Actual registration implementation
+const performRegistration = async (
+  name: string, 
+  email: string, 
+  phone: string, 
+  password: string, 
+  userType: 'user' | 'sports_professional'
+): Promise<User | null> => {
   try {
-    console.log("Starting registration process for:", { name, email, phone, userType });
-    
     // Format phone number if provided
     let formattedPhone = phone;
     if (phone && !phone.startsWith('+')) {
@@ -120,8 +137,5 @@ export const register = async (
   } catch (error) {
     console.error("Registration error:", error);
     throw error;
-  } finally {
-    // Always clean up the registration tracking
-    ongoingRegistrations.delete(registrationKey);
   }
 };
