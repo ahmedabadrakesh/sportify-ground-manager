@@ -2,6 +2,9 @@
 import { supabase } from "@/integrations/supabase/client";
 import { User } from "@/types/models";
 
+// Track ongoing registration attempts to prevent duplicates
+const ongoingRegistrations = new Set<string>();
+
 // Register a new user
 export const register = async (
   name: string, 
@@ -10,6 +13,21 @@ export const register = async (
   password: string, 
   userType: 'user' | 'sports_professional' = 'user'
 ): Promise<User | null> => {
+  // Create a unique key for this registration attempt
+  const registrationKey = `${email || phone}_${Date.now()}`;
+  
+  // Check if a similar registration is already in progress
+  const existingKey = Array.from(ongoingRegistrations).find(key => 
+    key.startsWith(email || phone)
+  );
+  
+  if (existingKey) {
+    console.log("Registration already in progress for this identifier");
+    throw new Error("Registration already in progress. Please wait.");
+  }
+
+  ongoingRegistrations.add(registrationKey);
+
   try {
     console.log("Starting registration process for:", { name, email, phone, userType });
     
@@ -33,6 +51,12 @@ export const register = async (
     
     if (error) {
       console.error("Registration error:", error);
+      
+      // Handle rate limit errors specifically
+      if (error.status === 429 || error.message?.includes("rate limit")) {
+        throw new Error("Too many registration attempts. Please wait a few minutes before trying again.");
+      }
+      
       throw error;
     }
     
@@ -96,5 +120,8 @@ export const register = async (
   } catch (error) {
     console.error("Registration error:", error);
     throw error;
+  } finally {
+    // Always clean up the registration tracking
+    ongoingRegistrations.delete(registrationKey);
   }
 };

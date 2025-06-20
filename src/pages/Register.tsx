@@ -20,36 +20,42 @@ const Register: React.FC = () => {
   const [userType, setUserType] = useState<'user' | 'sports_professional'>('user');
   const [isLoading, setIsLoading] = useState(false);
   const [registrationType, setRegistrationType] = useState<"email" | "phone">("email");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    e.stopPropagation();
+    
+    // Prevent multiple submissions
+    if (isLoading || isSubmitting) {
+      console.log("Registration already in progress, ignoring submission");
+      return;
+    }
+
     setIsLoading(true);
+    setIsSubmitting(true);
 
-    // Simple form validation
-    if (!name || (!email && !phone) || !password || !confirmPassword) {
-      toast.error("Please fill in all required fields");
-      setIsLoading(false);
-      return;
-    }
-
-    if (password !== confirmPassword) {
-      toast.error("Passwords do not match");
-      setIsLoading(false);
-      return;
-    }
-
-    // Basic validation for phone number format
-    if (registrationType === "phone" && phone) {
-      const phoneRegex = /^\d{10}$/;
-      if (!phoneRegex.test(phone)) {
-        toast.error("Please enter a valid 10-digit mobile number");
-        setIsLoading(false);
+    try {
+      // Simple form validation
+      if (!name || (!email && !phone) || !password || !confirmPassword) {
+        toast.error("Please fill in all required fields");
         return;
       }
-    }
 
-    // Registration logic
-    try {
+      if (password !== confirmPassword) {
+        toast.error("Passwords do not match");
+        return;
+      }
+
+      // Basic validation for phone number format
+      if (registrationType === "phone" && phone) {
+        const phoneRegex = /^\d{10}$/;
+        if (!phoneRegex.test(phone)) {
+          toast.error("Please enter a valid 10-digit mobile number");
+          return;
+        }
+      }
+
       console.log("Starting registration with:", { name, email, phone, userType });
       
       const user = await register(
@@ -85,13 +91,14 @@ const Register: React.FC = () => {
         toast.error("Password must be at least 6 characters long.");
       } else if (error.message?.includes("phone_provider_disabled")) {
         toast.error("Phone number registration is currently disabled. Please use email instead.");
-      } else if (error.message?.includes("rate limit") || error.status === 429) {
-        toast.error("Too many registration attempts. Please try again later or contact support.");
+      } else if (error.message?.includes("rate limit") || error.status === 429 || error.code === "over_email_send_rate_limit") {
+        toast.error("Too many registration attempts. Please wait a few minutes before trying again.");
       } else {
         toast.error("Registration failed. Please check your details and try again.");
       }
     } finally {
       setIsLoading(false);
+      setIsSubmitting(false);
     }
   };
 
@@ -121,13 +128,18 @@ const Register: React.FC = () => {
                   placeholder="John Smith"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
+                  disabled={isLoading}
                   required
                 />
               </div>
 
               <div className="space-y-2">
                 <Label>Account Type</Label>
-                <RadioGroup value={userType} onValueChange={(value: 'user' | 'sports_professional') => setUserType(value)}>
+                <RadioGroup 
+                  value={userType} 
+                  onValueChange={(value: 'user' | 'sports_professional') => setUserType(value)}
+                  disabled={isLoading}
+                >
                   <div className="flex items-center space-x-2">
                     <RadioGroupItem value="user" id="user" />
                     <Label htmlFor="user">Regular User</Label>
@@ -141,8 +153,8 @@ const Register: React.FC = () => {
               
               <Tabs defaultValue="email" onValueChange={(value) => setRegistrationType(value as "email" | "phone")}>
                 <TabsList className="grid w-full grid-cols-2">
-                  <TabsTrigger value="email">Email</TabsTrigger>
-                  <TabsTrigger value="phone">Phone</TabsTrigger>
+                  <TabsTrigger value="email" disabled={isLoading}>Email</TabsTrigger>
+                  <TabsTrigger value="phone" disabled={isLoading}>Phone</TabsTrigger>
                 </TabsList>
                 
                 <TabsContent value="email" className="space-y-2">
@@ -153,6 +165,7 @@ const Register: React.FC = () => {
                     placeholder="you@example.com"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
+                    disabled={isLoading}
                     required={registrationType === "email"}
                   />
                 </TabsContent>
@@ -165,6 +178,7 @@ const Register: React.FC = () => {
                     placeholder="10-digit mobile number"
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
+                    disabled={isLoading}
                     required={registrationType === "phone"}
                   />
                   <p className="text-xs text-gray-500">
@@ -181,6 +195,7 @@ const Register: React.FC = () => {
                   placeholder="Create a password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
+                  disabled={isLoading}
                   required
                 />
               </div>
@@ -193,6 +208,7 @@ const Register: React.FC = () => {
                   placeholder="Confirm your password"
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
+                  disabled={isLoading}
                   required
                 />
               </div>
@@ -209,7 +225,11 @@ const Register: React.FC = () => {
                 .
               </div>
               
-              <Button type="submit" className="w-full" disabled={isLoading}>
+              <Button 
+                type="submit" 
+                className="w-full" 
+                disabled={isLoading || isSubmitting}
+              >
                 {isLoading ? "Creating account..." : "Register"}
               </Button>
             </form>
@@ -232,6 +252,7 @@ const Register: React.FC = () => {
               variant="outline"
               className="w-full"
               onClick={() => navigate("/")}
+              disabled={isLoading}
             >
               Back to Home
             </Button>
