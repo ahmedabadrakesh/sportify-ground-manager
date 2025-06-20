@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -9,6 +8,8 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { toast } from "sonner";
 import { register } from "@/utils/auth";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Info } from "lucide-react";
 
 const Register: React.FC = () => {
   const navigate = useNavigate();
@@ -20,10 +21,12 @@ const Register: React.FC = () => {
   const [userType, setUserType] = useState<'user' | 'sports_professional'>('user');
   const [isLoading, setIsLoading] = useState(false);
   const [registrationType, setRegistrationType] = useState<"email" | "phone">("email");
+  const [showRateLimitInfo, setShowRateLimitInfo] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
+    setShowRateLimitInfo(false);
 
     // Simple form validation
     if (!name || (!email && !phone) || !password || !confirmPassword) {
@@ -61,7 +64,16 @@ const Register: React.FC = () => {
       );
       
       if (user) {
-        toast.success("Registration successful! Welcome to SportifyGround!");
+        // Check if this was a mock registration (due to rate limiting)
+        const isMockUser = user.id.startsWith('mock_user_');
+        
+        if (isMockUser) {
+          toast.success("Demo account created successfully! (Note: This is a temporary account for testing)");
+          setShowRateLimitInfo(true);
+        } else {
+          toast.success("Registration successful! Welcome to SportifyGround!");
+        }
+        
         console.log("Registration successful, user:", user);
         
         // Redirect based on user type
@@ -85,8 +97,9 @@ const Register: React.FC = () => {
         toast.error("Password must be at least 6 characters long.");
       } else if (error.message?.includes("phone_provider_disabled")) {
         toast.error("Phone number registration is currently disabled. Please use email instead.");
-      } else if (error.message?.includes("over_email_send_rate_limit")) {
-        toast.error("Too many registration attempts. Please try again later.");
+      } else if (error.message?.includes("rate limit") || error.status === 429) {
+        toast.error("Too many registration attempts. Please try again later or contact support.");
+        setShowRateLimitInfo(true);
       } else {
         toast.error("Registration failed. Please check your details and try again.");
       }
@@ -103,6 +116,17 @@ const Register: React.FC = () => {
             <h1 className="text-3xl font-bold text-primary-800">SportifyGround</h1>
           </Link>
         </div>
+
+        {showRateLimitInfo && (
+          <Alert className="mb-6">
+            <Info className="h-4 w-4" />
+            <AlertDescription>
+              Due to high traffic, we've created a temporary demo account for you. 
+              Your data will be saved locally for this session. For a permanent account, 
+              please try registering again later.
+            </AlertDescription>
+          </Alert>
+        )}
 
         <Card>
           <CardHeader>

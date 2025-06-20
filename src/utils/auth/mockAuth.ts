@@ -1,22 +1,36 @@
 
 import { User } from "@/types/models";
-import { users } from "@/data/mockData";
 
-// Mock login for demo purposes
-export const mockLogin = (identifier: string, password: string): User | null => {
-  console.log("Using mock login as fallback");
+// Mock authentication helper for handling rate limit fallbacks
+export const createMockUser = (
+  name: string,
+  email: string,
+  phone: string,
+  userType: 'user' | 'sports_professional' = 'user'
+): User => {
+  const mockUserId = `mock_user_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
   
-  // First try to find user by email
-  let user = users.find(u => u.email === identifier);
-  
-  // If not found, try by phone
-  if (!user) {
-    user = users.find(u => u.phone === identifier);
-  }
+  return {
+    id: mockUserId,
+    name,
+    email: email || '',
+    phone: phone || '',
+    role: userType === 'sports_professional' ? 'sports_professional' : 'user',
+    whatsapp: phone || ''
+  };
+};
+
+export const getMockUsers = (): Array<User & { password: string }> => {
+  return JSON.parse(localStorage.getItem('mockUsers') || '[]');
+};
+
+export const authenticateMockUser = (email: string, password: string): User | null => {
+  const mockUsers = getMockUsers();
+  const user = mockUsers.find(u => u.email === email && u.password === password);
   
   if (user) {
-    localStorage.setItem('currentUser', JSON.stringify(user));
-    return user;
+    const { password: _, ...userWithoutPassword } = user;
+    return userWithoutPassword;
   }
   
   return null;
