@@ -88,7 +88,7 @@ export const login = async (identifier: string, password: string): Promise<User 
   return null;
 };
 
-// Register a new user with fallback for rate limiting
+// Register a new user
 export const register = async (
   name: string, 
   email: string, 
@@ -105,125 +105,77 @@ export const register = async (
       formattedPhone = '+91' + phone.replace(/^0+/, '');
     }
     
-    // Try Supabase Auth registration first
-    try {
-      const { data, error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          data: {
-            name,
-            user_type: userType
-          },
-          emailRedirectTo: `${window.location.origin}/`
-        }
-      });
-      
-      if (error) {
-        // Check if it's a rate limit error
-        if (error.message?.includes("rate limit") || error.status === 429) {
-          console.log("Rate limit hit, falling back to mock registration");
-          throw new Error("RATE_LIMIT_FALLBACK");
-        }
-        console.error("Registration error:", error);
-        throw error;
-      }
-      
-      console.log("Supabase auth registration successful:", data);
-      
-      if (data.user) {
-        // Wait a moment for the trigger to execute
-        await new Promise(resolve => setTimeout(resolve, 1500));
-        
-        // Fetch the created user profile
-        const { data: userData, error: userError } = await supabase
-          .from('users')
-          .select('*')
-          .eq('auth_id', data.user.id)
-          .single();
-        
-        if (userData && !userError) {
-          console.log("User profile created successfully:", userData);
-          localStorage.setItem('currentUser', JSON.stringify(userData));
-          
-          // Trigger a custom event to notify other components
-          window.dispatchEvent(new CustomEvent('authStateChanged', { 
-            detail: { user: userData, session: data.session } 
-          }));
-          
-          return userData as User;
-        } else {
-          console.error("Error fetching user profile:", userError);
-          // If the user profile wasn't created automatically, create it manually
-          console.log("Attempting to create user profile manually...");
-          
-          const { data: manualUserData, error: manualError } = await supabase
-            .from('users')
-            .insert({
-              auth_id: data.user.id,
-              name,
-              email,
-              phone: formattedPhone || null,
-              role: userType === 'sports_professional' ? 'sports_professional' : 'user'
-            })
-            .select()
-            .single();
-          
-          if (manualUserData && !manualError) {
-            console.log("Manual user profile creation successful:", manualUserData);
-            localStorage.setItem('currentUser', JSON.stringify(manualUserData));
-            
-            // Trigger a custom event to notify other components
-            window.dispatchEvent(new CustomEvent('authStateChanged', { 
-              detail: { user: manualUserData, session: data.session } 
-            }));
-            
-            return manualUserData as User;
-          } else {
-            console.error("Manual user profile creation failed:", manualError);
-          }
-        }
-      }
-    } catch (supabaseError: any) {
-      // Handle rate limiting with fallback registration
-      if (supabaseError.message === "RATE_LIMIT_FALLBACK" || 
-          supabaseError.message?.includes("rate limit") || 
-          supabaseError.status === 429) {
-        
-        console.log("Using mock registration due to rate limit");
-        
-        // Generate a unique ID for the mock user
-        const mockUserId = `mock_user_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
-        
-        const mockUser: User = {
-          id: mockUserId,
+    const { data, error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        data: {
           name,
-          email: email || '',
-          phone: formattedPhone || '',
-          role: userType === 'sports_professional' ? 'sports_professional' : 'user',
-          whatsapp: formattedPhone || ''
-        };
-        
-        // Store mock user in localStorage for demo persistence
-        const mockUsers = JSON.parse(localStorage.getItem('mockUsers') || '[]');
-        mockUsers.push({
-          ...mockUser,
-          password // Store password for mock login
-        });
-        localStorage.setItem('mockUsers', JSON.stringify(mockUsers));
-        localStorage.setItem('currentUser', JSON.stringify(mockUser));
+          user_type: userType
+        },
+        emailRedirectTo: `${window.location.origin}/`
+      }
+    });
+    
+    if (error) {
+      console.error("Registration error:", error);
+      throw error;
+    }
+    
+    console.log("Supabase auth registration successful:", data);
+    
+    if (data.user) {
+      // Wait a moment for the trigger to execute
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      
+      // Fetch the created user profile
+      const { data: userData, error: userError } = await supabase
+        .from('users')
+        .select('*')
+        .eq('auth_id', data.user.id)
+        .single();
+      
+      if (userData && !userError) {
+        console.log("User profile created successfully:", userData);
+        localStorage.setItem('currentUser', JSON.stringify(userData));
         
         // Trigger a custom event to notify other components
         window.dispatchEvent(new CustomEvent('authStateChanged', { 
-          detail: { user: mockUser, session: null } 
+          detail: { user: userData, session: data.session } 
         }));
         
-        console.log("Mock registration successful:", mockUser);
-        return mockUser;
+        return userData as User;
+      } else {
+        console.error("Error fetching user profile:", userError);
+        // If the user profile wasn't created automatically, create it manually
+        console.log("Attempting to create user profile manually...");
+        
+        const { data: manualUserData, error: manualError } = await supabase
+          .from('users')
+          .insert({
+            auth_id: data.user.id,
+            name,
+            email,
+            phone: formattedPhone || null,
+            role: userType === 'sports_professional' ? 'sports_professional' : 'user'
+          })
+          .select()
+          .single();
+        
+        if (manualUserData && !manualError) {
+          console.log("Manual user profile creation successful:", manualUserData);
+          localStorage.setItem('currentUser', JSON.stringify(manualUserData));
+          
+          // Trigger a custom event to notify other components
+          window.dispatchEvent(new CustomEvent('authStateChanged', { 
+            detail: { user: manualUserData, session: data.session } 
+          }));
+          
+          return manualUserData as User;
+        } else {
+          console.error("Manual user profile creation failed:", manualError);
+        }
       }
-      
-      // Re-throw other errors
-      throw supabaseError;
     }
     
     return null;
