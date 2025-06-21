@@ -11,6 +11,9 @@ export const useProfessionalRegistration = (onSuccess: () => void, isUpdate: boo
 
   const registerMutation = useMutation({
     mutationFn: async (values: ProfessionalFormValues) => {
+      console.log('Mutation called with values:', values);
+      console.log('Is update mode:', isUpdate);
+
       // Get current user
       const currentUser = await getCurrentUser();
       if (!currentUser) {
@@ -19,45 +22,42 @@ export const useProfessionalRegistration = (onSuccess: () => void, isUpdate: boo
 
       let userId: string;
 
-      // Check if user already has a professional profile (unless super admin)
-      if (!isSuperAdmin && !isUpdate) {
-        // For phone users, we need to find or create a user record in the users table
-        if ('phone' in currentUser && currentUser.phone) {
-          // First, check if a user record exists for this phone user
-          const { data: existingUser } = await supabase
+      // Handle user ID resolution
+      if ('phone' in currentUser && currentUser.phone) {
+        // For phone users, find or create user record
+        const { data: existingUser } = await supabase
+          .from('users')
+          .select('id')
+          .eq('phone', currentUser.phone)
+          .single();
+
+        if (existingUser) {
+          userId = existingUser.id;
+        } else {
+          const { data: newUser, error: userError } = await supabase
             .from('users')
+            .insert({
+              name: currentUser.name,
+              email: values.contact_number.includes('@') ? values.contact_number : `${currentUser.phone}@phone.user`,
+              phone: currentUser.phone,
+              role: isUpdate ? 'sports_professional' : 'user'
+            })
             .select('id')
-            .eq('phone', currentUser.phone)
             .single();
 
-          if (existingUser) {
-            userId = existingUser.id;
-          } else {
-            // Create a user record for phone registration users
-            const { data: newUser, error: userError } = await supabase
-              .from('users')
-              .insert({
-                name: currentUser.name,
-                email: values.contact_number.includes('@') ? values.contact_number : `${currentUser.phone}@phone.user`,
-                phone: currentUser.phone,
-                role: 'sports_professional'
-              })
-              .select('id')
-              .single();
-
-            if (userError) {
-              console.error('Error creating user record:', userError);
-              throw new Error("Failed to create user profile");
-            }
-
-            userId = newUser.id;
+          if (userError) {
+            console.error('Error creating user record:', userError);
+            throw new Error("Failed to create user profile");
           }
-        } else {
-          // For email users, use the existing user ID
-          userId = currentUser.id;
-        }
 
-        // Check if user already has a professional profile
+          userId = newUser.id;
+        }
+      } else {
+        userId = currentUser.id;
+      }
+
+      // Check for existing profile only when not updating
+      if (!isSuperAdmin && !isUpdate) {
         const { data: existingProfile } = await supabase
           .from('sports_professionals')
           .select('id')
@@ -67,39 +67,6 @@ export const useProfessionalRegistration = (onSuccess: () => void, isUpdate: boo
         if (existingProfile) {
           throw new Error("You already have a professional profile. You can only have one profile.");
         }
-      } else {
-        // For updates or super admin, we still need a valid user ID
-        if ('phone' in currentUser && currentUser.phone) {
-          const { data: existingUser } = await supabase
-            .from('users')
-            .select('id')
-            .eq('phone', currentUser.phone)
-            .single();
-
-          if (existingUser) {
-            userId = existingUser.id;
-          } else {
-            const { data: newUser, error: userError } = await supabase
-              .from('users')
-              .insert({
-                name: currentUser.name,
-                email: values.contact_number.includes('@') ? values.contact_number : `${currentUser.phone}@phone.user`,
-                phone: currentUser.phone,
-                role: 'user'
-              })
-              .select('id')
-              .single();
-
-            if (userError) {
-              console.error('Error creating user record:', userError);
-              throw new Error("Failed to create user profile");
-            }
-
-            userId = newUser.id;
-          }
-        } else {
-          userId = currentUser.id;
-        }
       }
 
       const professionalData = {
@@ -108,7 +75,7 @@ export const useProfessionalRegistration = (onSuccess: () => void, isUpdate: boo
         profession_type: values.profession_type,
         game_id: values.game_id,
         contact_number: values.contact_number,
-        fee: values.fee,
+        fee: Number(values.fee) || 0,
         fee_type: values.fee_type,
         city: values.city,
         address: values.address,
@@ -129,21 +96,39 @@ export const useProfessionalRegistration = (onSuccess: () => void, isUpdate: boo
         coaching_availability: values.coaching_availability || [],
       };
       
+      console.log('Professional data to save:', professionalData);
+      
       if (isUpdate) {
         // Update existing professional profile
-        const { error } = await supabase
+        console.log('Updating professional profile for user_id:', userId);
+        const { data, error } = await supabase
           .from('sports_professionals')
           .update(professionalData)
-          .eq('user_id', userId);
+          .eq('user_id', userId)
+          .select()
+          .single();
         
-        if (error) throw error;
+        if (error) {
+          console.error('Update error:', error);
+          throw error;
+        }
+        
+        console.log('Update successful:', data);
       } else {
         // Insert new professional profile
-        const { error } = await supabase
+        console.log('Creating new professional profile');
+        const { data, error } = await supabase
           .from('sports_professionals')
-          .insert(professionalData);
+          .insert(professionalData)
+          .select()
+          .single();
         
-        if (error) throw error;
+        if (error) {
+          console.error('Insert error:', error);
+          throw error;
+        }
+        
+        console.log('Insert successful:', data);
 
         // Update user role to sports_professional only if not already super admin
         if (!isSuperAdmin) {
@@ -154,7 +139,6 @@ export const useProfessionalRegistration = (onSuccess: () => void, isUpdate: boo
 
           if (userUpdateError) {
             console.error("Failed to update user role:", userUpdateError);
-            // Don't throw here as the professional profile was created successfully
           }
 
           // Update localStorage with new role for phone users

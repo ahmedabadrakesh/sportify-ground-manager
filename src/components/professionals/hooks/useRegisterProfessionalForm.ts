@@ -56,9 +56,21 @@ export const useRegisterProfessionalForm = (onSuccess: () => void, isUpdate: boo
   };
 
   const onSubmit = (values: ProfessionalFormValues) => {
-    console.log('Submitting form with values:', values);
+    console.log('Form submission triggered with values:', values);
     console.log('Is update mode:', isUpdate);
-    registerMutation.mutate(values);
+    console.log('Current form state:', form.formState);
+    console.log('Form errors:', form.formState.errors);
+    
+    // Ensure numeric fields are properly converted
+    const processedValues = {
+      ...values,
+      fee: Number(values.fee) || 0,
+      years_of_experience: Number(values.years_of_experience) || 0,
+      total_match_played: Number(values.total_match_played) || 0,
+    };
+    
+    console.log('Processed values for submission:', processedValues);
+    registerMutation.mutate(processedValues);
   };
 
   return {
