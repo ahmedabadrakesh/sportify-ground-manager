@@ -26,8 +26,7 @@ export const StepperForm = ({ currentStep, totalSteps, stepTitles }: StepperForm
                   className={cn(
                     "flex items-center justify-center w-10 h-10 rounded-full border-2 transition-all duration-200",
                     {
-                      "bg-primary border-primary text-white": isCompleted,
-                      "bg-primary border-primary text-white": isCurrent,
+                      "bg-primary border-primary text-white": isCompleted || isCurrent,
                       "bg-white border-gray-300 text-gray-400": isUpcoming,
                     }
                   )}
