@@ -59,6 +59,15 @@ const Register: React.FC = () => {
         }
       }
 
+      // Basic validation for email format
+      if (registrationType === "email" && email) {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+          toast.error("Please enter a valid email address");
+          return;
+        }
+      }
+
       console.log("Starting registration with:", { name, email, phone, userType });
       
       const user = await register(
@@ -73,6 +82,11 @@ const Register: React.FC = () => {
         toast.success("Registration successful! Welcome to SportifyGround!");
         console.log("Registration successful, user:", user);
         
+        // Show additional message for phone registrations
+        if (registrationType === "phone") {
+          toast.info("You can now login using your phone number and password.");
+        }
+        
         // Redirect based on user type
         if (userType === 'sports_professional') {
           navigate("/sports-professionals");
@@ -86,14 +100,12 @@ const Register: React.FC = () => {
       console.error("Registration error:", error);
       
       // Handle specific error messages
-      if (error.message?.includes("User already registered")) {
-        toast.error("This email is already registered. Please use a different email or try logging in.");
+      if (error.message?.includes("already registered")) {
+        toast.error(error.message);
       } else if (error.message?.includes("email_address_invalid")) {
         toast.error("Please enter a valid email address.");
       } else if (error.message?.includes("password")) {
         toast.error("Password must be at least 6 characters long.");
-      } else if (error.message?.includes("phone_provider_disabled")) {
-        toast.error("Phone number registration is currently disabled. Please use email instead.");
       } else if (error.message?.includes("rate limit") || error.status === 429 || error.code === "over_email_send_rate_limit") {
         toast.error("Too many registration attempts. Please wait a few minutes before trying again.");
       } else {
@@ -185,7 +197,7 @@ const Register: React.FC = () => {
                     required={registrationType === "phone"}
                   />
                   <p className="text-xs text-gray-500">
-                    Enter your 10-digit mobile number without country code
+                    Enter your 10-digit mobile number without country code. You'll use this number and password to login.
                   </p>
                 </TabsContent>
               </Tabs>

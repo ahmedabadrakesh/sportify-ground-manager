@@ -54,13 +54,30 @@ const performRegistration = async (
       formattedPhone = '+91' + phone.replace(/^0+/, '');
     }
     
+    // For phone-only registration, create a temporary email
+    let registrationEmail = email;
+    let isPhoneOnlyRegistration = false;
+    
+    if (!email && phone) {
+      isPhoneOnlyRegistration = true;
+      // Create a temporary email based on phone number for Supabase auth
+      registrationEmail = `${phone.replace(/\D/g, '')}@temp.sportifyground.com`;
+      console.log("Phone-only registration, using temporary email:", registrationEmail);
+    }
+    
+    if (!registrationEmail) {
+      throw new Error("Either email or phone number is required");
+    }
+    
     const { data, error } = await supabase.auth.signUp({
-      email,
+      email: registrationEmail,
       password,
       options: {
         data: {
           name,
-          user_type: userType
+          user_type: userType,
+          phone: formattedPhone,
+          is_phone_registration: isPhoneOnlyRegistration
         },
         emailRedirectTo: `${window.location.origin}/`
       }
@@ -72,6 +89,15 @@ const performRegistration = async (
       // Handle rate limit errors specifically
       if (error.status === 429 || error.message?.includes("rate limit")) {
         throw new Error("Too many registration attempts. Please wait a few minutes before trying again.");
+      }
+      
+      // Handle email already registered
+      if (error.message?.includes("User already registered")) {
+        if (isPhoneOnlyRegistration) {
+          throw new Error("This phone number is already registered. Please try logging in or use a different number.");
+        } else {
+          throw new Error("This email is already registered. Please try logging in or use a different email.");
+        }
       }
       
       throw error;
@@ -92,14 +118,40 @@ const performRegistration = async (
       
       if (userData && !userError) {
         console.log("User profile created successfully:", userData);
-        localStorage.setItem('currentUser', JSON.stringify(userData));
         
-        // Trigger a custom event to notify other components
-        window.dispatchEvent(new CustomEvent('authStateChanged', { 
-          detail: { user: userData, session: data.session } 
-        }));
-        
-        return userData as User;
+        // For phone-only registrations, update the user profile with correct data
+        if (isPhoneOnlyRegistration) {
+          const { data: updatedUserData, error: updateError } = await supabase
+            .from('users')
+            .update({
+              email: '', // Clear the temporary email
+              phone: formattedPhone,
+              name: name
+            })
+            .eq('auth_id', data.user.id)
+            .select()
+            .single();
+          
+          if (updatedUserData && !updateError) {
+            localStorage.setItem('currentUser', JSON.stringify(updatedUserData));
+            
+            // Trigger a custom event to notify other components
+            window.dispatchEvent(new CustomEvent('authStateChanged', { 
+              detail: { user: updatedUserData, session: data.session } 
+            }));
+            
+            return updatedUserData as User;
+          }
+        } else {
+          localStorage.setItem('currentUser', JSON.stringify(userData));
+          
+          // Trigger a custom event to notify other components
+          window.dispatchEvent(new CustomEvent('authStateChanged', { 
+            detail: { user: userData, session: data.session } 
+          }));
+          
+          return userData as User;
+        }
       } else {
         console.error("Error fetching user profile:", userError);
         // If the user profile wasn't created automatically, create it manually
@@ -110,7 +162,7 @@ const performRegistration = async (
           .insert({
             auth_id: data.user.id,
             name,
-            email,
+            email: isPhoneOnlyRegistration ? '' : registrationEmail,
             phone: formattedPhone || null,
             role: userType === 'sports_professional' ? 'sports_professional' : 'user'
           })
