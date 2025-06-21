@@ -438,36 +438,6 @@ export type Database = {
           },
         ]
       }
-      phone_registrations: {
-        Row: {
-          created_at: string
-          id: string
-          name: string
-          password: string
-          phone: string
-          updated_at: string
-          user_type: string
-        }
-        Insert: {
-          created_at?: string
-          id?: string
-          name: string
-          password: string
-          phone: string
-          updated_at?: string
-          user_type?: string
-        }
-        Update: {
-          created_at?: string
-          id?: string
-          name?: string
-          password?: string
-          phone?: string
-          updated_at?: string
-          user_type?: string
-        }
-        Relationships: []
-      }
       products: {
         Row: {
           category: string

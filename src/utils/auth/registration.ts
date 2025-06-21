@@ -1,42 +1,32 @@
 
 import { supabase } from "@/integrations/supabase/client";
 import { User } from "@/types/models";
-import { registerWithPhone, PhoneUser } from "./phoneRegistration";
 
 // Track ongoing registration attempts to prevent duplicates
-const ongoingRegistrations = new Map<string, Promise<User | PhoneUser | null>>();
+const ongoingRegistrations = new Map<string, Promise<User | null>>();
 
-// Register a new user - now supports both Supabase Auth and direct phone registration
+// Register a new user
 export const register = async (
   name: string, 
   email: string, 
   phone: string, 
   password: string, 
   userType: 'user' | 'sports_professional' = 'user'
-): Promise<User | PhoneUser | null> => {
+): Promise<User | null> => {
   // Create a unique key for this registration attempt
   const registrationKey = email || phone;
   
   // Check if a registration is already in progress for this identifier
   if (ongoingRegistrations.has(registrationKey)) {
     console.log("Registration already in progress for:", registrationKey);
+    // Return the existing promise instead of creating a new one
     return ongoingRegistrations.get(registrationKey)!;
   }
 
   console.log("Starting registration process for:", { name, email, phone, userType });
   
-  // Determine registration method
-  let registrationPromise: Promise<User | PhoneUser | null>;
-  
-  if (!email && phone) {
-    // Phone-only registration using direct database approach
-    console.log("Using phone-only registration method");
-    registrationPromise = registerWithPhone(name, phone, password, userType);
-  } else {
-    // Email registration using Supabase Auth (fallback)
-    console.log("Using email registration method");
-    registrationPromise = performEmailRegistration(name, email, phone, password, userType);
-  }
+  // Create the registration promise
+  const registrationPromise = performRegistration(name, email, phone, password, userType);
   
   // Store the promise to prevent duplicates
   ongoingRegistrations.set(registrationKey, registrationPromise);
@@ -49,8 +39,8 @@ export const register = async (
   return registrationPromise;
 };
 
-// Email registration implementation (existing Supabase Auth method)
-const performEmailRegistration = async (
+// Actual registration implementation
+const performRegistration = async (
   name: string, 
   email: string, 
   phone: string, 
@@ -64,34 +54,24 @@ const performEmailRegistration = async (
       formattedPhone = '+91' + phone.replace(/^0+/, '');
     }
     
-    if (!email) {
-      throw new Error("Email is required for Supabase Auth registration");
-    }
-    
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: {
         data: {
           name,
-          user_type: userType,
-          phone: formattedPhone
+          user_type: userType
         },
         emailRedirectTo: `${window.location.origin}/`
       }
     });
     
     if (error) {
-      console.error("Email registration error:", error);
+      console.error("Registration error:", error);
       
       // Handle rate limit errors specifically
       if (error.status === 429 || error.message?.includes("rate limit")) {
         throw new Error("Too many registration attempts. Please wait a few minutes before trying again.");
-      }
-      
-      // Handle email already registered
-      if (error.message?.includes("User already registered")) {
-        throw new Error("This email is already registered. Please try logging in or use a different email.");
       }
       
       throw error;
@@ -122,7 +102,9 @@ const performEmailRegistration = async (
         return userData as User;
       } else {
         console.error("Error fetching user profile:", userError);
-        // Create user profile manually if needed
+        // If the user profile wasn't created automatically, create it manually
+        console.log("Attempting to create user profile manually...");
+        
         const { data: manualUserData, error: manualError } = await supabase
           .from('users')
           .insert({
@@ -145,13 +127,15 @@ const performEmailRegistration = async (
           }));
           
           return manualUserData as User;
+        } else {
+          console.error("Manual user profile creation failed:", manualError);
         }
       }
     }
     
     return null;
   } catch (error) {
-    console.error("Email registration error:", error);
+    console.error("Registration error:", error);
     throw error;
   }
 };

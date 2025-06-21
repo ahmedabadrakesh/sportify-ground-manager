@@ -19,7 +19,7 @@ const Register: React.FC = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [userType, setUserType] = useState<'user' | 'sports_professional'>('user');
   const [isLoading, setIsLoading] = useState(false);
-  const [registrationType, setRegistrationType] = useState<"email" | "phone">("phone");
+  const [registrationType, setRegistrationType] = useState<"email" | "phone">("email");
   
   // Use a ref to track if submission is in progress
   const isSubmittingRef = useRef(false);
@@ -50,11 +50,6 @@ const Register: React.FC = () => {
         return;
       }
 
-      if (password.length < 6) {
-        toast.error("Password must be at least 6 characters long");
-        return;
-      }
-
       // Basic validation for phone number format
       if (registrationType === "phone" && phone) {
         const phoneRegex = /^\d{10}$/;
@@ -64,16 +59,7 @@ const Register: React.FC = () => {
         }
       }
 
-      // Basic validation for email format
-      if (registrationType === "email" && email) {
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!emailRegex.test(email)) {
-          toast.error("Please enter a valid email address");
-          return;
-        }
-      }
-
-      console.log("Starting registration with:", { name, email, phone, userType, registrationType });
+      console.log("Starting registration with:", { name, email, phone, userType });
       
       const user = await register(
         name, 
@@ -86,13 +72,6 @@ const Register: React.FC = () => {
       if (user) {
         toast.success("Registration successful! Welcome to SportifyGround!");
         console.log("Registration successful, user:", user);
-        
-        // Show different messages based on registration type
-        if (registrationType === "phone") {
-          toast.info("You can now login using your phone number and password. No email verification required!");
-        } else {
-          toast.info("Please check your email for verification instructions.");
-        }
         
         // Redirect based on user type
         if (userType === 'sports_professional') {
@@ -107,12 +86,14 @@ const Register: React.FC = () => {
       console.error("Registration error:", error);
       
       // Handle specific error messages
-      if (error.message?.includes("already registered")) {
-        toast.error(error.message);
+      if (error.message?.includes("User already registered")) {
+        toast.error("This email is already registered. Please use a different email or try logging in.");
       } else if (error.message?.includes("email_address_invalid")) {
         toast.error("Please enter a valid email address.");
       } else if (error.message?.includes("password")) {
         toast.error("Password must be at least 6 characters long.");
+      } else if (error.message?.includes("phone_provider_disabled")) {
+        toast.error("Phone number registration is currently disabled. Please use email instead.");
       } else if (error.message?.includes("rate limit") || error.status === 429 || error.code === "over_email_send_rate_limit") {
         toast.error("Too many registration attempts. Please wait a few minutes before trying again.");
       } else {
@@ -173,27 +154,11 @@ const Register: React.FC = () => {
                 </RadioGroup>
               </div>
               
-              <Tabs defaultValue="phone" onValueChange={(value) => setRegistrationType(value as "email" | "phone")}>
+              <Tabs defaultValue="email" onValueChange={(value) => setRegistrationType(value as "email" | "phone")}>
                 <TabsList className="grid w-full grid-cols-2">
-                  <TabsTrigger value="phone" disabled={isLoading}>Phone (Recommended)</TabsTrigger>
                   <TabsTrigger value="email" disabled={isLoading}>Email</TabsTrigger>
+                  <TabsTrigger value="phone" disabled={isLoading}>Phone</TabsTrigger>
                 </TabsList>
-                
-                <TabsContent value="phone" className="space-y-2">
-                  <Label htmlFor="phone">Phone Number</Label>
-                  <Input
-                    id="phone"
-                    type="tel"
-                    placeholder="10-digit mobile number"
-                    value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
-                    disabled={isLoading}
-                    required={registrationType === "phone"}
-                  />
-                  <p className="text-xs text-green-600 bg-green-50 p-2 rounded">
-                    ✓ Fast registration - No email verification required! You can login immediately after registration.
-                  </p>
-                </TabsContent>
                 
                 <TabsContent value="email" className="space-y-2">
                   <Label htmlFor="email">Email</Label>
@@ -206,8 +171,21 @@ const Register: React.FC = () => {
                     disabled={isLoading}
                     required={registrationType === "email"}
                   />
-                  <p className="text-xs text-orange-600 bg-orange-50 p-2 rounded">
-                    ⚠️ Email verification required. May have rate limits during high traffic.
+                </TabsContent>
+                
+                <TabsContent value="phone" className="space-y-2">
+                  <Label htmlFor="phone">Phone Number</Label>
+                  <Input
+                    id="phone"
+                    type="tel"
+                    placeholder="10-digit mobile number"
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
+                    disabled={isLoading}
+                    required={registrationType === "phone"}
+                  />
+                  <p className="text-xs text-gray-500">
+                    Enter your 10-digit mobile number without country code
                   </p>
                 </TabsContent>
               </Tabs>
@@ -217,7 +195,7 @@ const Register: React.FC = () => {
                 <Input
                   id="password"
                   type="password"
-                  placeholder="Create a password (min 6 characters)"
+                  placeholder="Create a password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   disabled={isLoading}

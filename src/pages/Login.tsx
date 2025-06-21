@@ -38,13 +38,10 @@ const Login: React.FC = () => {
       if (user) {
         toast.success(`Welcome back, ${user.name}!`);
         
-        // Get the role from either User or PhoneUser
-        const userRole = 'role' in user ? user.role : user.user_type;
-        
         // Redirect based on user role
-        if (userRole === 'admin' || userRole === 'super_admin') {
+        if (user.role === 'admin' || user.role === 'super_admin') {
           navigate('/admin');
-        } else if (userRole === 'ground_owner') {
+        } else if (user.role === 'ground_owner') {
           navigate('/admin/grounds'); // Ground owners go to grounds page
         } else {
           navigate('/');
