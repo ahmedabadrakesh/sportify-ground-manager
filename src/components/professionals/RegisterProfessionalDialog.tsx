@@ -14,6 +14,7 @@ import { StepContentRenderer } from "./components/StepContentRenderer";
 import { useRegisterProfessionalForm } from "./hooks/useRegisterProfessionalForm";
 import { getCurrentUser } from "@/utils/auth";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 
 interface RegisterProfessionalProps {
   open: boolean;
@@ -30,6 +31,7 @@ const RegisterProfessionalDialog = ({
 }: RegisterProfessionalProps) => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
   const [currentUser, setCurrentUser] = useState<any>(null);
+  const [existingProfileData, setExistingProfileData] = useState<any>(null);
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -48,6 +50,35 @@ const RegisterProfessionalDialog = ({
     }
   }, [open, onOpenChange]);
 
+  // Fetch existing profile data if in update mode
+  useEffect(() => {
+    const fetchExistingProfile = async () => {
+      if (isUpdate && currentUser && open) {
+        try {
+          const { data: profile, error } = await supabase
+            .from('sports_professionals')
+            .select('*')
+            .eq('user_id', currentUser.id)
+            .single();
+
+          if (error && error.code !== 'PGRST116') {
+            console.error('Error fetching existing profile:', error);
+            return;
+          }
+
+          if (profile) {
+            setExistingProfileData(profile);
+            console.log('Fetched existing profile:', profile);
+          }
+        } catch (error) {
+          console.error('Error fetching profile:', error);
+        }
+      }
+    };
+
+    fetchExistingProfile();
+  }, [isUpdate, currentUser, open]);
+
   const {
     form,
     currentStep,
@@ -61,24 +92,35 @@ const RegisterProfessionalDialog = ({
   } = useRegisterProfessionalForm(() => {
     onOpenChange(false);
     resetForm();
-  });
+  }, isUpdate);
 
   // Pre-fill form data when user is available and dialog opens
   useEffect(() => {
-    if (currentUser && open && !hasExistingProfile) {
-      // Pre-fill name and contact information
-      form.setValue('name', currentUser.name || '');
-      if (currentUser.email) {
-        form.setValue('contact_number', currentUser.email);
-      } else if (currentUser.phone) {
-        form.setValue('contact_number', currentUser.phone);
+    if (currentUser && open) {
+      if (isUpdate && existingProfileData) {
+        // Pre-fill with existing professional data
+        console.log('Pre-filling form with existing data:', existingProfileData);
+        Object.keys(existingProfileData).forEach((key) => {
+          if (key in form.getValues()) {
+            form.setValue(key as any, existingProfileData[key]);
+          }
+        });
+      } else if (!hasExistingProfile) {
+        // Pre-fill with basic user information for new registrations
+        form.setValue('name', currentUser.name || '');
+        if (currentUser.email) {
+          form.setValue('contact_number', currentUser.email);
+        } else if (currentUser.phone) {
+          form.setValue('contact_number', currentUser.phone);
+        }
       }
     }
-  }, [currentUser, open, hasExistingProfile, form]);
+  }, [currentUser, open, hasExistingProfile, form, isUpdate, existingProfileData]);
 
   const handleDialogClose = (open: boolean) => {
     if (!open) {
       resetForm();
+      setExistingProfileData(null);
     }
     onOpenChange(open);
   };

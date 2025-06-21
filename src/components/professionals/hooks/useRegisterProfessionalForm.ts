@@ -5,7 +5,7 @@ import { professionalFormSchema, type ProfessionalFormValues } from "../schemas/
 import { useStepNavigation } from "./useStepNavigation";
 import { useProfessionalRegistration } from "./useProfessionalRegistration";
 
-export const useRegisterProfessionalForm = (onSuccess: () => void) => {
+export const useRegisterProfessionalForm = (onSuccess: () => void, isUpdate: boolean = false) => {
   const form = useForm<ProfessionalFormValues>({
     resolver: zodResolver(professionalFormSchema),
     defaultValues: {
@@ -48,7 +48,7 @@ export const useRegisterProfessionalForm = (onSuccess: () => void) => {
     resetNavigation,
   } = useStepNavigation(form);
 
-  const { registerMutation } = useProfessionalRegistration(onSuccess);
+  const { registerMutation } = useProfessionalRegistration(onSuccess, isUpdate);
 
   const resetForm = () => {
     resetNavigation();
@@ -56,6 +56,8 @@ export const useRegisterProfessionalForm = (onSuccess: () => void) => {
   };
 
   const onSubmit = (values: ProfessionalFormValues) => {
+    console.log('Submitting form with values:', values);
+    console.log('Is update mode:', isUpdate);
     registerMutation.mutate(values);
   };
 

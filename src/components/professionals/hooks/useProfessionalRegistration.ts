@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import { getCurrentUser, hasRoleSync } from "@/utils/auth";
 import { ProfessionalFormValues } from "../schemas/professionalFormSchema";
 
-export const useProfessionalRegistration = (onSuccess: () => void) => {
+export const useProfessionalRegistration = (onSuccess: () => void, isUpdate: boolean = false) => {
   const queryClient = useQueryClient();
   const isSuperAdmin = hasRoleSync('super_admin');
 
@@ -20,7 +20,7 @@ export const useProfessionalRegistration = (onSuccess: () => void) => {
       let userId: string;
 
       // Check if user already has a professional profile (unless super admin)
-      if (!isSuperAdmin) {
+      if (!isSuperAdmin && !isUpdate) {
         // For phone users, we need to find or create a user record in the users table
         if ('phone' in currentUser && currentUser.phone) {
           // First, check if a user record exists for this phone user
@@ -68,8 +68,7 @@ export const useProfessionalRegistration = (onSuccess: () => void) => {
           throw new Error("You already have a professional profile. You can only have one profile.");
         }
       } else {
-        // Super admin can create profiles without user constraints
-        // For super admin, we still need a valid user ID
+        // For updates or super admin, we still need a valid user ID
         if ('phone' in currentUser && currentUser.phone) {
           const { data: existingUser } = await supabase
             .from('users')
@@ -130,45 +129,62 @@ export const useProfessionalRegistration = (onSuccess: () => void) => {
         coaching_availability: values.coaching_availability || [],
       };
       
-      const { error } = await supabase
-        .from('sports_professionals')
-        .insert(professionalData);
-      
-      if (error) throw error;
+      if (isUpdate) {
+        // Update existing professional profile
+        const { error } = await supabase
+          .from('sports_professionals')
+          .update(professionalData)
+          .eq('user_id', userId);
+        
+        if (error) throw error;
+      } else {
+        // Insert new professional profile
+        const { error } = await supabase
+          .from('sports_professionals')
+          .insert(professionalData);
+        
+        if (error) throw error;
 
-      // Update user role to sports_professional only if not already super admin
-      if (!isSuperAdmin) {
-        const { error: userUpdateError } = await supabase
-          .from('users')
-          .update({ role: 'sports_professional' })
-          .eq('id', userId);
+        // Update user role to sports_professional only if not already super admin
+        if (!isSuperAdmin) {
+          const { error: userUpdateError } = await supabase
+            .from('users')
+            .update({ role: 'sports_professional' })
+            .eq('id', userId);
 
-        if (userUpdateError) {
-          console.error("Failed to update user role:", userUpdateError);
-          // Don't throw here as the professional profile was created successfully
-        }
+          if (userUpdateError) {
+            console.error("Failed to update user role:", userUpdateError);
+            // Don't throw here as the professional profile was created successfully
+          }
 
-        // Update localStorage with new role for phone users
-        if ('phone' in currentUser && currentUser.phone) {
-          const updatedUser = { ...currentUser, role: 'sports_professional' as const };
-          localStorage.setItem('currentUser', JSON.stringify(updatedUser));
-          
-          // Trigger auth state change event
-          window.dispatchEvent(new CustomEvent('authStateChanged', { 
-            detail: { user: updatedUser, session: null } 
-          }));
+          // Update localStorage with new role for phone users
+          if ('phone' in currentUser && currentUser.phone) {
+            const updatedUser = { ...currentUser, role: 'sports_professional' as const };
+            localStorage.setItem('currentUser', JSON.stringify(updatedUser));
+            
+            // Trigger auth state change event
+            window.dispatchEvent(new CustomEvent('authStateChanged', { 
+              detail: { user: updatedUser, session: null } 
+            }));
+          }
         }
       }
     },
     onSuccess: () => {
-      toast.success("Successfully registered as a sports professional");
+      const successMessage = isUpdate 
+        ? "Successfully updated your professional profile" 
+        : "Successfully registered as a sports professional";
+      toast.success(successMessage);
       queryClient.invalidateQueries({ queryKey: ["sports-professionals"] });
       queryClient.invalidateQueries({ queryKey: ["admin-sports-professionals"] });
       onSuccess();
     },
     onError: (error) => {
-      toast.error("Failed to register. Please try again.");
-      console.error("Registration error:", error);
+      const errorMessage = isUpdate 
+        ? "Failed to update profile. Please try again." 
+        : "Failed to register. Please try again.";
+      toast.error(errorMessage);
+      console.error("Registration/Update error:", error);
     }
   });
 
