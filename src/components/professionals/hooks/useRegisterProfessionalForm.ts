@@ -61,7 +61,7 @@ export const useRegisterProfessionalForm = (onSuccess: () => void) => {
       // Check if user already has a professional profile (unless super admin)
       if (!isSuperAdmin) {
         // For phone users, we need to find or create a user record in the users table
-        if (currentUser.type === 'phone') {
+        if ('phone' in currentUser && currentUser.phone) {
           // First, check if a user record exists for this phone user
           const { data: existingUser } = await supabase
             .from('users')
@@ -109,7 +109,7 @@ export const useRegisterProfessionalForm = (onSuccess: () => void) => {
       } else {
         // Super admin can create profiles without user constraints
         // For super admin, we still need a valid user ID
-        if (currentUser.type === 'phone') {
+        if ('phone' in currentUser && currentUser.phone) {
           const { data: existingUser } = await supabase
             .from('users')
             .select('id')
@@ -188,7 +188,7 @@ export const useRegisterProfessionalForm = (onSuccess: () => void) => {
         }
 
         // Update localStorage with new role for phone users
-        if (currentUser.type === 'phone') {
+        if ('phone' in currentUser && currentUser.phone) {
           const updatedUser = { ...currentUser, role: 'sports_professional' as const };
           localStorage.setItem('currentUser', JSON.stringify(updatedUser));
           

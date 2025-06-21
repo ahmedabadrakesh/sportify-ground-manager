@@ -92,6 +92,12 @@ const performRegistration = async (
       
       if (userData && !userError) {
         console.log("User profile created successfully:", userData);
+        
+        // If user registered as sports professional, create sports professional entry
+        if (userType === 'sports_professional') {
+          await createDefaultSportsProfessionalEntry(userData.id, name, email || formattedPhone);
+        }
+        
         localStorage.setItem('currentUser', JSON.stringify(userData));
         
         // Trigger a custom event to notify other components
@@ -119,6 +125,12 @@ const performRegistration = async (
         
         if (manualUserData && !manualError) {
           console.log("Manual user profile creation successful:", manualUserData);
+          
+          // If user registered as sports professional, create sports professional entry
+          if (userType === 'sports_professional') {
+            await createDefaultSportsProfessionalEntry(manualUserData.id, name, email || formattedPhone);
+          }
+          
           localStorage.setItem('currentUser', JSON.stringify(manualUserData));
           
           // Trigger a custom event to notify other components
@@ -137,5 +149,66 @@ const performRegistration = async (
   } catch (error) {
     console.error("Registration error:", error);
     throw error;
+  }
+};
+
+// Helper function to create a default sports professional entry
+const createDefaultSportsProfessionalEntry = async (
+  userId: string,
+  name: string,
+  contactNumber: string
+) => {
+  try {
+    console.log("Creating default sports professional entry for user:", userId);
+    
+    // Get the first available game for default assignment
+    const { data: games } = await supabase
+      .from('games')
+      .select('id')
+      .limit(1);
+    
+    if (!games || games.length === 0) {
+      console.error("No games available to assign to sports professional");
+      return;
+    }
+    
+    const defaultProfessionalData = {
+      user_id: userId,
+      name: name,
+      profession_type: 'Athlete' as const,
+      game_id: games[0].id,
+      contact_number: contactNumber,
+      fee: 0,
+      fee_type: 'Per Hour' as const,
+      city: '',
+      address: '',
+      comments: null,
+      photo: null,
+      awards: [],
+      accomplishments: [],
+      certifications: [],
+      training_locations: [],
+      videos: [],
+      images: [],
+      punch_line: null,
+      instagram_link: null,
+      facebook_link: null,
+      linkedin_link: null,
+      website: null,
+      level: null,
+      coaching_availability: [],
+    };
+    
+    const { error: professionalError } = await supabase
+      .from('sports_professionals')
+      .insert(defaultProfessionalData);
+    
+    if (professionalError) {
+      console.error("Error creating sports professional entry:", professionalError);
+    } else {
+      console.log("Default sports professional entry created successfully");
+    }
+  } catch (error) {
+    console.error("Error in createDefaultSportsProfessionalEntry:", error);
   }
 };
