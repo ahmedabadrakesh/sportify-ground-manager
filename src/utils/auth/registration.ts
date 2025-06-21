@@ -1,32 +1,42 @@
 
 import { supabase } from "@/integrations/supabase/client";
 import { User } from "@/types/models";
+import { registerWithPhone, PhoneUser } from "./phoneRegistration";
 
 // Track ongoing registration attempts to prevent duplicates
-const ongoingRegistrations = new Map<string, Promise<User | null>>();
+const ongoingRegistrations = new Map<string, Promise<User | PhoneUser | null>>();
 
-// Register a new user
+// Register a new user - now supports both Supabase Auth and direct phone registration
 export const register = async (
   name: string, 
   email: string, 
   phone: string, 
   password: string, 
   userType: 'user' | 'sports_professional' = 'user'
-): Promise<User | null> => {
+): Promise<User | PhoneUser | null> => {
   // Create a unique key for this registration attempt
   const registrationKey = email || phone;
   
   // Check if a registration is already in progress for this identifier
   if (ongoingRegistrations.has(registrationKey)) {
     console.log("Registration already in progress for:", registrationKey);
-    // Return the existing promise instead of creating a new one
     return ongoingRegistrations.get(registrationKey)!;
   }
 
   console.log("Starting registration process for:", { name, email, phone, userType });
   
-  // Create the registration promise
-  const registrationPromise = performRegistration(name, email, phone, password, userType);
+  // Determine registration method
+  let registrationPromise: Promise<User | PhoneUser | null>;
+  
+  if (!email && phone) {
+    // Phone-only registration using direct database approach
+    console.log("Using phone-only registration method");
+    registrationPromise = registerWithPhone(name, phone, password, userType);
+  } else {
+    // Email registration using Supabase Auth (fallback)
+    console.log("Using email registration method");
+    registrationPromise = performEmailRegistration(name, email, phone, password, userType);
+  }
   
   // Store the promise to prevent duplicates
   ongoingRegistrations.set(registrationKey, registrationPromise);
@@ -39,8 +49,8 @@ export const register = async (
   return registrationPromise;
 };
 
-// Actual registration implementation
-const performRegistration = async (
+// Email registration implementation (existing Supabase Auth method)
+const performEmailRegistration = async (
   name: string, 
   email: string, 
   phone: string, 
@@ -54,37 +64,25 @@ const performRegistration = async (
       formattedPhone = '+91' + phone.replace(/^0+/, '');
     }
     
-    // For phone-only registration, create a temporary email
-    let registrationEmail = email;
-    let isPhoneOnlyRegistration = false;
-    
-    if (!email && phone) {
-      isPhoneOnlyRegistration = true;
-      // Create a temporary email based on phone number for Supabase auth
-      registrationEmail = `${phone.replace(/\D/g, '')}@temp.sportifyground.com`;
-      console.log("Phone-only registration, using temporary email:", registrationEmail);
-    }
-    
-    if (!registrationEmail) {
-      throw new Error("Either email or phone number is required");
+    if (!email) {
+      throw new Error("Email is required for Supabase Auth registration");
     }
     
     const { data, error } = await supabase.auth.signUp({
-      email: registrationEmail,
+      email,
       password,
       options: {
         data: {
           name,
           user_type: userType,
-          phone: formattedPhone,
-          is_phone_registration: isPhoneOnlyRegistration
+          phone: formattedPhone
         },
         emailRedirectTo: `${window.location.origin}/`
       }
     });
     
     if (error) {
-      console.error("Registration error:", error);
+      console.error("Email registration error:", error);
       
       // Handle rate limit errors specifically
       if (error.status === 429 || error.message?.includes("rate limit")) {
@@ -93,11 +91,7 @@ const performRegistration = async (
       
       // Handle email already registered
       if (error.message?.includes("User already registered")) {
-        if (isPhoneOnlyRegistration) {
-          throw new Error("This phone number is already registered. Please try logging in or use a different number.");
-        } else {
-          throw new Error("This email is already registered. Please try logging in or use a different email.");
-        }
+        throw new Error("This email is already registered. Please try logging in or use a different email.");
       }
       
       throw error;
@@ -118,51 +112,23 @@ const performRegistration = async (
       
       if (userData && !userError) {
         console.log("User profile created successfully:", userData);
+        localStorage.setItem('currentUser', JSON.stringify(userData));
         
-        // For phone-only registrations, update the user profile with correct data
-        if (isPhoneOnlyRegistration) {
-          const { data: updatedUserData, error: updateError } = await supabase
-            .from('users')
-            .update({
-              email: '', // Clear the temporary email
-              phone: formattedPhone,
-              name: name
-            })
-            .eq('auth_id', data.user.id)
-            .select()
-            .single();
-          
-          if (updatedUserData && !updateError) {
-            localStorage.setItem('currentUser', JSON.stringify(updatedUserData));
-            
-            // Trigger a custom event to notify other components
-            window.dispatchEvent(new CustomEvent('authStateChanged', { 
-              detail: { user: updatedUserData, session: data.session } 
-            }));
-            
-            return updatedUserData as User;
-          }
-        } else {
-          localStorage.setItem('currentUser', JSON.stringify(userData));
-          
-          // Trigger a custom event to notify other components
-          window.dispatchEvent(new CustomEvent('authStateChanged', { 
-            detail: { user: userData, session: data.session } 
-          }));
-          
-          return userData as User;
-        }
+        // Trigger a custom event to notify other components
+        window.dispatchEvent(new CustomEvent('authStateChanged', { 
+          detail: { user: userData, session: data.session } 
+        }));
+        
+        return userData as User;
       } else {
         console.error("Error fetching user profile:", userError);
-        // If the user profile wasn't created automatically, create it manually
-        console.log("Attempting to create user profile manually...");
-        
+        // Create user profile manually if needed
         const { data: manualUserData, error: manualError } = await supabase
           .from('users')
           .insert({
             auth_id: data.user.id,
             name,
-            email: isPhoneOnlyRegistration ? '' : registrationEmail,
+            email,
             phone: formattedPhone || null,
             role: userType === 'sports_professional' ? 'sports_professional' : 'user'
           })
@@ -179,15 +145,13 @@ const performRegistration = async (
           }));
           
           return manualUserData as User;
-        } else {
-          console.error("Manual user profile creation failed:", manualError);
         }
       }
     }
     
     return null;
   } catch (error) {
-    console.error("Registration error:", error);
+    console.error("Email registration error:", error);
     throw error;
   }
 };
