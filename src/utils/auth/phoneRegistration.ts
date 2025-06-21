@@ -7,6 +7,7 @@ export interface PhoneUser {
   name: string;
   phone: string;
   user_type: 'user' | 'sports_professional';
+  role: 'user' | 'sports_professional'; // Add role property for compatibility
   created_at: string;
   updated_at: string;
 }
@@ -67,12 +68,13 @@ export const registerWithPhone = async (
     if (data) {
       console.log("Phone registration successful:", data);
       
-      // Store user in localStorage
-      const user = {
+      // Store user in localStorage with proper typing
+      const user: PhoneUser = {
         id: data.id,
         name: data.name,
         phone: data.phone,
-        user_type: data.user_type,
+        user_type: data.user_type as 'user' | 'sports_professional',
+        role: data.user_type as 'user' | 'sports_professional', // Map user_type to role
         created_at: data.created_at,
         updated_at: data.updated_at
       };
@@ -126,12 +128,13 @@ export const loginWithPhone = async (phone: string, password: string): Promise<P
     
     console.log("Phone login successful:", data);
     
-    // Store user in localStorage
-    const user = {
+    // Store user in localStorage with proper typing
+    const user: PhoneUser = {
       id: data.id,
       name: data.name,
       phone: data.phone,
-      user_type: data.user_type,
+      user_type: data.user_type as 'user' | 'sports_professional',
+      role: data.user_type as 'user' | 'sports_professional', // Map user_type to role
       created_at: data.created_at,
       updated_at: data.updated_at
     };
@@ -165,7 +168,12 @@ export const getCurrentPhoneUser = (): PhoneUser | null => {
   const userStr = localStorage.getItem('currentPhoneUser');
   if (userStr) {
     try {
-      return JSON.parse(userStr);
+      const user = JSON.parse(userStr);
+      // Ensure backward compatibility by adding role if it doesn't exist
+      if (user && !user.role && user.user_type) {
+        user.role = user.user_type;
+      }
+      return user;
     } catch (error) {
       console.error("Error parsing stored user:", error);
       localStorage.removeItem('currentPhoneUser');
