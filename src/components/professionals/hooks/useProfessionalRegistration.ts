@@ -24,16 +24,24 @@ export const useProfessionalRegistration = (onSuccess: () => void, isUpdate: boo
 
       // Handle user ID resolution
       if ('phone' in currentUser && currentUser.phone) {
+        console.log('Phone user detected, finding user record...');
         // For phone users, find or create user record
-        const { data: existingUser } = await supabase
+        const { data: existingUser, error: userLookupError } = await supabase
           .from('users')
           .select('id')
           .eq('phone', currentUser.phone)
-          .single();
+          .maybeSingle();
+
+        if (userLookupError) {
+          console.error('Error looking up user by phone:', userLookupError);
+          throw new Error("Failed to find user profile");
+        }
 
         if (existingUser) {
           userId = existingUser.id;
+          console.log('Found existing user record with ID:', userId);
         } else {
+          console.log('Creating new user record for phone user...');
           const { data: newUser, error: userError } = await supabase
             .from('users')
             .insert({
@@ -51,22 +59,36 @@ export const useProfessionalRegistration = (onSuccess: () => void, isUpdate: boo
           }
 
           userId = newUser.id;
+          console.log('Created new user record with ID:', userId);
         }
       } else {
         userId = currentUser.id;
+        console.log('Using direct user ID:', userId);
       }
 
-      // Check for existing profile only when not updating
-      if (!isSuperAdmin && !isUpdate) {
-        const { data: existingProfile } = await supabase
-          .from('sports_professionals')
-          .select('id')
-          .eq('user_id', userId)
-          .single();
+      // Check for existing profile 
+      console.log('Checking for existing professional profile...');
+      const { data: existingProfile, error: profileCheckError } = await supabase
+        .from('sports_professionals')
+        .select('id')
+        .eq('user_id', userId)
+        .maybeSingle();
 
-        if (existingProfile) {
-          throw new Error("You already have a professional profile. You can only have one profile.");
-        }
+      if (profileCheckError) {
+        console.error('Error checking for existing profile:', profileCheckError);
+        throw new Error("Failed to check existing profile");
+      }
+
+      const hasExistingProfile = !!existingProfile;
+      console.log('Has existing profile:', hasExistingProfile);
+
+      // Validate the operation
+      if (!isSuperAdmin && !isUpdate && hasExistingProfile) {
+        throw new Error("You already have a professional profile. Use the update option instead.");
+      }
+
+      if (isUpdate && !hasExistingProfile) {
+        throw new Error("No existing profile found to update. Please create a new profile instead.");
       }
 
       const professionalData = {
@@ -114,6 +136,7 @@ export const useProfessionalRegistration = (onSuccess: () => void, isUpdate: boo
         }
         
         console.log('Update successful:', data);
+        return data;
       } else {
         // Insert new professional profile
         console.log('Creating new professional profile');
@@ -139,6 +162,8 @@ export const useProfessionalRegistration = (onSuccess: () => void, isUpdate: boo
 
           if (userUpdateError) {
             console.error("Failed to update user role:", userUpdateError);
+          } else {
+            console.log("Updated user role to sports_professional");
           }
 
           // Update localStorage with new role for phone users
@@ -152,6 +177,8 @@ export const useProfessionalRegistration = (onSuccess: () => void, isUpdate: boo
             }));
           }
         }
+
+        return data;
       }
     },
     onSuccess: () => {

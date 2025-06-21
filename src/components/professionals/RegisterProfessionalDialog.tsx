@@ -61,37 +61,56 @@ const RegisterProfessionalDialog = ({
           
           let userId = currentUser.id;
           
-          // Handle phone users
+          // Handle phone users - find their record in the users table
           if ('phone' in currentUser && currentUser.phone) {
-            const { data: existingUser } = await supabase
+            console.log('Phone user detected, looking up user record by phone:', currentUser.phone);
+            const { data: existingUser, error: userError } = await supabase
               .from('users')
               .select('id')
               .eq('phone', currentUser.phone)
               .single();
             
-            if (existingUser) {
+            if (userError) {
+              console.error('Error finding user by phone:', userError);
+              if (userError.code !== 'PGRST116') {
+                throw userError;
+              }
+            } else if (existingUser) {
               userId = existingUser.id;
+              console.log('Found user record with ID:', userId);
             }
           }
 
+          console.log('Searching for professional profile with user_id:', userId);
           const { data: profile, error } = await supabase
             .from('sports_professionals')
             .select('*')
             .eq('user_id', userId)
-            .single();
+            .maybeSingle();
 
-          if (error && error.code !== 'PGRST116') {
+          if (error) {
             console.error('Error fetching existing profile:', error);
             toast.error('Failed to load existing profile');
             return;
           }
 
           if (profile) {
-            console.log('Fetched existing profile:', profile);
+            console.log('Found existing profile:', profile);
             setExistingProfileData(profile);
           } else {
-            console.log('No existing profile found');
+            console.log('No existing profile found for user_id:', userId);
+            // Check if there are any profiles at all for debugging
+            const { data: allProfiles, error: debugError } = await supabase
+              .from('sports_professionals')
+              .select('user_id, name')
+              .limit(5);
+            
+            if (!debugError) {
+              console.log('Sample of existing profiles:', allProfiles);
+            }
+            
             setExistingProfileData(null);
+            toast.info('No existing profile found. You can create a new one.');
           }
         } catch (error) {
           console.error('Error fetching profile:', error);
@@ -130,29 +149,35 @@ const RegisterProfessionalDialog = ({
         console.log('Pre-filling with existing data:', existingProfileData);
         
         // Set each field individually to ensure proper type conversion
-        form.setValue('name', existingProfileData.name || '');
-        form.setValue('profession_type', existingProfileData.profession_type || 'Athlete');
-        form.setValue('game_id', existingProfileData.game_id || '');
-        form.setValue('contact_number', existingProfileData.contact_number || '');
-        form.setValue('fee', existingProfileData.fee || 0);
-        form.setValue('fee_type', existingProfileData.fee_type || 'Per Hour');
-        form.setValue('city', existingProfileData.city || '');
-        form.setValue('address', existingProfileData.address || '');
-        form.setValue('comments', existingProfileData.comments || '');
-        form.setValue('photo', existingProfileData.photo || '');
-        form.setValue('awards', existingProfileData.awards || []);
-        form.setValue('accomplishments', existingProfileData.accomplishments || []);
-        form.setValue('certifications', existingProfileData.certifications || []);
-        form.setValue('training_locations', existingProfileData.training_locations || []);
-        form.setValue('videos', existingProfileData.videos || []);
-        form.setValue('images', existingProfileData.images || []);
-        form.setValue('punch_line', existingProfileData.punch_line || '');
-        form.setValue('instagram_link', existingProfileData.instagram_link || '');
-        form.setValue('facebook_link', existingProfileData.facebook_link || '');
-        form.setValue('linkedin_link', existingProfileData.linkedin_link || '');
-        form.setValue('website', existingProfileData.website || '');
-        form.setValue('level', existingProfileData.level || undefined);
-        form.setValue('coaching_availability', existingProfileData.coaching_availability || []);
+        const fieldsToSet = [
+          ['name', existingProfileData.name || ''],
+          ['profession_type', existingProfileData.profession_type || 'Athlete'],
+          ['game_id', existingProfileData.game_id || ''],
+          ['contact_number', existingProfileData.contact_number || ''],
+          ['fee', existingProfileData.fee || 0],
+          ['fee_type', existingProfileData.fee_type || 'Per Hour'],
+          ['city', existingProfileData.city || ''],
+          ['address', existingProfileData.address || ''],
+          ['comments', existingProfileData.comments || ''],
+          ['photo', existingProfileData.photo || ''],
+          ['awards', existingProfileData.awards || []],
+          ['accomplishments', existingProfileData.accomplishments || []],
+          ['certifications', existingProfileData.certifications || []],
+          ['training_locations', existingProfileData.training_locations || []],
+          ['videos', existingProfileData.videos || []],
+          ['images', existingProfileData.images || []],
+          ['punch_line', existingProfileData.punch_line || ''],
+          ['instagram_link', existingProfileData.instagram_link || ''],
+          ['facebook_link', existingProfileData.facebook_link || ''],
+          ['linkedin_link', existingProfileData.linkedin_link || ''],
+          ['website', existingProfileData.website || ''],
+          ['level', existingProfileData.level || undefined],
+          ['coaching_availability', existingProfileData.coaching_availability || []],
+        ];
+
+        fieldsToSet.forEach(([field, value]) => {
+          form.setValue(field as any, value);
+        });
         
         console.log('Form values after pre-fill:', form.getValues());
       } else if (!hasExistingProfile) {
