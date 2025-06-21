@@ -81,34 +81,77 @@ const RegisterProfessionalDialog = ({
             }
           }
 
+          // First try to find profile by user_id
           console.log('Searching for professional profile with user_id:', userId);
-          const { data: profile, error } = await supabase
+          let { data: profile, error } = await supabase
             .from('sports_professionals')
             .select('*')
             .eq('user_id', userId)
             .maybeSingle();
 
           if (error) {
-            console.error('Error fetching existing profile:', error);
-            toast.error('Failed to load existing profile');
-            return;
+            console.error('Error fetching existing profile by user_id:', error);
+            throw error;
+          }
+
+          // If no profile found by user_id, try to find by contact info (for legacy profiles)
+          if (!profile) {
+            console.log('No profile found by user_id, searching by contact info...');
+            const contactQueries = [];
+            
+            if (currentUser.email) {
+              contactQueries.push(
+                supabase
+                  .from('sports_professionals')
+                  .select('*')
+                  .eq('contact_number', currentUser.email)
+                  .maybeSingle()
+              );
+            }
+            
+            if (currentUser.phone) {
+              contactQueries.push(
+                supabase
+                  .from('sports_professionals')
+                  .select('*')
+                  .eq('contact_number', currentUser.phone)
+                  .maybeSingle()
+              );
+            }
+
+            // Try to find by contact info
+            for (const query of contactQueries) {
+              const { data: contactProfile, error: contactError } = await query;
+              if (contactError) {
+                console.error('Error searching by contact:', contactError);
+                continue;
+              }
+              if (contactProfile) {
+                console.log('Found profile by contact info:', contactProfile);
+                profile = contactProfile;
+                
+                // Update the profile to link it to the current user
+                const { error: linkError } = await supabase
+                  .from('sports_professionals')
+                  .update({ user_id: userId })
+                  .eq('id', contactProfile.id);
+                
+                if (linkError) {
+                  console.error('Error linking profile to user:', linkError);
+                } else {
+                  console.log('Successfully linked profile to user');
+                  profile.user_id = userId; // Update local data
+                }
+                break;
+              }
+            }
           }
 
           if (profile) {
             console.log('Found existing profile:', profile);
             setExistingProfileData(profile);
           } else {
-            console.log('No existing profile found for user_id:', userId);
-            // Check if there are any profiles at all for debugging
-            const { data: allProfiles, error: debugError } = await supabase
-              .from('sports_professionals')
-              .select('user_id, name')
-              .limit(5);
-            
-            if (!debugError) {
-              console.log('Sample of existing profiles:', allProfiles);
-            }
-            
+            console.log('No existing profile found for user');
             setExistingProfileData(null);
             toast.info('No existing profile found. You can create a new one.');
           }

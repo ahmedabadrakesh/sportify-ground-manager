@@ -66,21 +66,38 @@ export const useProfessionalRegistration = (onSuccess: () => void, isUpdate: boo
         console.log('Using direct user ID:', userId);
       }
 
-      // Check for existing profile 
+      // Check for existing profile by user_id first, then by contact info
       console.log('Checking for existing professional profile...');
-      const { data: existingProfile, error: profileCheckError } = await supabase
+      let { data: existingProfile, error: profileCheckError } = await supabase
         .from('sports_professionals')
-        .select('id')
+        .select('id, user_id')
         .eq('user_id', userId)
         .maybeSingle();
 
       if (profileCheckError) {
-        console.error('Error checking for existing profile:', profileCheckError);
+        console.error('Error checking for existing profile by user_id:', profileCheckError);
         throw new Error("Failed to check existing profile");
       }
 
+      // If no profile found by user_id, check by contact info (for legacy profiles)
+      if (!existingProfile) {
+        console.log('No profile found by user_id, checking by contact info...');
+        const { data: contactProfile, error: contactError } = await supabase
+          .from('sports_professionals')
+          .select('id, user_id')
+          .eq('contact_number', values.contact_number)
+          .maybeSingle();
+
+        if (contactError) {
+          console.error('Error checking profile by contact:', contactError);
+        } else if (contactProfile) {
+          console.log('Found profile by contact info:', contactProfile);
+          existingProfile = contactProfile;
+        }
+      }
+
       const hasExistingProfile = !!existingProfile;
-      console.log('Has existing profile:', hasExistingProfile);
+      console.log('Has existing profile:', hasExistingProfile, existingProfile);
 
       // Validate the operation
       if (!isSuperAdmin && !isUpdate && hasExistingProfile) {
@@ -120,13 +137,15 @@ export const useProfessionalRegistration = (onSuccess: () => void, isUpdate: boo
       
       console.log('Professional data to save:', professionalData);
       
-      if (isUpdate) {
+      if (isUpdate && hasExistingProfile) {
         // Update existing professional profile
-        console.log('Updating professional profile for user_id:', userId);
+        console.log('Updating professional profile with ID:', existingProfile.id);
+        
+        // Update by profile ID for more reliable targeting
         const { data, error } = await supabase
           .from('sports_professionals')
           .update(professionalData)
-          .eq('user_id', userId)
+          .eq('id', existingProfile.id)
           .select()
           .single();
         
