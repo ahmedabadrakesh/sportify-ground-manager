@@ -1,6 +1,6 @@
+
 import React from "react";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, ChevronRight } from "lucide-react";
 
 interface FormNavigationProps {
   currentStep: number;
@@ -8,44 +8,42 @@ interface FormNavigationProps {
   onPrevious: () => void;
   onNext: () => void;
   isSubmitting: boolean;
+  isUpdate?: boolean;
 }
 
-export const FormNavigation = ({
-  currentStep,
-  totalSteps,
-  onPrevious,
-  onNext,
+export const FormNavigation = ({ 
+  currentStep, 
+  totalSteps, 
+  onPrevious, 
+  onNext, 
   isSubmitting,
+  isUpdate = false
 }: FormNavigationProps) => {
+  const isLastStep = currentStep === totalSteps;
+  const isFirstStep = currentStep === 1;
+  
+  const submitButtonText = isUpdate 
+    ? (isSubmitting ? "Updating Profile..." : "Update Profile")
+    : (isSubmitting ? "Registering..." : "Register as Professional");
+
   return (
-    <div className="flex justify-between bottom-end pt-6">
+    <div className="flex justify-between pt-6">
       <Button
         type="button"
         variant="outline"
         onClick={onPrevious}
-        disabled={currentStep === 1}
-        className="flex items-center gap-2"
+        disabled={isFirstStep || isSubmitting}
       >
-        <ChevronLeft className="w-4 h-4" />
         Previous
       </Button>
-
-      {currentStep < totalSteps ? (
-        <Button
-          type="button"
-          onClick={onNext}
-          className="flex items-center gap-2"
-        >
-          Next
-          <ChevronRight className="w-4 h-4" />
+      
+      {isLastStep ? (
+        <Button type="submit" disabled={isSubmitting}>
+          {submitButtonText}
         </Button>
       ) : (
-        <Button
-          type="submit"
-          disabled={isSubmitting}
-          className="flex items-center gap-2"
-        >
-          {isSubmitting ? "Registering..." : "Complete Registration"}
+        <Button type="button" onClick={onNext}>
+          Next
         </Button>
       )}
     </div>

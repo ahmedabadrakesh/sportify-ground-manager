@@ -54,26 +54,25 @@ const SportsProfessionals = () => {
       return;
     }
 
-    if (!isSuperAdmin && hasExistingProfile) {
-      toast.error("You already have a professional profile");
-      return;
-    }
-
     setIsDialogOpen(true);
   };
 
   const getButtonText = () => {
     if (!currentUser) return "Login to Register";
     if (isSuperAdmin) return "Add Professional";
-    if (hasExistingProfile) return "Profile Already Created";
+    if (hasExistingProfile) return "Update Your Profile";
+    if (isSportsProfessional) return "Update Your Profile";
     return "Register as Professional";
   };
 
   const shouldShowButton = () => {
     if (!currentUser) return true; // Show login prompt
     if (isSuperAdmin) return true; // Super admin can always add
-    if (hasExistingProfile) return true; // Show disabled button with message
-    return true; // Regular users can register
+    return true; // All logged-in users can register or update
+  };
+
+  const isUpdateMode = () => {
+    return (isSportsProfessional || hasExistingProfile) && !isSuperAdmin;
   };
 
   return (
@@ -89,7 +88,7 @@ const SportsProfessionals = () => {
           {shouldShowButton() && (
             <Button 
               onClick={handleRegisterClick}
-              disabled={checkingProfile || (!isSuperAdmin && hasExistingProfile)}
+              disabled={checkingProfile}
             >
               {checkingProfile ? "Checking..." : getButtonText()}
             </Button>
@@ -101,6 +100,8 @@ const SportsProfessionals = () => {
         <RegisterProfessionalDialog 
           open={isDialogOpen} 
           onOpenChange={setIsDialogOpen}
+          hasExistingProfile={hasExistingProfile}
+          isUpdate={isUpdateMode()}
         />
       </div>
     </MainLayout>

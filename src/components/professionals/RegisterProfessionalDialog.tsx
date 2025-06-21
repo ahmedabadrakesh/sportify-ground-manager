@@ -18,18 +18,24 @@ import { toast } from "sonner";
 interface RegisterProfessionalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  hasExistingProfile?: boolean;
+  isUpdate?: boolean;
 }
 
 const RegisterProfessionalDialog = ({
   open,
   onOpenChange,
+  hasExistingProfile = false,
+  isUpdate = false,
 }: RegisterProfessionalProps) => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
+  const [currentUser, setCurrentUser] = useState<any>(null);
 
   useEffect(() => {
     const checkAuth = async () => {
       const user = await getCurrentUser();
       setIsAuthenticated(!!user);
+      setCurrentUser(user);
       
       if (!user && open) {
         toast.error("Please log in to register as a sports professional");
@@ -57,6 +63,19 @@ const RegisterProfessionalDialog = ({
     resetForm();
   });
 
+  // Pre-fill form data when user is available and dialog opens
+  useEffect(() => {
+    if (currentUser && open && !hasExistingProfile) {
+      // Pre-fill name and contact information
+      form.setValue('name', currentUser.name || '');
+      if (currentUser.email) {
+        form.setValue('contact_number', currentUser.email);
+      } else if (currentUser.phone) {
+        form.setValue('contact_number', currentUser.phone);
+      }
+    }
+  }, [currentUser, open, hasExistingProfile, form]);
+
   const handleDialogClose = (open: boolean) => {
     if (!open) {
       resetForm();
@@ -74,12 +93,14 @@ const RegisterProfessionalDialog = ({
     return null;
   }
 
+  const dialogTitle = isUpdate ? "Update Your Profile" : "Register as Sports Professional";
+
   return (
     <Dialog open={open} onOpenChange={handleDialogClose}>
       <DialogContent className="max-w-4xl max-h-[90vh]">
         <DialogHeader>
           <DialogTitle className="text-center pb-4 pt-4">
-            Register as Sports Professional
+            {dialogTitle}
           </DialogTitle>
         </DialogHeader>
 
@@ -99,6 +120,7 @@ const RegisterProfessionalDialog = ({
                   onPrevious={handlePrevious}
                   onNext={handleNext}
                   isSubmitting={registerMutation.isPending}
+                  isUpdate={isUpdate}
                 />
               </div>
             </form>

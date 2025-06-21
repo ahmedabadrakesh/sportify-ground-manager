@@ -95,6 +95,7 @@ const AdminSportsProfessionals = () => {
       <RegisterProfessionalDialog
         open={isRegisterDialogOpen}
         onOpenChange={setIsRegisterDialogOpen}
+        isUpdate={false}
       />
     </AdminLayout>
   );
