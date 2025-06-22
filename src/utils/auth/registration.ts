@@ -54,6 +54,7 @@ const performRegistration = async (
       formattedPhone = '+91' + phone.replace(/^0+/, '');
     }
     
+    console.log("Attempting Supabase auth signup...");
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
@@ -81,36 +82,21 @@ const performRegistration = async (
     
     if (data.user) {
       // Wait a moment for the trigger to execute
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      await new Promise(resolve => setTimeout(resolve, 2000));
       
       // Fetch the created user profile
+      console.log("Fetching user profile for auth_id:", data.user.id);
       const { data: userData, error: userError } = await supabase
         .from('users')
         .select('*')
         .eq('auth_id', data.user.id)
         .single();
       
-      if (userData && !userError) {
-        console.log("User profile created successfully:", userData);
-        
-        // If user registered as sports professional, create sports professional entry
-        if (userType === 'sports_professional') {
-          await createDefaultSportsProfessionalEntry(userData.id, name, email || formattedPhone);
-        }
-        
-        localStorage.setItem('currentUser', JSON.stringify(userData));
-        
-        // Trigger a custom event to notify other components
-        window.dispatchEvent(new CustomEvent('authStateChanged', { 
-          detail: { user: userData, session: data.session } 
-        }));
-        
-        return userData as User;
-      } else {
-        console.error("Error fetching user profile:", userError);
+      let finalUser = userData;
+      
+      if (!userData || userError) {
+        console.log("User profile not found, creating manually...", userError);
         // If the user profile wasn't created automatically, create it manually
-        console.log("Attempting to create user profile manually...");
-        
         const { data: manualUserData, error: manualError } = await supabase
           .from('users')
           .insert({
@@ -125,23 +111,30 @@ const performRegistration = async (
         
         if (manualUserData && !manualError) {
           console.log("Manual user profile creation successful:", manualUserData);
-          
-          // If user registered as sports professional, create sports professional entry
-          if (userType === 'sports_professional') {
-            await createDefaultSportsProfessionalEntry(manualUserData.id, name, email || formattedPhone);
-          }
-          
-          localStorage.setItem('currentUser', JSON.stringify(manualUserData));
-          
-          // Trigger a custom event to notify other components
-          window.dispatchEvent(new CustomEvent('authStateChanged', { 
-            detail: { user: manualUserData, session: data.session } 
-          }));
-          
-          return manualUserData as User;
+          finalUser = manualUserData;
         } else {
           console.error("Manual user profile creation failed:", manualError);
+          throw new Error("Failed to create user profile");
         }
+      } else {
+        console.log("User profile found:", userData);
+      }
+      
+      // If user registered as sports professional, create sports professional entry
+      if (userType === 'sports_professional' && finalUser) {
+        console.log("Creating sports professional entry for user:", finalUser.id);
+        await createSportsProfessionalEntry(finalUser.id, name, email || formattedPhone);
+      }
+      
+      if (finalUser) {
+        localStorage.setItem('currentUser', JSON.stringify(finalUser));
+        
+        // Trigger a custom event to notify other components
+        window.dispatchEvent(new CustomEvent('authStateChanged', { 
+          detail: { user: finalUser, session: data.session } 
+        }));
+        
+        return finalUser as User;
       }
     }
     
@@ -152,24 +145,29 @@ const performRegistration = async (
   }
 };
 
-// Helper function to create a default sports professional entry
-const createDefaultSportsProfessionalEntry = async (
+// Helper function to create a sports professional entry
+const createSportsProfessionalEntry = async (
   userId: string,
   name: string,
   contactNumber: string
 ) => {
   try {
-    console.log("Creating default sports professional entry for user:", userId);
+    console.log("Creating sports professional entry for user:", userId);
     
     // Get the first available game for default assignment
-    const { data: games } = await supabase
+    const { data: games, error: gamesError } = await supabase
       .from('games')
       .select('id')
       .limit(1);
     
+    if (gamesError) {
+      console.error("Error fetching games:", gamesError);
+      throw gamesError;
+    }
+    
     if (!games || games.length === 0) {
       console.error("No games available to assign to sports professional");
-      return;
+      throw new Error("No games available. Please contact administrator.");
     }
     
     const defaultProfessionalData = {
@@ -199,16 +197,22 @@ const createDefaultSportsProfessionalEntry = async (
       coaching_availability: [],
     };
     
-    const { error: professionalError } = await supabase
+    console.log("Inserting sports professional data:", defaultProfessionalData);
+    
+    const { data: professionalData, error: professionalError } = await supabase
       .from('sports_professionals')
-      .insert(defaultProfessionalData);
+      .insert(defaultProfessionalData)
+      .select()
+      .single();
     
     if (professionalError) {
       console.error("Error creating sports professional entry:", professionalError);
+      throw professionalError;
     } else {
-      console.log("Default sports professional entry created successfully");
+      console.log("Sports professional entry created successfully:", professionalData);
     }
   } catch (error) {
-    console.error("Error in createDefaultSportsProfessionalEntry:", error);
+    console.error("Error in createSportsProfessionalEntry:", error);
+    throw error;
   }
 };

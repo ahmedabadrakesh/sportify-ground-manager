@@ -11,7 +11,7 @@ export const useProfessionalRegistration = (onSuccess: () => void, isUpdate: boo
 
   const registerMutation = useMutation({
     mutationFn: async (values: ProfessionalFormValues) => {
-      console.log('Mutation called with values:', values);
+      console.log('Professional registration/update called with values:', values);
       console.log('Is update mode:', isUpdate);
 
       // Get current user
@@ -48,7 +48,7 @@ export const useProfessionalRegistration = (onSuccess: () => void, isUpdate: boo
               name: currentUser.name,
               email: values.contact_number.includes('@') ? values.contact_number : `${currentUser.phone}@phone.user`,
               phone: currentUser.phone,
-              role: isUpdate ? 'sports_professional' : 'user'
+              role: 'sports_professional'
             })
             .select('id')
             .single();
@@ -66,34 +66,17 @@ export const useProfessionalRegistration = (onSuccess: () => void, isUpdate: boo
         console.log('Using direct user ID:', userId);
       }
 
-      // Check for existing profile by user_id first, then by contact info
+      // Check for existing profile
       console.log('Checking for existing professional profile...');
-      let { data: existingProfile, error: profileCheckError } = await supabase
+      const { data: existingProfile, error: profileCheckError } = await supabase
         .from('sports_professionals')
         .select('id, user_id')
         .eq('user_id', userId)
         .maybeSingle();
 
       if (profileCheckError) {
-        console.error('Error checking for existing profile by user_id:', profileCheckError);
+        console.error('Error checking for existing profile:', profileCheckError);
         throw new Error("Failed to check existing profile");
-      }
-
-      // If no profile found by user_id, check by contact info (for legacy profiles)
-      if (!existingProfile) {
-        console.log('No profile found by user_id, checking by contact info...');
-        const { data: contactProfile, error: contactError } = await supabase
-          .from('sports_professionals')
-          .select('id, user_id')
-          .eq('contact_number', values.contact_number)
-          .maybeSingle();
-
-        if (contactError) {
-          console.error('Error checking profile by contact:', contactError);
-        } else if (contactProfile) {
-          console.log('Found profile by contact info:', contactProfile);
-          existingProfile = contactProfile;
-        }
       }
 
       const hasExistingProfile = !!existingProfile;
@@ -141,7 +124,6 @@ export const useProfessionalRegistration = (onSuccess: () => void, isUpdate: boo
         // Update existing professional profile
         console.log('Updating professional profile with ID:', existingProfile.id);
         
-        // Update by profile ID for more reliable targeting
         const { data, error } = await supabase
           .from('sports_professionals')
           .update(professionalData)

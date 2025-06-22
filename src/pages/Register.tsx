@@ -1,4 +1,3 @@
-
 import React, { useState, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -70,7 +69,11 @@ const Register: React.FC = () => {
       );
       
       if (user) {
-        toast.success("Registration successful! Welcome to SportifyGround!");
+        const successMessage = userType === 'sports_professional' 
+          ? "Registration successful! Your sports professional profile has been created. Welcome to SportifyGround!"
+          : "Registration successful! Welcome to SportifyGround!";
+        
+        toast.success(successMessage);
         console.log("Registration successful, user:", user);
         
         // Redirect based on user type
@@ -96,8 +99,10 @@ const Register: React.FC = () => {
         toast.error("Phone number registration is currently disabled. Please use email instead.");
       } else if (error.message?.includes("rate limit") || error.status === 429 || error.code === "over_email_send_rate_limit") {
         toast.error("Too many registration attempts. Please wait a few minutes before trying again.");
+      } else if (error.message?.includes("No games available")) {
+        toast.error("Sports professional registration is temporarily unavailable. Please contact support.");
       } else {
-        toast.error("Registration failed. Please check your details and try again.");
+        toast.error(error.message || "Registration failed. Please check your details and try again.");
       }
     } finally {
       setIsLoading(false);
@@ -152,6 +157,11 @@ const Register: React.FC = () => {
                     <Label htmlFor="sports_professional">Sports Professional</Label>
                   </div>
                 </RadioGroup>
+                {userType === 'sports_professional' && (
+                  <p className="text-xs text-blue-600">
+                    A basic sports professional profile will be created for you, which you can update later.
+                  </p>
+                )}
               </div>
               
               <Tabs defaultValue="email" onValueChange={(value) => setRegistrationType(value as "email" | "phone")}>
