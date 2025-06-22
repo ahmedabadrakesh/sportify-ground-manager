@@ -16,6 +16,9 @@ export const register = async (
   // Create a unique key for this registration attempt
   const registrationKey = email || phone;
   
+  console.log("=== REGISTRATION START ===");
+  console.log("Registration parameters:", { name, email, phone, userType, registrationKey });
+  
   // Check if a registration is already in progress for this identifier
   if (ongoingRegistrations.has(registrationKey)) {
     console.log("Registration already in progress for:", registrationKey);
@@ -33,6 +36,7 @@ export const register = async (
   
   // Clean up when done (whether success or failure)
   registrationPromise.finally(() => {
+    console.log("Cleaning up registration promise for:", registrationKey);
     ongoingRegistrations.delete(registrationKey);
   });
   
@@ -48,15 +52,42 @@ const performRegistration = async (
   userType: 'user' | 'sports_professional'
 ): Promise<User | null> => {
   try {
+    console.log("=== PERFORM REGISTRATION START ===");
+    console.log("Input validation:", { 
+      name: !!name, 
+      email: !!email, 
+      phone: !!phone, 
+      password: !!password, 
+      userType 
+    });
+    
+    // Validate inputs
+    if (!name || !password) {
+      throw new Error("Name and password are required");
+    }
+    
+    if (!email && !phone) {
+      throw new Error("Either email or phone number is required");
+    }
+    
     // Format phone number if provided
     let formattedPhone = phone;
     if (phone && !phone.startsWith('+')) {
       formattedPhone = '+91' + phone.replace(/^0+/, '');
+      console.log("Formatted phone:", formattedPhone);
+    }
+    
+    // Validate email if provided
+    if (email) {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(email)) {
+        throw new Error("Invalid email format");
+      }
     }
     
     console.log("Attempting Supabase auth signup...");
-    const { data, error } = await supabase.auth.signUp({
-      email,
+    const signUpData = {
+      email: email || `${phone}@phone.user`,
       password,
       options: {
         data: {
@@ -65,10 +96,13 @@ const performRegistration = async (
         },
         emailRedirectTo: `${window.location.origin}/`
       }
-    });
+    };
+    console.log("SignUp data:", signUpData);
+    
+    const { data, error } = await supabase.auth.signUp(signUpData);
     
     if (error) {
-      console.error("Registration error:", error);
+      console.error("Supabase auth signup error:", error);
       
       // Handle rate limit errors specifically
       if (error.status === 429 || error.message?.includes("rate limit")) {
@@ -81,7 +115,10 @@ const performRegistration = async (
     console.log("Supabase auth registration successful:", data);
     
     if (data.user) {
+      console.log("User created with ID:", data.user.id);
+      
       // Wait a moment for the trigger to execute
+      console.log("Waiting for user profile creation...");
       await new Promise(resolve => setTimeout(resolve, 2000));
       
       // Fetch the created user profile
@@ -97,21 +134,24 @@ const performRegistration = async (
       if (!userData || userError) {
         console.log("User profile not found, creating manually...", userError);
         // If the user profile wasn't created automatically, create it manually
-        const { data: manualUserData, error: manualError } = await supabase
+        const manualUserData = {
+          auth_id: data.user.id,
+          name,
+          email: email || `${formattedPhone}@phone.user`,
+          phone: formattedPhone || null,
+          role: userType === 'sports_professional' ? 'sports_professional' : 'user'
+        };
+        console.log("Creating manual user profile:", manualUserData);
+        
+        const { data: manualUserResult, error: manualError } = await supabase
           .from('users')
-          .insert({
-            auth_id: data.user.id,
-            name,
-            email,
-            phone: formattedPhone || null,
-            role: userType === 'sports_professional' ? 'sports_professional' : 'user'
-          })
+          .insert(manualUserData)
           .select()
           .single();
         
-        if (manualUserData && !manualError) {
-          console.log("Manual user profile creation successful:", manualUserData);
-          finalUser = manualUserData;
+        if (manualUserResult && !manualError) {
+          console.log("Manual user profile creation successful:", manualUserResult);
+          finalUser = manualUserResult;
         } else {
           console.error("Manual user profile creation failed:", manualError);
           throw new Error("Failed to create user profile");
@@ -127,6 +167,7 @@ const performRegistration = async (
       }
       
       if (finalUser) {
+        console.log("Storing user in localStorage:", finalUser);
         localStorage.setItem('currentUser', JSON.stringify(finalUser));
         
         // Trigger a custom event to notify other components
@@ -134,13 +175,15 @@ const performRegistration = async (
           detail: { user: finalUser, session: data.session } 
         }));
         
+        console.log("=== REGISTRATION SUCCESS ===");
         return finalUser as User;
       }
     }
     
+    console.log("=== REGISTRATION FAILED - NO USER ===");
     return null;
   } catch (error) {
-    console.error("Registration error:", error);
+    console.error("=== REGISTRATION ERROR ===", error);
     throw error;
   }
 };
@@ -152,6 +195,7 @@ const createSportsProfessionalEntry = async (
   contactNumber: string
 ) => {
   try {
+    console.log("=== CREATING SPORTS PROFESSIONAL ENTRY ===");
     console.log("Creating sports professional entry for user:", userId);
     
     // Get the first available game for default assignment

@@ -1,3 +1,4 @@
+
 import React, { useState, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -27,6 +28,10 @@ const Register: React.FC = () => {
     e.preventDefault();
     e.stopPropagation();
     
+    console.log("Form submission triggered");
+    console.log("Current form state:", { name, email, phone, password, confirmPassword, userType, registrationType });
+    console.log("isLoading:", isLoading, "isSubmittingRef.current:", isSubmittingRef.current);
+    
     // Prevent multiple submissions using ref (more reliable than state)
     if (isLoading || isSubmittingRef.current) {
       console.log("Registration already in progress, ignoring submission");
@@ -40,11 +45,13 @@ const Register: React.FC = () => {
     try {
       // Simple form validation
       if (!name || (!email && !phone) || !password || !confirmPassword) {
+        console.log("Validation failed: missing required fields");
         toast.error("Please fill in all required fields");
         return;
       }
 
       if (password !== confirmPassword) {
+        console.log("Validation failed: passwords don't match");
         toast.error("Passwords do not match");
         return;
       }
@@ -53,12 +60,28 @@ const Register: React.FC = () => {
       if (registrationType === "phone" && phone) {
         const phoneRegex = /^\d{10}$/;
         if (!phoneRegex.test(phone)) {
+          console.log("Validation failed: invalid phone format");
           toast.error("Please enter a valid 10-digit mobile number");
           return;
         }
       }
 
-      console.log("Starting registration with:", { name, email, phone, userType });
+      // Basic validation for email format
+      if (registrationType === "email" && email) {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+          console.log("Validation failed: invalid email format");
+          toast.error("Please enter a valid email address");
+          return;
+        }
+      }
+
+      console.log("Starting registration with:", { 
+        name, 
+        email: registrationType === "email" ? email : "", 
+        phone: registrationType === "phone" ? phone : "", 
+        userType 
+      });
       
       const user = await register(
         name, 
@@ -67,6 +90,8 @@ const Register: React.FC = () => {
         password,
         userType
       );
+      
+      console.log("Registration result:", user);
       
       if (user) {
         const successMessage = userType === 'sports_professional' 
@@ -83,6 +108,7 @@ const Register: React.FC = () => {
           navigate("/");
         }
       } else {
+        console.log("Registration failed: no user returned");
         toast.error("Registration failed. Please try again.");
       }
     } catch (error: any) {
@@ -105,6 +131,7 @@ const Register: React.FC = () => {
         toast.error(error.message || "Registration failed. Please check your details and try again.");
       }
     } finally {
+      console.log("Registration process completed, resetting loading state");
       setIsLoading(false);
       isSubmittingRef.current = false;
     }
@@ -164,7 +191,11 @@ const Register: React.FC = () => {
                 )}
               </div>
               
-              <Tabs defaultValue="email" onValueChange={(value) => setRegistrationType(value as "email" | "phone")}>
+              <Tabs 
+                defaultValue="email" 
+                value={registrationType}
+                onValueChange={(value) => setRegistrationType(value as "email" | "phone")}
+              >
                 <TabsList className="grid w-full grid-cols-2">
                   <TabsTrigger value="email" disabled={isLoading}>Email</TabsTrigger>
                   <TabsTrigger value="phone" disabled={isLoading}>Phone</TabsTrigger>
@@ -242,6 +273,10 @@ const Register: React.FC = () => {
                 type="submit" 
                 className="w-full" 
                 disabled={isLoading}
+                onClick={(e) => {
+                  console.log("Register button clicked");
+                  // The onClick will bubble up to the form's onSubmit
+                }}
               >
                 {isLoading ? "Creating account..." : "Register"}
               </Button>
