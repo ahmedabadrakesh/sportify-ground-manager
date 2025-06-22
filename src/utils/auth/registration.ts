@@ -163,6 +163,10 @@ const performRegistration = async (
       
       // If user registered as sports professional, create sports professional entry
       if (userType === 'sports_professional' && finalUser) {
+        console.log("Sports professional registration requested - waiting 5 seconds for database consistency...");
+        // Add 5-second delay before creating sports professional entry
+        await new Promise(resolve => setTimeout(resolve, 5000));
+        
         console.log("Creating sports professional entry for user:", finalUser.id);
         await createSportsProfessionalEntry(finalUser.id, name, email || formattedPhone);
       }
