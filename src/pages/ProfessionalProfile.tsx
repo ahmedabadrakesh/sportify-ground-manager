@@ -166,7 +166,7 @@ const ProfessionalProfile = () => {
       <Card className="flex-auto ">
         <CardContent>
           {items.map((achievement, index) => (
-            <div className="flex">
+            <div className="flex" key={index}>
               {achievement}
               {/* <span className="text-sm bg-white/20 px-3 py-1 rounded-full">
                         {achievement.year}
@@ -505,7 +505,7 @@ const ProfessionalProfile = () => {
                   <div className="lg:col-span-5 md:col-span-1 leading-relaxed align-left text-justify">
                     {professional.awards.map((item, index) => {
                       return (
-                        <div className="flex items-center">
+                        <div className="flex items-center" key={index}>
                           <ChevronsRight
                             color="#6260e2"
                             className="mr-2 "
@@ -529,7 +529,7 @@ const ProfessionalProfile = () => {
                   <div className="lg:col-span-5 md:col-span-1 leading-relaxed align-left text-justify">
                     {professional.accomplishments.map((item, index) => {
                       return (
-                        <div className="flex items-center">
+                        <div className="flex items-center" key={index}>
                           <ChevronsRight
                             color="#6260e2"
                             className="mr-2 "
@@ -554,7 +554,7 @@ const ProfessionalProfile = () => {
                   <div className="lg:col-span-5 gap-2 leading-relaxed align-left text-justify">
                     {professional.certifications.map((item, index) => {
                       return (
-                        <div className="flex items-center">
+                        <div className="flex items-center" key={index}>
                           <ChevronsRight
                             color="#6260e2"
                             className="mr-2 "
@@ -578,7 +578,7 @@ const ProfessionalProfile = () => {
                   <div className="grid col-span-5 leading-relaxed align-left text-justify">
                     {professional.training_locations.map((item, index) => {
                       return (
-                        <div className="flex items-center">
+                        <div className="flex items-center" key={index}>
                           <ChevronsRight
                             color="#6260e2"
                             className="mr-2 "
@@ -618,7 +618,7 @@ const ProfessionalProfile = () => {
                   <div className="grid col-span-5 leading-relaxed align-left text-justify">
                     {professional.coaching_availability.map((item, index) => {
                       return (
-                        <div className="flex items-center">
+                        <div className="flex items-center" key={index}>
                           <ChevronsRight
                             color="#6260e2"
                             className="mr-2 "

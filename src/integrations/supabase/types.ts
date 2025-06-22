@@ -562,6 +562,7 @@ export type Database = {
           user_id: string | null
           videos: string[] | null
           website: string | null
+          youtube_link: string | null
         }
         Insert: {
           accomplishments?: string[] | null
@@ -591,6 +592,7 @@ export type Database = {
           user_id?: string | null
           videos?: string[] | null
           website?: string | null
+          youtube_link?: string | null
         }
         Update: {
           accomplishments?: string[] | null
@@ -620,6 +622,7 @@ export type Database = {
           user_id?: string | null
           videos?: string[] | null
           website?: string | null
+          youtube_link?: string | null
         }
         Relationships: [
           {
