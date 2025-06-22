@@ -1,10 +1,13 @@
 
-import React from "react";
+import React, { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import ProfessionalCard from "./ProfessionalCard";
+import AuthRequiredDialog from "@/components/auth/AuthRequiredDialog";
 
 const ProfessionalsList = () => {
+  const [isAuthDialogOpen, setIsAuthDialogOpen] = useState(false);
+
   const { data: professionals, isLoading, error } = useQuery({
     queryKey: ["sports-professionals"],
     queryFn: async () => {
@@ -57,6 +60,10 @@ const ProfessionalsList = () => {
 
   console.log("ProfessionalsList render - isLoading:", isLoading, "error:", error, "professionals:", professionals);
 
+  const handleLoginClick = () => {
+    setIsAuthDialogOpen(true);
+  };
+
   if (isLoading) {
     return (
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -89,11 +96,24 @@ const ProfessionalsList = () => {
   }
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-      {professionals?.map((professional) => (
-        <ProfessionalCard key={professional.id} professional={professional} />
-      ))}
-    </div>
+    <>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {professionals?.map((professional) => (
+          <ProfessionalCard 
+            key={professional.id} 
+            professional={professional}
+            onLoginClick={handleLoginClick}
+          />
+        ))}
+      </div>
+
+      <AuthRequiredDialog 
+        open={isAuthDialogOpen}
+        onOpenChange={setIsAuthDialogOpen}
+        title="Login Required"
+        description="Please login or register to view complete contact details."
+      />
+    </>
   );
 };
 

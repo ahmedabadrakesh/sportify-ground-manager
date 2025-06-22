@@ -5,8 +5,18 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { MapPin, Phone, Calendar } from "lucide-react";
+import { getCurrentUserSync } from "@/utils/auth";
 
-const ProfessionalCard = ({ professional }: { professional: any }) => {
+const ProfessionalCard = ({ professional, onLoginClick }: { professional: any; onLoginClick?: () => void }) => {
+  const currentUser = getCurrentUserSync();
+  const isAuthenticated = !!currentUser;
+
+  const maskPhone = (phone: string) => {
+    if (!phone || isAuthenticated) return phone;
+    if (phone.length <= 4) return phone;
+    return phone.substring(0, 2) + "*".repeat(phone.length - 4) + phone.substring(phone.length - 2);
+  };
+
   return (
     <Card className="overflow-hidden hover:shadow-lg transition-all duration-300 group cursor-pointer">
       <Link to={`/professional/${professional.id}`}>
@@ -44,7 +54,19 @@ const ProfessionalCard = ({ professional }: { professional: any }) => {
             </div>
             <div className="flex items-center gap-2 text-sm text-gray-600">
               <Phone className="h-4 w-4" />
-              <span>{professional.contact_number}</span>
+              <span>{maskPhone(professional.contact_number)}</span>
+              {!isAuthenticated && (
+                <button 
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    onLoginClick?.();
+                  }}
+                  className="text-xs text-blue-600 hover:text-blue-800 underline cursor-pointer ml-1"
+                >
+                  (Login to view)
+                </button>
+              )}
             </div>
             <div className="flex items-center gap-2 text-sm text-gray-600">
               <Calendar className="h-4 w-4" />
