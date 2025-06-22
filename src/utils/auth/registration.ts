@@ -189,6 +189,32 @@ const performRegistration = async (
   }
 };
 
+// Helper function to verify user exists before creating sports professional entry
+const verifyUserExists = async (userId: string, maxRetries: number = 3): Promise<boolean> => {
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    console.log(`Verifying user exists, attempt ${attempt}/${maxRetries}:`, userId);
+    
+    const { data, error } = await supabase
+      .from('users')
+      .select('id')
+      .eq('id', userId)
+      .single();
+    
+    if (data && !error) {
+      console.log("User verification successful:", userId);
+      return true;
+    }
+    
+    if (attempt < maxRetries) {
+      console.log(`User not found yet, waiting before retry ${attempt + 1}...`);
+      await new Promise(resolve => setTimeout(resolve, 1000));
+    }
+  }
+  
+  console.error("User verification failed after all retries:", userId);
+  return false;
+};
+
 // Helper function to create a sports professional entry
 const createSportsProfessionalEntry = async (
   userId: string,
@@ -198,6 +224,12 @@ const createSportsProfessionalEntry = async (
   try {
     console.log("=== CREATING SPORTS PROFESSIONAL ENTRY ===");
     console.log("Creating sports professional entry for user:", userId);
+    
+    // First, verify that the user exists in the database
+    const userExists = await verifyUserExists(userId);
+    if (!userExists) {
+      throw new Error("User record not found in database. Cannot create sports professional entry.");
+    }
     
     // Get the first available game for default assignment
     const { data: games, error: gamesError } = await supabase
