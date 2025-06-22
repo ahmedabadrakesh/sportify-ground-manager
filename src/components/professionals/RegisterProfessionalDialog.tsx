@@ -33,6 +33,7 @@ const RegisterProfessionalDialog = ({
   const [currentUser, setCurrentUser] = useState<any>(null);
   const [existingProfileData, setExistingProfileData] = useState<any>(null);
   const [isLoadingProfile, setIsLoadingProfile] = useState(false);
+  const [userEmail, setUserEmail] = useState<string>("");
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -50,6 +51,29 @@ const RegisterProfessionalDialog = ({
       checkAuth();
     }
   }, [open, onOpenChange]);
+
+  // Fetch user email from users table
+  useEffect(() => {
+    const fetchUserEmail = async () => {
+      if (currentUser) {
+        try {
+          const { data: userData, error } = await supabase
+            .from('users')
+            .select('email')
+            .eq('id', currentUser.id)
+            .single();
+          
+          if (userData && !error) {
+            setUserEmail(userData.email);
+          }
+        } catch (error) {
+          console.error('Error fetching user email:', error);
+        }
+      }
+    };
+
+    fetchUserEmail();
+  }, [currentUser]);
 
   // Fetch existing profile data if in update mode
   useEffect(() => {
@@ -99,12 +123,12 @@ const RegisterProfessionalDialog = ({
             console.log('No profile found by user_id, searching by contact info...');
             const contactQueries = [];
             
-            if (currentUser.email) {
+            if (userEmail) {
               contactQueries.push(
                 supabase
                   .from('sports_professionals')
                   .select('*')
-                  .eq('contact_number', currentUser.email)
+                  .eq('contact_number', userEmail)
                   .maybeSingle()
               );
             }
@@ -165,7 +189,7 @@ const RegisterProfessionalDialog = ({
     };
 
     fetchExistingProfile();
-  }, [isUpdate, currentUser, open]);
+  }, [isUpdate, currentUser, open, userEmail]);
 
   const {
     form,
@@ -197,6 +221,7 @@ const RegisterProfessionalDialog = ({
           ['profession_type', existingProfileData.profession_type || 'Athlete'],
           ['game_id', existingProfileData.game_id || ''],
           ['contact_number', existingProfileData.contact_number || ''],
+          ['email', userEmail], // Set the user's email from users table
           ['fee', existingProfileData.fee || 0],
           ['fee_type', existingProfileData.fee_type || 'Per Hour'],
           ['city', existingProfileData.city || ''],
@@ -226,14 +251,13 @@ const RegisterProfessionalDialog = ({
       } else if (!hasExistingProfile) {
         // Pre-fill with basic user information for new registrations
         form.setValue('name', currentUser.name || '');
-        if (currentUser.email) {
-          form.setValue('contact_number', currentUser.email);
-        } else if (currentUser.phone) {
+        form.setValue('email', userEmail); // Set the user's email from users table
+        if (currentUser.phone) {
           form.setValue('contact_number', currentUser.phone);
         }
       }
     }
-  }, [currentUser, open, hasExistingProfile, form, isUpdate, existingProfileData, isLoadingProfile]);
+  }, [currentUser, open, hasExistingProfile, form, isUpdate, existingProfileData, isLoadingProfile, userEmail]);
 
   const handleDialogClose = (open: boolean) => {
     if (!open) {

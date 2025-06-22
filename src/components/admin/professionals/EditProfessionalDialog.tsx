@@ -1,5 +1,5 @@
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -24,6 +24,7 @@ const EditProfessionalDialog = ({ open, onOpenChange, professional }: EditProfes
   const queryClient = useQueryClient();
   const currentUser = getCurrentUserSync();
   const isSuperAdmin = hasRoleSync('super_admin');
+  const [userEmail, setUserEmail] = useState<string>("");
   
   // Check if user can edit this profile
   const canEdit = isSuperAdmin || professional.user_id === currentUser?.id;
@@ -56,6 +57,32 @@ const EditProfessionalDialog = ({ open, onOpenChange, professional }: EditProfes
       coaching_availability: professional.coaching_availability || [],
     },
   });
+
+  // Fetch user email from users table
+  useEffect(() => {
+    const fetchUserEmail = async () => {
+      if (professional.user_id) {
+        try {
+          const { data: userData, error } = await supabase
+            .from('users')
+            .select('email')
+            .eq('id', professional.user_id)
+            .single();
+          
+          if (userData && !error) {
+            setUserEmail(userData.email);
+            form.setValue('email', userData.email);
+          }
+        } catch (error) {
+          console.error('Error fetching user email:', error);
+        }
+      }
+    };
+
+    if (open) {
+      fetchUserEmail();
+    }
+  }, [open, professional.user_id, form]);
 
   const updateMutation = useMutation({
     mutationFn: async (values: ProfessionalFormValues) => {
@@ -133,7 +160,7 @@ const EditProfessionalDialog = ({ open, onOpenChange, professional }: EditProfes
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
               <PhotoUpload form={form} />
-              <ProfessionalFormFields form={form} />
+              <ProfessionalFormFields form={form} userEmail={userEmail} />
               <Button 
                 type="submit" 
                 className="w-full"

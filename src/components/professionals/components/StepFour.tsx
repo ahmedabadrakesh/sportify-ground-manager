@@ -1,4 +1,5 @@
-import React from "react";
+
+import React, { useEffect, useState } from "react";
 import { UseFormReturn } from "react-hook-form";
 import {
   FormField,
@@ -10,12 +11,42 @@ import {
 import { Input } from "@/components/ui/input";
 import { ProfessionalFormValues } from "../schemas/professionalFormSchema";
 import { Phone, Mail, MapPin, Building } from "lucide-react";
+import { getCurrentUser } from "@/utils/auth";
+import { supabase } from "@/integrations/supabase/client";
 
 interface StepFourProps {
   form: UseFormReturn<ProfessionalFormValues>;
 }
 
 export const StepFour = ({ form }: StepFourProps) => {
+  const [userEmail, setUserEmail] = useState<string>("");
+
+  useEffect(() => {
+    const fetchUserEmail = async () => {
+      try {
+        const currentUser = await getCurrentUser();
+        if (currentUser) {
+          // Fetch email from users table
+          const { data: userData, error } = await supabase
+            .from('users')
+            .select('email')
+            .eq('id', currentUser.id)
+            .single();
+          
+          if (userData && !error) {
+            setUserEmail(userData.email);
+            // Set the email in the form for display but don't make it editable
+            form.setValue('email', userData.email);
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching user email:', error);
+      }
+    };
+
+    fetchUserEmail();
+  }, [form]);
+
   return (
     <div className="space-y-6">
       <div className="grid md:grid-cols-2 gap-4">
@@ -43,15 +74,21 @@ export const StepFour = ({ form }: StepFourProps) => {
             <FormItem>
               <FormLabel className="flex items-center gap-2">
                 <Mail className="w-4 h-4" />
-                Email
+                Email (Registration Email)
               </FormLabel>
               <FormControl>
                 <Input
                   {...field}
                   type="email"
-                  placeholder="Enter your email address"
+                  value={userEmail}
+                  disabled
+                  className="bg-gray-100 cursor-not-allowed"
+                  placeholder="Loading email..."
                 />
               </FormControl>
+              <p className="text-xs text-muted-foreground">
+                This is your registration email and cannot be changed.
+              </p>
               <FormMessage />
             </FormItem>
           )}
@@ -99,7 +136,7 @@ export const StepFour = ({ form }: StepFourProps) => {
         </h3>
         <p className="text-sm text-muted-foreground">
           Make sure your contact information is accurate so potential clients
-          can easily reach out to you.
+          can easily reach out to you. Your email address is from your registration and cannot be modified here.
         </p>
       </div>
     </div>

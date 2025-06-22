@@ -9,6 +9,7 @@ import { useGames } from "@/hooks/useGames";
 import { Database } from "@/integrations/supabase/types";
 import { ArrayFieldInput } from "./ArrayFieldInput";
 import { MultiSelectField } from "./MultiSelectField";
+import { Mail } from "lucide-react";
 
 // Get the enum types from the database types
 type ProfessionType = Database["public"]["Enums"]["sport_profession_type"];
@@ -16,9 +17,10 @@ type FeeType = Database["public"]["Enums"]["fee_type"];
 
 interface ProfessionalFormFieldsProps {
   form: UseFormReturn<ProfessionalFormValues>;
+  userEmail?: string;
 }
 
-export const ProfessionalFormFields = ({ form }: ProfessionalFormFieldsProps) => {
+export const ProfessionalFormFields = ({ form, userEmail }: ProfessionalFormFieldsProps) => {
   const { games } = useGames();
   
   // Use the actual enum values from the database
@@ -206,6 +208,34 @@ export const ProfessionalFormFields = ({ form }: ProfessionalFormFieldsProps) =>
             </FormItem>
           )}
         />
+
+        {userEmail && (
+          <FormField
+            name="email"
+            control={form.control}
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="flex items-center gap-2">
+                  <Mail className="w-4 h-4" />
+                  Email (Registration Email)
+                </FormLabel>
+                <FormControl>
+                  <Input
+                    {...field}
+                    type="email"
+                    value={userEmail}
+                    disabled
+                    className="bg-gray-100 cursor-not-allowed"
+                  />
+                </FormControl>
+                <p className="text-xs text-muted-foreground">
+                  This is your registration email and cannot be changed.
+                </p>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        )}
 
         <FormField
           name="city"
