@@ -15,9 +15,10 @@ import { getCurrentUserSync } from "@/utils/auth";
 
 interface ContactDetailsProps {
   professional: any;
+  onLoginClick?: () => void;
 }
 
-const ContactDetails = ({ professional }: ContactDetailsProps) => {
+const ContactDetails = ({ professional, onLoginClick }: ContactDetailsProps) => {
   const currentUser = getCurrentUserSync();
   const isAuthenticated = !!currentUser;
 
@@ -77,7 +78,12 @@ const ContactDetails = ({ professional }: ContactDetailsProps) => {
             <div className="flex items-center p-1 rounded-xl">
               <contact.icon className="w-5 h-5 text-blue-800 mr-4" />
               <span className="text-gray-600">{contact.value}</span>
-              <span className="ml-2 text-xs text-gray-400">(Login to view)</span>
+              <button 
+                onClick={onLoginClick}
+                className="ml-2 text-xs text-blue-600 hover:text-blue-800 underline cursor-pointer"
+              >
+                (Login to view)
+              </button>
             </div>
           )}
         </div>

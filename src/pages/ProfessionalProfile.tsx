@@ -595,7 +595,7 @@ const ProfessionalProfile = () => {
             )}
 
             <div>
-              <div className="grid lg:grid-cols-6 gap-4">
+              <div className="grid lg:grid-cols-6 gap-1">
                 <div className="grid col-span-1 text-left uppercase font-bold">
                   Charges
                 </div>
@@ -665,7 +665,10 @@ const ProfessionalProfile = () => {
                 Contact Details
               </div>
               <div className="grid col-span-5 lg:flex-row leading-relaxed align-left text-justify">
-                <ContactDetails professional={professional} />
+                <ContactDetails 
+                  professional={professional} 
+                  onLoginClick={() => setIsAuthDialogOpen(true)}
+                />
               </div>
             </div>
           </div>
