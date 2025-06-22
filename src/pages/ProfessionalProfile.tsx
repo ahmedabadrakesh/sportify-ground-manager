@@ -27,15 +27,28 @@ import {
   Youtube,
   BadgeIndianRupee,
   ChevronsRight,
+  Edit,
+  Eye,
+  EyeOff,
 } from "lucide-react";
 import VideoGallery from "@/components/professionals/components/VideoGallery";
 import ImageGallery from "@/components/professionals/components/ImageGallery";
 import ContactDetails from "@/components/professionals/components/ContactDetails";
+import { getCurrentUserSync, hasRoleSync } from "@/utils/auth";
+import RegisterProfessionalDialog from "@/components/professionals/RegisterProfessionalDialog";
+import AuthRequiredDialog from "@/components/auth/AuthRequiredDialog";
 
 const ProfessionalProfile = () => {
   const { id } = useParams<{ id: string }>();
-  const [isAboutRReadMoreOpened, setIsAboutRReadMoreOpened] =
-    useState<boolean>(false);
+  const [isAboutRReadMoreOpened, setIsAboutRReadMoreOpened] = useState<boolean>(false);
+  const [showContactDetails, setShowContactDetails] = useState<boolean>(false);
+  const [isUpdateDialogOpen, setIsUpdateDialogOpen] = useState(false);
+  const [isAuthDialogOpen, setIsAuthDialogOpen] = useState(false);
+  
+  const currentUser = getCurrentUserSync();
+  const isSuperAdmin = hasRoleSync('super_admin');
+  const isAuthenticated = !!currentUser;
+
   const { data: professional, isLoading } = useQuery({
     queryKey: ["professional", id],
     queryFn: async () => {
@@ -57,6 +70,59 @@ const ProfessionalProfile = () => {
     },
     enabled: !!id,
   });
+
+  // Fetch professional's email from users table
+  const { data: professionalUser } = useQuery({
+    queryKey: ["professional-user", professional?.user_id],
+    queryFn: async () => {
+      if (!professional?.user_id) return null;
+      
+      const { data, error } = await supabase
+        .from("users")
+        .select("email")
+        .eq("id", professional.user_id)
+        .single();
+
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!professional?.user_id,
+  });
+
+  // Check if current user can edit this profile
+  const canEdit = isAuthenticated && (isSuperAdmin || professional?.user_id === currentUser?.id);
+
+  const handleContactClick = () => {
+    if (!isAuthenticated) {
+      setIsAuthDialogOpen(true);
+      return;
+    }
+    setShowContactDetails(!showContactDetails);
+  };
+
+  const handleUpdateProfile = () => {
+    if (!isAuthenticated) {
+      setIsAuthDialogOpen(true);
+      return;
+    }
+    setIsUpdateDialogOpen(true);
+  };
+
+  const maskEmail = (email: string) => {
+    if (!email) return "";
+    const [username, domain] = email.split("@");
+    const maskedUsername = username.length > 2 
+      ? username.substring(0, 2) + "*".repeat(username.length - 2)
+      : username;
+    return `${maskedUsername}@${domain}`;
+  };
+
+  const maskPhone = (phone: string) => {
+    if (!phone) return "";
+    if (phone.length <= 4) return phone;
+    return phone.substring(0, 2) + "*".repeat(phone.length - 4) + phone.substring(phone.length - 2);
+  };
+
   if (isLoading) {
     return (
       <MainLayout>
@@ -144,7 +210,7 @@ const ProfessionalProfile = () => {
       {
         name: "YouTube",
         icon: <Youtube className="h-5 w-5" />,
-        url: "https://youtube.com/@jokova.official",
+        url: professional.youtube_link,
         color: "red-600",
       },
     ];
@@ -156,9 +222,8 @@ const ProfessionalProfile = () => {
     return (
       <div className="flex lg:flex-col md:flex-row flex-wrap lg:items-end items-baseline gap-1">
         {activeLinks.map((link, index) => (
-          <div className="flex items-end ">
+          <div className="flex items-end " key={index}>
             <a
-              key={index}
               href={link.url}
               target="_blank"
               rel="noopener noreferrer"
@@ -232,18 +297,26 @@ const ProfessionalProfile = () => {
       </div>
     );
   };
+
   return (
     <MainLayout>
       <div className="container mx-auto py-8">
-        {/* Back button */}
-        <div className="mb-6">
+        {/* Back button and Update Profile button */}
+        <div className="mb-6 flex justify-between items-center">
           <Link to="/sports-professionals">
             <Button variant="ghost" className="flex items-center gap-2">
               <ArrowLeft className="h-4 w-4" />
               Back to Professionals
             </Button>
           </Link>
+          {canEdit && (
+            <Button onClick={handleUpdateProfile} className="flex items-center gap-2">
+              <Edit className="h-4 w-4" />
+              Update Profile
+            </Button>
+          )}
         </div>
+
         <div className="">
           <div>
             <div className="flex lg:flex-row flex-col items-center lg:gap-16">
@@ -277,9 +350,9 @@ const ProfessionalProfile = () => {
                           stroke="currentColor"
                         >
                           <path
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            stroke-width="4"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth="4"
                             d="M5 13l4 4L19 7"
                           ></path>
                         </svg>
@@ -336,6 +409,54 @@ const ProfessionalProfile = () => {
             <div className="pb-6 pt-6">
               <hr className="w-48 h-1 mx-auto my-4 bg-blue-400 border-0 rounded-sm md:my-10 dark:bg-gray-700" />
             </div>
+
+            {/* Contact Information Section */}
+            <div className="mb-6">
+              <div className="grid lg:grid-cols-6 gap-4">
+                <div className="grid col-span-1 text-left uppercase font-bold">
+                  Contact Info
+                </div>
+                <div className="lg:col-span-5 leading-relaxed align-left">
+                  <div className="space-y-3">
+                    {/* Phone Number */}
+                    <div className="flex items-center gap-2">
+                      <span className="font-medium">Phone:</span>
+                      <span className="cursor-pointer flex items-center gap-2" onClick={handleContactClick}>
+                        {showContactDetails ? professional.contact_number : maskPhone(professional.contact_number)}
+                        {showContactDetails ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                      </span>
+                    </div>
+                    
+                    {/* Email */}
+                    <div className="flex items-center gap-2">
+                      <span className="font-medium">Email:</span>
+                      <span className="cursor-pointer flex items-center gap-2" onClick={handleContactClick}>
+                        {showContactDetails ? professionalUser?.email : maskEmail(professionalUser?.email || "")}
+                        {showContactDetails ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                      </span>
+                    </div>
+
+                    {!isAuthenticated && (
+                      <div className="mt-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+                        <p className="text-yellow-800 text-sm">
+                          To view complete contact details, please register or login.
+                        </p>
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          className="mt-2"
+                          onClick={() => setIsAuthDialogOpen(true)}
+                        >
+                          Register / Login
+                        </Button>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+              {showOrangeDividerLine()}
+            </div>
+
             {professional.comments && (
               <div>
                 <div className="lg:grid lg:grid-cols-6 gap-4 md:flex-flow-row">
@@ -362,9 +483,9 @@ const ProfessionalProfile = () => {
                       >
                         <path
                           stroke="currentColor"
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                          stroke-width="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="2"
                           d="M1 5h12m0 0L9 1m4 4L9 9"
                         />
                       </svg>
@@ -547,18 +668,23 @@ const ProfessionalProfile = () => {
                 <ContactDetails professional={professional} />
               </div>
             </div>
-
-            <div className="grid lg:grid-cols-6 gap-2">
-              <div className="grid col-span-1 text-left uppercase font-bold"></div>
-              <div className="grid col-span-5 leading-relaxed align-left text-justify"></div>
-            </div>
-
-            <div className="grid lg:grid-cols-6 gap-2">
-              <div className="grid col-span-1 text-left uppercase font-bold"></div>
-              <div className="grid col-span-5 leading-relaxed align-left text-justify"></div>
-            </div>
           </div>
         </div>
+
+        {/* Dialogs */}
+        <RegisterProfessionalDialog 
+          open={isUpdateDialogOpen} 
+          onOpenChange={setIsUpdateDialogOpen}
+          hasExistingProfile={true}
+          isUpdate={true}
+        />
+
+        <AuthRequiredDialog 
+          open={isAuthDialogOpen}
+          onOpenChange={setIsAuthDialogOpen}
+          title="Login Required"
+          description="Please login or register to view contact details and access all features."
+        />
       </div>
     </MainLayout>
   );
