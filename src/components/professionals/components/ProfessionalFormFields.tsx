@@ -1,4 +1,3 @@
-
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
@@ -218,21 +217,25 @@ export const ProfessionalFormFields = ({ form, userEmail }: ProfessionalFormFiel
             <FormItem>
               <FormLabel className="flex items-center gap-2">
                 <Mail className="w-4 h-4" />
-                {isSuperAdmin ? "Email Address" : "Email (Registration Email)"}
+                Email Address
               </FormLabel>
               <FormControl>
                 <Input
                   {...field}
                   type="email"
-                  value={isSuperAdmin ? field.value || "" : userEmail || ""}
-                  disabled={!isSuperAdmin}
-                  className={!isSuperAdmin ? "bg-gray-100 cursor-not-allowed" : ""}
-                  placeholder={isSuperAdmin ? "Enter email address" : ""}
+                  disabled={!isSuperAdmin && !!userEmail}
+                  className={!isSuperAdmin && !!userEmail ? "bg-gray-100 cursor-not-allowed" : ""}
+                  placeholder={isSuperAdmin ? "Enter email address for new user" : "Email address"}
                 />
               </FormControl>
               {!isSuperAdmin && (
                 <p className="text-xs text-muted-foreground">
                   This is your registration email and cannot be changed.
+                </p>
+              )}
+              {isSuperAdmin && (
+                <p className="text-xs text-muted-foreground">
+                  Enter the email address for the new sports professional. A user account will be created with this email.
                 </p>
               )}
               <FormMessage />

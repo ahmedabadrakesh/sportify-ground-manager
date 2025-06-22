@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from "react";
 import {
   Dialog,
@@ -54,7 +55,7 @@ const RegisterProfessionalDialog = ({
     }
   }, [open, onOpenChange]);
 
-  // Fetch user email from users table
+  // Fetch user email from users table (only for non-super admin users)
   useEffect(() => {
     const fetchUserEmail = async () => {
       if (currentUser && !isSuperAdmin) {
@@ -80,7 +81,7 @@ const RegisterProfessionalDialog = ({
   // Fetch existing profile data if in update mode
   useEffect(() => {
     const fetchExistingProfile = async () => {
-      if (isUpdate && currentUser && open) {
+      if (isUpdate && currentUser && open && !isSuperAdmin) {
         setIsLoadingProfile(true);
         try {
           console.log('Fetching existing profile for user:', currentUser);
@@ -191,7 +192,7 @@ const RegisterProfessionalDialog = ({
     };
 
     fetchExistingProfile();
-  }, [isUpdate, currentUser, open, userEmail]);
+  }, [isUpdate, currentUser, open, userEmail, isSuperAdmin]);
 
   const {
     form,
@@ -212,9 +213,41 @@ const RegisterProfessionalDialog = ({
   useEffect(() => {
     if (currentUser && open && !isLoadingProfile) {
       console.log('Pre-filling form data...');
+      console.log('Is super admin:', isSuperAdmin);
+      console.log('Is update:', isUpdate);
+      console.log('Has existing profile:', hasExistingProfile);
       
-      if (isUpdate && existingProfileData) {
-        // Pre-fill with existing professional data
+      if (isSuperAdmin && !isUpdate) {
+        // Super admin creating new professional - completely fresh form
+        console.log('Super admin creating new professional - using fresh form');
+        form.reset({
+          name: "",
+          profession_type: "Athlete",
+          game_id: "",
+          contact_number: "",
+          email: "", // Empty email for super admin to fill
+          fee: 0,
+          fee_type: "Per Hour",
+          city: "",
+          address: "",
+          comments: "",
+          photo: "",
+          awards: [],
+          accomplishments: [],
+          certifications: [],
+          training_locations: [],
+          videos: [],
+          images: [],
+          punch_line: "",
+          instagram_link: "",
+          facebook_link: "",
+          linkedin_link: "",
+          website: "",
+          level: undefined,
+          coaching_availability: [],
+        });
+      } else if (isUpdate && existingProfileData) {
+        // Pre-fill with existing professional data for update
         console.log('Pre-filling with existing data:', existingProfileData);
         
         // Set each field individually to ensure proper type conversion
@@ -250,17 +283,11 @@ const RegisterProfessionalDialog = ({
         });
         
         console.log('Form values after pre-fill:', form.getValues());
-      } else if (!hasExistingProfile) {
-        // Pre-fill with basic user information for new registrations
+      } else if (!hasExistingProfile && !isSuperAdmin) {
+        // Pre-fill with basic user information for new registrations (non-super admin)
+        console.log('Regular user creating new profile');
         form.setValue('name', currentUser.name || '');
-        
-        if (isSuperAdmin) {
-          // For super admin, leave email empty for manual entry
-          form.setValue('email', '');
-        } else {
-          // For regular users, set the user's email from users table
-          form.setValue('email', userEmail);
-        }
+        form.setValue('email', userEmail);
         
         if (currentUser.phone) {
           form.setValue('contact_number', currentUser.phone);
@@ -287,7 +314,11 @@ const RegisterProfessionalDialog = ({
     return null;
   }
 
-  const dialogTitle = isUpdate ? "Update Your Profile" : "Register as Sports Professional";
+  const dialogTitle = isSuperAdmin && !isUpdate 
+    ? "Register New Sports Professional" 
+    : isUpdate 
+      ? "Update Your Profile" 
+      : "Register as Sports Professional";
 
   return (
     <Dialog open={open} onOpenChange={handleDialogClose}>
