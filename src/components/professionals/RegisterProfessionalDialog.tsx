@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from "react";
 import {
   Dialog,
@@ -15,6 +14,7 @@ import { useRegisterProfessionalForm } from "./hooks/useRegisterProfessionalForm
 import { getCurrentUser } from "@/utils/auth";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { hasRoleSync } from "@/utils/auth";
 
 interface RegisterProfessionalProps {
   open: boolean;
@@ -34,6 +34,8 @@ const RegisterProfessionalDialog = ({
   const [existingProfileData, setExistingProfileData] = useState<any>(null);
   const [isLoadingProfile, setIsLoadingProfile] = useState(false);
   const [userEmail, setUserEmail] = useState<string>("");
+  
+  const isSuperAdmin = hasRoleSync('super_admin');
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -55,7 +57,7 @@ const RegisterProfessionalDialog = ({
   // Fetch user email from users table
   useEffect(() => {
     const fetchUserEmail = async () => {
-      if (currentUser) {
+      if (currentUser && !isSuperAdmin) {
         try {
           const { data: userData, error } = await supabase
             .from('users')
@@ -73,7 +75,7 @@ const RegisterProfessionalDialog = ({
     };
 
     fetchUserEmail();
-  }, [currentUser]);
+  }, [currentUser, isSuperAdmin]);
 
   // Fetch existing profile data if in update mode
   useEffect(() => {
@@ -251,13 +253,21 @@ const RegisterProfessionalDialog = ({
       } else if (!hasExistingProfile) {
         // Pre-fill with basic user information for new registrations
         form.setValue('name', currentUser.name || '');
-        form.setValue('email', userEmail); // Set the user's email from users table
+        
+        if (isSuperAdmin) {
+          // For super admin, leave email empty for manual entry
+          form.setValue('email', '');
+        } else {
+          // For regular users, set the user's email from users table
+          form.setValue('email', userEmail);
+        }
+        
         if (currentUser.phone) {
           form.setValue('contact_number', currentUser.phone);
         }
       }
     }
-  }, [currentUser, open, hasExistingProfile, form, isUpdate, existingProfileData, isLoadingProfile, userEmail]);
+  }, [currentUser, open, hasExistingProfile, form, isUpdate, existingProfileData, isLoadingProfile, userEmail, isSuperAdmin]);
 
   const handleDialogClose = (open: boolean) => {
     if (!open) {

@@ -11,7 +11,7 @@ export const professionalFormSchema = z.object({
   profession_type: z.enum(["Athlete", "Coach", "Trainer", "Sports Manager", "Support Staff", "Player", "Umpire"] as const),
   game_id: z.string().min(1, "Please select a game"),
   contact_number: z.string().min(1, "Contact number is required"),
-  email: z.string().optional(), // Make email optional since it's read-only
+  email: z.string().email("Invalid email format").min(1, "Email is required"),
   fee: z.union([z.string(), z.number()]).transform((val) => Number(val) || 0),
   fee_type: z.enum(["Per Hour", "Per Day", "Per Match"] as const),
   city: z.string().min(1, "City is required"),
