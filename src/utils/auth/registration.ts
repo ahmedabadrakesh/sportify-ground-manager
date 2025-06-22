@@ -134,12 +134,13 @@ const performRegistration = async (
       if (!userData || userError) {
         console.log("User profile not found, creating manually...", userError);
         // If the user profile wasn't created automatically, create it manually
+        const userRole = userType === 'sports_professional' ? 'sports_professional' : 'user';
         const manualUserData = {
           auth_id: data.user.id,
           name,
           email: email || `${formattedPhone}@phone.user`,
           phone: formattedPhone || null,
-          role: userType === 'sports_professional' ? 'sports_professional' : 'user'
+          role: userRole as 'user' | 'sports_professional' | 'admin' | 'super_admin' | 'ground_owner'
         };
         console.log("Creating manual user profile:", manualUserData);
         
