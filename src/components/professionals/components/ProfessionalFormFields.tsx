@@ -18,9 +18,10 @@ type FeeType = Database["public"]["Enums"]["fee_type"];
 interface ProfessionalFormFieldsProps {
   form: UseFormReturn<ProfessionalFormValues>;
   userEmail?: string;
+  isUpdate?: boolean;
 }
 
-export const ProfessionalFormFields = ({ form, userEmail }: ProfessionalFormFieldsProps) => {
+export const ProfessionalFormFields = ({ form, userEmail, isUpdate = false }: ProfessionalFormFieldsProps) => {
   const { games } = useGames();
   const isSuperAdmin = hasRoleSync('super_admin');
   
@@ -35,6 +36,9 @@ export const ProfessionalFormFields = ({ form, userEmail }: ProfessionalFormFiel
 
   const levelOptions = ["Beginner", "Intermediate", "Professional"];
   const coachingAvailabilityOptions = ["Personal", "Group", "Home", "Out of City"];
+
+  // Determine if email field should be disabled
+  const isEmailDisabled = !isSuperAdmin && !isUpdate && !!userEmail;
 
   return (
     <div className="space-y-4">
@@ -223,17 +227,21 @@ export const ProfessionalFormFields = ({ form, userEmail }: ProfessionalFormFiel
                 <Input
                   {...field}
                   type="email"
-                  disabled={!isSuperAdmin && !!userEmail}
-                  className={!isSuperAdmin && !!userEmail ? "bg-gray-100 cursor-not-allowed" : ""}
-                  placeholder={isSuperAdmin ? "Enter email address for new user" : "Email address"}
+                  disabled={isEmailDisabled}
+                  className={isEmailDisabled ? "bg-gray-100 cursor-not-allowed" : ""}
+                  placeholder={
+                    isSuperAdmin && !isUpdate 
+                      ? "Enter email address for new professional" 
+                      : "Email address"
+                  }
                 />
               </FormControl>
-              {!isSuperAdmin && (
+              {isEmailDisabled && (
                 <p className="text-xs text-muted-foreground">
                   This is your registration email and cannot be changed.
                 </p>
               )}
-              {isSuperAdmin && (
+              {isSuperAdmin && !isUpdate && (
                 <p className="text-xs text-muted-foreground">
                   Enter the email address for the new sports professional. A user account will be created with this email.
                 </p>

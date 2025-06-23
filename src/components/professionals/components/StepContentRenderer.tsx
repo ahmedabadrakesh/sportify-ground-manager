@@ -12,12 +12,14 @@ import { StepSix } from "./StepSix";
 interface StepContentRendererProps {
   currentStep: number;
   form: UseFormReturn<ProfessionalFormValues>;
+  userEmail?: string;
+  isUpdate?: boolean;
 }
 
-export const StepContentRenderer = ({ currentStep, form }: StepContentRendererProps) => {
+export const StepContentRenderer = ({ currentStep, form, userEmail, isUpdate }: StepContentRendererProps) => {
   switch (currentStep) {
     case 1:
-      return <StepOne form={form} />;
+      return <StepOne form={form} userEmail={userEmail} isUpdate={isUpdate} />;
     case 2:
       return <StepTwo form={form} />;
     case 3:

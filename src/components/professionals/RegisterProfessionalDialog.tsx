@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from "react";
 import {
   Dialog,
@@ -345,7 +344,12 @@ const RegisterProfessionalDialog = ({
                   totalSteps={totalSteps}
                   stepTitles={stepTitles}
                 />
-                <StepContentRenderer currentStep={currentStep} form={form} />
+                <StepContentRenderer 
+                  currentStep={currentStep} 
+                  form={form} 
+                  userEmail={userEmail}
+                  isUpdate={isUpdate}
+                />
                 <div className="bottom-end">
                   <FormNavigation
                     currentStep={currentStep}
