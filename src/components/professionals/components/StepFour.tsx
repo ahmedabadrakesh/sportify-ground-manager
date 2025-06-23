@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from "react";
 import { UseFormReturn } from "react-hook-form";
 import {
@@ -11,7 +10,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { ProfessionalFormValues } from "../schemas/professionalFormSchema";
 import { Phone, Mail, MapPin, Building } from "lucide-react";
-import { getCurrentUser } from "@/utils/auth";
+import { getCurrentUser, hasRoleSync } from "@/utils/auth";
 import { supabase } from "@/integrations/supabase/client";
 
 interface StepFourProps {
@@ -20,7 +19,7 @@ interface StepFourProps {
 
 export const StepFour = ({ form }: StepFourProps) => {
   const [userEmail, setUserEmail] = useState<string>("");
-
+  const isSuperAdmin = hasRoleSync("super_admin");
   useEffect(() => {
     const fetchUserEmail = async () => {
       try {
@@ -28,19 +27,19 @@ export const StepFour = ({ form }: StepFourProps) => {
         if (currentUser) {
           // Fetch email from users table
           const { data: userData, error } = await supabase
-            .from('users')
-            .select('email')
-            .eq('id', currentUser.id)
+            .from("users")
+            .select("email")
+            .eq("id", currentUser.id)
             .single();
-          
+
           if (userData && !error) {
             setUserEmail(userData.email);
             // Set the email in the form for display but don't make it editable
-            form.setValue('email', userData.email);
+            form.setValue("email", userData.email);
           }
         }
       } catch (error) {
-        console.error('Error fetching user email:', error);
+        console.error("Error fetching user email:", error);
       }
     };
 
@@ -77,14 +76,18 @@ export const StepFour = ({ form }: StepFourProps) => {
                 Email (Registration Email)
               </FormLabel>
               <FormControl>
-                <Input
-                  {...field}
-                  type="email"
-                  value={userEmail}
-                  disabled
-                  className="bg-gray-100 cursor-not-allowed"
-                  placeholder="Loading email..."
-                />
+                {isSuperAdmin ? (
+                  <Input {...field} type="email" placeholder="Enter email..." />
+                ) : (
+                  <Input
+                    {...field}
+                    type="email"
+                    value={userEmail}
+                    disabled
+                    className="bg-gray-100 cursor-not-allowed"
+                    placeholder="Loading email..."
+                  />
+                )}
               </FormControl>
               <p className="text-xs text-muted-foreground">
                 This is your registration email and cannot be changed.
@@ -136,7 +139,8 @@ export const StepFour = ({ form }: StepFourProps) => {
         </h3>
         <p className="text-sm text-muted-foreground">
           Make sure your contact information is accurate so potential clients
-          can easily reach out to you. Your email address is from your registration and cannot be modified here.
+          can easily reach out to you. Your email address is from your
+          registration and cannot be modified here.
         </p>
       </div>
     </div>
