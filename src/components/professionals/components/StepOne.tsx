@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { UseFormReturn } from "react-hook-form";
 import {
@@ -25,9 +26,11 @@ type ProfessionType = Database["public"]["Enums"]["sport_profession_type"];
 
 interface StepOneProps {
   form: UseFormReturn<ProfessionalFormValues>;
+  userEmail?: string;
+  isUpdate?: boolean;
 }
 
-export const StepOne = ({ form }: StepOneProps) => {
+export const StepOne = ({ form, userEmail, isUpdate }: StepOneProps) => {
   const professionTypes: ProfessionType[] = [
     "Athlete",
     "Coach",
@@ -40,44 +43,25 @@ export const StepOne = ({ form }: StepOneProps) => {
 
   const [suggestedPunchLine, setSuggestedPunchLine] = useState();
   const punchLineData = [
-    "I don’t build athletes—I build belief.",
-
+    "I don't build athletes—I build belief.",
     "Greatness starts with guidance.",
-
-    "Coaching isn’t a job—it’s a mission.",
-
+    "Coaching isn't a job—it's a mission.",
     "Behind every champion is a coach who believed first.",
-
-    "We don’t train for trophies. We train for legacy.",
-
+    "We don't train for trophies. We train for legacy.",
     "I coach minds as much as muscles.",
-
     "Fuel the fire. Focus the fight.",
-
     "Push harder, think smarter, finish stronger.",
-
-    "I don’t promise wins—I promise work.",
-
+    "I don't promise wins—I promise work.",
     "Strong bodies are built in the gym. Strong champions are built in the mind.",
-
-    "You don’t need easy. You need possible.",
-
-    "Comfort zones don’t raise champions.",
-
-    "Excuses don’t lift medals. Effort does.",
-
+    "You don't need easy. You need possible.",
+    "Comfort zones don't raise champions.",
+    "Excuses don't lift medals. Effort does.",
     "No shortcuts. Just sweat and standards.",
-
     "Discipline today. Glory tomorrow.",
-
     "Coach. Mentor. Gamechanger.",
-
     "Tough love. Real results.",
-
     "More than drills—it's direction.",
-
     "Where effort meets elevation.",
-
     "Respect the grind. Trust the coach.",
   ];
 
