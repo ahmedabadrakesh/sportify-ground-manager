@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { ShoppingCart, Menu, X, LogIn, UserPlus, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { logout, getCurrentUserSync } from "@/utils/auth";
+import { logout, getCurrentUserSync, hasRoleSync } from "@/utils/auth";
 import { Toaster } from "@/components/ui/toaster";
 import { toast } from "sonner";
 import jokovaLogoTextImage from "/public/green_text_only_logo.png";
@@ -16,6 +16,7 @@ const MainLayout = ({ children }: MainLayoutProps) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [authenticated, setAuthenticated] = useState(false);
   const navigate = useNavigate();
+  const isSuperAdmin = hasRoleSync("super_admin");
 
   // Check authentication status on mount and listen for changes
   useEffect(() => {
@@ -55,7 +56,7 @@ const MainLayout = ({ children }: MainLayoutProps) => {
       <header className="bg-white">
         <div className="mx-auto max-w-7xl">
           <div className="flex h-16 justify-between items-center">
-            <div className="flex items-center">
+            <div className="flex-grow items-center">
               <Link to="/" className="flex items-center">
                 <img
                   src={jokovaLogoSymbolImage}
@@ -67,24 +68,24 @@ const MainLayout = ({ children }: MainLayoutProps) => {
             </div>
 
             {/* Desktop Navigation */}
-            <nav className="hidden md:flex space-x-8">
-              <Link
+            <nav className="hidden md:flex space-x-8 mr-16">
+              {/* <Link
                 to="/search"
                 className="text-green-700 font-bold hover:text-primary"
               >
                 Grounds
-              </Link>
-              <Link
+              </Link> */}
+              {/* <Link
                 to="/bookings"
                 className="text-green-700 font-bold  hover:text-primary"
               >
                 Bookings
-              </Link>
+              </Link> */}
               <Link
                 to="/sports-professionals"
                 className="text-green-700 font-bold  hover:text-primary"
               >
-                Professionals
+                Sport Professionals
               </Link>
               <Link
                 to="/events"
@@ -109,9 +110,11 @@ const MainLayout = ({ children }: MainLayoutProps) => {
               </Link>
               {authenticated ? (
                 <div className="flex items-center space-x-1">
-                  <Link to="/admin/dashboard">
-                    <Button variant="outline">Dashboard</Button>
-                  </Link>
+                  {isSuperAdmin && (
+                    <Link to="/admin/dashboard">
+                      <Button variant="outline">Dashboard</Button>
+                    </Link>
+                  )}
                   <Button variant="outline" onClick={handleLogout}>
                     Logout
                   </Button>

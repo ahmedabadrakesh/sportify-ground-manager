@@ -1,4 +1,3 @@
-
 import React from "react";
 import MainLayout from "@/components/layouts/MainLayout";
 import { useState, useEffect } from "react";
@@ -13,10 +12,10 @@ const SportsProfessionals = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [hasExistingProfile, setHasExistingProfile] = useState(false);
   const [checkingProfile, setCheckingProfile] = useState(true);
-  
+
   const currentUser = getCurrentUserSync();
-  const isSuperAdmin = hasRoleSync('super_admin');
-  const isSportsProfessional = hasRoleSync('sports_professional');
+  const isSuperAdmin = hasRoleSync("super_admin");
+  const isSportsProfessional = hasRoleSync("sports_professional");
 
   // Check if current user already has a professional profile
   useEffect(() => {
@@ -28,18 +27,19 @@ const SportsProfessionals = () => {
 
       try {
         const { data, error } = await supabase
-          .from('sports_professionals')
-          .select('id')
-          .eq('user_id', currentUser.id)
+          .from("sports_professionals")
+          .select("id")
+          .eq("user_id", currentUser.id)
           .single();
 
-        if (error && error.code !== 'PGRST116') { // PGRST116 is "not found" error
+        if (error && error.code !== "PGRST116") {
+          // PGRST116 is "not found" error
           throw error;
         }
 
         setHasExistingProfile(!!data);
       } catch (error) {
-        console.error('Error checking existing profile:', error);
+        console.error("Error checking existing profile:", error);
       } finally {
         setCheckingProfile(false);
       }
@@ -80,16 +80,15 @@ const SportsProfessionals = () => {
       <div className="container mx-auto py-8">
         <div className="flex justify-between items-center mb-8">
           <div>
-            <h1 className="text-3xl font-bold mb-2">Sports Professionals</h1>
+            <h1 className="text-3xl font-bold mb-2 text-left">
+              Sports Professionals
+            </h1>
             <p className="text-gray-600">
               Find experienced sports professionals or register yourself
             </p>
           </div>
           {shouldShowButton() && (
-            <Button 
-              onClick={handleRegisterClick}
-              disabled={checkingProfile}
-            >
+            <Button onClick={handleRegisterClick} disabled={checkingProfile}>
               {checkingProfile ? "Checking..." : getButtonText()}
             </Button>
           )}
@@ -97,8 +96,8 @@ const SportsProfessionals = () => {
 
         <ProfessionalsList />
 
-        <RegisterProfessionalDialog 
-          open={isDialogOpen} 
+        <RegisterProfessionalDialog
+          open={isDialogOpen}
           onOpenChange={setIsDialogOpen}
           hasExistingProfile={hasExistingProfile}
           isUpdate={isUpdateMode()}
