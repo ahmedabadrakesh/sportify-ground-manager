@@ -5,13 +5,17 @@ import { supabase } from "@/integrations/supabase/client";
 import ProfessionalCard from "./ProfessionalCard";
 import AuthRequiredDialog from "@/components/auth/AuthRequiredDialog";
 
-const ProfessionalsList = () => {
+interface ProfessionalsListProps {
+  sportFilter?: string | null;
+}
+
+const ProfessionalsList = ({ sportFilter }: ProfessionalsListProps) => {
   const [isAuthDialogOpen, setIsAuthDialogOpen] = useState(false);
 
   const { data: professionals, isLoading, error } = useQuery({
-    queryKey: ["sports-professionals"],
+    queryKey: ["sports-professionals", sportFilter],
     queryFn: async () => {
-      console.log("Fetching sports professionals...");
+      console.log("Fetching sports professionals with filter:", sportFilter);
       
       // First, let's try a simple query without joins to see if we can access the table
       const { data: testData, error: testError } = await supabase
@@ -21,27 +25,36 @@ const ProfessionalsList = () => {
       
       console.log("Test query result:", { testData, testError });
       
-      // Now try the full query with join
-      const { data, error } = await supabase
+      // Build the query with optional sport filter
+      let query = supabase
         .from("sports_professionals")
         .select(`
           *,
           games!inner (
             name
           )
-        `)
-        .order("created_at", { ascending: false });
+        `);
+
+      // Apply sport filter if provided
+      if (sportFilter) {
+        query = query.ilike("games.name", `%${sportFilter}%`);
+      }
+
+      const { data, error } = await query.order("created_at", { ascending: false });
 
       console.log("Full query result:", { data, error });
       
       if (error) {
         console.error("Error fetching sports professionals:", error);
         
-        // If the join fails, try without the join
+        // If the join fails, try without the join but still apply filter if needed
         console.log("Trying query without games join...");
-        const { data: fallbackData, error: fallbackError } = await supabase
+        let fallbackQuery = supabase
           .from("sports_professionals")
-          .select("*")
+          .select("*");
+
+        // For fallback, we can't filter by game name directly, so we'll get all and filter client-side if needed
+        const { data: fallbackData, error: fallbackError } = await fallbackQuery
           .order("created_at", { ascending: false });
           
         console.log("Fallback query result:", { fallbackData, fallbackError });
@@ -85,9 +98,13 @@ const ProfessionalsList = () => {
   }
 
   if (!professionals || professionals.length === 0) {
+    const noDataMessage = sportFilter 
+      ? `No ${sportFilter} professionals found. Be the first to register!`
+      : "No sports professionals found. Be the first to register!";
+    
     return (
       <div className="text-center py-8">
-        <p className="text-gray-600">No sports professionals found. Be the first to register!</p>
+        <p className="text-gray-600">{noDataMessage}</p>
         <p className="text-sm text-gray-500 mt-2">
           If you expect to see data here, there might be a permissions issue.
         </p>

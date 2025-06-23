@@ -1,6 +1,8 @@
+
 import React from "react";
 import MainLayout from "@/components/layouts/MainLayout";
 import { useState, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import ProfessionalsList from "@/components/professionals/ProfessionalsList";
 import RegisterProfessionalDialog from "@/components/professionals/RegisterProfessionalDialog";
@@ -12,6 +14,8 @@ const SportsProfessionals = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [hasExistingProfile, setHasExistingProfile] = useState(false);
   const [checkingProfile, setCheckingProfile] = useState(true);
+  const [searchParams] = useSearchParams();
+  const sportFilter = searchParams.get('sport');
 
   const currentUser = getCurrentUserSync();
   const isSuperAdmin = hasRoleSync("super_admin");
@@ -75,16 +79,30 @@ const SportsProfessionals = () => {
     return (isSportsProfessional || hasExistingProfile) && !isSuperAdmin;
   };
 
+  const getPageTitle = () => {
+    if (sportFilter) {
+      return `${sportFilter.charAt(0).toUpperCase() + sportFilter.slice(1)} Professionals`;
+    }
+    return "Sports Professionals";
+  };
+
+  const getPageDescription = () => {
+    if (sportFilter) {
+      return `Find experienced ${sportFilter} professionals or register yourself`;
+    }
+    return "Find experienced sports professionals or register yourself";
+  };
+
   return (
     <MainLayout>
       <div className="container mx-auto py-8">
         <div className="flex justify-between items-center mb-8">
           <div>
             <h1 className="text-3xl font-bold mb-2 text-left">
-              Sports Professionals
+              {getPageTitle()}
             </h1>
             <p className="text-gray-600">
-              Find experienced sports professionals or register yourself
+              {getPageDescription()}
             </p>
           </div>
           {shouldShowButton() && (
@@ -94,7 +112,7 @@ const SportsProfessionals = () => {
           )}
         </div>
 
-        <ProfessionalsList />
+        <ProfessionalsList sportFilter={sportFilter} />
 
         <RegisterProfessionalDialog
           open={isDialogOpen}

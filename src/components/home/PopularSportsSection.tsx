@@ -1,5 +1,6 @@
 
 import { motion } from "framer-motion";
+import { useNavigate } from "react-router-dom";
 import { 
   Carousel, 
   CarouselContent, 
@@ -42,6 +43,12 @@ const sports = [
 ];
 
 const PopularSportsSection = () => {
+  const navigate = useNavigate();
+
+  const handleSportClick = (sportName: string) => {
+    navigate(`/sports-professionals?sport=${encodeURIComponent(sportName.toLowerCase())}`);
+  };
+
   return (
     <div className="mb-16">
       <div className="relative px-4">
@@ -61,6 +68,7 @@ const PopularSportsSection = () => {
                   initial={{ opacity: 0, y: 30 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.5, delay: index * 0.1 }}
+                  onClick={() => handleSportClick(sport.name)}
                 >
                   <div className={`relative aspect-[4/5] ${sport.color} overflow-hidden`}>
                     <img 
@@ -84,4 +92,3 @@ const PopularSportsSection = () => {
 };
 
 export default PopularSportsSection;
-
