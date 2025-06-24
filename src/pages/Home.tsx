@@ -65,34 +65,35 @@ const Home: React.FC = () => {
     <MainLayout>
       <HeroSection onSearch={handleSearch} />
       <div>
-        <SportsProfessionalsPromotion />
         <PopularSportsSection />
+        <SportsProfessionalsPromotion />
         <SearchResultsSection
           searchTerm={searchTerm}
           hasSearched={hasSearched}
         />
-        <FeaturedGroundsSection />
+        {/* <FeaturedGroundsSection /> */}
+        <div className="bg-gray-50 py-16">
+          <div className="container mx-auto px-4 mb-8">
+            <div className="flex flex-col md:flex-row justify-between items-center mb-8">
+              <h2 className="text-3xl font-bold">Events</h2>
+              <Button
+                onClick={handleAddEvent}
+                className="mt-4 md:mt-0 flex items-center gap-2"
+              >
+                <Plus className="h-4 w-4" /> Add Event
+              </Button>
+            </div>
+          </div>
+          <EventsPromotion />
+        </div>
         <StatBanner />
       </div>
-      <div className="bg-gray-50 py-16">
-        <div className="container mx-auto px-4 mb-8">
-          <div className="flex flex-col md:flex-row justify-between items-center mb-8">
-            <h2 className="text-3xl font-bold">Events</h2>
-            <Button
-              onClick={handleAddEvent}
-              className="mt-4 md:mt-0 flex items-center gap-2"
-            >
-              <Plus className="h-4 w-4" /> Add Event
-            </Button>
-          </div>
-        </div>
-        <EventsPromotion />
-      </div>
+
       <div className="container mx-auto px-4">
-        <HowItWorksSection />
+        {/* <HowItWorksSection /> */}
         <TestimonialsSection />
         <ShopPromotionSection />
-        <WhyChooseUsSection />
+        {/* <WhyChooseUsSection /> */}
       </div>
 
       {/* Authentication Required Dialog */}
