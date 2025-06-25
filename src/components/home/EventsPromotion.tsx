@@ -13,8 +13,17 @@ const EventsPromotion = () => {
   const { events, isLoading } = useEvents();
   const { games } = useGames();
   
-  // Get only the upcoming 3 events
-  const upcomingEvents = events.slice(0, 3);
+  // Get current date for comparison
+  const currentDate = new Date();
+  currentDate.setHours(0, 0, 0, 0); // Reset time to start of day
+  
+  // Filter only upcoming events and get the first 3
+  const upcomingEvents = events
+    .filter(event => {
+      const eventDate = new Date(event.eventDate);
+      return eventDate >= currentDate;
+    })
+    .slice(0, 3);
   
   const getSportName = (sportId?: string) => {
     if (!sportId) return "General";
