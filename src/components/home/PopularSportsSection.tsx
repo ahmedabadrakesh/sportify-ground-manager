@@ -65,6 +65,13 @@ const PopularSportsSection = () => {
 
   return (
     <div className="mb-16">
+      <h2 className="text-2xl font-bold text-gray-900 mt-6">
+        Discover Experts in Your Favorite Sport Find inspiration
+      </h2>
+      <p className="mb-6">
+        learn from their experiences, and connect with like-minded enthusiasts.
+        What's your favorite sport?
+      </p>
       <div className="relative px-4">
         <Carousel
           opts={{
