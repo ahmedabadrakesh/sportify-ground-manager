@@ -1,5 +1,4 @@
-
-import React from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Calendar, MapPin, ArrowRight } from "lucide-react";
 import { format, parseISO } from "date-fns";
@@ -7,11 +6,17 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useEvents } from "@/hooks/useEvents";
 import { useGames } from "@/hooks/useGames";
+import ExternalRedirectDialog from "@/components/events/ExternalRedirectDialog";
 
 const EventsPromotion = () => {
   const navigate = useNavigate();
   const { events, isLoading } = useEvents();
   const { games } = useGames();
+  const [redirectDialog, setRedirectDialog] = useState({
+    open: false,
+    url: "",
+    eventName: "",
+  });
   
   // Get current date for comparison
   const currentDate = new Date();
@@ -39,9 +44,13 @@ const EventsPromotion = () => {
     }
   };
 
-  const handleEventClick = (url?: string) => {
+  const handleEventClick = (url?: string, eventName?: string) => {
     if (url) {
-      window.open(url, "_blank");
+      setRedirectDialog({
+        open: true,
+        url,
+        eventName: eventName || "Event",
+      });
     }
   };
 
@@ -56,7 +65,7 @@ const EventsPromotion = () => {
           <Card 
             key={event.id} 
             className={`overflow-hidden hover:shadow-lg transition-all duration-300 h-full flex flex-col ${event.registrationUrl ? 'cursor-pointer hover:-translate-y-1 hover:bg-gray-50' : ''}`}
-            onClick={() => event.registrationUrl && handleEventClick(event.registrationUrl)}
+            onClick={() => event.registrationUrl && handleEventClick(event.registrationUrl, event.eventName)}
           >
             {event.image ? (
               <div className="h-48 overflow-hidden">
@@ -98,7 +107,7 @@ const EventsPromotion = () => {
                     className="w-full mt-4"
                     onClick={(e) => {
                       e.stopPropagation(); // Prevent the card click from triggering
-                      window.open(event.registrationUrl, "_blank");
+                      handleEventClick(event.registrationUrl, event.eventName);
                     }}
                   >
                     Register
@@ -119,6 +128,13 @@ const EventsPromotion = () => {
           View All Events <ArrowRight className="h-4 w-4" />
         </Button>
       </div>
+
+      <ExternalRedirectDialog
+        open={redirectDialog.open}
+        onOpenChange={(open) => setRedirectDialog(prev => ({ ...prev, open }))}
+        url={redirectDialog.url}
+        eventName={redirectDialog.eventName}
+      />
     </div>
   );
 };

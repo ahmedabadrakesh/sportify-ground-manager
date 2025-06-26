@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import MainLayout from "@/components/layouts/MainLayout";
 import { useEvents } from "@/hooks/useEvents";
@@ -10,6 +9,7 @@ import EventsHeader from "@/components/events/EventsHeader";
 import EventsFilters from "@/components/events/EventsFilters";
 import EventsList from "@/components/events/EventsList";
 import EventsPagination from "@/components/events/EventsPagination";
+import ExternalRedirectDialog from "@/components/events/ExternalRedirectDialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const Events = () => {
@@ -21,6 +21,11 @@ const Events = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [authDialogOpen, setAuthDialogOpen] = useState(false);
   const [eventDialogOpen, setEventDialogOpen] = useState(false);
+  const [redirectDialog, setRedirectDialog] = useState({
+    open: false,
+    url: "",
+    eventName: "",
+  });
   const eventsPerPage = 6;
 
   const cities = [...new Set(events.map(event => event.city))];
@@ -95,9 +100,13 @@ const Events = () => {
     }
   };
 
-  const handleEventClick = (url?: string) => {
+  const handleEventClick = (url?: string, eventName?: string) => {
     if (url) {
-      window.open(url, "_blank");
+      setRedirectDialog({
+        open: true,
+        url,
+        eventName: eventName || "Event",
+      });
     }
   };
 
@@ -172,6 +181,14 @@ const Events = () => {
         open={eventDialogOpen}
         onOpenChange={setEventDialogOpen}
         mode="create"
+      />
+
+      {/* External Redirect Confirmation Dialog */}
+      <ExternalRedirectDialog
+        open={redirectDialog.open}
+        onOpenChange={(open) => setRedirectDialog(prev => ({ ...prev, open }))}
+        url={redirectDialog.url}
+        eventName={redirectDialog.eventName}
       />
     </MainLayout>
   );

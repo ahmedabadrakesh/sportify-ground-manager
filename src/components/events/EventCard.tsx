@@ -8,7 +8,7 @@ import { Event } from "@/types/models";
 interface EventCardProps {
   event: Event;
   sportName: string;
-  onEventClick: (url?: string) => void;
+  onEventClick: (url?: string, eventName?: string) => void;
 }
 
 const EventCard = ({ event, sportName, onEventClick }: EventCardProps) => {
@@ -25,7 +25,7 @@ const EventCard = ({ event, sportName, onEventClick }: EventCardProps) => {
     <Card 
       key={event.id} 
       className={`overflow-hidden hover:shadow-lg transition-all duration-300 h-full flex flex-col ${event.registrationUrl ? 'cursor-pointer hover:-translate-y-1 hover:bg-gray-50' : ''}`}
-      onClick={() => event.registrationUrl && onEventClick(event.registrationUrl)}
+      onClick={() => event.registrationUrl && onEventClick(event.registrationUrl, event.eventName)}
     >
       {event.image ? (
         <div className="h-48 overflow-hidden">
@@ -68,7 +68,7 @@ const EventCard = ({ event, sportName, onEventClick }: EventCardProps) => {
               className="w-full flex items-center justify-center gap-2 mt-4"
               onClick={(e) => {
                 e.stopPropagation(); // Prevent the card click from triggering
-                window.open(event.registrationUrl, "_blank");
+                onEventClick(event.registrationUrl, event.eventName);
               }}
             >
               <LinkIcon className="h-4 w-4" />
