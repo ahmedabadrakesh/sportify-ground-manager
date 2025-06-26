@@ -11,11 +11,12 @@ import WhyChooseUsSection from "@/components/home/WhyChooseUsSection";
 import StatBanner from "@/components/home/StatBanner";
 import SportsProfessionalsPromotion from "@/components/home/SportsProfessionalsPromotion";
 import EventsPromotion from "@/components/home/EventsPromotion";
-import { Plus } from "lucide-react";
+import { ArrowRight, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { getCurrentUserSync } from "@/utils/auth";
 import AuthRequiredDialog from "@/components/auth/AuthRequiredDialog";
 import EventDialog from "@/components/admin/events/EventDialog";
+import { useNavigate } from "react-router-dom";
 
 const Home: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -23,6 +24,7 @@ const Home: React.FC = () => {
   const [authDialogOpen, setAuthDialogOpen] = useState(false);
   const [eventDialogOpen, setEventDialogOpen] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const navigate = useNavigate();
 
   // Check authentication status on mount and listen for changes
   useEffect(() => {
@@ -76,12 +78,21 @@ const Home: React.FC = () => {
           <div className="container mx-auto px-4 mb-8">
             <div className="flex flex-col md:flex-row justify-between items-center mb-8">
               <h2 className="text-3xl font-bold">Events</h2>
-              <Button
-                onClick={handleAddEvent}
-                className="mt-4 md:mt-0 flex items-center gap-2"
-              >
-                <Plus className="h-4 w-4" /> Add Event
-              </Button>
+              <div className="flex flex-row gap-2">
+                <Button
+                  onClick={handleAddEvent}
+                  className="mt-4 md:mt-0 flex items-center gap-2"
+                >
+                  Add Event
+                  <Plus className="h-4 w-4" />
+                </Button>
+                <Button
+                  className="mt-4 md:mt-0 flex items-center gap-2"
+                  onClick={() => navigate("/events")}
+                >
+                  View All Events <ArrowRight className="h-4 w-4" />
+                </Button>
+              </div>
             </div>
           </div>
           <EventsPromotion />
