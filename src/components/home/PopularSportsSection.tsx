@@ -1,5 +1,7 @@
+
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
+import Autoplay from "embla-carousel-autoplay";
 import {
   Carousel,
   CarouselContent,
@@ -74,6 +76,13 @@ const PopularSportsSection = () => {
       </p>
       <div className="relative px-4">
         <Carousel
+          plugins={[
+            Autoplay({
+              delay: 3000,
+              stopOnInteraction: true,
+              stopOnMouseEnter: true,
+            }),
+          ]}
           opts={{
             align: "start",
             loop: true,
