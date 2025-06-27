@@ -1,5 +1,9 @@
-
-import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+} from "react-router-dom";
 import Home from "./pages/Home";
 import Bookings from "./pages/Bookings";
 import Shop from "./pages/Shop";
@@ -55,13 +59,22 @@ function App() {
         <Route path="/admin/bookings" element={<AdminBookings />} />
         <Route path="/admin/events" element={<AdminEvents />} />
         <Route path="/admin/inventory" element={<AdminInventory />} />
-        <Route path="/admin/inventory/allocate/:id" element={<InventoryAllocate />} />
+        <Route
+          path="/admin/inventory/allocate/:id"
+          element={<InventoryAllocate />}
+        />
         <Route path="/admin/add-ground" element={<AddGround />} />
         <Route path="/admin/edit-ground/:id" element={<AddEditGround />} />
         <Route path="/admin/ground-owners" element={<GroundOwners />} />
-        <Route path="/admin/sports-professionals" element={<SportsProfessionalsAdmin />} />
+        <Route
+          path="/admin/sports-professionals"
+          element={<SportsProfessionalsAdmin />}
+        />
         <Route path="/admin/ecommerce" element={<EcommerceManager />} />
-
+        <Route
+          path="/jokova_socialmedia_og.jpg"
+          element={"/jokova_socialmedia_og.jpg"}
+        />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </Router>
