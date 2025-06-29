@@ -44,8 +44,8 @@ const SportsProfessionalsPromotion = () => {
           transition={{ duration: 0.5, delay: 0.2 }}
           className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-secondary-600 to-secondary-800 p-8 text-white"
         >
-          <div className="flex gap-6">
-            <div className="w-1/2">
+          <div className="flex-row md:flex gap-6">
+            <div className="w-full md:w-1/2">
               <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full transform translate-x-16 -translate-y-16" />
               {/* <UserPlus className="w-12 h-12 mb-4" /> */}
               <img
@@ -54,7 +54,7 @@ const SportsProfessionalsPromotion = () => {
                 className="w-full h-auto object-cover object-center"
               />
             </div>
-            <div className="flex-grow content-center text-left">
+            <div className="flex-grow content-center md:text-left">
               <div className="relative z-10 ">
                 <h3 className="text-2xl font-bold mb-4">
                   Want to join JOKOVO's Professional Squad?

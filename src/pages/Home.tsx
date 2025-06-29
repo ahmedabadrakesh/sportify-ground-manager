@@ -74,7 +74,7 @@ const Home: React.FC = () => {
           hasSearched={hasSearched}
         />
         {/* <FeaturedGroundsSection /> */}
-        <div className="bg-gray-50 py-16">
+        <div className="bg-gray-50 py-8">
           <div className="container mx-auto px-4 mb-8">
             <div className="flex flex-col md:flex-row justify-between items-center mb-8">
               <h2 className="text-3xl font-bold">Events</h2>
