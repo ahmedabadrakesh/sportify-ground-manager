@@ -1,8 +1,10 @@
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ShoppingBag } from "lucide-react";
-import bet from "/ecom/bet.png";
+import cricket from "/ecom/cricket.png";
 import nivia_ball from "/ecom/nivia_ball.png";
+import football from "/ecom/football.png";
+import tennis from "/ecom/tennis.png";
 
 const ShopPromotionSection = () => {
   const navigate = useNavigate();
@@ -32,7 +34,7 @@ const ShopPromotionSection = () => {
             <div className="bg-white/20 p-4 rounded-lg backdrop-blur-sm">
               <div className="h-24 w-24 bg-white/10 rounded-full mx-auto mb-2">
                 <img
-                  src={bet}
+                  src={cricket}
                   alt={"Cricket Plastic Bet"}
                   className="h-24 w-24 rounded-full "
                 />
@@ -52,22 +54,22 @@ const ShopPromotionSection = () => {
             <div className="bg-white/20 p-4 rounded-lg backdrop-blur-sm">
               <div className="h-24 w-24 bg-white/10 rounded-full mx-auto mb-2">
                 <img
-                  src={bet}
-                  alt={"FoorBalls"}
+                  src={tennis}
+                  alt={"Tennis"}
                   className="h-24 w-24 rounded-full "
                 />
               </div>
-              <p className="text-center font-medium">Tennis Rackets</p>
+              <p className="text-center font-medium">Tennis</p>
             </div>
             <div className="bg-white/20 p-4 rounded-lg backdrop-blur-sm">
               <div className="h-24 w-24 bg-white/10 rounded-full mx-auto mb-2">
                 <img
-                  src={bet}
+                  src={football}
                   alt={"FoorBalls"}
                   className="h-24 w-24 rounded-full "
                 />
               </div>
-              <p className="text-center font-medium">Sports Attire</p>
+              <p className="text-center font-medium">Football</p>
             </div>
           </div>
         </div>
