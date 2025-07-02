@@ -1,6 +1,12 @@
-
 import React from "react";
 import { Play, Youtube, ExternalLink } from "lucide-react";
+import {
+  FacebookEmbed,
+  InstagramEmbed,
+  PinterestEmbed,
+  XEmbed,
+  YouTubeEmbed,
+} from "react-social-media-embed";
 
 const VideoGallery = ({ videos }) => {
   const videos1 = [
@@ -50,7 +56,22 @@ const VideoGallery = ({ videos }) => {
             key={index}
             className="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 hover:scale-105 group"
           >
-            <iframe
+            {video.includes("youtube") && (
+              <YouTubeEmbed url={video} width="100%" height="315" />
+            )}
+            {video.includes("instagram") && (
+              <InstagramEmbed url={video} width="100%" height="315" captioned />
+            )}
+            {video.includes("facebook") && (
+              <FacebookEmbed url={video} width="100%" height="315" />
+            )}
+            {video.includes("pinterest") && (
+              <PinterestEmbed url={video} width="100%" height="315" />
+            )}
+            {video.includes("twitter") && (
+              <XEmbed url={video} width="100%" height="315" />
+            )}
+            {/* <iframe
               width="100%"
               height="315"
               src={video}
@@ -58,7 +79,7 @@ const VideoGallery = ({ videos }) => {
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
               referrerPolicy="strict-origin-when-cross-origin"
               allowFullScreen
-            ></iframe>
+            ></iframe> */}
           </div>
         ))}
       </div>
