@@ -208,6 +208,30 @@ const RegisterProfessionalDialog = ({
     resetForm();
   }, isUpdate);
 
+  // Handle explicit form submission only when submit button is clicked
+  const handleFormSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    console.log('Form submit prevented, currentStep:', currentStep, 'totalSteps:', totalSteps);
+    
+    // Only submit if we're on the last step
+    if (currentStep === totalSteps) {
+      console.log('On final step, proceeding with form submission');
+      const values = form.getValues();
+      onSubmit(values);
+    } else {
+      console.log('Not on final step, ignoring submit event');
+    }
+  };
+
+  // Handle explicit submit button click
+  const handleSubmitButtonClick = () => {
+    console.log('Submit button clicked on step:', currentStep);
+    if (currentStep === totalSteps) {
+      const values = form.getValues();
+      onSubmit(values);
+    }
+  };
+
   // Pre-fill form data when data is available
   useEffect(() => {
     if (currentUser && open && !isLoadingProfile) {
@@ -338,7 +362,7 @@ const RegisterProfessionalDialog = ({
         ) : (
           <ScrollArea className="h-[calc(90vh-120px)] px-1">
             <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+              <form onSubmit={handleFormSubmit} className="space-y-6">
                 <StepperForm
                   currentStep={currentStep}
                   totalSteps={totalSteps}
@@ -356,6 +380,7 @@ const RegisterProfessionalDialog = ({
                     totalSteps={totalSteps}
                     onPrevious={handlePrevious}
                     onNext={handleNext}
+                    onSubmit={handleSubmitButtonClick}
                     isSubmitting={registerMutation.isPending}
                     isUpdate={isUpdate}
                   />
