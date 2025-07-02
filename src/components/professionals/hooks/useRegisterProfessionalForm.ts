@@ -57,9 +57,16 @@ export const useRegisterProfessionalForm = (onSuccess: () => void, isUpdate: boo
 
   const onSubmit = (values: ProfessionalFormValues) => {
     console.log('Form submission triggered with values:', values);
+    console.log('Current step:', currentStep, 'Total steps:', totalSteps);
     console.log('Is update mode:', isUpdate);
     console.log('Current form state:', form.formState);
     console.log('Form errors:', form.formState.errors);
+    
+    // Only submit if we're on the last step
+    if (currentStep !== totalSteps) {
+      console.log('Not on last step, preventing submission');
+      return;
+    }
     
     // Ensure numeric fields are properly converted
     const processedValues = {

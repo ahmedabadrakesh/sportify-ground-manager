@@ -42,7 +42,7 @@ export const FormNavigation = ({
           {submitButtonText}
         </Button>
       ) : (
-        <Button type="button" onClick={onNext}>
+        <Button type="button" onClick={onNext} disabled={isSubmitting}>
           Next
         </Button>
       )}

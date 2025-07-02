@@ -12,9 +12,21 @@ export const useStepNavigation = (form: UseFormReturn<ProfessionalFormValues>) =
   const { validateStepAndShowError } = useFormValidation(form);
 
   const handleNext = async () => {
+    console.log('HandleNext called, current step:', currentStep, 'total steps:', totalSteps);
+    
+    // Don't proceed if we're on the last step (form submission should handle this)
+    if (currentStep >= totalSteps) {
+      console.log('Already on last step, not proceeding');
+      return;
+    }
+
     const isValid = await validateStepAndShowError(currentStep);
-    if (isValid && currentStep < totalSteps) {
-      setCurrentStep(currentStep + 1);
+    console.log('Step validation result:', isValid);
+    
+    if (isValid) {
+      const nextStep = currentStep + 1;
+      console.log('Moving to step:', nextStep);
+      setCurrentStep(nextStep);
     }
   };
 

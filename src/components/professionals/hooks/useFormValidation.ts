@@ -4,43 +4,59 @@ import { toast } from "sonner";
 import { ProfessionalFormValues } from "../schemas/professionalFormSchema";
 
 export const useFormValidation = (form: UseFormReturn<ProfessionalFormValues>) => {
-  const getFieldsForStep = (step: number): (keyof ProfessionalFormValues)[] => {
+  const validateStepAndShowError = async (step: number): Promise<boolean> => {
+    console.log('Validating step:', step);
+    
+    let fieldsToValidate: (keyof ProfessionalFormValues)[] = [];
+
     switch (step) {
       case 1:
-        return ["name", "profession_type"];
+        fieldsToValidate = ["name", "email", "contact_number"];
+        break;
       case 2:
-        return []; // Step 2 has no required fields
+        fieldsToValidate = ["profession_type", "game_id", "fee", "fee_type"];
+        break;
       case 3:
-        return ["game_id"]; // Only game_id is required in step 3
+        fieldsToValidate = ["city", "address"];
+        break;
       case 4:
-        return ["contact_number", "city", "address"]; // Required fields in step 4
+        fieldsToValidate = ["punch_line"];
+        break;
       case 5:
-        return []; // Step 5 has no required fields
+        // Social media fields are optional, so we can proceed to step 6
+        fieldsToValidate = [];
+        break;
       case 6:
-        return []; // Step 6 has no required fields
+        // Final step - all validation will be handled by form submission
+        fieldsToValidate = [];
+        break;
       default:
-        return [];
+        return true;
     }
-  };
 
-  const validateCurrentStep = async (currentStep: number) => {
-    const fieldsToValidate = getFieldsForStep(currentStep);
-    console.log(`Validating step ${currentStep} with fields:`, fieldsToValidate);
-    const isValid = await form.trigger(fieldsToValidate);
-    console.log(`Step ${currentStep} validation result:`, isValid);
-    return isValid;
-  };
-
-  const validateStepAndShowError = async (currentStep: number) => {
-    const isValid = await validateCurrentStep(currentStep);
-    if (!isValid) {
-      toast.error("Please fill in all required fields before proceeding.");
+    // If no fields to validate, step is valid
+    if (fieldsToValidate.length === 0) {
+      console.log('No fields to validate for step', step);
+      return true;
     }
-    return isValid;
+
+    // Validate specific fields
+    const isStepValid = await form.trigger(fieldsToValidate);
+    console.log('Step validation result:', isStepValid);
+
+    if (!isStepValid) {
+      const errors = form.formState.errors;
+      const errorFields = fieldsToValidate.filter(field => errors[field]);
+      
+      if (errorFields.length > 0) {
+        toast.error(`Please fill in all required fields before proceeding.`);
+      }
+    }
+
+    return isStepValid;
   };
 
   return {
-    validateCurrentStep,
     validateStepAndShowError,
   };
 };
