@@ -26,6 +26,8 @@ export const FormNavigation = ({
     ? (isSubmitting ? "Updating Profile..." : "Update Profile")
     : (isSubmitting ? "Registering..." : "Register as Professional");
 
+  console.log('FormNavigation render - currentStep:', currentStep, 'totalSteps:', totalSteps, 'isLastStep:', isLastStep);
+
   return (
     <div className="flex justify-between pt-6">
       <Button
@@ -38,11 +40,24 @@ export const FormNavigation = ({
       </Button>
       
       {isLastStep ? (
-        <Button type="submit" disabled={isSubmitting}>
+        <Button 
+          type="submit" 
+          disabled={isSubmitting}
+          onClick={() => {
+            console.log('Submit button clicked on step:', currentStep);
+          }}
+        >
           {submitButtonText}
         </Button>
       ) : (
-        <Button type="button" onClick={onNext} disabled={isSubmitting}>
+        <Button 
+          type="button" 
+          onClick={() => {
+            console.log('Next button clicked, moving from step:', currentStep);
+            onNext();
+          }} 
+          disabled={isSubmitting}
+        >
           Next
         </Button>
       )}

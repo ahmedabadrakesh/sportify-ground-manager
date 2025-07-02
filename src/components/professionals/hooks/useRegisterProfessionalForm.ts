@@ -59,14 +59,15 @@ export const useRegisterProfessionalForm = (onSuccess: () => void, isUpdate: boo
     console.log('Form submission triggered with values:', values);
     console.log('Current step:', currentStep, 'Total steps:', totalSteps);
     console.log('Is update mode:', isUpdate);
-    console.log('Current form state:', form.formState);
-    console.log('Form errors:', form.formState.errors);
     
-    // Only submit if we're on the last step
+    // Only submit if we're on the last step - this prevents accidental submissions
     if (currentStep !== totalSteps) {
-      console.log('Not on last step, preventing submission');
+      console.log('Not on last step, preventing submission. Current step:', currentStep, 'Total steps:', totalSteps);
+      // Don't call handleNext here - let the navigation handle step changes
       return;
     }
+    
+    console.log('On final step, proceeding with submission');
     
     // Ensure numeric fields are properly converted
     const processedValues = {
