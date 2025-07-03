@@ -5,7 +5,7 @@ import { toast } from "sonner";
 interface TextSuggestionCarouselProps {
   suggestions: string[];
   className?: string;
-  setSuggestedPunchLine: React.Dispatch<React.SetStateAction<null | string>>;
+  setSuggestedPunchLine: any;
 }
 
 const TextSuggestionCarousel = ({

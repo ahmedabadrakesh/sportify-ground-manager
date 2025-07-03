@@ -40,13 +40,14 @@ import AuthRequiredDialog from "@/components/auth/AuthRequiredDialog";
 
 const ProfessionalProfile = () => {
   const { id } = useParams<{ id: string }>();
-  const [isAboutRReadMoreOpened, setIsAboutRReadMoreOpened] = useState<boolean>(false);
+  const [isAboutRReadMoreOpened, setIsAboutRReadMoreOpened] =
+    useState<boolean>(false);
   const [showContactDetails, setShowContactDetails] = useState<boolean>(false);
   const [isUpdateDialogOpen, setIsUpdateDialogOpen] = useState(false);
   const [isAuthDialogOpen, setIsAuthDialogOpen] = useState(false);
-  
+
   const currentUser = getCurrentUserSync();
-  const isSuperAdmin = hasRoleSync('super_admin');
+  const isSuperAdmin = hasRoleSync("super_admin");
   const isAuthenticated = !!currentUser;
 
   const { data: professional, isLoading } = useQuery({
@@ -76,7 +77,7 @@ const ProfessionalProfile = () => {
     queryKey: ["professional-user", professional?.user_id],
     queryFn: async () => {
       if (!professional?.user_id) return null;
-      
+
       const { data, error } = await supabase
         .from("users")
         .select("email")
@@ -90,7 +91,9 @@ const ProfessionalProfile = () => {
   });
 
   // Check if current user can edit this profile
-  const canEdit = isAuthenticated && (isSuperAdmin || professional?.user_id === currentUser?.id);
+  const canEdit =
+    isAuthenticated &&
+    (isSuperAdmin || professional?.user_id === currentUser?.id);
 
   const handleContactClick = () => {
     if (!isAuthenticated) {
@@ -111,16 +114,21 @@ const ProfessionalProfile = () => {
   const maskEmail = (email: string) => {
     if (!email) return "";
     const [username, domain] = email.split("@");
-    const maskedUsername = username.length > 2 
-      ? username.substring(0, 2) + "*".repeat(username.length - 2)
-      : username;
+    const maskedUsername =
+      username.length > 2
+        ? username.substring(0, 2) + "*".repeat(username.length - 2)
+        : username;
     return `${maskedUsername}@${domain}`;
   };
 
   const maskPhone = (phone: string) => {
     if (!phone) return "";
     if (phone.length <= 4) return phone;
-    return phone.substring(0, 2) + "*".repeat(phone.length - 4) + phone.substring(phone.length - 2);
+    return (
+      phone.substring(0, 2) +
+      "*".repeat(phone.length - 4) +
+      phone.substring(phone.length - 2)
+    );
   };
 
   if (isLoading) {
@@ -184,52 +192,54 @@ const ProfessionalProfile = () => {
   const renderSocialLinks = () => {
     const links = [
       {
-        url: professional.instagram_link,
+        url: professional.instagram_link || "",
         icon: <Instagram className="h-5 w-5" />,
         name: "Instagram",
-        color: "pink-600",
-      },
-      {
-        url: professional.facebook_link,
-        icon: <Facebook className="h-5 w-5" />,
-        name: "Facebook",
-        color: "blue-600",
-      },
-      {
-        url: professional.linkedin_link,
-        icon: <Linkedin className="h-5 w-5" />,
-        name: "LinkedIn",
-        color: "blue-600",
-      },
-      {
-        url: professional.website,
-        icon: <Globe className="h-5 w-5" />,
-        name: "Website",
-        color: "green-600",
-      },
-      {
-        name: "YouTube",
-        icon: <Youtube className="h-5 w-5" />,
-        url: professional.youtube_link,
+        //color: "pink-600",
         color: "red-600",
       },
+      {
+        url: professional.facebook_link || "",
+        icon: <Facebook className="h-5 w-5" />,
+        name: "Facebook",
+        //color: "blue-600",
+        color: "red-600",
+      },
+      {
+        url: professional.linkedin_link || "",
+        icon: <Linkedin className="h-5 w-5" />,
+        name: "LinkedIn",
+        //color: "blue-600",
+        color: "red-600",
+      },
+      {
+        url: professional.website || "",
+        icon: <Globe className="h-5 w-5" />,
+        name: "Website",
+        //color: "green-600",
+        color: "red-600",
+      },
+      // {
+      //   name: "YouTube",
+      //   icon: <Youtube className="h-5 w-5" />,
+      //   url: "",
+      //   color: "red-600",
+      // },
     ];
 
-    const activeLinks = links.filter((link) => link.url);
+    const activeLinks = links;
 
     if (activeLinks.length === 0) return null;
 
     return (
       <div className="flex lg:flex-col md:flex-row flex-wrap lg:items-end items-baseline gap-1">
         {activeLinks.map((link, index) => (
-          <div className="flex items-end " key={index}>
-            <a
-              href={link.url}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
+          <div className="flex items-end" key={index}>
+            <a href={link.url} target="_blank" rel="noopener">
               <div
-                className={`p-2 bg-${link.color} border-2 border-solid rounded-lg text-white group-hover:scale-110`}
+                className={`p-2 bg-${link.color} ${
+                  link.url === "" ? "bg-opacity-40" : ""
+                } border-2 border-solid rounded-lg text-white group-hover:scale-110`}
               >
                 {link.icon}
               </div>
@@ -310,7 +320,10 @@ const ProfessionalProfile = () => {
             </Button>
           </Link>
           {canEdit && (
-            <Button onClick={handleUpdateProfile} className="flex items-center gap-2">
+            <Button
+              onClick={handleUpdateProfile}
+              className="flex items-center gap-2"
+            >
               <Edit className="h-4 w-4" />
               Update Profile
             </Button>
@@ -421,29 +434,48 @@ const ProfessionalProfile = () => {
                     {/* Phone Number */}
                     <div className="flex items-center gap-2">
                       <span className="font-medium">Phone:</span>
-                      <span className="cursor-pointer flex items-center gap-2" onClick={handleContactClick}>
-                        {showContactDetails ? professional.contact_number : maskPhone(professional.contact_number)}
-                        {showContactDetails ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                      <span
+                        className="cursor-pointer flex items-center gap-2"
+                        onClick={handleContactClick}
+                      >
+                        {showContactDetails
+                          ? professional.contact_number
+                          : maskPhone(professional.contact_number)}
+                        {showContactDetails ? (
+                          <EyeOff className="h-4 w-4" />
+                        ) : (
+                          <Eye className="h-4 w-4" />
+                        )}
                       </span>
                     </div>
-                    
+
                     {/* Email */}
                     <div className="flex items-center gap-2">
                       <span className="font-medium">Email:</span>
-                      <span className="cursor-pointer flex items-center gap-2" onClick={handleContactClick}>
-                        {showContactDetails ? professionalUser?.email : maskEmail(professionalUser?.email || "")}
-                        {showContactDetails ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                      <span
+                        className="cursor-pointer flex items-center gap-2"
+                        onClick={handleContactClick}
+                      >
+                        {showContactDetails
+                          ? professionalUser?.email
+                          : maskEmail(professionalUser?.email || "")}
+                        {showContactDetails ? (
+                          <EyeOff className="h-4 w-4" />
+                        ) : (
+                          <Eye className="h-4 w-4" />
+                        )}
                       </span>
                     </div>
 
                     {!isAuthenticated && (
                       <div className="mt-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
                         <p className="text-yellow-800 text-sm">
-                          To view complete contact details, please register or login.
+                          To view complete contact details, please register or
+                          login.
                         </p>
-                        <Button 
-                          variant="outline" 
-                          size="sm" 
+                        <Button
+                          variant="outline"
+                          size="sm"
                           className="mt-2"
                           onClick={() => setIsAuthDialogOpen(true)}
                         >
@@ -665,8 +697,8 @@ const ProfessionalProfile = () => {
                 Contact Details
               </div>
               <div className="grid col-span-5 lg:flex-row leading-relaxed align-left text-justify">
-                <ContactDetails 
-                  professional={professional} 
+                <ContactDetails
+                  professional={professional}
                   onLoginClick={() => setIsAuthDialogOpen(true)}
                 />
               </div>
@@ -675,14 +707,14 @@ const ProfessionalProfile = () => {
         </div>
 
         {/* Dialogs */}
-        <RegisterProfessionalDialog 
-          open={isUpdateDialogOpen} 
+        <RegisterProfessionalDialog
+          open={isUpdateDialogOpen}
           onOpenChange={setIsUpdateDialogOpen}
           hasExistingProfile={true}
           isUpdate={true}
         />
 
-        <AuthRequiredDialog 
+        <AuthRequiredDialog
           open={isAuthDialogOpen}
           onOpenChange={setIsAuthDialogOpen}
           title="Login Required"

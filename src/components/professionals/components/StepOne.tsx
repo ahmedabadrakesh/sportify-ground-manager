@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { UseFormReturn } from "react-hook-form";
 import {
@@ -41,7 +40,9 @@ export const StepOne = ({ form, userEmail, isUpdate }: StepOneProps) => {
     "Umpire",
   ];
 
-  const [suggestedPunchLine, setSuggestedPunchLine] = useState();
+  const [suggestedPunchLine, setSuggestedPunchLine] = useState(
+    form.getValues("punch_line")
+  );
   const punchLineData = [
     "I don't build athletes—I build belief.",
     "Greatness starts with guidance.",
@@ -106,7 +107,10 @@ export const StepOne = ({ form, userEmail, isUpdate }: StepOneProps) => {
             <TextSuggestionCarousel
               suggestions={punchLineData}
               className="max-w-md mx-auto"
-              setSuggestedPunchLine={setSuggestedPunchLine}
+              setSuggestedPunchLine={(value) => {
+                form.setValue("punch_line", value);
+                setSuggestedPunchLine(value);
+              }}
             />
           </div>
         </div>
