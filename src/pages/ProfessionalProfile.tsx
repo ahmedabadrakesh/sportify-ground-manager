@@ -416,7 +416,8 @@ const ProfessionalProfile = () => {
             </div>
 
             {/* Professional Experience Section */}
-            {(professional.years_of_experience || professional.total_match_played) && (
+            {(professional.years_of_experience ||
+              professional.total_match_played) && (
               <>
                 <div className="mb-6">
                   <div className="grid lg:grid-cols-6 gap-4">
@@ -428,14 +429,18 @@ const ProfessionalProfile = () => {
                         {professional.years_of_experience && (
                           <div className="flex items-center gap-2">
                             <Award className="h-4 w-4 text-blue-500" />
-                            <span className="font-medium">Experience:</span>
-                            <span>{professional.years_of_experience} years</span>
+                            <span className="font-medium">
+                              Years of Experience:
+                            </span>
+                            <span>
+                              {professional.years_of_experience} years
+                            </span>
                           </div>
                         )}
                         {professional.total_match_played && (
                           <div className="flex items-center gap-2">
                             <Trophy className="h-4 w-4 text-yellow-500" />
-                            <span className="font-medium">Matches:</span>
+                            <span className="font-medium">Matches Played:</span>
                             <span>{professional.total_match_played}</span>
                           </div>
                         )}
