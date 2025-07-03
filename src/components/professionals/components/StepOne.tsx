@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { UseFormReturn } from "react-hook-form";
 import {
@@ -155,6 +156,11 @@ export const StepOne = ({ form, userEmail, isUpdate }: StepOneProps) => {
                 <Input
                   type="number"
                   {...field}
+                  value={field.value || ''}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    field.onChange(value === '' ? undefined : Number(value));
+                  }}
                   placeholder="Enter years of experience"
                   min="0"
                 />
@@ -177,6 +183,11 @@ export const StepOne = ({ form, userEmail, isUpdate }: StepOneProps) => {
                 <Input
                   type="number"
                   {...field}
+                  value={field.value || ''}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    field.onChange(value === '' ? undefined : Number(value));
+                  }}
                   placeholder="Enter total matches played"
                   min="0"
                 />

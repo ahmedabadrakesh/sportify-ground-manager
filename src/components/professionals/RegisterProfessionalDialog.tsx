@@ -54,7 +54,6 @@ const RegisterProfessionalDialog = ({
     }
   }, [open, onOpenChange]);
 
-  // Fetch user email from users table (only for non-super admin users)
   useEffect(() => {
     const fetchUserEmail = async () => {
       if (currentUser && !isSuperAdmin) {
@@ -77,7 +76,6 @@ const RegisterProfessionalDialog = ({
     fetchUserEmail();
   }, [currentUser, isSuperAdmin]);
 
-  // Fetch existing profile data if in update mode
   useEffect(() => {
     const fetchExistingProfile = async () => {
       if (isUpdate && currentUser && open && !isSuperAdmin) {
@@ -87,7 +85,6 @@ const RegisterProfessionalDialog = ({
           
           let userId = currentUser.id;
           
-          // Handle phone users - find their record in the users table
           if ('phone' in currentUser && currentUser.phone) {
             console.log('Phone user detected, looking up user record by phone:', currentUser.phone);
             const { data: existingUser, error: userError } = await supabase
@@ -107,7 +104,6 @@ const RegisterProfessionalDialog = ({
             }
           }
 
-          // First try to find profile by user_id
           console.log('Searching for professional profile with user_id:', userId);
           let { data: profile, error } = await supabase
             .from('sports_professionals')
@@ -120,7 +116,6 @@ const RegisterProfessionalDialog = ({
             throw error;
           }
 
-          // If no profile found by user_id, try to find by contact info (for legacy profiles)
           if (!profile) {
             console.log('No profile found by user_id, searching by contact info...');
             const contactQueries = [];
@@ -145,7 +140,6 @@ const RegisterProfessionalDialog = ({
               );
             }
 
-            // Try to find by contact info
             for (const query of contactQueries) {
               const { data: contactProfile, error: contactError } = await query;
               if (contactError) {
@@ -156,7 +150,6 @@ const RegisterProfessionalDialog = ({
                 console.log('Found profile by contact info:', contactProfile);
                 profile = contactProfile;
                 
-                // Update the profile to link it to the current user
                 const { error: linkError } = await supabase
                   .from('sports_professionals')
                   .update({ user_id: userId })
@@ -166,7 +159,7 @@ const RegisterProfessionalDialog = ({
                   console.error('Error linking profile to user:', linkError);
                 } else {
                   console.log('Successfully linked profile to user');
-                  profile.user_id = userId; // Update local data
+                  profile.user_id = userId;
                 }
                 break;
               }
@@ -208,12 +201,10 @@ const RegisterProfessionalDialog = ({
     resetForm();
   }, isUpdate);
 
-  // Handle explicit form submission only when submit button is clicked
   const handleFormSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     console.log('Form submit prevented, currentStep:', currentStep, 'totalSteps:', totalSteps);
     
-    // Only submit if we're on the last step
     if (currentStep === totalSteps) {
       console.log('On final step, proceeding with form submission');
       const values = form.getValues();
@@ -223,7 +214,6 @@ const RegisterProfessionalDialog = ({
     }
   };
 
-  // Handle explicit submit button click
   const handleSubmitButtonClick = () => {
     console.log('Submit button clicked on step:', currentStep);
     if (currentStep === totalSteps) {
@@ -232,7 +222,6 @@ const RegisterProfessionalDialog = ({
     }
   };
 
-  // Pre-fill form data when data is available
   useEffect(() => {
     if (currentUser && open && !isLoadingProfile) {
       console.log('Pre-filling form data...');
@@ -241,20 +230,21 @@ const RegisterProfessionalDialog = ({
       console.log('Has existing profile:', hasExistingProfile);
       
       if (isSuperAdmin && !isUpdate) {
-        // Super admin creating new professional - completely fresh form
         console.log('Super admin creating new professional - using fresh form');
         form.reset({
           name: "",
           profession_type: "Athlete",
           game_id: "",
           contact_number: "",
-          email: "", // Empty email for super admin to fill
+          email: "",
           fee: 0,
           fee_type: "Per Hour",
           city: "",
           address: "",
           comments: "",
           photo: "",
+          years_of_experience: undefined,
+          total_match_played: undefined,
           awards: [],
           accomplishments: [],
           certifications: [],
@@ -270,7 +260,6 @@ const RegisterProfessionalDialog = ({
           coaching_availability: [],
         });
       } else if (isUpdate && existingProfileData) {
-        // Pre-fill with existing professional data for update
         console.log('Pre-filling with existing data:', existingProfileData);
         
         // Set each field individually to ensure proper type conversion
@@ -279,13 +268,15 @@ const RegisterProfessionalDialog = ({
           ['profession_type', existingProfileData.profession_type || 'Athlete'],
           ['game_id', existingProfileData.game_id || ''],
           ['contact_number', existingProfileData.contact_number || ''],
-          ['email', userEmail], // Set the user's email from users table
+          ['email', userEmail],
           ['fee', existingProfileData.fee || 0],
           ['fee_type', existingProfileData.fee_type || 'Per Hour'],
           ['city', existingProfileData.city || ''],
           ['address', existingProfileData.address || ''],
           ['comments', existingProfileData.comments || ''],
           ['photo', existingProfileData.photo || ''],
+          ['years_of_experience', existingProfileData.years_of_experience || undefined],
+          ['total_match_played', existingProfileData.total_match_played || undefined],
           ['awards', existingProfileData.awards || []],
           ['accomplishments', existingProfileData.accomplishments || []],
           ['certifications', existingProfileData.certifications || []],
@@ -307,7 +298,6 @@ const RegisterProfessionalDialog = ({
         
         console.log('Form values after pre-fill:', form.getValues());
       } else if (!hasExistingProfile && !isSuperAdmin) {
-        // Pre-fill with basic user information for new registrations (non-super admin)
         console.log('Regular user creating new profile');
         form.setValue('name', currentUser.name || '');
         form.setValue('email', userEmail);
@@ -327,12 +317,10 @@ const RegisterProfessionalDialog = ({
     onOpenChange(open);
   };
 
-  // Don't render the dialog if authentication status is still loading
   if (isAuthenticated === null) {
     return null;
   }
 
-  // Don't render the dialog if user is not authenticated
   if (!isAuthenticated) {
     return null;
   }

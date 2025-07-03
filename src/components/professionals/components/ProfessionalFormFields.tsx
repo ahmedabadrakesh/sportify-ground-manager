@@ -165,6 +165,11 @@ export const ProfessionalFormFields = ({ form, userEmail, isUpdate = false }: Pr
                   <Input
                     type="number"
                     {...field}
+                    value={field.value || ''}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      field.onChange(value === '' ? undefined : Number(value));
+                    }}
                     placeholder="Enter years of experience"
                     min="0"
                   />
@@ -187,6 +192,11 @@ export const ProfessionalFormFields = ({ form, userEmail, isUpdate = false }: Pr
                   <Input
                     type="number"
                     {...field}
+                    value={field.value || ''}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      field.onChange(value === '' ? undefined : Number(value));
+                    }}
                     placeholder="Enter total matches played"
                     min="0"
                   />
@@ -328,7 +338,6 @@ export const ProfessionalFormFields = ({ form, userEmail, isUpdate = false }: Pr
         />
       </div>
 
-      {/* Social Media Links */}
       <div className="space-y-4">
         <h3 className="text-lg font-semibold">Social Media & Website</h3>
         
@@ -391,7 +400,6 @@ export const ProfessionalFormFields = ({ form, userEmail, isUpdate = false }: Pr
         </div>
       </div>
 
-      {/* Professional Details */}
       <div className="space-y-4">
         <h3 className="text-lg font-semibold">Professional Details</h3>
         
@@ -488,7 +496,6 @@ export const ProfessionalFormFields = ({ form, userEmail, isUpdate = false }: Pr
         />
       </div>
 
-      {/* Media */}
       <div className="space-y-4">
         <h3 className="text-lg font-semibold">Media</h3>
         
@@ -531,7 +538,6 @@ export const ProfessionalFormFields = ({ form, userEmail, isUpdate = false }: Pr
         />
       </div>
 
-      {/* Comments */}
       <FormField
         name="comments"
         control={form.control}
