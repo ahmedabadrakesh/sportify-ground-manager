@@ -232,20 +232,21 @@ const ProfessionalProfile = () => {
     if (activeLinks.length === 0) return null;
 
     return (
-      <div className="flex lg:flex-col md:flex-row flex-wrap lg:items-end items-baseline gap-1">
-        {activeLinks.map((link, index) => (
-          <div className="flex items-end" key={index}>
-            <a href={link.url} target="_blank" rel="noopener">
-              <div
-                className={`p-2 bg-${link.color} ${
-                  link.url === "" ? "bg-opacity-40" : ""
-                } border-2 border-solid rounded-lg text-white group-hover:scale-110`}
-              >
-                {link.icon}
+      <div className="flex md:flex-row flex-wrap items-baseline gap-1">
+        {activeLinks.map(
+          (link, index) =>
+            link.url && (
+              <div className="flex items-end" key={index}>
+                <a href={link.url} target="_blank" rel="noopener">
+                  <div
+                    className={`p-2 bg-${link.color} border-2 border-solid rounded-lg text-white group-hover:scale-110`}
+                  >
+                    {link.icon}
+                  </div>
+                </a>
               </div>
-            </a>
-          </div>
-        ))}
+            )
+        )}
       </div>
     );
   };
@@ -297,7 +298,11 @@ const ProfessionalProfile = () => {
   };
 
   const getFiftyWords = (str, count) => {
-    return str.split(" ").slice(0, count).join(" ") + " ... ";
+    if (str.length > count) {
+      return str.split(" ").slice(0, count).join(" ") + " ... ";
+    } else {
+      return str + " ";
+    }
   };
 
   const showOrangeDividerLine = () => {
@@ -414,11 +419,12 @@ const ProfessionalProfile = () => {
                     </Badge>
                   )}
                 </div>
-              </div>
-              <div className="grow leading-relaxed items-end  text-right">
-                {renderSocialLinks()}
+                <div className="grow leading-relaxed">
+                  {renderSocialLinks()}
+                </div>
               </div>
             </div>
+
             <div className="pb-6 pt-6">
               <hr className="w-48 h-1 mx-auto my-4 bg-blue-400 border-0 rounded-sm md:my-10 dark:bg-gray-700" />
             </div>
@@ -499,29 +505,31 @@ const ProfessionalProfile = () => {
                     {isAboutRReadMoreOpened
                       ? `${professional.comments} `
                       : getFiftyWords(professional.comments, 50)}
-                    <a
-                      onClick={() =>
-                        setIsAboutRReadMoreOpened(!isAboutRReadMoreOpened)
-                      }
-                      className="cursor-pointer inline-flex items-center font-medium text-blue-600 dark:text-blue-500 hover:underline"
-                    >
-                      {isAboutRReadMoreOpened ? "Read Less" : "Read More"}
-                      <svg
-                        className="w-4 h-4 ms-2 rtl:rotate-180"
-                        aria-hidden="true"
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 14 10"
+                    {professional.comments.length >= 50 && (
+                      <a
+                        onClick={() =>
+                          setIsAboutRReadMoreOpened(!isAboutRReadMoreOpened)
+                        }
+                        className="cursor-pointer inline-flex items-center font-medium text-blue-600 dark:text-blue-500 hover:underline"
                       >
-                        <path
-                          stroke="currentColor"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth="2"
-                          d="M1 5h12m0 0L9 1m4 4L9 9"
-                        />
-                      </svg>
-                    </a>
+                        {isAboutRReadMoreOpened ? "Read Less" : "Read More"}
+                        <svg
+                          className="w-4 h-4 ms-2 rtl:rotate-180"
+                          aria-hidden="true"
+                          xmlns="http://www.w3.org/2000/svg"
+                          fill="none"
+                          viewBox="0 0 14 10"
+                        >
+                          <path
+                            stroke="currentColor"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth="2"
+                            d="M1 5h12m0 0L9 1m4 4L9 9"
+                          />
+                        </svg>
+                      </a>
+                    )}
                   </div>
                 </div>
                 {showOrangeDividerLine()}
