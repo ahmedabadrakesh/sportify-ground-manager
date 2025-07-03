@@ -557,11 +557,13 @@ export type Database = {
           photo: string | null
           profession_type: Database["public"]["Enums"]["sport_profession_type"]
           punch_line: string | null
+          total_match_played: number | null
           training_locations: string[] | null
           updated_at: string
           user_id: string | null
           videos: string[] | null
           website: string | null
+          years_of_experience: number | null
           youtube_link: string | null
         }
         Insert: {
@@ -587,11 +589,13 @@ export type Database = {
           photo?: string | null
           profession_type: Database["public"]["Enums"]["sport_profession_type"]
           punch_line?: string | null
+          total_match_played?: number | null
           training_locations?: string[] | null
           updated_at?: string
           user_id?: string | null
           videos?: string[] | null
           website?: string | null
+          years_of_experience?: number | null
           youtube_link?: string | null
         }
         Update: {
@@ -617,11 +621,13 @@ export type Database = {
           photo?: string | null
           profession_type?: Database["public"]["Enums"]["sport_profession_type"]
           punch_line?: string | null
+          total_match_played?: number | null
           training_locations?: string[] | null
           updated_at?: string
           user_id?: string | null
           videos?: string[] | null
           website?: string | null
+          years_of_experience?: number | null
           youtube_link?: string | null
         }
         Relationships: [

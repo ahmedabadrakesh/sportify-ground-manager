@@ -30,6 +30,8 @@ import {
   Edit,
   Eye,
   EyeOff,
+  Award,
+  Trophy,
 } from "lucide-react";
 import VideoGallery from "@/components/professionals/components/VideoGallery";
 import ImageGallery from "@/components/professionals/components/ImageGallery";
@@ -176,12 +178,6 @@ const ProfessionalProfile = () => {
           {items.map((achievement, index) => (
             <div className="flex" key={index}>
               {achievement}
-              {/* <span className="text-sm bg-white/20 px-3 py-1 rounded-full">
-                        {achievement.year}
-                      </span>
-                      <p className="text-blue-100 text-sm leading-relaxed">
-                        {achievement.description}
-                      </p> */}
             </div>
           ))}
         </CardContent>
@@ -195,36 +191,26 @@ const ProfessionalProfile = () => {
         url: professional.instagram_link || "",
         icon: <Instagram className="h-5 w-5" />,
         name: "Instagram",
-        //color: "pink-600",
         color: "red-600",
       },
       {
         url: professional.facebook_link || "",
         icon: <Facebook className="h-5 w-5" />,
         name: "Facebook",
-        //color: "blue-600",
         color: "red-600",
       },
       {
         url: professional.linkedin_link || "",
         icon: <Linkedin className="h-5 w-5" />,
         name: "LinkedIn",
-        //color: "blue-600",
         color: "red-600",
       },
       {
         url: professional.website || "",
         icon: <Globe className="h-5 w-5" />,
         name: "Website",
-        //color: "green-600",
         color: "red-600",
       },
-      // {
-      //   name: "YouTube",
-      //   icon: <Youtube className="h-5 w-5" />,
-      //   url: "",
-      //   color: "red-600",
-      // },
     ];
 
     const activeLinks = links;
@@ -429,6 +415,38 @@ const ProfessionalProfile = () => {
               <hr className="w-48 h-1 mx-auto my-4 bg-blue-400 border-0 rounded-sm md:my-10 dark:bg-gray-700" />
             </div>
 
+            {/* Professional Experience Section */}
+            {(professional.years_of_experience || professional.total_match_played) && (
+              <>
+                <div className="mb-6">
+                  <div className="grid lg:grid-cols-6 gap-4">
+                    <div className="grid col-span-1 text-left uppercase font-bold">
+                      Experience
+                    </div>
+                    <div className="lg:col-span-5 leading-relaxed align-left">
+                      <div className="flex gap-6">
+                        {professional.years_of_experience && (
+                          <div className="flex items-center gap-2">
+                            <Award className="h-4 w-4 text-blue-500" />
+                            <span className="font-medium">Experience:</span>
+                            <span>{professional.years_of_experience} years</span>
+                          </div>
+                        )}
+                        {professional.total_match_played && (
+                          <div className="flex items-center gap-2">
+                            <Trophy className="h-4 w-4 text-yellow-500" />
+                            <span className="font-medium">Matches:</span>
+                            <span>{professional.total_match_played}</span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                  {showOrangeDividerLine()}
+                </div>
+              </>
+            )}
+
             {/* Contact Information Section */}
             <div className="mb-6">
               <div className="grid lg:grid-cols-6 gap-4">
@@ -495,6 +513,7 @@ const ProfessionalProfile = () => {
               {showOrangeDividerLine()}
             </div>
 
+            {/* About me section */}
             {professional.comments && (
               <div>
                 <div className="lg:grid lg:grid-cols-6 gap-4 md:flex-flow-row">
@@ -536,6 +555,7 @@ const ProfessionalProfile = () => {
               </div>
             )}
 
+            {/* rest of the sections */}
             {professional.awards.length !== 0 && (
               <>
                 <div className="grid lg:grid-cols-6 gap-4">

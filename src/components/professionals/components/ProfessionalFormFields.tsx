@@ -1,3 +1,4 @@
+
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
@@ -8,7 +9,7 @@ import { useGames } from "@/hooks/useGames";
 import { Database } from "@/integrations/supabase/types";
 import { ArrayFieldInput } from "./ArrayFieldInput";
 import { MultiSelectField } from "./MultiSelectField";
-import { Mail } from "lucide-react";
+import { Mail, Award, Trophy } from "lucide-react";
 import { hasRoleSync } from "@/utils/auth";
 
 // Get the enum types from the database types
@@ -148,6 +149,53 @@ export const ProfessionalFormFields = ({ form, userEmail, isUpdate = false }: Pr
             </FormItem>
           )}
         />
+
+        {/* Experience Fields */}
+        <div className="grid grid-cols-2 gap-4">
+          <FormField
+            name="years_of_experience"
+            control={form.control}
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="flex items-center gap-2">
+                  <Award className="w-4 h-4" />
+                  Years of Experience
+                </FormLabel>
+                <FormControl>
+                  <Input
+                    type="number"
+                    {...field}
+                    placeholder="Enter years of experience"
+                    min="0"
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            name="total_match_played"
+            control={form.control}
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="flex items-center gap-2">
+                  <Trophy className="w-4 h-4" />
+                  Total Matches Played
+                </FormLabel>
+                <FormControl>
+                  <Input
+                    type="number"
+                    {...field}
+                    placeholder="Enter total matches played"
+                    min="0"
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
       </div>
 
       {/* Fee Information */}

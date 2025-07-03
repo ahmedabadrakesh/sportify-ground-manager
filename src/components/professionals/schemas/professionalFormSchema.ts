@@ -18,7 +18,7 @@ export const professionalFormSchema = z.object({
   address: z.string().min(1, "Address is required"),
   comments: z.string().optional(),
   photo: z.string().optional(),
-  // New fields with proper type handling
+  // Updated these fields to ensure proper type handling
   years_of_experience: z.union([z.string(), z.number()]).transform((val) => Number(val) || 0).optional(),
   total_match_played: z.union([z.string(), z.number()]).transform((val) => Number(val) || 0).optional(),
   awards: z.array(z.string()).optional(),
