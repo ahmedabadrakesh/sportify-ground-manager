@@ -84,7 +84,7 @@ const ProfessionalCard = ({ professional, onLoginClick }: { professional: any; o
               variant="outline"
               onClick={(e) => e.preventDefault()}
             >
-              View Profile
+              View This Profile
             </Button>
           </div>
         </CardContent>
