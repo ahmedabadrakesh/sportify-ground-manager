@@ -20,7 +20,7 @@ export const useRegisterProfessionalForm = (onSuccess: () => void, isUpdate: boo
       // Contact & Social Details
       contact_number: "",
       whatsapp: "",
-      whatsapp_same_as_phone: false,
+      whatsapp_same_as_phone: true,
       email: "",
       instagram_link: "",
       youtube_link: "",
