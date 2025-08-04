@@ -301,459 +301,363 @@ const ProfessionalProfile = () => {
 
   return (
     <MainLayout>
-      <div className="container mx-auto py-8">
-        {/* Back button and Update Profile button */}
-        <div className="mb-6 flex justify-between items-center">
-          <Link to="/sports-professionals">
-            <Button variant="ghost" className="flex items-center gap-2">
-              <ArrowLeft className="h-4 w-4" />
-              Back to Professionals
-            </Button>
-          </Link>
-          {canEdit && (
-            <Button
-              onClick={handleUpdateProfile}
-              className="flex items-center gap-2"
-            >
-              <Edit className="h-4 w-4" />
-              Update Profile
-            </Button>
-          )}
-        </div>
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
+        {/* Header Section */}
+        <div className="bg-gradient-to-r from-slate-800 to-slate-900 text-white py-16">
+          <div className="container mx-auto px-4">
+            {/* Back button and Update Profile button */}
+            <div className="mb-8 flex justify-between items-center">
+              <Link to="/sports-professionals">
+                <Button variant="ghost" className="flex items-center gap-2 text-white hover:bg-white/10">
+                  <ArrowLeft className="h-4 w-4" />
+                  Back to Professionals
+                </Button>
+              </Link>
+              {canEdit && (
+                <Button
+                  onClick={handleUpdateProfile}
+                  className="flex items-center gap-2 bg-white text-gray-900 hover:bg-gray-100"
+                >
+                  <Edit className="h-4 w-4" />
+                  Update Profile
+                </Button>
+              )}
+            </div>
 
-        <div className="">
-          <div>
-            <div className="flex lg:flex-row flex-col items-center lg:gap-16">
-              <div className="flex place-content-center items-center">
-                <Avatar className="w-64 h-64">
-                  {professional.photo && (
-                    <AvatarImage
-                      src={professional.photo || "/placeholder.svg"}
+            {/* Profile Header */}
+            <div className="flex flex-col lg:flex-row items-center lg:items-start gap-8">
+              {/* Avatar and Initials */}
+              <div className="relative">
+                <div className="w-32 h-32 lg:w-48 lg:h-48 rounded-full bg-gradient-to-br from-blue-400 to-purple-600 flex items-center justify-center text-white text-4xl lg:text-6xl font-bold">
+                  {professional.photo ? (
+                    <img
+                      src={professional.photo}
                       alt={professional.name}
+                      className="w-full h-full rounded-full object-cover"
                     />
+                  ) : (
+                    professional.name.split(' ').map(n => n[0]).join('').toUpperCase()
                   )}
-                  <AvatarFallback className="text-6xl">
-                    {professional.name.charAt(0)}
-                  </AvatarFallback>
-                </Avatar>
+                </div>
               </div>
-              <div className="lg:flex-col md:flex-col  items-center">
-                <div className="lg:flex md:inline-flex flex-row lg:content-left lg:items-left space-x-2 mt-2">
-                  <p className="text-2xl ">
-                    {`${professional.name} `}
-                    <div className="inline-flex items-center">
-                      <span
-                        className="bg-blue-500 rounded-full p-1"
-                        title="Verified"
-                      >
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          className="text-gray-100 h-2.5 w-2.5"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          stroke="currentColor"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth="4"
-                            d="M5 13l4 4L19 7"
-                          ></path>
-                        </svg>
-                      </span>
+
+              {/* Profile Info */}
+              <div className="flex-1 text-center lg:text-left">
+                <h1 className="text-4xl lg:text-5xl font-bold mb-4">
+                  {professional.name}
+                </h1>
+                <p className="text-xl lg:text-2xl text-gray-300 mb-6">
+                  {professional.profession_type}, {professional.games?.name}
+                </p>
+                {professional.punch_line && (
+                  <p className="text-lg text-gray-400 mb-6 italic">
+                    "{professional.punch_line}"
+                  </p>
+                )}
+
+                {/* Achievement Badges */}
+                <div className="flex flex-wrap justify-center lg:justify-start gap-4 mb-6">
+                  {professional.years_of_experience && (
+                    <div className="bg-white/10 backdrop-blur-sm rounded-lg px-4 py-2 text-center">
+                      <div className="text-2xl font-bold">{professional.years_of_experience}+</div>
+                      <div className="text-sm text-gray-300">Years Experience</div>
                     </div>
-                  </p>
-                </div>
-                <div className="flex items-left space-x-2 mt-2">
-                  <p className="flex text-xl sm:text-xl italic lg:text-2xl items-center font-light mb-6">
-                    <Quote size={16} color="#6260e2" fill="#111" />
-                    {professional.punch_line}
-                    <Quote size={16} color="#6260e2" fill="#111" />
-                  </p>
-                </div>
-                <div className="lg:flex md:grid items-center flex-wrap gap-2 mb-4">
-                  <Badge
-                    variant="default"
-                    className="flex items-center gap-2 px-4 py-2 mb-4"
-                  >
-                    <MapPin className="w-4 h-4" />
-                    <span>{professional.city}</span>
-                  </Badge>
-                  {professional.profession_type && (
-                    <Badge
-                      variant="secondary"
-                      className="flex items-center gap-2 px-4 py-2 ring-1 ring-green-700 ring-inset mb-4"
-                    >
-                      <Star className="h-3 w-3" />
-                      {professional.profession_type}
-                    </Badge>
                   )}
-                  <Badge
-                    variant="outline"
-                    className="flex items-left gap-2 px-4 py-2 ring-1 ring-green-700 ring-inset mb-4"
-                  >
-                    <LandPlot className="w-4 h-4 text-green-400" />
-                    {professional.games?.name}
-                  </Badge>
-                  {professional.level && (
-                    <Badge
-                      variant="secondary"
-                      className="flex items-left gap-2 px-4 py-2 ring-1 ring-green-700 ring-inset mb-4"
-                    >
-                      <Star className="h-3 w-3" />
-                      {professional.level}
-                    </Badge>
+                  {professional.total_match_played && (
+                    <div className="bg-white/10 backdrop-blur-sm rounded-lg px-4 py-2 text-center">
+                      <div className="text-2xl font-bold">{professional.total_match_played}+</div>
+                      <div className="text-sm text-gray-300">Matches Played</div>
+                    </div>
                   )}
+                  <div className="bg-white/10 backdrop-blur-sm rounded-lg px-4 py-2 text-center">
+                    <div className="text-2xl font-bold">✓</div>
+                    <div className="text-sm text-gray-300">Certified Professional</div>
+                  </div>
                 </div>
-                <div className="grow leading-relaxed">
+
+                {/* Location and Social Links */}
+                <div className="flex flex-wrap justify-center lg:justify-start items-center gap-4">
+                  <Badge variant="secondary" className="bg-white/10 text-white border-white/20">
+                    <MapPin className="w-4 h-4 mr-2" />
+                    {professional.city}
+                  </Badge>
                   {renderSocialLinks()}
                 </div>
               </div>
             </div>
+          </div>
+        </div>
 
-            <div className="pb-6 pt-6">
-              <hr className="w-48 h-1 mx-auto my-4 bg-blue-400 border-0 rounded-sm md:my-10 dark:bg-gray-700" />
+        {/* Main Content */}
+        <div className="container mx-auto px-4 py-12">
+          <div className="grid lg:grid-cols-3 gap-8">
+            {/* Left Column - Main Content */}
+            <div className="lg:col-span-2 space-y-8">
+              
+              {/* About Me Section */}
+              {professional.comments && (
+                <Card className="bg-white shadow-lg">
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <Quote className="h-5 w-5 text-primary" />
+                      About Me
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-gray-700 leading-relaxed">
+                      {isAboutRReadMoreOpened
+                        ? professional.comments
+                        : getFiftyWords(professional.comments, 50)}
+                      {professional.comments.length >= 50 && (
+                        <button
+                          onClick={() =>
+                            setIsAboutRReadMoreOpened(!isAboutRReadMoreOpened)
+                          }
+                          className="ml-2 text-primary hover:underline font-medium"
+                        >
+                          {isAboutRReadMoreOpened ? "Read Less" : "Read More"}
+                        </button>
+                      )}
+                    </p>
+                  </CardContent>
+                </Card>
+              )}
+
+              {/* Specialties */}
+              {professional.accomplishments && professional.accomplishments.length > 0 && (
+                <Card className="bg-white shadow-lg">
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <Target className="h-5 w-5 text-primary" />
+                      Specialties
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <ul className="space-y-3">
+                      {professional.accomplishments.map((item, index) => (
+                        <li key={index} className="flex items-start gap-3">
+                          <div className="w-2 h-2 rounded-full bg-green-500 mt-2 flex-shrink-0" />
+                          <span className="text-gray-700">{item}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </CardContent>
+                </Card>
+              )}
+
+              {/* Success Stories */}
+              {professional.awards && professional.awards.length > 0 && (
+                <Card className="bg-white shadow-lg">
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <Trophy className="h-5 w-5 text-primary" />
+                      Success Stories
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-6">
+                      {professional.awards.map((story, index) => (
+                        <div key={index} className="border-l-4 border-green-500 pl-4">
+                          <p className="text-gray-700 leading-relaxed">{story}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+
+              {/* Training Gallery */}
+              {professional.images && professional.images.length > 0 && (
+                <Card className="bg-white shadow-lg">
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <Camera className="h-5 w-5 text-primary" />
+                      Training Gallery
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <ImageGallery images={professional.images} />
+                  </CardContent>
+                </Card>
+              )}
+
+              {/* Certifications & Education */}
+              {professional.certifications && professional.certifications.length > 0 && (
+                <Card className="bg-white shadow-lg">
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <Award className="h-5 w-5 text-primary" />
+                      Certifications & Education
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <ul className="space-y-3">
+                      {professional.certifications.map((cert, index) => (
+                        <li key={index} className="flex items-start gap-3">
+                          <div className="w-2 h-2 rounded-full bg-blue-500 mt-2 flex-shrink-0" />
+                          <span className="text-gray-700">{cert}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </CardContent>
+                </Card>
+              )}
+
+              {/* Featured Videos */}
+              {professional.videos && professional.videos.length > 0 && (
+                <Card className="bg-white shadow-lg">
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <Youtube className="h-5 w-5 text-primary" />
+                      Training Videos & Reels
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <VideoGallery videos={professional.videos} />
+                  </CardContent>
+                </Card>
+              )}
             </div>
 
-            {/* Professional Experience Section */}
-            {(professional.years_of_experience ||
-              professional.total_match_played) && (
-              <>
-                <div className="mb-6">
-                  <div className="grid lg:grid-cols-6 gap-4">
-                    <div className="grid col-span-1 text-left uppercase font-bold">
-                      Experience
-                    </div>
-                    <div className="lg:col-span-5 leading-relaxed align-left">
-                      <div className="flex gap-6">
-                        {professional.years_of_experience && (
-                          <div className="flex items-center gap-2">
-                            <Award className="h-4 w-4 text-blue-500" />
-                            <span className="font-medium">
-                              Years of Experience:
-                            </span>
-                            <span>
-                              {professional.years_of_experience} years
-                            </span>
-                          </div>
-                        )}
-                        {professional.total_match_played && (
-                          <div className="flex items-center gap-2">
-                            <Trophy className="h-4 w-4 text-yellow-500" />
-                            <span className="font-medium">Matches Played:</span>
-                            <span>{professional.total_match_played}</span>
-                          </div>
-                        )}
+            {/* Right Column - Contact & Details */}
+            <div className="space-y-6">
+              {/* Contact Information */}
+              <Card className="bg-white shadow-lg sticky top-8">
+                <CardHeader>
+                  <CardTitle>Contact Information</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center">
+                        <Users className="w-4 h-4 text-green-600" />
+                      </div>
+                      <div>
+                        <p className="font-medium text-sm text-gray-500">Phone</p>
+                        <p className="cursor-pointer" onClick={handleContactClick}>
+                          {showContactDetails
+                            ? professional.contact_number
+                            : maskPhone(professional.contact_number)}
+                        </p>
                       </div>
                     </div>
-                  </div>
-                  {showOrangeDividerLine()}
-                </div>
-              </>
-            )}
 
-            {/* Contact Information Section */}
-            <div className="mb-6">
-              <div className="grid lg:grid-cols-6 gap-4">
-                <div className="grid col-span-1 text-left uppercase font-bold">
-                  Contact Info
-                </div>
-                <div className="lg:col-span-5 leading-relaxed align-left">
-                  <div className="space-y-3">
-                    {/* Phone Number */}
-                    <div className="flex items-center gap-2">
-                      <span className="font-medium">Phone:</span>
-                      <span
-                        className="cursor-pointer flex items-center gap-2"
-                        onClick={handleContactClick}
-                      >
-                        {showContactDetails
-                          ? professional.contact_number
-                          : maskPhone(professional.contact_number)}
-                        {showContactDetails ? (
-                          <EyeOff className="h-4 w-4" />
-                        ) : (
-                          <Eye className="h-4 w-4" />
-                        )}
-                      </span>
-                    </div>
-
-                    {/* Email */}
-                    <div className="flex items-center gap-2">
-                      <span className="font-medium">Email:</span>
-                      <span
-                        className="cursor-pointer flex items-center gap-2"
-                        onClick={handleContactClick}
-                      >
-                        {showContactDetails
-                          ? professionalUser?.email
-                          : maskEmail(professionalUser?.email || "")}
-                        {showContactDetails ? (
-                          <EyeOff className="h-4 w-4" />
-                        ) : (
-                          <Eye className="h-4 w-4" />
-                        )}
-                      </span>
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center">
+                        <Globe className="w-4 h-4 text-blue-600" />
+                      </div>
+                      <div>
+                        <p className="font-medium text-sm text-gray-500">Email</p>
+                        <p className="cursor-pointer" onClick={handleContactClick}>
+                          {showContactDetails
+                            ? professionalUser?.email
+                            : maskEmail(professionalUser?.email || "")}
+                        </p>
+                      </div>
                     </div>
 
                     {!isAuthenticated && (
-                      <div className="mt-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
-                        <p className="text-yellow-800 text-sm">
-                          To view complete contact details, please register or
-                          login.
+                      <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+                        <p className="text-yellow-800 text-xs mb-2">
+                          Full contact details available after registration
                         </p>
                         <Button
                           variant="outline"
                           size="sm"
-                          className="mt-2"
+                          className="w-full"
                           onClick={() => setIsAuthDialogOpen(true)}
                         >
                           Register / Login
                         </Button>
                       </div>
                     )}
-                  </div>
-                </div>
-              </div>
-              {showOrangeDividerLine()}
-            </div>
 
-            {/* About me section */}
-            {professional.comments && (
-              <div>
-                <div className="lg:grid lg:grid-cols-6 gap-4 md:flex-flow-row">
-                  <div className="lg:col-span-1 md:col-span-1 text-left uppercase font-bold">
-                    About me
+                    <Button 
+                      className="w-full bg-slate-800 hover:bg-slate-700"
+                      onClick={handleContactClick}
+                    >
+                      Contact Me
+                    </Button>
                   </div>
-                  <div className="lg:col-span-5  md:col-span-1 leading-relaxed align-left text-justify">
-                    {isAboutRReadMoreOpened
-                      ? `${professional.comments} `
-                      : getFiftyWords(professional.comments, 50)}
-                    {professional.comments.length >= 50 && (
-                      <a
-                        onClick={() =>
-                          setIsAboutRReadMoreOpened(!isAboutRReadMoreOpened)
-                        }
-                        className="cursor-pointer inline-flex items-center font-medium text-blue-600 dark:text-blue-500 hover:underline"
-                      >
-                        {isAboutRReadMoreOpened ? "Read Less" : "Read More"}
-                        <svg
-                          className="w-4 h-4 ms-2 rtl:rotate-180"
-                          aria-hidden="true"
-                          xmlns="http://www.w3.org/2000/svg"
-                          fill="none"
-                          viewBox="0 0 14 10"
-                        >
-                          <path
-                            stroke="currentColor"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth="2"
-                            d="M1 5h12m0 0L9 1m4 4L9 9"
-                          />
-                        </svg>
-                      </a>
-                    )}
-                  </div>
-                </div>
-                {showOrangeDividerLine()}
-              </div>
-            )}
+                </CardContent>
+              </Card>
 
-            {/* rest of the sections */}
-            {professional.awards.length !== 0 && (
-              <>
-                <div className="grid lg:grid-cols-6 gap-4">
-                  <div className="grid col-span-1 md:col-span-1 text-left uppercase font-bold">
-                    Awads
-                  </div>
-                  <div className="lg:col-span-5 md:col-span-1 leading-relaxed align-left text-justify">
-                    {professional.awards.map((item, index) => {
-                      return (
-                        <div className="flex items-center" key={index}>
-                          <ChevronsRight
-                            color="#6260e2"
-                            className="mr-2 "
-                            size={20}
-                          />
-                          {item}
+              {/* Training Locations */}
+              {professional.training_locations && professional.training_locations.length > 0 && (
+                <Card className="bg-white shadow-lg">
+                  <CardHeader>
+                    <CardTitle>Training Locations</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    {professional.training_locations.map((location, index) => (
+                      <div key={index} className="p-3 bg-gray-50 rounded-lg">
+                        <div className="flex items-start gap-3">
+                          <MapPin className="w-4 h-4 text-gray-500 mt-0.5" />
+                          <div>
+                            <p className="font-medium text-sm">{location}</p>
+                          </div>
                         </div>
-                      );
-                    })}
-                  </div>
-                </div>
-                {showOrangeDividerLine()}
-              </>
-            )}
-            {professional.accomplishments.length !== 0 && (
-              <>
-                <div className="grid lg:grid-cols-6 gap-4 md:grid-flow-row">
-                  <div className="grid col-span-1 text-left uppercase font-bold">
-                    Accomplishments
-                  </div>
-                  <div className="lg:col-span-5 md:col-span-1 leading-relaxed align-left text-justify">
-                    {professional.accomplishments.map((item, index) => {
-                      return (
-                        <div className="flex items-center" key={index}>
-                          <ChevronsRight
-                            color="#6260e2"
-                            className="mr-2 "
-                            size={20}
-                          />
-                          {item}
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-                {showOrangeDividerLine()}
-              </>
-            )}
+                      </div>
+                    ))}
+                  </CardContent>
+                </Card>
+              )}
 
-            {professional.certifications.length !== 0 && (
-              <>
-                <div className="grid lg:grid-cols-6 gap-4">
-                  <div className="grid col-span-1 text-left uppercase font-bold">
-                    Certifications
-                  </div>
-                  <div className="lg:col-span-5 gap-2 leading-relaxed align-left text-justify">
-                    {professional.certifications.map((item, index) => {
-                      return (
-                        <div className="flex items-center" key={index}>
-                          <ChevronsRight
-                            color="#6260e2"
-                            className="mr-2 "
-                            size={20}
-                          />
-                          {item}
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-                {showOrangeDividerLine()}
-              </>
-            )}
-            {professional.training_locations.length !== 0 && (
-              <>
-                <div className="grid lg:grid-cols-6 gap-4">
-                  <div className="grid col-span-1 text-left uppercase font-bold ">
-                    Training locations
-                  </div>
-                  <div className="grid col-span-5 leading-relaxed align-left text-justify">
-                    {professional.training_locations.map((item, index) => {
-                      return (
-                        <div className="flex items-center" key={index}>
-                          <ChevronsRight
-                            color="#6260e2"
-                            className="mr-2 "
-                            size={20}
-                          />
-                          {item}
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-                {showOrangeDividerLine()}
-              </>
-            )}
+              {/* Pricing */}
+              {professional.fee && (
+                <Card className="bg-white shadow-lg">
+                  <CardHeader>
+                    <CardTitle>Pricing</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-center p-4 bg-gray-50 rounded-lg">
+                      <div className="text-2xl font-bold text-primary">
+                        ₹{professional.fee}
+                      </div>
+                      <div className="text-sm text-gray-600">
+                        {professional.fee_type}
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
 
-            <div>
-              <div className="grid lg:grid-cols-6 gap-1">
-                <div className="grid col-span-1 text-left uppercase font-bold">
-                  Charges
-                </div>
-                <div className="lg:col-span-5 leading-relaxed align-left text-justify">
-                  <div className="flex items-center gap-2">
-                    <BadgeIndianRupee size={16} color="#6260e2 " />
-                    {`${professional.fee}/- ${professional.fee_type}`}
-                  </div>
-                </div>
-              </div>
-              {showOrangeDividerLine()}
-            </div>
-
-            {professional.coaching_availability.length !== 0 && (
-              <>
-                <div className="grid lg:grid-cols-6 gap-4">
-                  <div className="grid col-span-1 text-left uppercase font-bold">
-                    coaching availability
-                  </div>
-                  <div className="grid col-span-5 leading-relaxed align-left text-justify">
-                    {professional.coaching_availability.map((item, index) => {
-                      return (
-                        <div className="flex items-center" key={index}>
-                          <ChevronsRight
-                            color="#6260e2"
-                            className="mr-2 "
-                            size={20}
-                          />
-                          {item}
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-                {showOrangeDividerLine()}
-              </>
-            )}
-            <div>
-              <div className="grid lg:grid-cols-6 md:grid-cols-1 gap-4 md:grid-flow-row">
-                <div className="grid lg:col-span-1 text-left uppercase font-bold">
-                  Featured Gallery
-                </div>
-                <div className="grid lg:col-span-5 text-left leading-relaxed align-left">
-                  Moments from training sessions, tournaments, and student
-                  achievements
-                  <ImageGallery images={professional.images} />
-                </div>
-              </div>
-              {showOrangeDividerLine()}
-            </div>
-
-            <div>
-              <div className="grid lg:grid-cols-6 gap-2 md:grid-flow-row">
-                <div className="grid col-span-1 text-left uppercase font-bold">
-                  Featured Videos
-                </div>
-                <div className="grid lg:col-span-5 text-left leading-relaxed align-left">
-                  Free training content to help you improve your game
-                  <VideoGallery videos={professional.videos} />
-                </div>
-              </div>
-              {showOrangeDividerLine()}
-            </div>
-
-            <div className="grid lg:grid-cols-6 gap-1">
-              <div className="grid col-span-1 text-left uppercase font-bold">
-                Contact Details
-              </div>
-              <div className="grid col-span-5 lg:flex-row leading-relaxed align-left text-justify">
-                <ContactDetails
-                  professional={professional}
-                  onLoginClick={() => setIsAuthDialogOpen(true)}
-                />
-              </div>
+              {/* Availability */}
+              {professional.coaching_availability && professional.coaching_availability.length > 0 && (
+                <Card className="bg-white shadow-lg">
+                  <CardHeader>
+                    <CardTitle>Available For</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="flex flex-wrap gap-2">
+                      {professional.coaching_availability.map((availability, index) => (
+                        <Badge key={index} variant="secondary" className="text-xs">
+                          {availability}
+                        </Badge>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
             </div>
           </div>
         </div>
-
-        {/* Dialogs */}
-        <RegisterProfessionalDialog
-          open={isUpdateDialogOpen}
-          onOpenChange={setIsUpdateDialogOpen}
-          hasExistingProfile={true}
-          isUpdate={true}
-        />
-
-        <AuthRequiredDialog
-          open={isAuthDialogOpen}
-          onOpenChange={setIsAuthDialogOpen}
-          title="Login Required"
-          description="Please login or register to view contact details and access all features."
-        />
       </div>
+
+      {/* Dialogs */}
+      <RegisterProfessionalDialog
+        open={isUpdateDialogOpen}
+        onOpenChange={setIsUpdateDialogOpen}
+        hasExistingProfile={true}
+        isUpdate={true}
+      />
+
+      <AuthRequiredDialog
+        open={isAuthDialogOpen}
+        onOpenChange={setIsAuthDialogOpen}
+        title="Login Required"
+        description="Please login or register to view contact details and access all features."
+      />
     </MainLayout>
   );
 };
