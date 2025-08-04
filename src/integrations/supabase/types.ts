@@ -540,6 +540,8 @@ export type Database = {
       }
       sports_professionals: {
         Row: {
+          about_me: string | null
+          academy_name: string | null
           accomplishments: string[] | null
           address: string
           awards: string[] | null
@@ -549,29 +551,45 @@ export type Database = {
           comments: string | null
           contact_number: string
           created_at: string
+          district_level_tournaments: number | null
+          education: string[] | null
           facebook_link: string | null
           fee: number
           fee_type: Database["public"]["Enums"]["fee_type"]
+          free_demo_call: boolean | null
           game_id: string
+          group_session_price: number | null
           id: string
           images: string[] | null
           instagram_link: string | null
+          international_level_tournaments: number | null
           level: string | null
           linkedin_link: string | null
           name: string
+          national_level_tournaments: number | null
+          one_on_one_price: number | null
+          online_price: number | null
           photo: string | null
           profession_type: Database["public"]["Enums"]["sport_profession_type"]
           punch_line: string | null
+          specialties: string[] | null
+          state_level_tournaments: number | null
+          success_stories: Json | null
           total_match_played: number | null
           training_locations: string[] | null
+          training_locations_detailed: Json | null
           updated_at: string
           user_id: string | null
           videos: string[] | null
           website: string | null
+          whatsapp: string | null
+          whatsapp_same_as_phone: boolean | null
           years_of_experience: number | null
           youtube_link: string | null
         }
         Insert: {
+          about_me?: string | null
+          academy_name?: string | null
           accomplishments?: string[] | null
           address: string
           awards?: string[] | null
@@ -581,29 +599,45 @@ export type Database = {
           comments?: string | null
           contact_number: string
           created_at?: string
+          district_level_tournaments?: number | null
+          education?: string[] | null
           facebook_link?: string | null
           fee: number
           fee_type: Database["public"]["Enums"]["fee_type"]
+          free_demo_call?: boolean | null
           game_id: string
+          group_session_price?: number | null
           id?: string
           images?: string[] | null
           instagram_link?: string | null
+          international_level_tournaments?: number | null
           level?: string | null
           linkedin_link?: string | null
           name: string
+          national_level_tournaments?: number | null
+          one_on_one_price?: number | null
+          online_price?: number | null
           photo?: string | null
           profession_type: Database["public"]["Enums"]["sport_profession_type"]
           punch_line?: string | null
+          specialties?: string[] | null
+          state_level_tournaments?: number | null
+          success_stories?: Json | null
           total_match_played?: number | null
           training_locations?: string[] | null
+          training_locations_detailed?: Json | null
           updated_at?: string
           user_id?: string | null
           videos?: string[] | null
           website?: string | null
+          whatsapp?: string | null
+          whatsapp_same_as_phone?: boolean | null
           years_of_experience?: number | null
           youtube_link?: string | null
         }
         Update: {
+          about_me?: string | null
+          academy_name?: string | null
           accomplishments?: string[] | null
           address?: string
           awards?: string[] | null
@@ -613,25 +647,39 @@ export type Database = {
           comments?: string | null
           contact_number?: string
           created_at?: string
+          district_level_tournaments?: number | null
+          education?: string[] | null
           facebook_link?: string | null
           fee?: number
           fee_type?: Database["public"]["Enums"]["fee_type"]
+          free_demo_call?: boolean | null
           game_id?: string
+          group_session_price?: number | null
           id?: string
           images?: string[] | null
           instagram_link?: string | null
+          international_level_tournaments?: number | null
           level?: string | null
           linkedin_link?: string | null
           name?: string
+          national_level_tournaments?: number | null
+          one_on_one_price?: number | null
+          online_price?: number | null
           photo?: string | null
           profession_type?: Database["public"]["Enums"]["sport_profession_type"]
           punch_line?: string | null
+          specialties?: string[] | null
+          state_level_tournaments?: number | null
+          success_stories?: Json | null
           total_match_played?: number | null
           training_locations?: string[] | null
+          training_locations_detailed?: Json | null
           updated_at?: string
           user_id?: string | null
           videos?: string[] | null
           website?: string | null
+          whatsapp?: string | null
+          whatsapp_same_as_phone?: boolean | null
           years_of_experience?: number | null
           youtube_link?: string | null
         }
