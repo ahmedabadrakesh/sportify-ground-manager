@@ -21,7 +21,8 @@ export const useFormValidation = (form: UseFormReturn<ProfessionalFormValues>) =
         fieldsToValidate = ["games_played"];
         break;
       case 4:
-        fieldsToValidate = ["punch_line"];
+        // Step 4 is Training Info - no required fields
+        fieldsToValidate = [];
         break;
       case 5:
         // Social media fields are optional, so we can proceed to step 6

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { UseFormReturn } from "react-hook-form";
 import {
   FormField,
@@ -8,140 +8,226 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { Switch } from "@/components/ui/switch";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ProfessionalFormValues } from "../schemas/professionalFormSchema";
-import { Phone, Mail, MapPin, Building } from "lucide-react";
-import { getCurrentUser, hasRoleSync } from "@/utils/auth";
-import { supabase } from "@/integrations/supabase/client";
+import { MultiSelect } from "@/components/ui/multi-select";
+import { MapPin, DollarSign, Clock, Plus, Trash2 } from "lucide-react";
 
 interface StepFourProps {
   form: UseFormReturn<ProfessionalFormValues>;
 }
 
 export const StepFour = ({ form }: StepFourProps) => {
-  const [userEmail, setUserEmail] = useState<string>("");
-  const isSuperAdmin = hasRoleSync("super_admin");
-  useEffect(() => {
-    const fetchUserEmail = async () => {
-      try {
-        const currentUser = await getCurrentUser();
-        if (currentUser) {
-          // Fetch email from users table
-          const { data: userData, error } = await supabase
-            .from("users")
-            .select("email")
-            .eq("id", currentUser.id)
-            .single();
+  const coachingAvailabilityOptions = [
+    { label: "Personal", value: "Personal" },
+    { label: "Home", value: "Home" },
+    { label: "Group", value: "Group" },
+    { label: "Out of City", value: "Out of City" },
+  ];
 
-          if (userData && !error) {
-            setUserEmail(userData.email);
-            // Set the email in the form for display but don't make it editable
-            form.setValue("email", userData.email);
-          }
-        }
-      } catch (error) {
-        console.error("Error fetching user email:", error);
-      }
-    };
+  const trainingLocations = form.watch("training_locations_detailed") || [];
 
-    fetchUserEmail();
-  }, [form]);
+  const addTrainingLocation = () => {
+    const currentLocations = form.getValues("training_locations_detailed") || [];
+    form.setValue("training_locations_detailed", [
+      ...currentLocations,
+      { location: "", address: "", timings: "" }
+    ]);
+  };
+
+  const removeTrainingLocation = (index: number) => {
+    const currentLocations = form.getValues("training_locations_detailed") || [];
+    const newLocations = currentLocations.filter((_, i) => i !== index);
+    form.setValue("training_locations_detailed", newLocations);
+  };
+
+  const updateTrainingLocation = (index: number, field: string, value: string) => {
+    const currentLocations = form.getValues("training_locations_detailed") || [];
+    const newLocations = [...currentLocations];
+    newLocations[index] = { ...newLocations[index], [field]: value };
+    form.setValue("training_locations_detailed", newLocations);
+  };
 
   return (
     <div className="space-y-6">
-      <div className="grid md:grid-cols-2 gap-4">
+      <div>
+        <h2 className="text-2xl font-bold mb-6">Training Information</h2>
+        
+        {/* Coaching Availability */}
         <FormField
-          name="contact_number"
+          name="coaching_availability"
           control={form.control}
           render={({ field }) => (
-            <FormItem>
+            <FormItem className="mb-6">
               <FormLabel className="flex items-center gap-2">
-                <Phone className="w-4 h-4" />
-                Contact Number *
+                <MapPin className="w-4 h-4" />
+                Coaching Availability
               </FormLabel>
               <FormControl>
-                <Input {...field} placeholder="Enter phone number" />
+                <MultiSelect
+                  options={coachingAvailabilityOptions}
+                  onValueChange={field.onChange}
+                  defaultValue={field.value || []}
+                  placeholder="Select coaching availability"
+                  maxCount={4}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
 
-        <FormField
-          name="email"
-          control={form.control}
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel className="flex items-center gap-2">
-                <Mail className="w-4 h-4" />
-                Email (Registration Email)
-              </FormLabel>
-              <FormControl>
-                {isSuperAdmin ? (
-                  <Input {...field} type="email" placeholder="Enter email..." />
-                ) : (
-                  <Input
-                    {...field}
-                    type="email"
-                    value={userEmail}
-                    disabled
-                    className="bg-gray-100 cursor-not-allowed"
-                    placeholder="Loading email..."
-                  />
+        {/* Pricing Section */}
+        <Card className="mb-6">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <DollarSign className="w-5 h-5" />
+              Pricing
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid md:grid-cols-3 gap-4">
+              <FormField
+                name="one_on_one_price"
+                control={form.control}
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>One-on-One (₹)</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="number"
+                        {...field}
+                        placeholder="Amount"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
                 )}
-              </FormControl>
-              <p className="text-xs text-muted-foreground">
-                This is your registration email and cannot be changed.
-              </p>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-      </div>
+              />
+              
+              <FormField
+                name="group_session_price"
+                control={form.control}
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Group Sessions (₹)</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="number"
+                        {...field}
+                        placeholder="Amount"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              
+              <FormField
+                name="online_price"
+                control={form.control}
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Online (₹/session)</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="number"
+                        {...field}
+                        placeholder="Amount"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
 
-      <FormField
-        name="address"
-        control={form.control}
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel className="flex items-center gap-2">
-              <MapPin className="w-4 h-4" />
-              Address
-            </FormLabel>
-            <FormControl>
-              <Input {...field} placeholder="Enter your full address" />
-            </FormControl>
-            <FormMessage />
-          </FormItem>
-        )}
-      />
+            <FormField
+              name="free_demo_call"
+              control={form.control}
+              render={({ field }) => (
+                <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                  <div className="space-y-0.5">
+                    <FormLabel className="text-base">
+                      Free 15-min Demo call Available
+                    </FormLabel>
+                    <div className="text-sm text-muted-foreground">
+                      Offer a free demo call to potential clients
+                    </div>
+                  </div>
+                  <FormControl>
+                    <Switch
+                      checked={field.value}
+                      onCheckedChange={field.onChange}
+                    />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+          </CardContent>
+        </Card>
 
-      <FormField
-        name="city"
-        control={form.control}
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel className="flex items-center gap-2">
-              <Building className="w-4 h-4" />
-              City *
-            </FormLabel>
-            <FormControl>
-              <Input {...field} placeholder="Enter your city" />
-            </FormControl>
-            <FormMessage />
-          </FormItem>
-        )}
-      />
-
-      <div className="p-4 bg-gradient-to-r from-blue/10 to-blue/5 rounded-lg border border-blue/20">
-        <h3 className="text-sm font-semibold mb-2 flex items-center gap-2">
-          <Phone className="w-4 h-4" />
-          Contact Tip
-        </h3>
-        <p className="text-sm text-muted-foreground">
-          Make sure your contact information is accurate so potential clients
-          can easily reach out to you. Your email address is from your
-          registration and cannot be modified here.
-        </p>
+        {/* Training Locations */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Clock className="w-5 h-5" />
+              Training Location(s)
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {trainingLocations.map((location, index) => (
+              <div key={index} className="grid md:grid-cols-3 gap-4 p-4 border rounded-lg relative">
+                <div>
+                  <FormLabel>Location</FormLabel>
+                  <Input
+                    placeholder="Location name"
+                    value={location.location}
+                    onChange={(e) => updateTrainingLocation(index, "location", e.target.value)}
+                  />
+                </div>
+                <div>
+                  <FormLabel>Address</FormLabel>
+                  <Input
+                    placeholder="Full address"
+                    value={location.address}
+                    onChange={(e) => updateTrainingLocation(index, "address", e.target.value)}
+                  />
+                </div>
+                <div>
+                  <FormLabel>Timings</FormLabel>
+                  <Input
+                    placeholder="e.g., 6:00 AM - 8:00 PM"
+                    value={location.timings}
+                    onChange={(e) => updateTrainingLocation(index, "timings", e.target.value)}
+                  />
+                </div>
+                {trainingLocations.length > 1 && (
+                  <Button
+                    type="button"
+                    variant="destructive"
+                    size="sm"
+                    className="absolute top-2 right-2"
+                    onClick={() => removeTrainingLocation(index)}
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </Button>
+                )}
+              </div>
+            ))}
+            <Button
+              type="button"
+              variant="outline"
+              onClick={addTrainingLocation}
+              className="w-full"
+            >
+              <Plus className="w-4 h-4 mr-2" />
+              Add Training Location
+            </Button>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );
