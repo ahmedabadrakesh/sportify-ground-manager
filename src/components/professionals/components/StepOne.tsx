@@ -82,7 +82,7 @@ export const StepOne = ({ form }: StepOneProps) => {
           <PhotoUpload form={form} />
         </div>
 
-        {/* Right Side: Coach Name, Professional Type, Punch Line */}
+        {/* Right Side: Coach Name, Professional Type */}
         <div className="space-y-4">
           <FormField
             name="name"
@@ -122,41 +122,40 @@ export const StepOne = ({ form }: StepOneProps) => {
               </FormItem>
             )}
           />
-
-          <div>
-            <FormField
-              name="punch_line"
-              control={form.control}
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Punch Line</FormLabel>
-                  <FormControl>
-                    <Input
-                      {...field}
-                      value={suggestedPunchLine}
-                      onChange={(e) => {
-                        setSuggestedPunchLine(e.target.value);
-                        field.onChange(e.target.value);
-                      }}
-                      placeholder="A catchy phrase about yourself"
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <div className="mt-2">
-              <TextSuggestionCarousel
-                suggestions={punchLineData}
-                className="max-w-full"
-                setSuggestedPunchLine={(value) => {
-                  form.setValue("punch_line", value);
-                  setSuggestedPunchLine(value);
-                }}
-              />
-            </div>
-          </div>
         </div>
+      </div>
+
+      {/* Punch Line - Full Width Row */}
+      <div className="space-y-2">
+        <FormField
+          name="punch_line"
+          control={form.control}
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Punch Line</FormLabel>
+              <FormControl>
+                <Input
+                  {...field}
+                  value={suggestedPunchLine}
+                  onChange={(e) => {
+                    setSuggestedPunchLine(e.target.value);
+                    field.onChange(e.target.value);
+                  }}
+                  placeholder="A catchy phrase about yourself"
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <TextSuggestionCarousel
+          suggestions={punchLineData}
+          className="max-w-full"
+          setSuggestedPunchLine={(value) => {
+            form.setValue("punch_line", value);
+            setSuggestedPunchLine(value);
+          }}
+        />
       </div>
 
       {/* Bottom Row: Academy Name (Left), Game/Sport (Center), Years of Experience (Right) */}
