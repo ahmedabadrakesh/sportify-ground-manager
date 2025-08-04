@@ -158,8 +158,8 @@ export const StepOne = ({ form }: StepOneProps) => {
         />
       </div>
 
-      {/* Bottom Row: Academy Name (Left), Game/Sport (Center), Years of Experience (Right) */}
-      <div className="grid lg:grid-cols-3 gap-6">
+      {/* Bottom Row: Academy Name (Left), Years of Experience (Right) */}
+      <div className="grid lg:grid-cols-2 gap-6">
         {/* Left: Academy Name */}
         <FormField
           name="academy_name"
@@ -170,32 +170,6 @@ export const StepOne = ({ form }: StepOneProps) => {
               <FormControl>
                 <Input {...field} placeholder="Academy or organization name" />
               </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        {/* Center: Game/Sport */}
-        <FormField
-          name="game_id"
-          control={form.control}
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Game/Sport *</FormLabel>
-              <Select onValueChange={field.onChange} value={field.value}>
-                <FormControl>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select a game/sport" />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                  {games?.map((game) => (
-                    <SelectItem key={game.id} value={game.id}>
-                      {game.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
               <FormMessage />
             </FormItem>
           )}
