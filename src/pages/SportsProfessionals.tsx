@@ -4,6 +4,7 @@ import MainLayout from "@/components/layouts/MainLayout";
 import { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import ProfessionalsList from "@/components/professionals/ProfessionalsList";
 import RegisterProfessionalDialog from "@/components/professionals/RegisterProfessionalDialog";
 import { getCurrentUserSync, hasRoleSync } from "@/utils/auth";
@@ -95,23 +96,47 @@ const SportsProfessionals = () => {
 
   return (
     <MainLayout>
-      <div className="container mx-auto py-8">
-        <div className="flex justify-between items-center mb-8">
-          <div>
-            <h1 className="text-3xl font-bold mb-2 text-left">
-              {getPageTitle()}
-            </h1>
-            <p className="text-gray-600">
-              {getPageDescription()}
-            </p>
+      {/* Hero Section */}
+      <div className="bg-gradient-to-br from-primary/5 via-background to-accent/5 border-b">
+        <div className="container mx-auto py-12">
+          <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
+            <div className="flex-1">
+              <h1 className="text-4xl lg:text-5xl font-bold mb-4 bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+                {getPageTitle()}
+              </h1>
+              <p className="text-lg text-muted-foreground max-w-2xl">
+                {getPageDescription()}
+              </p>
+              <div className="mt-6 flex flex-wrap gap-3">
+                <Badge variant="outline" className="px-3 py-1">
+                  1000+ Professionals
+                </Badge>
+                <Badge variant="outline" className="px-3 py-1">
+                  All Sports
+                </Badge>
+                <Badge variant="outline" className="px-3 py-1">
+                  Verified Coaches
+                </Badge>
+              </div>
+            </div>
+            {shouldShowButton() && (
+              <div className="flex-shrink-0">
+                <Button 
+                  onClick={handleRegisterClick} 
+                  disabled={checkingProfile}
+                  size="lg"
+                  className="bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 text-white shadow-lg"
+                >
+                  {checkingProfile ? "Checking..." : getButtonText()}
+                </Button>
+              </div>
+            )}
           </div>
-          {shouldShowButton() && (
-            <Button onClick={handleRegisterClick} disabled={checkingProfile}>
-              {checkingProfile ? "Checking..." : getButtonText()}
-            </Button>
-          )}
         </div>
+      </div>
 
+      {/* Main Content */}
+      <div className="container mx-auto py-8">
         <ProfessionalsList sportFilter={sportFilter} />
 
         <RegisterProfessionalDialog
