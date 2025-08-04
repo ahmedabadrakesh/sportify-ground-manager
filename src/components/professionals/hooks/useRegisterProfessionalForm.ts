@@ -34,6 +34,7 @@ export const useRegisterProfessionalForm = (onSuccess: () => void, isUpdate: boo
       national_level_tournaments: 0,
       international_level_tournaments: 0,
       specialties: [],
+      games_played: [],
       certifications: [],
       education: [],
       accomplishments: [],
