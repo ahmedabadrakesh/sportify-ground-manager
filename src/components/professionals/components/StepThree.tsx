@@ -11,7 +11,7 @@ import { Input } from "@/components/ui/input";
 import { useGames } from "@/hooks/useGames";
 import { ProfessionalFormValues } from "../schemas/professionalFormSchema";
 import { ArrayFieldInput } from "./ArrayFieldInput";
-import { MultiSelectField } from "./MultiSelectField";
+import { MultiSelect } from "@/components/ui/multi-select";
 import { Gamepad2, Trophy, Target, Award, GraduationCap } from "lucide-react";
 
 interface StepThreeProps {
@@ -20,7 +20,11 @@ interface StepThreeProps {
 
 export const StepThree = ({ form }: StepThreeProps) => {
   const { games } = useGames();
-  const gameOptions = games?.map(game => game.name) || [];
+  const gameOptions = games?.map(game => ({ 
+    label: game.name, 
+    value: game.name,
+    icon: Gamepad2
+  })) || [];
 
   return (
     <div className="space-y-6">
@@ -33,13 +37,19 @@ export const StepThree = ({ form }: StepThreeProps) => {
           control={form.control}
           render={({ field }) => (
             <FormItem className="mb-6">
-              <MultiSelectField
-                options={gameOptions}
-                value={field.value || []}
-                onChange={field.onChange}
-                label="Games/Sport *"
-                icon={<Gamepad2 className="w-4 h-4" />}
-              />
+              <FormLabel className="flex items-center gap-2">
+                <Gamepad2 className="w-4 h-4" />
+                Games/Sport *
+              </FormLabel>
+              <FormControl>
+                <MultiSelect
+                  options={gameOptions}
+                  onValueChange={field.onChange}
+                  defaultValue={field.value || []}
+                  placeholder="Select games/sports"
+                  maxCount={5}
+                />
+              </FormControl>
               <FormMessage />
             </FormItem>
           )}
