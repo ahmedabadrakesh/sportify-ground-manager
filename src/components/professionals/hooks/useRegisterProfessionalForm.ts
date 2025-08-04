@@ -9,31 +9,58 @@ export const useRegisterProfessionalForm = (onSuccess: () => void, isUpdate: boo
   const form = useForm<ProfessionalFormValues>({
     resolver: zodResolver(professionalFormSchema),
     defaultValues: {
+      // Basic Info
       name: "",
       profession_type: "Athlete",
+      photo: "",
+      academy_name: "",
+      years_of_experience: 0,
       game_id: "",
+      
+      // Contact & Social Details
       contact_number: "",
+      whatsapp: "",
+      whatsapp_same_as_phone: false,
       email: "",
-      fee: 0,
-      fee_type: "Per Hour",
+      instagram_link: "",
+      youtube_link: "",
+      linkedin_link: "",
+      website: "",
+      facebook_link: "",
+      
+      // Professional Details
+      district_level_tournaments: 0,
+      state_level_tournaments: 0,
+      national_level_tournaments: 0,
+      international_level_tournaments: 0,
+      specialties: [],
+      certifications: [],
+      education: [],
+      accomplishments: [],
+      training_locations_detailed: [],
+      
+      // Media & Pricing
+      images: [],
+      videos: [],
+      one_on_one_price: 0,
+      group_session_price: 0,
+      online_price: 0,
+      free_demo_call: false,
+      
+      // About Me
+      about_me: "",
+      success_stories: [],
+      
+      // Legacy fields
       city: "",
       address: "",
       comments: "",
-      photo: "",
-      years_of_experience: 0,
+      fee: 0,
+      fee_type: "Per Hour",
       total_match_played: 0,
       awards: [],
-      accomplishments: [],
-      certifications: [],
       training_locations: [],
-      videos: [],
-      images: [],
       punch_line: "",
-      instagram_link: "",
-      facebook_link: "",
-      linkedin_link: "",
-      website: "",
-      youtube_link: "",
       level: undefined,
       coaching_availability: [],
     },
@@ -75,6 +102,13 @@ export const useRegisterProfessionalForm = (onSuccess: () => void, isUpdate: boo
       fee: Number(values.fee) || 0,
       years_of_experience: Number(values.years_of_experience) || 0,
       total_match_played: Number(values.total_match_played) || 0,
+      district_level_tournaments: Number(values.district_level_tournaments) || 0,
+      state_level_tournaments: Number(values.state_level_tournaments) || 0,
+      national_level_tournaments: Number(values.national_level_tournaments) || 0,
+      international_level_tournaments: Number(values.international_level_tournaments) || 0,
+      one_on_one_price: Number(values.one_on_one_price) || 0,
+      group_session_price: Number(values.group_session_price) || 0,
+      online_price: Number(values.online_price) || 0,
     };
     
     console.log('Processed values for submission:', processedValues);

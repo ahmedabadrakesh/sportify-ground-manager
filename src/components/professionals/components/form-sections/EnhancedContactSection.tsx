@@ -1,0 +1,151 @@
+import React from "react";
+import { UseFormReturn } from "react-hook-form";
+import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Checkbox } from "@/components/ui/checkbox";
+import { ProfessionalFormValues } from "../../schemas/professionalFormSchema";
+
+interface EnhancedContactSectionProps {
+  form: UseFormReturn<ProfessionalFormValues>;
+  userEmail?: string;
+  isUpdate?: boolean;
+}
+
+export const EnhancedContactSection = ({ form, userEmail, isUpdate = false }: EnhancedContactSectionProps) => {
+  const watchWhatsAppSame = form.watch("whatsapp_same_as_phone");
+  const watchContactNumber = form.watch("contact_number");
+
+  React.useEffect(() => {
+    if (watchWhatsAppSame && watchContactNumber) {
+      form.setValue("whatsapp", watchContactNumber);
+    }
+  }, [watchWhatsAppSame, watchContactNumber, form]);
+
+  return (
+    <div className="space-y-4">
+      <h3 className="text-lg font-semibold">Contact & Social Details</h3>
+      
+      <FormField
+        name="contact_number"
+        control={form.control}
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>Contact Number *</FormLabel>
+            <FormControl>
+              <Input {...field} placeholder="Phone number" />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+
+      <FormField
+        name="whatsapp_same_as_phone"
+        control={form.control}
+        render={({ field }) => (
+          <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+            <FormControl>
+              <Checkbox
+                checked={field.value}
+                onCheckedChange={field.onChange}
+              />
+            </FormControl>
+            <div className="space-y-1 leading-none">
+              <FormLabel>WhatsApp same as phone number</FormLabel>
+            </div>
+          </FormItem>
+        )}
+      />
+
+      {!watchWhatsAppSame && (
+        <FormField
+          name="whatsapp"
+          control={form.control}
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>WhatsApp Number</FormLabel>
+              <FormControl>
+                <Input {...field} placeholder="WhatsApp number" />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+      )}
+
+      <FormField
+        name="email"
+        control={form.control}
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>Email *</FormLabel>
+            <FormControl>
+              <Input {...field} type="email" placeholder="Email address" />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+
+      <div className="grid grid-cols-2 gap-4">
+        <FormField
+          name="instagram_link"
+          control={form.control}
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Instagram</FormLabel>
+              <FormControl>
+                <Input {...field} placeholder="Instagram profile URL" />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          name="youtube_link"
+          control={form.control}
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>YouTube</FormLabel>
+              <FormControl>
+                <Input {...field} placeholder="YouTube channel URL" />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+      </div>
+
+      <div className="grid grid-cols-2 gap-4">
+        <FormField
+          name="linkedin_link"
+          control={form.control}
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>LinkedIn</FormLabel>
+              <FormControl>
+                <Input {...field} placeholder="LinkedIn profile URL" />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          name="website"
+          control={form.control}
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Website</FormLabel>
+              <FormControl>
+                <Input {...field} placeholder="Personal website URL" />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+      </div>
+    </div>
+  );
+};
