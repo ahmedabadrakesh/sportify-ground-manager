@@ -25,11 +25,7 @@ export const useFormValidation = (form: UseFormReturn<ProfessionalFormValues>) =
         fieldsToValidate = [];
         break;
       case 5:
-        // Social media fields are optional, so we can proceed to step 6
-        fieldsToValidate = [];
-        break;
-      case 6:
-        // Final step - all validation will be handled by form submission
+        // Step 5 is About Me - no required fields
         fieldsToValidate = [];
         break;
       default:
