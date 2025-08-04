@@ -136,28 +136,52 @@ export const StepThree = ({ form }: StepThreeProps) => {
           </div>
         </div>
 
-        {/* Specialties */}
-        <FormField
-          name="specialties"
-          control={form.control}
-          render={({ field }) => (
-            <FormItem className="mb-6">
-              <FormLabel className="flex items-center gap-2">
-                <Target className="w-4 h-4" />
-                Specialties
-              </FormLabel>
-              <FormControl>
-                <ArrayFieldInput
-                  value={field.value || []}
-                  onChange={field.onChange}
-                  placeholder="Add specialty"
-                  label="Specialties"
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+        {/* Specialties and Achievements */}
+        <div className="grid md:grid-cols-2 gap-6 mb-6">
+          <FormField
+            name="specialties"
+            control={form.control}
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="flex items-center gap-2">
+                  <Target className="w-4 h-4" />
+                  Specialties
+                </FormLabel>
+                <FormControl>
+                  <ArrayFieldInput
+                    value={field.value || []}
+                    onChange={field.onChange}
+                    placeholder="Add specialty"
+                    label="Specialties"
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            name="accomplishments"
+            control={form.control}
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="flex items-center gap-2">
+                  <Award className="w-4 h-4" />
+                  Achievements
+                </FormLabel>
+                <FormControl>
+                  <ArrayFieldInput
+                    value={field.value || []}
+                    onChange={field.onChange}
+                    placeholder="Add achievement"
+                    label="Achievements"
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
 
         {/* Certifications & Education */}
         <div className="grid md:grid-cols-2 gap-6 mb-6">
@@ -205,29 +229,6 @@ export const StepThree = ({ form }: StepThreeProps) => {
             )}
           />
         </div>
-
-        {/* Achievements */}
-        <FormField
-          name="accomplishments"
-          control={form.control}
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel className="flex items-center gap-2">
-                <Award className="w-4 h-4" />
-                Achievements
-              </FormLabel>
-              <FormControl>
-                <ArrayFieldInput
-                  value={field.value || []}
-                  onChange={field.onChange}
-                  placeholder="Add achievement"
-                  label="Achievements"
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
       </div>
     </div>
   );
