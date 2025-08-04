@@ -4,18 +4,12 @@ import { Link } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { MapPin, Phone, Mail, Camera } from "lucide-react";
+import { MapPin, Phone, Mail, Camera, Target } from "lucide-react";
 import { getCurrentUserSync } from "@/utils/auth";
 
 const ProfessionalCard = ({ professional, onLoginClick }: { professional: any; onLoginClick?: () => void }) => {
   const currentUser = getCurrentUserSync();
   const isAuthenticated = !!currentUser;
-
-  const maskPhone = (phone: string) => {
-    if (!phone || isAuthenticated) return phone;
-    if (phone.length <= 4) return phone;
-    return phone.substring(0, 2) + "*".repeat(phone.length - 4) + phone.substring(phone.length - 2);
-  };
 
   // Extract years of experience from comments or use a default
   const getExperience = () => {
@@ -24,7 +18,7 @@ const ProfessionalCard = ({ professional, onLoginClick }: { professional: any; o
       if (match) return `${match[1]}+ Years`;
     }
     const yearsActive = new Date().getFullYear() - new Date(professional.created_at).getFullYear();
-    return `${yearsActive}+ Years`;
+    return `${Math.max(yearsActive, 1)}+ Years`;
   };
 
   // Mock client count based on experience
@@ -35,108 +29,102 @@ const ProfessionalCard = ({ professional, onLoginClick }: { professional: any; o
   };
 
   return (
-    <Card className="hover:shadow-lg transition-shadow duration-300 bg-card border border-border">
-      <CardContent className="p-6">
-        <div className="flex items-start gap-4 mb-4">
-          {/* Profile Image */}
-          <div className="relative flex-shrink-0">
-            <div className="w-16 h-16 rounded-full overflow-hidden bg-muted">
-              {professional.photo ? (
-                <img
-                  src={professional.photo}
-                  alt={professional.name}
-                  className="w-full h-full object-cover"
-                />
-              ) : (
-                <div className="w-full h-full bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center text-foreground font-bold text-xl">
-                  {professional.name?.charAt(0) || 'P'}
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* Main Info */}
-          <div className="flex-1 min-w-0">
-            <h3 className="text-lg font-semibold text-foreground mb-1">
-              {professional.name}
-            </h3>
-            <p className="text-sm text-muted-foreground mb-2">
-              {professional.profession_type}
-            </p>
-
-            {/* Stats Row */}
-            <div className="flex gap-4 mb-3">
-              <div className="text-xs">
-                <span className="font-medium text-foreground">{getExperience()}</span>
+    <Card className="p-6 hover:shadow-md transition-shadow bg-white border border-gray-200">
+      <div className="flex items-start gap-4 mb-4">
+        {/* Profile Image */}
+        <div className="flex-shrink-0">
+          <div className="w-12 h-12 rounded-full overflow-hidden bg-gray-200">
+            {professional.photo ? (
+              <img
+                src={professional.photo}
+                alt={professional.name}
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              <div className="w-full h-full bg-gray-300 flex items-center justify-center text-gray-600 font-bold text-sm">
+                {professional.name?.split(' ').map(n => n[0]).join('') || 'P'}
               </div>
-              <div className="text-xs">
-                <span className="font-medium text-foreground">{getClientCount()}</span>
-              </div>
-              <div className="text-xs">
-                <Badge variant="secondary" className="text-xs px-2 py-0.5">
-                  Certified
-                </Badge>
-              </div>
-            </div>
-
-            {/* Specialties */}
-            <div className="mb-3">
-              <p className="text-xs font-medium text-muted-foreground mb-1">
-                🎯 Specialties
-              </p>
-              <p className="text-sm text-foreground">
-                {professional.games?.name || "Sports Training"}, {professional.profession_type} +2 more
-              </p>
-            </div>
-
-            {/* Location */}
-            <div className="flex items-center gap-1 mb-3">
-              <MapPin className="h-3 w-3 text-muted-foreground" />
-              <span className="text-sm text-foreground">{professional.city}</span>
-            </div>
-
-            {/* Description */}
-            {professional.comments && (
-              <p className="text-sm text-muted-foreground mb-4 line-clamp-2">
-                {professional.comments}
-              </p>
             )}
-
-            {/* Contact Icons and Button */}
-            <div className="flex items-center justify-between">
-              <div className="flex gap-2">
-                <button 
-                  onClick={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    if (!isAuthenticated) onLoginClick?.();
-                  }}
-                  className="p-1 rounded hover:bg-muted transition-colors"
-                  title="Phone"
-                >
-                  <Phone className="h-4 w-4 text-muted-foreground" />
-                </button>
-                <button className="p-1 rounded hover:bg-muted transition-colors" title="Email">
-                  <Mail className="h-4 w-4 text-muted-foreground" />
-                </button>
-                <button className="p-1 rounded hover:bg-muted transition-colors" title="Gallery">
-                  <Camera className="h-4 w-4 text-muted-foreground" />
-                </button>
-              </div>
-
-              <Link to={`/professional/${professional.id}`}>
-                <Button 
-                  variant="default" 
-                  size="sm"
-                  className="bg-foreground text-background hover:bg-foreground/90"
-                >
-                  View Profile
-                </Button>
-              </Link>
-            </div>
           </div>
         </div>
-      </CardContent>
+
+        {/* Main Content */}
+        <div className="flex-1 min-w-0">
+          {/* Name and Profession */}
+          <h3 className="text-lg font-semibold text-gray-900 mb-1">
+            {professional.name}
+          </h3>
+          <p className="text-sm text-gray-600 mb-3">
+            {professional.profession_type}
+          </p>
+
+          {/* Stats Row */}
+          <div className="flex items-center gap-4 mb-4">
+            <span className="text-sm font-medium text-gray-700">{getExperience()}</span>
+            <span className="text-sm font-medium text-gray-700">{getClientCount()}</span>
+            <Badge variant="secondary" className="text-xs bg-gray-100 text-gray-700 border-0">
+              Certified
+            </Badge>
+          </div>
+
+          {/* Specialties */}
+          <div className="mb-4">
+            <div className="flex items-center gap-2 mb-2">
+              <Target className="h-4 w-4 text-gray-500" />
+              <span className="text-sm font-medium text-gray-700">Specialties</span>
+            </div>
+            <p className="text-sm text-gray-600">
+              {professional.games?.name || "Sports Training"}, {professional.profession_type} +2 more
+            </p>
+          </div>
+
+          {/* Location */}
+          <div className="flex items-center gap-2 mb-4">
+            <MapPin className="h-4 w-4 text-gray-500" />
+            <span className="text-sm text-gray-600">{professional.city}</span>
+          </div>
+
+          {/* Description */}
+          {professional.comments && (
+            <p className="text-sm text-gray-600 mb-4 line-clamp-2">
+              {professional.comments}
+            </p>
+          )}
+
+          {/* Bottom Row - Contact Icons and Button */}
+          <div className="flex items-center justify-between">
+            <div className="flex gap-2">
+              <button 
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  if (!isAuthenticated) onLoginClick?.();
+                }}
+                className="p-1.5 rounded hover:bg-gray-100 transition-colors"
+                title="Phone"
+              >
+                📞
+              </button>
+              <button className="p-1.5 rounded hover:bg-gray-100 transition-colors" title="Email">
+                ✉️
+              </button>
+              <button className="p-1.5 rounded hover:bg-gray-100 transition-colors" title="Gallery">
+                📷
+              </button>
+            </div>
+
+            <Link to={`/professional/${professional.id}`}>
+              <Button 
+                variant="default" 
+                size="sm"
+                className="bg-gray-800 text-white hover:bg-gray-700 px-4 py-2 text-sm"
+              >
+                View Profile
+              </Button>
+            </Link>
+          </div>
+        </div>
+      </div>
     </Card>
   );
 };

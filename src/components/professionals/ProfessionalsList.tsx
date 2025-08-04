@@ -79,9 +79,9 @@ const ProfessionalsList = ({ sportFilter }: ProfessionalsListProps) => {
 
   if (isLoading) {
     return (
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-7xl mx-auto">
         {[...Array(6)].map((_, i) => (
-          <div key={i} className="h-48 bg-gray-100 animate-pulse rounded-lg"></div>
+          <div key={i} className="h-80 bg-gray-100 animate-pulse rounded-lg"></div>
         ))}
       </div>
     );
@@ -114,7 +114,7 @@ const ProfessionalsList = ({ sportFilter }: ProfessionalsListProps) => {
 
   return (
     <>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-7xl mx-auto">
         {professionals?.map((professional) => (
           <ProfessionalCard 
             key={professional.id} 
