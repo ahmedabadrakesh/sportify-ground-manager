@@ -153,11 +153,26 @@ export const useProfessionalRegistration = (onSuccess: () => void, isUpdate: boo
         throw new Error("No existing profile found to update. Please create a new profile instead.");
       }
 
+      // Find the first game ID from games_played array if game_id is not set
+      let gameId = values.game_id;
+      if (!gameId && values.games_played && values.games_played.length > 0) {
+        // Find the game ID for the first selected game name
+        const { data: gameData } = await supabase
+          .from('games')
+          .select('id, name')
+          .eq('name', values.games_played[0])
+          .single();
+        
+        if (gameData) {
+          gameId = gameData.id;
+        }
+      }
+
       const professionalData = {
         user_id: userId,
         name: values.name,
         profession_type: values.profession_type,
-        game_id: values.game_id,
+        game_id: gameId,
         contact_number: values.contact_number,
         fee: Number(values.fee) || 0,
         fee_type: values.fee_type,
@@ -191,6 +206,7 @@ export const useProfessionalRegistration = (onSuccess: () => void, isUpdate: boo
         national_level_tournaments: Number(values.national_level_tournaments) || 0,
         international_level_tournaments: Number(values.international_level_tournaments) || 0,
         specialties: values.specialties || [],
+        games_played: values.games_played || [],
         education: values.education || [],
         training_locations_detailed: values.training_locations_detailed || [],
         one_on_one_price: Number(values.one_on_one_price) || 0,
