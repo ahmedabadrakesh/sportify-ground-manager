@@ -14,10 +14,10 @@ export const useFormValidation = (form: UseFormReturn<ProfessionalFormValues>) =
         fieldsToValidate = ["name", "email", "contact_number"];
         break;
       case 2:
-        fieldsToValidate = ["profession_type", "games_played", "fee", "fee_type"];
+        fieldsToValidate = ["profession_type", "fee", "fee_type"];
         break;
       case 3:
-        // Step 3 is Professional Details - games_played is the only required field
+        // Step 3 is Professional Details - games_played is required
         fieldsToValidate = ["games_played"];
         break;
       case 4:
