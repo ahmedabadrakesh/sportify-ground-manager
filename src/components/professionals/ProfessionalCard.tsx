@@ -102,7 +102,7 @@ const ProfessionalCard = ({
             </span>
           </div>
           <p className="text-xs text-left text-gray-600">
-            {professional.games?.name || "Sports Training"},{" "}
+            {professional.game_ids && professional.game_ids.length > 0 ? 'Multi-Sport Training' : "Sports Training"},{" "}
             {professional.profession_type} +2 more
           </p>
         </div>

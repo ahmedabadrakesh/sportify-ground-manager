@@ -247,7 +247,7 @@ const RegisterProfessionalDialog = ({
         form.reset({
           name: "",
           profession_type: "Athlete",
-          game_id: "",
+          games_played: [],
           contact_number: "",
           email: "",
           fee: 0,
@@ -283,7 +283,7 @@ const RegisterProfessionalDialog = ({
           photo: existingProfileData.photo || "",
           academy_name: existingProfileData.academy_name || "",
           years_of_experience: existingProfileData.years_of_experience || 0,
-          game_id: existingProfileData.game_id || "",
+          games_played: [],
           is_certified: existingProfileData.is_certified || false,
           
           // Contact & Social Details
@@ -303,7 +303,6 @@ const RegisterProfessionalDialog = ({
           national_level_tournaments: existingProfileData.national_level_tournaments || 0,
           international_level_tournaments: existingProfileData.international_level_tournaments || 0,
           specialties: existingProfileData.specialties || [],
-          games_played: [], // This field doesn't exist in database, keep empty
           certifications: existingProfileData.certifications || [],
           education: existingProfileData.education || [],
           accomplishments: existingProfileData.accomplishments || [],

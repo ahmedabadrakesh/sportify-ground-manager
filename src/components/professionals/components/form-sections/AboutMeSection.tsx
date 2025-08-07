@@ -27,7 +27,7 @@ export const AboutMeSection = ({ form }: AboutMeSectionProps) => {
 
   const generateAboutMe = () => {
     const values = form.getValues();
-    const about = `Professional ${values.profession_type} with ${values.years_of_experience || 0} years of experience in ${values.game_id}. ${values.academy_name ? `Associated with ${values.academy_name}.` : ''} ${values.specialties?.length ? `Specializes in ${values.specialties.join(', ')}.` : ''} ${values.accomplishments?.length ? `Notable achievements include ${values.accomplishments.slice(0, 2).join(' and ')}.` : ''}`.trim();
+    const about = `Professional ${values.profession_type} with ${values.years_of_experience || 0} years of experience in ${values.games_played?.join(', ') || 'sports'}. ${values.academy_name ? `Associated with ${values.academy_name}.` : ''} ${values.specialties?.length ? `Specializes in ${values.specialties.join(', ')}.` : ''} ${values.accomplishments?.length ? `Notable achievements include ${values.accomplishments.slice(0, 2).join(' and ')}.` : ''}`.trim();
     
     form.setValue("about_me", about);
   };

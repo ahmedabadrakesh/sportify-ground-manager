@@ -93,12 +93,12 @@ export const EnhancedBasicInfoSection = ({ form }: EnhancedBasicInfoSectionProps
       />
 
       <FormField
-        name="game_id"
+        name="games_played"
         control={form.control}
         render={({ field }) => (
           <FormItem>
-            <FormLabel>Game/Sport *</FormLabel>
-            <Select onValueChange={field.onChange} value={field.value}>
+            <FormLabel>Games/Sport *</FormLabel>
+            <Select onValueChange={(value) => field.onChange([value])} value={field.value?.[0] || ""}>
               <FormControl>
                 <SelectTrigger>
                   <SelectValue placeholder="Select a game/sport" />
@@ -106,7 +106,7 @@ export const EnhancedBasicInfoSection = ({ form }: EnhancedBasicInfoSectionProps
               </FormControl>
               <SelectContent>
                 {games?.map((game) => (
-                  <SelectItem key={game.id} value={game.id}>
+                  <SelectItem key={game.id} value={game.name}>
                     {game.name}
                   </SelectItem>
                 ))}

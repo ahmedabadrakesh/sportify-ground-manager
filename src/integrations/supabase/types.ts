@@ -557,8 +557,7 @@ export type Database = {
           fee: number
           fee_type: Database["public"]["Enums"]["fee_type"]
           free_demo_call: boolean | null
-          game_id: string
-          games_played: string[] | null
+          game_ids: string[] | null
           group_session_price: number | null
           id: string
           images: string[] | null
@@ -607,8 +606,7 @@ export type Database = {
           fee: number
           fee_type: Database["public"]["Enums"]["fee_type"]
           free_demo_call?: boolean | null
-          game_id: string
-          games_played?: string[] | null
+          game_ids?: string[] | null
           group_session_price?: number | null
           id?: string
           images?: string[] | null
@@ -657,8 +655,7 @@ export type Database = {
           fee?: number
           fee_type?: Database["public"]["Enums"]["fee_type"]
           free_demo_call?: boolean | null
-          game_id?: string
-          games_played?: string[] | null
+          game_ids?: string[] | null
           group_session_price?: number | null
           id?: string
           images?: string[] | null
@@ -690,13 +687,6 @@ export type Database = {
           youtube_link?: string | null
         }
         Relationships: [
-          {
-            foreignKeyName: "sports_professionals_game_id_fkey"
-            columns: ["game_id"]
-            isOneToOne: false
-            referencedRelation: "games"
-            referencedColumns: ["id"]
-          },
           {
             foreignKeyName: "sports_professionals_user_id_fkey"
             columns: ["user_id"]

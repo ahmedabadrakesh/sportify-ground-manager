@@ -15,7 +15,7 @@ export const useRegisterProfessionalForm = (onSuccess: () => void, isUpdate: boo
       photo: "",
       academy_name: "",
       years_of_experience: 0,
-      game_id: "",
+      
       
       // Contact & Social Details
       contact_number: "",

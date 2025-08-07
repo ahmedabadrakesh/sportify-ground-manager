@@ -81,7 +81,7 @@ const AdminSportsProfessionals = () => {
                   />
                 </TableCell>
                 <TableCell>{professional.name}</TableCell>
-                <TableCell>{professional.games?.name}</TableCell>
+                <TableCell>{professional.game_ids && professional.game_ids.length > 0 ? professional.game_ids.length + ' games' : 'No games'}</TableCell>
                 <TableCell>{professional.profession_type}</TableCell>
                 <TableCell>₹{professional.fee} {professional.fee_type}</TableCell>
                 <TableCell>{professional.city}</TableCell>

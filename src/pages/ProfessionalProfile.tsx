@@ -357,7 +357,7 @@ const ProfessionalProfile = () => {
                   {toTitleCase(professional.name)}
                 </h1>
                 <p className="text-xl lg:text-xl text-gray-300 mb-6">
-                  {professional.profession_type}, {professional.games?.name}
+                  {professional.profession_type}, {professional.game_ids && professional.game_ids.length > 0 ? 'Multi-Sport Professional' : 'Sports Professional'}
                 </p>
 
                 {/* Achievement Badges */}

@@ -13,7 +13,7 @@ export const professionalFormSchema = z.object({
   photo: z.string().optional(),
   academy_name: z.string().optional(),
   years_of_experience: z.union([z.string(), z.number()]).transform((val) => Number(val) || 0).optional(),
-  game_id: z.string().min(1, "Please select a game"),
+  games_played: z.array(z.string()).min(1, "At least one game is required"),
   is_certified: z.boolean().optional(),
   
   // Contact & Social Details
@@ -33,7 +33,6 @@ export const professionalFormSchema = z.object({
   national_level_tournaments: z.union([z.string(), z.number()]).transform((val) => Number(val) || 0).optional(),
   international_level_tournaments: z.union([z.string(), z.number()]).transform((val) => Number(val) || 0).optional(),
   specialties: z.array(z.string()).optional(),
-  games_played: z.array(z.string()).optional(),
   certifications: z.array(z.string()).optional(),
   education: z.array(z.string()).optional(),
   accomplishments: z.array(z.string()).optional(),

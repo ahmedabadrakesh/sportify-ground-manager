@@ -34,7 +34,6 @@ const EditProfessionalDialog = ({ open, onOpenChange, professional }: EditProfes
     defaultValues: {
       name: professional.name,
       profession_type: professional.profession_type,
-      game_id: professional.game_id,
       contact_number: professional.contact_number,
       fee: professional.fee,
       fee_type: professional.fee_type,
@@ -75,22 +74,16 @@ const EditProfessionalDialog = ({ open, onOpenChange, professional }: EditProfes
             form.setValue('email', userData.email);
           }
 
-          // Fetch game name if game_id exists to populate games_played
-          if (professional.game_id) {
+          // Fetch game names from game IDs to populate games_played
+          if (professional.game_ids && Array.isArray(professional.game_ids) && professional.game_ids.length > 0) {
             const { data: gameData, error: gameError } = await supabase
               .from('games')
               .select('name')
-              .eq('id', professional.game_id)
-              .single();
+              .in('id', professional.game_ids);
             
             if (gameData && !gameError) {
-              form.setValue('games_played', [gameData.name]);
+              form.setValue('games_played', gameData.map(game => game.name));
             }
-          }
-
-          // Also populate games_played from the database if it exists
-          if (professional.games_played && Array.isArray(professional.games_played)) {
-            form.setValue('games_played', professional.games_played);
           }
         } catch (error) {
           console.error('Error fetching related data:', error);
@@ -101,7 +94,7 @@ const EditProfessionalDialog = ({ open, onOpenChange, professional }: EditProfes
     if (open) {
       fetchUserEmailAndGameName();
     }
-  }, [open, professional.user_id, professional.game_id, professional.games_played, form]);
+  }, [open, professional.user_id, professional.game_ids, form]);
 
   const updateMutation = useMutation({
     mutationFn: async (values: ProfessionalFormValues) => {
@@ -109,17 +102,16 @@ const EditProfessionalDialog = ({ open, onOpenChange, professional }: EditProfes
         throw new Error("You don't have permission to edit this profile");
       }
 
-      // Find the first game ID from games_played array if game_id needs to be updated
-      let gameId = values.game_id;
-      if (!gameId && values.games_played && values.games_played.length > 0) {
+      // Convert game names to game IDs
+      let gameIds: string[] = [];
+      if (values.games_played && values.games_played.length > 0) {
         const { data: gameData } = await supabase
           .from('games')
           .select('id, name')
-          .eq('name', values.games_played[0])
-          .single();
+          .in('name', values.games_played);
         
         if (gameData) {
-          gameId = gameData.id;
+          gameIds = gameData.map(game => game.id);
         }
       }
 
@@ -128,8 +120,7 @@ const EditProfessionalDialog = ({ open, onOpenChange, professional }: EditProfes
         .update({
           name: values.name,
           profession_type: values.profession_type,
-          game_id: gameId,
-          games_played: values.games_played || [],
+          game_ids: gameIds,
           contact_number: values.contact_number,
           fee: values.fee,
           fee_type: values.fee_type,
