@@ -60,16 +60,9 @@ const ProfessionalProfile = () => {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("sports_professionals")
-        .select(
-          `
-          *,
-          games (
-            name
-          )
-        `
-        )
+        .select("*")
         .eq("id", id)
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
       return data;
@@ -87,7 +80,7 @@ const ProfessionalProfile = () => {
         .from("users")
         .select("email")
         .eq("id", professional.user_id)
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
       return data;
