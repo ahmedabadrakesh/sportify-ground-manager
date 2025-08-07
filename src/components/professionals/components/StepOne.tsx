@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { UseFormReturn } from "react-hook-form";
 import {
@@ -34,7 +33,7 @@ interface StepOneProps {
 export const StepOne = ({ form }: StepOneProps) => {
   const professionTypes: ProfessionType[] = [
     "Athlete",
-    "Coach", 
+    "Coach",
     "Trainer",
     "Sports Manager",
     "Support Staff",
@@ -47,7 +46,7 @@ export const StepOne = ({ form }: StepOneProps) => {
   const [suggestedPunchLine, setSuggestedPunchLine] = useState(
     form.getValues("punch_line")
   );
-  
+
   const punchLineData = [
     "I don't build athletes—I build belief.",
     "Greatness starts with guidance.",
@@ -72,9 +71,9 @@ export const StepOne = ({ form }: StepOneProps) => {
   ];
 
   return (
-    <div className="space-y-8">
-      <h3 className="text-lg font-semibold">Basic Information</h3>
-      
+    <div className="w-[99%]">
+      <h2 className="text-2xl font-bold mb-4">Basic Information</h2>
+      <hr className="pb-6" />
       {/* Top Row: Photo Upload (Left) and Coach Details (Right) */}
       <div className="grid lg:grid-cols-2 gap-8">
         {/* Left Side: Photo Upload */}
@@ -126,13 +125,13 @@ export const StepOne = ({ form }: StepOneProps) => {
       </div>
 
       {/* Punch Line - Full Width Row */}
-      <div className="space-y-2">
+      <div className="pt-4 pb-4">
         <FormField
           name="punch_line"
           control={form.control}
           render={({ field }) => (
-            <FormItem>
-              <FormLabel>Punch Line</FormLabel>
+            <FormItem className="flex flex-col justify-between rounded-lg border p-4">
+              <FormLabel className="items-left">Punch Line</FormLabel>
               <FormControl>
                 <Input
                   {...field}
@@ -145,16 +144,16 @@ export const StepOne = ({ form }: StepOneProps) => {
                 />
               </FormControl>
               <FormMessage />
+              <TextSuggestionCarousel
+                suggestions={punchLineData}
+                className="w-full"
+                setSuggestedPunchLine={(value) => {
+                  form.setValue("punch_line", value);
+                  setSuggestedPunchLine(value);
+                }}
+              />
             </FormItem>
           )}
-        />
-        <TextSuggestionCarousel
-          suggestions={punchLineData}
-          className="max-w-full"
-          setSuggestedPunchLine={(value) => {
-            form.setValue("punch_line", value);
-            setSuggestedPunchLine(value);
-          }}
         />
       </div>
 
@@ -189,10 +188,10 @@ export const StepOne = ({ form }: StepOneProps) => {
                 <Input
                   type="number"
                   {...field}
-                  value={field.value || ''}
+                  value={field.value || ""}
                   onChange={(e) => {
                     const value = e.target.value;
-                    field.onChange(value === '' ? undefined : Number(value));
+                    field.onChange(value === "" ? undefined : Number(value));
                   }}
                   placeholder="Enter years of experience"
                   min="0"

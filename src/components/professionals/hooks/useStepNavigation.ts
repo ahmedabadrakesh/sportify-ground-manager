@@ -7,7 +7,7 @@ import { ProfessionalFormValues } from "../schemas/professionalFormSchema";
 export const useStepNavigation = (form: UseFormReturn<ProfessionalFormValues>) => {
   const [currentStep, setCurrentStep] = useState(1);
   const totalSteps = 5;
-  const stepTitles = ["Basic Info", "Professional", "Professional Details", "Training Info", "About Me"];
+  const stepTitles = ["Basic Info", "Contact Details", "Professional Details", "Training Info", "About Me"];
   
   const { validateStepAndShowError } = useFormValidation(form);
 

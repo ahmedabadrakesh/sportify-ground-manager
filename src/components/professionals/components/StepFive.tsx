@@ -13,14 +13,14 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ProfessionalFormValues } from "../schemas/professionalFormSchema";
 import { ArrayFieldInput } from "./ArrayFieldInput";
-import { 
-  User, 
-  Camera, 
-  Video, 
-  Star, 
-  Plus, 
+import {
+  User,
+  Camera,
+  Video,
+  Star,
+  Plus,
   Trash2,
-  Sparkles
+  Sparkles,
 } from "lucide-react";
 
 interface StepFiveProps {
@@ -36,8 +36,9 @@ export const StepFive = ({ form }: StepFiveProps) => {
     const gamesPlayed = formData.games_played?.join(", ") || "various sports";
     const experience = formData.years_of_experience || "several years";
     const professionType = formData.profession_type || "professional";
-    const specialties = formData.specialties?.slice(0, 3).join(", ") || "coaching and training";
-    
+    const specialties =
+      formData.specialties?.slice(0, 3).join(", ") || "coaching and training";
+
     const aboutMeText = `I am a passionate ${professionType.toLowerCase()} with ${experience} years of experience in ${gamesPlayed}. My expertise lies in ${specialties}, and I am dedicated to helping athletes reach their full potential through personalized training programs and professional guidance.
 
 I have participated in numerous tournaments and competitions, bringing real-world experience to my coaching methodology. My approach focuses on not just improving technical skills but also building mental strength and strategic thinking.
@@ -51,7 +52,7 @@ Whether you're a beginner looking to start your sports journey or an experienced
     const currentStories = form.getValues("success_stories") || [];
     form.setValue("success_stories", [
       ...currentStories,
-      { client_name: "", age: 0, story_details: "" }
+      { client_name: "", age: 0, story_details: "" },
     ]);
   };
 
@@ -61,7 +62,11 @@ Whether you're a beginner looking to start your sports journey or an experienced
     form.setValue("success_stories", newStories);
   };
 
-  const updateSuccessStory = (index: number, field: string, value: string | number) => {
+  const updateSuccessStory = (
+    index: number,
+    field: string,
+    value: string | number
+  ) => {
     const currentStories = form.getValues("success_stories") || [];
     const newStories = [...currentStories];
     newStories[index] = { ...newStories[index], [field]: value };
@@ -71,8 +76,9 @@ Whether you're a beginner looking to start your sports journey or an experienced
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-2xl font-bold mb-6">About Me</h2>
-        
+        <h2 className="text-2xl font-bold mb-4">About Me</h2>
+        <hr className="pb-6" />
+
         {/* Training Photos */}
         <FormField
           name="images"
@@ -92,7 +98,8 @@ Whether you're a beginner looking to start your sports journey or an experienced
                 />
               </FormControl>
               <p className="text-xs text-muted-foreground">
-                Upload multiple photos showcasing your training sessions, facilities, and achievements.
+                Upload multiple photos showcasing your training sessions,
+                facilities, and achievements.
               </p>
               <FormMessage />
             </FormItem>
@@ -118,7 +125,8 @@ Whether you're a beginner looking to start your sports journey or an experienced
                 />
               </FormControl>
               <p className="text-xs text-muted-foreground">
-                Share links to your Instagram reels, training videos, and snippets that showcase your coaching style.
+                Share links to your Instagram reels, training videos, and
+                snippets that showcase your coaching style.
               </p>
               <FormMessage />
             </FormItem>
@@ -155,7 +163,8 @@ Whether you're a beginner looking to start your sports journey or an experienced
                 />
               </FormControl>
               <p className="text-xs text-muted-foreground">
-                Click "Auto Generate" to create content based on your form data, then edit as needed.
+                Click "Auto Generate" to create content based on your form data,
+                then edit as needed.
               </p>
               <FormMessage />
             </FormItem>
@@ -172,13 +181,18 @@ Whether you're a beginner looking to start your sports journey or an experienced
           </CardHeader>
           <CardContent className="space-y-4">
             {successStories.map((story, index) => (
-              <div key={index} className="grid md:grid-cols-3 gap-4 p-4 border rounded-lg relative">
+              <div
+                key={index}
+                className="grid md:grid-cols-3 gap-4 p-4 border rounded-lg relative"
+              >
                 <div>
                   <FormLabel>Client Name</FormLabel>
                   <Input
                     placeholder="Client's name"
                     value={story.client_name}
-                    onChange={(e) => updateSuccessStory(index, "client_name", e.target.value)}
+                    onChange={(e) =>
+                      updateSuccessStory(index, "client_name", e.target.value)
+                    }
                   />
                 </div>
                 <div>
@@ -187,7 +201,13 @@ Whether you're a beginner looking to start your sports journey or an experienced
                     type="number"
                     placeholder="Age"
                     value={story.age || ""}
-                    onChange={(e) => updateSuccessStory(index, "age", parseInt(e.target.value) || 0)}
+                    onChange={(e) =>
+                      updateSuccessStory(
+                        index,
+                        "age",
+                        parseInt(e.target.value) || 0
+                      )
+                    }
                   />
                 </div>
                 <div className="md:col-span-1">
@@ -195,7 +215,9 @@ Whether you're a beginner looking to start your sports journey or an experienced
                   <Textarea
                     placeholder="Describe the success story..."
                     value={story.story_details}
-                    onChange={(e) => updateSuccessStory(index, "story_details", e.target.value)}
+                    onChange={(e) =>
+                      updateSuccessStory(index, "story_details", e.target.value)
+                    }
                     className="min-h-[80px]"
                   />
                 </div>
@@ -230,8 +252,9 @@ Whether you're a beginner looking to start your sports journey or an experienced
             Profile Tip
           </h3>
           <p className="text-sm text-muted-foreground">
-            Share authentic success stories and training content to build credibility. 
-            High-quality photos and videos of your training sessions help potential clients understand your coaching style.
+            Share authentic success stories and training content to build
+            credibility. High-quality photos and videos of your training
+            sessions help potential clients understand your coaching style.
           </p>
         </div>
       </div>

@@ -28,9 +28,10 @@ export const StepTwo = ({ form, userEmail, isUpdate }: StepTwoProps) => {
   }, [watchWhatsAppSame, watchContactNumber, form]);
 
   return (
-    <div className="space-y-6">
-      <h3 className="text-lg font-semibold">Contact & Social Details</h3>
-      
+    <div className="w-[99%]">
+      <h2 className="text-2xl font-bold mb-4">Contact & Social Details</h2>
+      <hr className="pb-6" />
+
       {/* Contact Number & Email in Single Row */}
       <div className="grid lg:grid-cols-2 gap-6">
         <FormField
@@ -107,7 +108,7 @@ export const StepTwo = ({ form, userEmail, isUpdate }: StepTwoProps) => {
       {/* Social Media Links */}
       <div className="space-y-4">
         <h4 className="text-md font-medium">Social Media Links</h4>
-        
+
         <div className="grid lg:grid-cols-2 gap-4">
           <FormField
             name="instagram_link"

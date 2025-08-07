@@ -20,17 +20,19 @@ interface StepThreeProps {
 
 export const StepThree = ({ form }: StepThreeProps) => {
   const { games } = useGames();
-  const gameOptions = games?.map(game => ({ 
-    label: game.name, 
-    value: game.name,
-    icon: Gamepad2
-  })) || [];
+  const gameOptions =
+    games?.map((game) => ({
+      label: game.name,
+      value: game.name,
+      icon: Gamepad2,
+    })) || [];
 
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-2xl font-bold mb-6">Professional Details</h2>
-        
+        <h2 className="text-2xl font-bold mb-4">Professional Details</h2>
+        <hr className="pb-6" />
+
         {/* Games/Sport Multi Select */}
         <FormField
           name="games_played"
@@ -69,17 +71,13 @@ export const StepThree = ({ form }: StepThreeProps) => {
                 <FormItem>
                   <FormLabel>District Level</FormLabel>
                   <FormControl>
-                    <Input
-                      type="number"
-                      {...field}
-                      placeholder="0"
-                    />
+                    <Input type="number" {...field} placeholder="0" />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
-            
+
             <FormField
               name="state_level_tournaments"
               control={form.control}
@@ -87,17 +85,13 @@ export const StepThree = ({ form }: StepThreeProps) => {
                 <FormItem>
                   <FormLabel>State Level</FormLabel>
                   <FormControl>
-                    <Input
-                      type="number"
-                      {...field}
-                      placeholder="0"
-                    />
+                    <Input type="number" {...field} placeholder="0" />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
-            
+
             <FormField
               name="national_level_tournaments"
               control={form.control}
@@ -105,17 +99,13 @@ export const StepThree = ({ form }: StepThreeProps) => {
                 <FormItem>
                   <FormLabel>National Level</FormLabel>
                   <FormControl>
-                    <Input
-                      type="number"
-                      {...field}
-                      placeholder="0"
-                    />
+                    <Input type="number" {...field} placeholder="0" />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
-            
+
             <FormField
               name="international_level_tournaments"
               control={form.control}
@@ -123,11 +113,7 @@ export const StepThree = ({ form }: StepThreeProps) => {
                 <FormItem>
                   <FormLabel>International</FormLabel>
                   <FormControl>
-                    <Input
-                      type="number"
-                      {...field}
-                      placeholder="0"
-                    />
+                    <Input type="number" {...field} placeholder="0" />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
