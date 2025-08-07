@@ -275,47 +275,64 @@ const RegisterProfessionalDialog = ({
       } else if (isUpdate && existingProfileData) {
         console.log("Pre-filling with existing data:", existingProfileData);
 
-        // Set each field individually to ensure proper type conversion
-        const fieldsToSet = [
-          ["name", existingProfileData.name || ""],
-          ["profession_type", existingProfileData.profession_type || "Athlete"],
-          ["game_id", existingProfileData.game_id || ""],
-          ["contact_number", existingProfileData.contact_number || ""],
-          ["email", userEmail],
-          ["fee", existingProfileData.fee || 0],
-          ["fee_type", existingProfileData.fee_type || "Per Hour"],
-          ["city", existingProfileData.city || ""],
-          ["address", existingProfileData.address || ""],
-          ["comments", existingProfileData.comments || ""],
-          ["photo", existingProfileData.photo || ""],
-          [
-            "years_of_experience",
-            existingProfileData.years_of_experience || undefined,
-          ],
-          [
-            "total_match_played",
-            existingProfileData.total_match_played || undefined,
-          ],
-          ["awards", existingProfileData.awards || []],
-          ["accomplishments", existingProfileData.accomplishments || []],
-          ["certifications", existingProfileData.certifications || []],
-          ["training_locations", existingProfileData.training_locations || []],
-          ["videos", existingProfileData.videos || []],
-          ["images", existingProfileData.images || []],
-          ["punch_line", existingProfileData.punch_line || ""],
-          ["instagram_link", existingProfileData.instagram_link || ""],
-          ["facebook_link", existingProfileData.facebook_link || ""],
-          ["linkedin_link", existingProfileData.linkedin_link || ""],
-          ["website", existingProfileData.website || ""],
-          ["level", existingProfileData.level || undefined],
-          [
-            "coaching_availability",
-            existingProfileData.coaching_availability || [],
-          ],
-        ];
-
-        fieldsToSet.forEach(([field, value]) => {
-          form.setValue(field as any, value);
+        // Use form.reset with the complete object to ensure proper type handling
+        form.reset({
+          // Basic Info
+          name: existingProfileData.name || "",
+          profession_type: existingProfileData.profession_type || "Athlete",
+          photo: existingProfileData.photo || "",
+          academy_name: existingProfileData.academy_name || "",
+          years_of_experience: existingProfileData.years_of_experience || 0,
+          game_id: existingProfileData.game_id || "",
+          is_certified: existingProfileData.is_certified || false,
+          
+          // Contact & Social Details
+          contact_number: existingProfileData.contact_number || "",
+          whatsapp: existingProfileData.whatsapp || "",
+          whatsapp_same_as_phone: existingProfileData.whatsapp_same_as_phone || false,
+          email: userEmail,
+          instagram_link: existingProfileData.instagram_link || "",
+          youtube_link: existingProfileData.youtube_link || "",
+          linkedin_link: existingProfileData.linkedin_link || "",
+          website: existingProfileData.website || "",
+          facebook_link: existingProfileData.facebook_link || "",
+          
+          // Professional Details
+          district_level_tournaments: existingProfileData.district_level_tournaments || 0,
+          state_level_tournaments: existingProfileData.state_level_tournaments || 0,
+          national_level_tournaments: existingProfileData.national_level_tournaments || 0,
+          international_level_tournaments: existingProfileData.international_level_tournaments || 0,
+          specialties: existingProfileData.specialties || [],
+          games_played: [], // This field doesn't exist in database, keep empty
+          certifications: existingProfileData.certifications || [],
+          education: existingProfileData.education || [],
+          accomplishments: existingProfileData.accomplishments || [],
+          training_locations_detailed: existingProfileData.training_locations_detailed || [],
+          
+          // Media & Pricing
+          images: existingProfileData.images || [],
+          videos: existingProfileData.videos || [],
+          one_on_one_price: existingProfileData.one_on_one_price || 0,
+          group_session_price: existingProfileData.group_session_price || 0,
+          online_price: existingProfileData.online_price || 0,
+          free_demo_call: existingProfileData.free_demo_call || false,
+          
+          // About Me
+          about_me: existingProfileData.about_me || "",
+          success_stories: existingProfileData.success_stories || [],
+          
+          // Legacy fields
+          city: existingProfileData.city || "",
+          address: existingProfileData.address || "",
+          comments: existingProfileData.comments || "",
+          fee: existingProfileData.fee || 0,
+          fee_type: existingProfileData.fee_type || "Per Hour",
+          total_match_played: existingProfileData.total_match_played || 0,
+          awards: existingProfileData.awards || [],
+          training_locations: existingProfileData.training_locations || [],
+          punch_line: existingProfileData.punch_line || "",
+          level: existingProfileData.level || undefined,
+          coaching_availability: existingProfileData.coaching_availability || [],
         });
 
         console.log("Form values after pre-fill:", form.getValues());
