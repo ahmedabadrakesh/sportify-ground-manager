@@ -575,7 +575,7 @@ export type Database = {
           punch_line: string | null
           specialties: string[] | null
           state_level_tournaments: number | null
-          success_stories: Json | null
+          success_stories: {story_details:string, age:number, client_name:string}[] | null
           total_match_played: number | null
           training_locations: string[] | null
           training_locations_detailed: Json | null

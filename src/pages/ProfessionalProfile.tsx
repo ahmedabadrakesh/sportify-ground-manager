@@ -33,6 +33,9 @@ import {
   Award,
   Trophy,
   CheckCircle,
+  Phone,
+  Mail,
+  Clock,
 } from "lucide-react";
 import VideoGallery from "@/components/professionals/components/VideoGallery";
 import ImageGallery from "@/components/professionals/components/ImageGallery";
@@ -42,10 +45,19 @@ import RegisterProfessionalDialog from "@/components/professionals/RegisterProfe
 import AuthRequiredDialog from "@/components/auth/AuthRequiredDialog";
 import coachProfileImage from "@/assets/coach-profile.jpg";
 import { getInitials, toTitleCase } from "@/lib/utils";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel";
+import trainingPhoto1 from "@/assets/coach-profile.jpg";
+import { Separator } from "@radix-ui/react-select";
 
 const ProfessionalProfile = () => {
   const { id } = useParams<{ id: string }>();
-  const [isAboutRReadMoreOpened, setIsAboutRReadMoreOpened] =
+  const [isAboutReadMoreOpened, setisAboutReadMoreOpened] =
     useState<boolean>(false);
   const [showContactDetails, setShowContactDetails] = useState<boolean>(false);
   const [isUpdateDialogOpen, setIsUpdateDialogOpen] = useState(false);
@@ -295,14 +307,14 @@ const ProfessionalProfile = () => {
     <MainLayout>
       <div>
         {/* Header Section */}
-        <div className="bg-gradient-to-r from-slate-800 to-slate-900 text-white py-16">
+        <div className="from-slate-800 to-slate-900 text-white py-4 ">
           <div className="container mx-auto px-4">
             {/* Back button and Update Profile button */}
             <div className="mb-8 flex justify-between items-center">
               <Link to="/sports-professionals">
                 <Button
                   variant="ghost"
-                  className="flex items-center gap-2 text-white hover:bg-white/10"
+                  className="flex bg-gradient-to-r items-center gap-2 hover:bg-white"
                 >
                   <ArrowLeft className="h-4 w-4" />
                   Back to Professionals
@@ -320,7 +332,7 @@ const ProfessionalProfile = () => {
             </div>
 
             {/* Profile Header */}
-            <div className="flex flex-col lg:flex-row items-center lg:items-start gap-8">
+            <div className="bg-gradient-to-r p-12 flex flex-col lg:flex-row items-center lg:items-start gap-8">
               {/* Avatar and Initials */}
               <div className="relative">
                 <div className="w-32 h-32 lg:w-32 ml-32 lg:h-32 rounded-full bg-gradient-to-br from-blue-400 to-purple-600 flex items-center justify-center text-white text-4xl lg:text-6xl font-bold">
@@ -350,7 +362,10 @@ const ProfessionalProfile = () => {
                   {toTitleCase(professional.name)}
                 </h1>
                 <p className="text-xl lg:text-xl text-gray-300 mb-6">
-                  {professional.profession_type}, {professional.game_ids && professional.game_ids.length > 0 ? 'Multi-Sport Professional' : 'Sports Professional'}
+                  {professional.profession_type},{" "}
+                  {professional.game_ids && professional.game_ids.length > 0
+                    ? "Multi-Sport Professional"
+                    : "Sports Professional"}
                 </p>
 
                 {/* Achievement Badges */}
@@ -363,7 +378,7 @@ const ProfessionalProfile = () => {
                       {professional.years_of_experience}+ Years Experience
                     </Badge>
                   )}
-                  {/* {coach.clientsTrained && ( */}
+                  {/* {professional.clientsTrained && ( */}
                   <Badge
                     variant="secondary"
                     className="bg-primary-foreground/20 text-primary-foreground border-primary-foreground/30"
@@ -414,37 +429,40 @@ const ProfessionalProfile = () => {
             </div>
           </div>
         </div>
-
         {/* Main Content */}
         <div className="container mx-auto px-4 py-12">
           <div className="grid lg:grid-cols-3 gap-8">
             {/* Left Column - Main Content */}
             <div className="lg:col-span-2 space-y-8">
               {/* About Me Section */}
-              {professional.comments && (
-                <Card className="bg-white">
-                  <CardHeader>
+              {professional.about_me && (
+                <Card className="shadow-elegant border-2 border-primary bg-muted/20">
+                  <CardHeader className="bg-primary text-primary-foreground">
                     <CardTitle className="flex items-center gap-2">
-                      <Quote className="h-5 w-5 text-primary" />
+                      <Quote className="h-5 w-5" />
                       About Me
                     </CardTitle>
                   </CardHeader>
-                  <CardContent>
-                    <p className="text-gray-700 text-left leading-relaxed">
-                      {isAboutRReadMoreOpened
-                        ? professional.comments
-                        : getFiftyWords(professional.comments, 50)}
-                      {professional.comments.length >= 50 && (
-                        <button
-                          onClick={() =>
-                            setIsAboutRReadMoreOpened(!isAboutRReadMoreOpened)
-                          }
-                          className="ml-2 text-primary hover:underline font-medium"
-                        >
-                          {isAboutRReadMoreOpened ? "Read Less" : "Read More"}
-                        </button>
-                      )}
-                    </p>
+                  <CardContent className="p-6">
+                    <div className="relative">
+                      <Quote className="absolute -top-2 -left-2 w-8 h-8 text-accent/30" />
+                      <p className="text-foreground text-gray-700 text-left leading-relaxed">
+                        {isAboutReadMoreOpened
+                          ? professional.about_me
+                          : getFiftyWords(professional.about_me, 50)}
+                        {professional.about_me.length >= 50 && (
+                          <button
+                            onClick={() =>
+                              setisAboutReadMoreOpened(!isAboutReadMoreOpened)
+                            }
+                            className="ml-2 text-primary hover:underline font-medium"
+                          >
+                            {isAboutReadMoreOpened ? "Read Less" : "Read More"}
+                          </button>
+                        )}
+                      </p>
+                      <Quote className="absolute -bottom-2 -right-2 w-8 h-8 text-accent/30 rotate-180" />
+                    </div>
                   </CardContent>
                 </Card>
               )}
@@ -454,52 +472,56 @@ const ProfessionalProfile = () => {
                 professional.accomplishments.length > 0 && (
                   <Card className="bg-white ">
                     <CardHeader>
-                      <CardTitle className="flex items-center gap-2">
-                        <Target className="h-5 w-5 text-primary" />
+                      <CardTitle className="flex items-center gap-2 text-primary">
+                        <Award className="w-5 h-5" />
                         Specialties
                       </CardTitle>
                     </CardHeader>
                     <CardContent>
-                      <ul className="space-y-2">
-                        {professional.accomplishments.map((item, index) => (
-                          <li key={index} className="flex items-start gap-3">
-                            <CheckCircle
-                              className="w-4 h-4 text-success"
-                              color="green"
-                            />
-                            <span className="text-gray-700">{item}</span>
-                          </li>
-                        ))}
-                      </ul>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        {professional.accomplishments.map(
+                          (specialty, index) => (
+                            <div
+                              key={index}
+                              className="flex items-center gap-2"
+                            >
+                              <CheckCircle className="w-4 h-4 text-success" />
+                              <span className="text-sm">{specialty}</span>
+                            </div>
+                          )
+                        )}
+                      </div>
                     </CardContent>
                   </Card>
                 )}
 
               {/* Success Stories */}
-              {professional.awards && professional.awards.length > 0 && (
-                <Card className="bg-white">
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <Trophy className="h-5 w-5 text-primary" />
-                      Success Stories
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-6">
-                      {professional.awards.map((story, index) => (
+              {professional.success_stories &&
+                professional.success_stories.length > 0 && (
+                  <Card className="bg-white">
+                    <CardHeader>
+                      <CardTitle className="flex items-center gap-2">
+                        <Trophy className="h-5 w-5 text-primary" />
+                        Success Stories
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-6">
+                      {professional.success_stories.map((story, index) => (
                         <div
                           key={index}
-                          className="border-l-4 border-green-500 pl-4"
+                          className="border-l-4 border-success pl-4"
                         >
+                          <h4 className="font-semibold text-left text-foreground">
+                            {story.client_name} (Age {story.age})
+                          </h4>
                           <p className="text-sm text-left text-muted-foreground mt-1">
-                            {story}
+                            {story.story_details}
                           </p>
                         </div>
                       ))}
-                    </div>
-                  </CardContent>
-                </Card>
-              )}
+                    </CardContent>
+                  </Card>
+                )}
 
               {/* Training Gallery */}
               {professional.images && professional.images.length > 0 && (
@@ -511,7 +533,28 @@ const ProfessionalProfile = () => {
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <ImageGallery images={professional.images} />
+                    {/* <ImageGallery images={professional.images} /> */}
+                    <Carousel className="w-full">
+                      <CarouselContent>
+                        {professional.images.map((photo, index) => (
+                          <CarouselItem
+                            key={index}
+                            className="md:basis-1/2 lg:basis-1/3"
+                          >
+                            <div className="rounded-lg overflow-hidden shadow-md">
+                              <img
+                                src={photo || trainingPhoto1}
+                                alt={photo}
+                                className="w-full h-48 object-cover"
+                              />
+                              {/* <div className="p-3 bg-card">
+                                <p className="text-sm font-medium">{photo}</p>
+                              </div> */}
+                            </div>
+                          </CarouselItem>
+                        ))}
+                      </CarouselContent>
+                    </Carousel>
                   </CardContent>
                 </Card>
               )}
@@ -558,7 +601,7 @@ const ProfessionalProfile = () => {
             {/* Right Column - Contact & Details */}
             <div className="space-y-6">
               {/* Contact Information */}
-              <Card className="bg-white sticky top-8">
+              <Card className="bg-white top-8">
                 <CardHeader>
                   <CardTitle>Contact Information</CardTitle>
                 </CardHeader>
@@ -566,38 +609,54 @@ const ProfessionalProfile = () => {
                   <div className="space-y-3">
                     <div className="flex items-center gap-3">
                       <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center">
-                        <Users className="w-4 h-4 text-green-600" />
+                        <Phone className="w-4 h-4 fill-white stroke-black text-accent" />
                       </div>
                       <div>
-                        <p className="font-medium text-sm text-gray-500">
-                          Phone
-                        </p>
                         <p
-                          className="cursor-pointer"
+                          className="cursor-pointer text-sm text-left"
                           onClick={handleContactClick}
                         >
                           {showContactDetails
                             ? professional.contact_number
                             : maskPhone(professional.contact_number)}
                         </p>
+                        <p className="text-xs text-muted-foreground">
+                          WhatsApp Available
+                        </p>
                       </div>
                     </div>
 
                     <div className="flex items-center gap-3">
                       <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center">
-                        <Globe className="w-4 h-4 text-blue-600" />
+                        <Mail className="w-4 h-4 fill-white stroke-black text-accent" />
                       </div>
                       <div>
-                        <p className="font-medium text-sm text-gray-500">
-                          Email
-                        </p>
                         <p
-                          className="cursor-pointer"
+                          className="cursor-pointer text-sm"
                           onClick={handleContactClick}
                         >
                           {showContactDetails
                             ? professionalUser?.email
                             : maskEmail(professionalUser?.email || "")}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center">
+                        <Instagram className="w-4 h-4 fill-white stroke-black text-accent" />
+                      </div>
+                      <div>
+                        <p
+                          className="cursor-pointer text-sm"
+                          onClick={() => {
+                            window.open(professional?.instagram_link, "_blank");
+                          }}
+                        >
+                          {professional?.instagram_link.replace(
+                            "https://www.instagram.com/",
+                            "@"
+                          )}
                         </p>
                       </div>
                     </div>
@@ -656,7 +715,6 @@ const ProfessionalProfile = () => {
                     </CardContent>
                   </Card>
                 )}
-
               {/* Pricing */}
               {professional.fee && (
                 <Card className="bg-white">
@@ -677,7 +735,53 @@ const ProfessionalProfile = () => {
               )}
 
               {/* Availability */}
-              {professional.coaching_availability &&
+              {professional.coaching_availability && (
+                <Card className="shadow-elegant">
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2 text-primary">
+                      <Clock className="w-4 h-4" />
+                      Availability
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-3">
+                    {/* {professional.coaching_availability && (
+                      <>
+                        <div>
+                          <p className="font-medium text-sm">Mon to Fri</p>
+                          <p className="text-xs text-muted-foreground">
+                            {professional.availability.weekdays}
+                          </p>
+                        </div>
+                        <div>
+                          <p className="font-medium text-sm">Sat & Sun</p>
+                          <p className="text-xs text-muted-foreground">
+                            {professional.availability.weekends}
+                          </p>
+                        </div>
+                        <Separator />
+                      </>
+                    )} */}
+                    <hr />
+                    {professional.coaching_availability &&
+                      professional.coaching_availability.length > 0 && (
+                        <div className="space-y-2 text-left">
+                          {professional.coaching_availability.map(
+                            (service, index) => (
+                              <Badge
+                                key={index}
+                                variant="outline"
+                                className="text-xs mr-2"
+                              >
+                                {service}
+                              </Badge>
+                            )
+                          )}
+                        </div>
+                      )}
+                  </CardContent>
+                </Card>
+              )}
+              {/* {professional.coaching_availability &&
                 professional.coaching_availability.length > 0 && (
                   <Card className="bg-white">
                     <CardHeader>
@@ -699,7 +803,7 @@ const ProfessionalProfile = () => {
                       </div>
                     </CardContent>
                   </Card>
-                )}
+                )} */}
             </div>
           </div>
         </div>
