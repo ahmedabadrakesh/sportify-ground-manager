@@ -558,6 +558,7 @@ export type Database = {
           fee_type: Database["public"]["Enums"]["fee_type"]
           free_demo_call: boolean | null
           game_id: string
+          games_played: string[] | null
           group_session_price: number | null
           id: string
           images: string[] | null
@@ -607,6 +608,7 @@ export type Database = {
           fee_type: Database["public"]["Enums"]["fee_type"]
           free_demo_call?: boolean | null
           game_id: string
+          games_played?: string[] | null
           group_session_price?: number | null
           id?: string
           images?: string[] | null
@@ -656,6 +658,7 @@ export type Database = {
           fee_type?: Database["public"]["Enums"]["fee_type"]
           free_demo_call?: boolean | null
           game_id?: string
+          games_played?: string[] | null
           group_session_price?: number | null
           id?: string
           images?: string[] | null

@@ -58,31 +58,50 @@ const EditProfessionalDialog = ({ open, onOpenChange, professional }: EditProfes
     },
   });
 
-  // Fetch user email from users table
+  // Fetch user email and game name from related tables
   useEffect(() => {
-    const fetchUserEmail = async () => {
+    const fetchUserEmailAndGameName = async () => {
       if (professional.user_id) {
         try {
-          const { data: userData, error } = await supabase
+          // Fetch user email
+          const { data: userData, error: userError } = await supabase
             .from('users')
             .select('email')
             .eq('id', professional.user_id)
             .single();
           
-          if (userData && !error) {
+          if (userData && !userError) {
             setUserEmail(userData.email);
             form.setValue('email', userData.email);
           }
+
+          // Fetch game name if game_id exists to populate games_played
+          if (professional.game_id) {
+            const { data: gameData, error: gameError } = await supabase
+              .from('games')
+              .select('name')
+              .eq('id', professional.game_id)
+              .single();
+            
+            if (gameData && !gameError) {
+              form.setValue('games_played', [gameData.name]);
+            }
+          }
+
+          // Also populate games_played from the database if it exists
+          if (professional.games_played && Array.isArray(professional.games_played)) {
+            form.setValue('games_played', professional.games_played);
+          }
         } catch (error) {
-          console.error('Error fetching user email:', error);
+          console.error('Error fetching related data:', error);
         }
       }
     };
 
     if (open) {
-      fetchUserEmail();
+      fetchUserEmailAndGameName();
     }
-  }, [open, professional.user_id, form]);
+  }, [open, professional.user_id, professional.game_id, professional.games_played, form]);
 
   const updateMutation = useMutation({
     mutationFn: async (values: ProfessionalFormValues) => {
@@ -90,12 +109,27 @@ const EditProfessionalDialog = ({ open, onOpenChange, professional }: EditProfes
         throw new Error("You don't have permission to edit this profile");
       }
 
+      // Find the first game ID from games_played array if game_id needs to be updated
+      let gameId = values.game_id;
+      if (!gameId && values.games_played && values.games_played.length > 0) {
+        const { data: gameData } = await supabase
+          .from('games')
+          .select('id, name')
+          .eq('name', values.games_played[0])
+          .single();
+        
+        if (gameData) {
+          gameId = gameData.id;
+        }
+      }
+
       const { error } = await supabase
         .from('sports_professionals')
         .update({
           name: values.name,
           profession_type: values.profession_type,
-          game_id: values.game_id,
+          game_id: gameId,
+          games_played: values.games_played || [],
           contact_number: values.contact_number,
           fee: values.fee,
           fee_type: values.fee_type,
