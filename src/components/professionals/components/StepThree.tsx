@@ -28,7 +28,7 @@ export const StepThree = ({ form }: StepThreeProps) => {
     })) || [];
 
   return (
-    <div className="space-y-6">
+    <div className="w-[98%] items-center pl-2">
       <div>
         <h2 className="text-2xl font-bold mb-4">Professional Details</h2>
         <hr className="pb-6" />
@@ -48,7 +48,7 @@ export const StepThree = ({ form }: StepThreeProps) => {
                   options={gameOptions}
                   onValueChange={field.onChange}
                   defaultValue={field.value || []}
-                  placeholder="Select games/sports"
+                  placeholder="Select Games/Sports, Select one or more"
                   maxCount={5}
                 />
               </FormControl>
@@ -71,7 +71,7 @@ export const StepThree = ({ form }: StepThreeProps) => {
                 <FormItem>
                   <FormLabel>District Level</FormLabel>
                   <FormControl>
-                    <Input type="number" {...field} placeholder="0" />
+                    <Input type="number" {...field} placeholder="" />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -85,7 +85,7 @@ export const StepThree = ({ form }: StepThreeProps) => {
                 <FormItem>
                   <FormLabel>State Level</FormLabel>
                   <FormControl>
-                    <Input type="number" {...field} placeholder="0" />
+                    <Input type="number" {...field} placeholder="" />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -99,7 +99,7 @@ export const StepThree = ({ form }: StepThreeProps) => {
                 <FormItem>
                   <FormLabel>National Level</FormLabel>
                   <FormControl>
-                    <Input type="number" {...field} placeholder="0" />
+                    <Input type="number" {...field} placeholder="" />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -113,7 +113,7 @@ export const StepThree = ({ form }: StepThreeProps) => {
                 <FormItem>
                   <FormLabel>International</FormLabel>
                   <FormControl>
-                    <Input type="number" {...field} placeholder="0" />
+                    <Input type="number" {...field} placeholder="" />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

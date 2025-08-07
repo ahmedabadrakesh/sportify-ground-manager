@@ -89,12 +89,10 @@ export const StepFour = ({ form }: StepFourProps) => {
 
         {/* Pricing Section */}
         <Card className="mb-6">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <DollarSign className="w-5 h-5" />
-              Pricing
-            </CardTitle>
-          </CardHeader>
+          <h3 className="text-lg font-semibold flex items-center gap-2 p-4">
+            <DollarSign className="w-5 h-5" />
+            Fee / Pricing
+          </h3>
           <CardContent className="space-y-4">
             <div className="grid md:grid-cols-3 gap-4">
               <FormField
@@ -144,21 +142,14 @@ export const StepFour = ({ form }: StepFourProps) => {
               name="free_demo_call"
               control={form.control}
               render={({ field }) => (
-                <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
-                  <div className="space-y-0.5">
-                    <FormLabel className="text-base">
-                      Free 15-min Demo call Available
-                    </FormLabel>
-                    <div className="text-sm text-muted-foreground">
-                      Offer a free demo call to potential clients
-                    </div>
-                  </div>
+                <FormItem className="flex w-3/5 flex-row items-center align-left gap-4 p-2">
                   <FormControl>
                     <Switch
                       checked={field.value}
                       onCheckedChange={field.onChange}
                     />
                   </FormControl>
+                  Offerring a Free Demo to potential clients?
                 </FormItem>
               )}
             />

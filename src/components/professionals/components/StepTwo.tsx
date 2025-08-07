@@ -28,7 +28,7 @@ export const StepTwo = ({ form, userEmail, isUpdate }: StepTwoProps) => {
   }, [watchWhatsAppSame, watchContactNumber, form]);
 
   return (
-    <div className="w-[99%]">
+    <div className="w-[98%] items-center pl-2">
       <h2 className="text-2xl font-bold mb-4">Contact & Social Details</h2>
       <hr className="pb-6" />
 
@@ -69,21 +69,14 @@ export const StepTwo = ({ form, userEmail, isUpdate }: StepTwoProps) => {
           name="whatsapp_same_as_phone"
           control={form.control}
           render={({ field }) => (
-            <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
-              <div className="space-y-0.5">
-                <FormLabel className="text-base">
-                  WhatsApp same as phone number
-                </FormLabel>
-                <div className="text-sm text-muted-foreground">
-                  Use the same number for WhatsApp contact
-                </div>
-              </div>
+            <FormItem className="flex flex-row w-1/2 p-2 gap-4">
               <FormControl>
                 <Switch
                   checked={field.value}
                   onCheckedChange={field.onChange}
                 />
               </FormControl>
+              Same for WhatsApp?
             </FormItem>
           )}
         />
@@ -106,7 +99,7 @@ export const StepTwo = ({ form, userEmail, isUpdate }: StepTwoProps) => {
       </div>
 
       {/* Social Media Links */}
-      <div className="space-y-4">
+      <div className="space-y-4 pt-4">
         <h4 className="text-md font-medium">Social Media Links</h4>
 
         <div className="grid lg:grid-cols-2 gap-4">
