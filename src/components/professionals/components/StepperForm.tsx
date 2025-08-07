@@ -15,7 +15,7 @@ export const StepperForm = ({
 }: StepperFormProps) => {
   return (
     <div className="flex h-full px-4 py-6">
-      <div className="flex flex-col items-left gap-4">
+      <div className="flex md:flex-col items-left gap-4">
         {Array.from({ length: totalSteps }, (_, index) => {
           const stepNumber = index + 1;
           const isCompleted = stepNumber < currentStep;
@@ -31,6 +31,7 @@ export const StepperForm = ({
                     {
                       "border-white text-white": isCompleted || isCurrent,
                       "border-gray-300 text-gray-200": isUpcoming,
+                      "ml-4 md:ml-0": stepNumber === 1,
                     }
                   )}
                 >
@@ -42,7 +43,7 @@ export const StepperForm = ({
                 </div>
                 <span
                   className={cn(
-                    "text-base text-left max-w-60 text-white transition-colors duration-200",
+                    "hidden md:block text-base text-left max-w-60 text-white transition-colors duration-200",
                     {
                       "font-semibold text-lg": isCurrent,
                       "font-medium ": isCompleted,
@@ -53,17 +54,17 @@ export const StepperForm = ({
                   {stepTitles[index]}
                 </span>
               </div>
-              {/* {stepNumber < totalSteps && (
+              {stepNumber <= totalSteps && (
                 <div
                   className={cn(
-                    "flex-1 h-0.5 mx-4 transition-colors duration-200",
+                    "flex mx-2 h-0.5  items-center transition-colors duration-200",
                     {
-                      "bg-primary": isCompleted,
-                      "bg-gray-300": !isCompleted,
+                      "bg-white": isCompleted,
+                      "bg-white-300": !isCompleted,
                     }
                   )}
                 />
-              )} */}
+              )}
             </div>
           );
         })}

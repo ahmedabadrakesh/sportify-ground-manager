@@ -28,7 +28,7 @@ export const StepThree = ({ form }: StepThreeProps) => {
     })) || [];
 
   return (
-    <div className="w-[98%] items-center pl-2">
+    <div className="w-[98%] items-center">
       <div>
         <h2 className="text-2xl font-bold mb-4">Professional Details</h2>
         <hr className="pb-6" />

@@ -366,9 +366,9 @@ const RegisterProfessionalDialog = ({
 
   return (
     <Dialog open={open} onOpenChange={handleDialogClose}>
-      <DialogContent className="max-w-6xl max-h-[90vh]">
-        <div className="grid grid-cols-8 gap-4">
-          <div className="col-span-2 bg-primary-800">
+      <DialogContent className="max-w-6xl md:max-h-[90vh]">
+        <div className="grid md:grid-cols-8 gap-4">
+          <div className="hidden md:block col-span-2 bg-primary-800">
             <DialogTitle className="text-left text-white pl-5 pb-4 pt-6">
               {dialogTitle}
             </DialogTitle>
@@ -379,7 +379,7 @@ const RegisterProfessionalDialog = ({
               stepTitles={stepTitles}
             />
           </div>
-          <div className="col-span-6">
+          <div className="md:col-span-6">
             {isLoadingProfile ? (
               <div className="flex items-center justify-center h-64">
                 <div className="text-center">
@@ -390,25 +390,29 @@ const RegisterProfessionalDialog = ({
                 </div>
               </div>
             ) : (
-              <ScrollArea className="h-[calc(90vh-120px)] px-2">
-                <Form {...form}>
-                  <form onSubmit={handleFormSubmit} className="space-y-6">
-                    {/* <StepperForm
-                        currentStep={currentStep}
-                        totalSteps={totalSteps}
-                        stepTitles={stepTitles}
-                      /> */}
-                    <div className="min-h-9/10">
-                      <StepContentRenderer
-                        currentStep={currentStep}
-                        form={form}
-                        userEmail={userEmail}
-                        isUpdate={isUpdate}
-                      />
-                    </div>
-                  </form>
-                </Form>
-              </ScrollArea>
+              <>
+                <div className="md:hidden bg-black mb-4 mt-6">
+                  <StepperForm
+                    currentStep={currentStep}
+                    totalSteps={totalSteps}
+                    stepTitles={stepTitles}
+                  />
+                </div>
+                <ScrollArea className="h-[calc(90vh-120px)]">
+                  <Form {...form}>
+                    <form onSubmit={handleFormSubmit} className="space-y-6">
+                      <div className="min-h-9/10">
+                        <StepContentRenderer
+                          currentStep={currentStep}
+                          form={form}
+                          userEmail={userEmail}
+                          isUpdate={isUpdate}
+                        />
+                      </div>
+                    </form>
+                  </Form>
+                </ScrollArea>
+              </>
             )}
             <div>
               <FormNavigation

@@ -1,4 +1,3 @@
-
 import React from "react";
 import MainLayout from "@/components/layouts/MainLayout";
 import { useState, useEffect } from "react";
@@ -16,7 +15,7 @@ const SportsProfessionals = () => {
   const [hasExistingProfile, setHasExistingProfile] = useState(false);
   const [checkingProfile, setCheckingProfile] = useState(true);
   const [searchParams] = useSearchParams();
-  const sportFilter = searchParams.get('sport');
+  const sportFilter = searchParams.get("sport");
 
   const currentUser = getCurrentUserSync();
   const isSuperAdmin = hasRoleSync("super_admin");
@@ -82,7 +81,9 @@ const SportsProfessionals = () => {
 
   const getPageTitle = () => {
     if (sportFilter) {
-      return `${sportFilter.charAt(0).toUpperCase() + sportFilter.slice(1)} Professionals`;
+      return `${
+        sportFilter.charAt(0).toUpperCase() + sportFilter.slice(1)
+      } Professionals`;
     }
     return "Sports Professionals";
   };
@@ -107,11 +108,11 @@ const SportsProfessionals = () => {
               Browse through our verified fitness professionals
             </p>
           </div>
-          
+
           {shouldShowButton() && (
             <div className="flex justify-center">
-              <Button 
-                onClick={handleRegisterClick} 
+              <Button
+                onClick={handleRegisterClick}
                 disabled={checkingProfile}
                 className="bg-foreground text-background hover:bg-foreground/90"
               >
@@ -123,7 +124,7 @@ const SportsProfessionals = () => {
       </div>
 
       {/* Main Content */}
-      <div className="container mx-auto py-8">
+      <div className="mx-auto py-8">
         <ProfessionalsList sportFilter={sportFilter} />
 
         <RegisterProfessionalDialog

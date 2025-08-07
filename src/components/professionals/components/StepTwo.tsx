@@ -28,7 +28,7 @@ export const StepTwo = ({ form, userEmail, isUpdate }: StepTwoProps) => {
   }, [watchWhatsAppSame, watchContactNumber, form]);
 
   return (
-    <div className="w-[98%] items-center pl-2">
+    <div className="w-[98%] items-center">
       <h2 className="text-2xl font-bold mb-4">Contact & Social Details</h2>
       <hr className="pb-6" />
 
@@ -48,28 +48,29 @@ export const StepTwo = ({ form, userEmail, isUpdate }: StepTwoProps) => {
           )}
         />
 
-        <FormField
-          name="email"
-          control={form.control}
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Email *</FormLabel>
-              <FormControl>
-                <Input {...field} type="email" placeholder="Email address" />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+        <div className="hidden md:block">
+          <FormField
+            name="email"
+            control={form.control}
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Email *</FormLabel>
+                <FormControl>
+                  <Input {...field} type="email" placeholder="Email address" />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
       </div>
-
       {/* WhatsApp Toggle */}
       <div className="space-y-4">
         <FormField
           name="whatsapp_same_as_phone"
           control={form.control}
           render={({ field }) => (
-            <FormItem className="flex flex-row w-1/2 p-2 gap-4">
+            <FormItem className="flex flex-row md:w-1/2 p-2 gap-4">
               <FormControl>
                 <Switch
                   checked={field.value}
@@ -98,10 +99,26 @@ export const StepTwo = ({ form, userEmail, isUpdate }: StepTwoProps) => {
         )}
       </div>
 
+      <div className="md:hidden mt-6">
+        <FormField
+          name="email"
+          control={form.control}
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Email *</FormLabel>
+              <FormControl>
+                <Input {...field} type="email" placeholder="Email address" />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+      </div>
+
       {/* Social Media Links */}
       <div className="space-y-4 pt-4">
         <h4 className="text-md font-medium">Social Media Links</h4>
-
+        <hr />
         <div className="grid lg:grid-cols-2 gap-4">
           <FormField
             name="instagram_link"

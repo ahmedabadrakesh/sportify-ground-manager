@@ -36,7 +36,7 @@ const ProfessionalCard = ({
   };
 
   return (
-    <Card className="p-6 hover:shadow-md transition-shadow bg-white border border-gray-200">
+    <Card className="p-4 hover:shadow-md transition-shadow bg-white border border-gray-200">
       <div className="flex items-start gap-4 mb-2">
         {/* Profile Image */}
         <div className="flex-shrink-0">
@@ -70,7 +70,7 @@ const ProfessionalCard = ({
         </div>
       </div>
 
-      <div className="h-40">
+      <div className="md:h-40">
         {/* Stats Row */}
         <div className="flex items-center gap-2">
           <Badge

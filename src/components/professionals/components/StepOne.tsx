@@ -72,8 +72,9 @@ export const StepOne = ({ form }: StepOneProps) => {
   ];
 
   return (
-    <div className="w-[98%] items-center pl-2">
+    <div className="w-[98%] items-center">
       <h2 className="text-2xl font-bold mb-4">Basic Information</h2>
+      <h2 className="text-2xl font-bold mb-4"></h2>
       <hr className="pb-6" />
       {/* Top Row: Photo Upload (Left) and Coach Details (Right) */}
       <div className="grid lg:grid-cols-2 gap-8">
