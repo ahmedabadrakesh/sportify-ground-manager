@@ -21,6 +21,7 @@ import { Database } from "@/integrations/supabase/types";
 import { Award } from "lucide-react";
 import TextSuggestionCarousel from "./TextSuggestionCarousel";
 import { useGames } from "@/hooks/useGames";
+import { Switch } from "@/components/ui/switch";
 
 type ProfessionType = Database["public"]["Enums"]["sport_profession_type"];
 
@@ -198,6 +199,29 @@ export const StepOne = ({ form }: StepOneProps) => {
                 />
               </FormControl>
               <FormMessage />
+            </FormItem>
+          )}
+        />
+      </div>
+
+      {/* Certification Toggle - Full Width Row */}
+      <div className="pt-4">
+        <FormField
+          name="is_certified"
+          control={form.control}
+          render={({ field }) => (
+            <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+              <div className="space-y-0.5">
+                <FormLabel className="text-base">
+                  Are you a certified Professional?
+                </FormLabel>
+              </div>
+              <FormControl>
+                <Switch
+                  checked={field.value || false}
+                  onCheckedChange={field.onChange}
+                />
+              </FormControl>
             </FormItem>
           )}
         />
