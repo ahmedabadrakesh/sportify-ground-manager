@@ -236,6 +236,7 @@ const RegisterProfessionalDialog = ({
   };
 
   useEffect(() => {
+    const fillFormData = async () => {
     if (currentUser && open && !isLoadingProfile) {
       console.log("Pre-filling form data...");
       console.log("Is super admin:", isSuperAdmin);
@@ -334,6 +335,23 @@ const RegisterProfessionalDialog = ({
           coaching_availability: existingProfileData.coaching_availability || [],
         });
 
+        // Convert game_ids to game names and set games_played
+        if (existingProfileData.game_ids && Array.isArray(existingProfileData.game_ids) && existingProfileData.game_ids.length > 0) {
+          try {
+            const { data: gameData, error: gameError } = await supabase
+              .from('games')
+              .select('name')
+              .in('id', existingProfileData.game_ids);
+            
+            if (gameData && !gameError) {
+              console.log('Setting games_played:', gameData.map(game => game.name));
+              form.setValue('games_played', gameData.map(game => game.name));
+            }
+          } catch (error) {
+            console.error('Error fetching game names:', error);
+          }
+        }
+
         console.log("Form values after pre-fill:", form.getValues());
       } else if (!hasExistingProfile && !isSuperAdmin) {
         console.log("Regular user creating new profile");
@@ -344,6 +362,11 @@ const RegisterProfessionalDialog = ({
           form.setValue("contact_number", currentUser.phone);
         }
       }
+      }
+    };
+
+    if (currentUser && open && !isLoadingProfile) {
+      fillFormData();
     }
   }, [
     currentUser,
