@@ -180,6 +180,25 @@ export const useProfessionalRegistration = (onSuccess: () => void, isUpdate: boo
         website: values.website || null,
         level: values.level || null,
         coaching_availability: values.coaching_availability || [],
+        // New enhanced fields
+        academy_name: values.academy_name || null,
+        is_certified: values.is_certified || false,
+        whatsapp: values.whatsapp || null,
+        whatsapp_same_as_phone: values.whatsapp_same_as_phone || false,
+        youtube_link: values.youtube_link || null,
+        district_level_tournaments: Number(values.district_level_tournaments) || 0,
+        state_level_tournaments: Number(values.state_level_tournaments) || 0,
+        national_level_tournaments: Number(values.national_level_tournaments) || 0,
+        international_level_tournaments: Number(values.international_level_tournaments) || 0,
+        specialties: values.specialties || [],
+        education: values.education || [],
+        training_locations_detailed: values.training_locations_detailed || [],
+        one_on_one_price: Number(values.one_on_one_price) || 0,
+        group_session_price: Number(values.group_session_price) || 0,
+        online_price: Number(values.online_price) || 0,
+        free_demo_call: values.free_demo_call || false,
+        about_me: values.about_me || null,
+        success_stories: values.success_stories || [],
       };
       
       console.log('Professional data to save:', professionalData);
