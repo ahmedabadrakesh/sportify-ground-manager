@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import { UseFormSetValue } from "react-hook-form";
 import { ProfessionalFormValues } from "../schemas/professionalFormSchema";
 
-export const usePhotoUpload = (setValue: UseFormSetValue<ProfessionalFormValues>) => {
+export const usePhotoUpload = (setValue: UseFormSetValue<ProfessionalFormValues>, existingPhoto?: string | null) => {
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
 

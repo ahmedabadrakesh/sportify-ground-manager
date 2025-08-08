@@ -16,8 +16,9 @@ interface PhotoUploadProps {
 }
 
 export const PhotoUpload = ({ form }: PhotoUploadProps) => {
+  const existingPhoto = form.getValues("photo");
   const { photoPreview, setPhotoPreview, uploading, handleImageUpload } =
-    usePhotoUpload(form.setValue);
+    usePhotoUpload(form.setValue, existingPhoto);
 
   return (
     <FormField
@@ -28,10 +29,10 @@ export const PhotoUpload = ({ form }: PhotoUploadProps) => {
           <FormLabel>Photo</FormLabel>
           <FormControl>
             <div className="flex flex-col items-center space-y-4 border-2 border-primary  border-dashed">
-              {photoPreview ? (
+              {photoPreview || existingPhoto ? (
                 <div className="relative w-32 h-32">
                   <img
-                    src={photoPreview}
+                    src={photoPreview || existingPhoto}
                     alt="Preview"
                     className="w-full h-full object-cover rounded-lg"
                   />
