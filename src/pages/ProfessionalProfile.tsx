@@ -47,6 +47,7 @@ import ContactDetails from "@/components/professionals/components/ContactDetails
 import { getCurrentUserSync, hasRoleSync } from "@/utils/auth";
 import RegisterProfessionalDialog from "@/components/professionals/RegisterProfessionalDialog";
 import AuthRequiredDialog from "@/components/auth/AuthRequiredDialog";
+import CircularProgress from "@/components/professionals/CircularProgress";
 import coachProfileImage from "@/assets/coach-profile.jpg";
 import { getInitials, toTitleCase } from "@/lib/utils";
 import {
@@ -338,7 +339,9 @@ const ProfessionalProfile = () => {
             {/* Profile Header */}
             <div className="bg-gradient-to-r p-12 flex flex-col lg:flex-row items-center lg:items-start gap-8">
               {/* Avatar and Initials */}
-              <div className="relative">
+              <div className="relative flex flex-col items-center gap-4">
+                {/* Circular Progress Bar */}
+                <CircularProgress professional={professional} />
                 <div className="w-32 h-32 lg:w-32 ml-32 lg:h-32 rounded-full bg-gradient-to-br from-blue-400 to-purple-600 flex items-center justify-center text-white text-4xl lg:text-6xl font-bold">
                   {professional.photo ? (
                     <Avatar className="w-32 h-32 border-4 border-primary-foreground shadow-elegant">
