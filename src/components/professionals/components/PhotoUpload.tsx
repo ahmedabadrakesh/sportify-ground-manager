@@ -20,6 +20,9 @@ export const PhotoUpload = ({ form }: PhotoUploadProps) => {
   const { photoPreview, setPhotoPreview, uploading, handleImageUpload } =
     usePhotoUpload(form.setValue, existingPhoto);
 
+  // Check if we have a photo to display (either new preview or existing photo)
+  const currentPhoto = photoPreview || (form.watch("photo") && existingPhoto);
+
   return (
     <FormField
       name="photo"
@@ -29,10 +32,10 @@ export const PhotoUpload = ({ form }: PhotoUploadProps) => {
           <FormLabel>Photo</FormLabel>
           <FormControl>
             <div className="flex flex-col items-center space-y-4 border-2 border-primary  border-dashed">
-              {photoPreview || existingPhoto ? (
+              {currentPhoto ? (
                 <div className="relative w-32 h-32">
                   <img
-                    src={photoPreview || existingPhoto}
+                    src={currentPhoto}
                     alt="Preview"
                     className="w-full h-full object-cover rounded-lg"
                   />
