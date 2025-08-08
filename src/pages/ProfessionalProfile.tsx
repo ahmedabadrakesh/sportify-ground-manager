@@ -37,6 +37,9 @@ import {
   Mail,
   Clock,
   DollarSign,
+  IndianRupee,
+  CircleCheck,
+  BadgeCheck,
 } from "lucide-react";
 import VideoGallery from "@/components/professionals/components/VideoGallery";
 import ImageGallery from "@/components/professionals/components/ImageGallery";
@@ -359,10 +362,22 @@ const ProfessionalProfile = () => {
 
               {/* Profile Info */}
               <div className="flex-1 text-center lg:text-left">
-                <h1 className="text-4xl lg:text-5xl font-bold mb-2 capitalize">
+                <h1 className="flex text-4xl lg:text-5xl font-bold mb-1 capitalize">
                   {toTitleCase(professional.name)}
+                  {professional.is_certified && (
+                    <>
+                      <BadgeCheck
+                        size={32}
+                        color="white"
+                        className="ml-2"
+                        fill="#1f2ce0"
+                        type="button"
+                      />
+                    </>
+                  )}
                 </h1>
-                <p className="text-xl lg:text-xl text-gray-300 mb-6">
+
+                <p className="text-lg lg:text-lg text-gray-300 mb-4">
                   {professional.profession_type},{" "}
                   {professional.game_ids && professional.game_ids.length > 0
                     ? "Multi-Sport Professional"
@@ -391,14 +406,18 @@ const ProfessionalProfile = () => {
                     variant="secondary"
                     className="bg-primary-foreground/20 text-primary-foreground border-primary-foreground/30"
                   >
-                    Certified Professional
+                    {professional.district_level_tournaments +
+                      professional.state_level_tournaments +
+                      professional.national_level_tournaments +
+                      professional.international_level_tournaments}
+                    + Match Played
                   </Badge>
                   <Badge
                     variant="secondary"
                     className="bg-primary-foreground/20 text-primary-foreground border-primary-foreground/30"
                   >
                     <MapPin className="w-4 h-4 mr-2" />
-                    {professional.city}
+                    {professional.city || "India"}
                   </Badge>
                   {/* {professional.total_match_played && (
                     <div className="bg-white/10 backdrop-blur-sm rounded-lg px-4 py-2 text-center">
@@ -417,11 +436,7 @@ const ProfessionalProfile = () => {
                     </div>
                   </div> */}
                 </div>
-                {professional.punch_line && (
-                  <p className="text-lg text-gray-400 mb-6 italic">
-                    "{professional.punch_line}"
-                  </p>
-                )}
+
                 {/* Location and Social Links */}
                 <div className="flex flex-wrap justify-center lg:justify-start items-center gap-4">
                   {renderSocialLinks()}
@@ -446,7 +461,14 @@ const ProfessionalProfile = () => {
                   </CardHeader>
                   <CardContent className="p-6">
                     <div className="relative">
-                      <Quote className="absolute -top-2 -left-2 w-8 h-8 text-accent/30" />
+                      <Quote className="absolute -top-2 -left-2 w-8 h-8 text-gray-500 rotate-180" />
+                      {professional.punch_line && (
+                        <p className="text-lg text-gray-700 ml-8 mb-6 italic text-left leading-relaxed ">
+                          {professional.punch_line}
+                        </p>
+                      )}
+                      <Quote className="absolute -bottom-2 -right-2 w-8 h-8 text-gray-500 " />
+
                       <p className="text-foreground text-gray-700 text-left leading-relaxed">
                         {isAboutReadMoreOpened
                           ? professional.about_me
@@ -462,7 +484,6 @@ const ProfessionalProfile = () => {
                           </button>
                         )}
                       </p>
-                      <Quote className="absolute -bottom-2 -right-2 w-8 h-8 text-accent/30 rotate-180" />
                     </div>
                   </CardContent>
                 </Card>
@@ -825,26 +846,29 @@ const ProfessionalProfile = () => {
                 <Card className="shadow-elegant">
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2 text-primary">
-                      <DollarSign className="w-4 h-4" />
+                      <IndianRupee className="w-4 h-4" />
                       Pricing
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-3">
                     <div className="flex justify-between items-center">
                       <span className="text-sm">Personal Training</span>
-                      <span className="font-semibold text-primary">
+                      <span className="flex font-semibold text-primary items-center">
+                        <IndianRupee className="w-4 h-4 align-center" />
                         {`${professional.one_on_one_price} / Per Session`}
                       </span>
                     </div>
                     <div className="flex justify-between items-center">
                       <span className="text-sm">Group Training</span>
-                      <span className="font-semibold text-primary">
+                      <span className="flex font-semibold text-primary items-center">
+                        <IndianRupee className="w-4 h-4 align-center" />
                         {`${professional.group_session_price} / Per Session`}
                       </span>
                     </div>
                     <div className="flex justify-between items-center">
                       <span className="text-sm">Online Training</span>
-                      <span className="font-semibold text-primary">
+                      <span className="flex font-semibold text-primary items-center">
+                        <IndianRupee className="w-4 h-4 align-center" />
                         {`${professional.online_price} / Per Session`}
                       </span>
                     </div>

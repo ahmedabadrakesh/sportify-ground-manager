@@ -1,9 +1,13 @@
-
 import React, { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Video, ExternalLink, Play, Instagram } from "lucide-react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 interface VideoGalleryProps {
   videos: string[] | null;
@@ -19,20 +23,24 @@ const VideoGallery = ({ videos }: VideoGalleryProps) => {
   const getVideoId = (url: string): string | null => {
     try {
       // Handle YouTube URLs
-      const youtubeMatch = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/|youtube\.com\/shorts\/)([^&\n?#]+)/);
+      const youtubeMatch = url.match(
+        /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/|youtube\.com\/shorts\/)([^&\n?#]+)/
+      );
       if (youtubeMatch) {
         return youtubeMatch[1];
       }
 
       // Handle Instagram URLs
-      const instagramMatch = url.match(/(?:instagram\.com\/(?:p|reel)\/|instagr\.am\/p\/)([^/?#&]+)/);
+      const instagramMatch = url.match(
+        /(?:instagram\.com\/(?:p|reel)\/|instagr\.am\/p\/)([^/?#&]+)/
+      );
       if (instagramMatch) {
         return instagramMatch[1];
       }
 
       return null;
     } catch (error) {
-      console.error('Error parsing video URL:', error);
+      console.error("Error parsing video URL:", error);
       return null;
     }
   };
@@ -45,9 +53,9 @@ const VideoGallery = ({ videos }: VideoGalleryProps) => {
       }
     } else if (isInstagramVideo(url)) {
       // Instagram doesn't provide direct thumbnail access, so we'll use a placeholder
-      return '/placeholder.svg';
+      return "/placeholder.svg";
     }
-    return '/placeholder.svg';
+    return "/placeholder.svg";
   };
 
   const getEmbedUrl = (url: string): string => {
@@ -66,33 +74,33 @@ const VideoGallery = ({ videos }: VideoGalleryProps) => {
   };
 
   const isYouTubeVideo = (url: string): boolean => {
-    return url.includes('youtube.com') || url.includes('youtu.be');
+    return url.includes("youtube.com") || url.includes("youtu.be");
   };
 
   const isInstagramVideo = (url: string): boolean => {
-    return url.includes('instagram.com') || url.includes('instagr.am');
+    return url.includes("instagram.com") || url.includes("instagr.am");
   };
 
-  const getVideoType = (url: string): 'youtube' | 'instagram' | 'external' => {
-    if (isYouTubeVideo(url)) return 'youtube';
-    if (isInstagramVideo(url)) return 'instagram';
-    return 'external';
+  const getVideoType = (url: string): "youtube" | "instagram" | "external" => {
+    if (isYouTubeVideo(url)) return "youtube";
+    if (isInstagramVideo(url)) return "instagram";
+    return "external";
   };
 
   const handleVideoClick = (url: string) => {
     const videoType = getVideoType(url);
-    if (videoType === 'youtube' || videoType === 'instagram') {
+    if (videoType === "youtube" || videoType === "instagram") {
       setSelectedVideo(url);
     } else {
       // For non-YouTube/Instagram videos, open in new tab
-      window.open(url, '_blank');
+      window.open(url, "_blank");
     }
   };
 
   const renderVideoThumbnail = (videoUrl: string, index: number) => {
     const videoType = getVideoType(videoUrl);
 
-    if (videoType === 'youtube') {
+    if (videoType === "youtube") {
       return (
         <>
           <img
@@ -101,7 +109,7 @@ const VideoGallery = ({ videos }: VideoGalleryProps) => {
             className="w-full h-full object-cover"
             onError={(e) => {
               const target = e.target as HTMLImageElement;
-              target.src = '/placeholder.svg';
+              target.src = "/placeholder.svg";
             }}
           />
           <div className="absolute inset-0 bg-black bg-opacity-30 flex items-center justify-center group-hover:bg-opacity-50 transition-all duration-300">
@@ -111,7 +119,7 @@ const VideoGallery = ({ videos }: VideoGalleryProps) => {
           </div>
         </>
       );
-    } else if (videoType === 'instagram') {
+    } else if (videoType === "instagram") {
       return (
         <>
           <div className="w-full h-full bg-gradient-to-br from-purple-400 via-pink-500 to-red-500 flex items-center justify-center">
@@ -137,9 +145,9 @@ const VideoGallery = ({ videos }: VideoGalleryProps) => {
   const getVideoLabel = (url: string, index: number): string => {
     const videoType = getVideoType(url);
     switch (videoType) {
-      case 'youtube':
+      case "youtube":
         return `YouTube Video ${index + 1}`;
-      case 'instagram':
+      case "instagram":
         return `Instagram Video ${index + 1}`;
       default:
         return `Video ${index + 1}`;
@@ -172,19 +180,21 @@ const VideoGallery = ({ videos }: VideoGalleryProps) => {
                     <p className="text-sm text-gray-600 truncate">
                       {getVideoLabel(videoUrl, index)}
                     </p>
-                    {videoType === 'external' && (
+                    {videoType === "external" && (
                       <div className="flex items-center gap-1 mt-1">
                         <ExternalLink className="h-3 w-3 text-gray-400" />
-                        <span className="text-xs text-gray-400">Opens externally</span>
+                        <span className="text-xs text-gray-400">
+                          Opens externally
+                        </span>
                       </div>
                     )}
-                    {videoType === 'instagram' && (
+                    {videoType === "instagram" && (
                       <div className="flex items-center gap-1 mt-1">
                         <Instagram className="h-3 w-3 text-pink-500" />
                         <span className="text-xs text-pink-500">Instagram</span>
                       </div>
                     )}
-                    {videoType === 'youtube' && (
+                    {videoType === "youtube" && (
                       <div className="flex items-center gap-1 mt-1">
                         <Play className="h-3 w-3 text-red-500" />
                         <span className="text-xs text-red-500">YouTube</span>
@@ -199,17 +209,25 @@ const VideoGallery = ({ videos }: VideoGalleryProps) => {
       </Card>
 
       {/* Video Modal */}
-      <Dialog open={!!selectedVideo} onOpenChange={() => setSelectedVideo(null)}>
+      <Dialog
+        open={!!selectedVideo}
+        onOpenChange={() => setSelectedVideo(null)}
+      >
         <DialogContent className="max-w-4xl max-h-[90vh] p-0">
           <DialogHeader className="p-4 pb-2">
             <DialogTitle>
-              {selectedVideo && getVideoType(selectedVideo) === 'instagram' 
-                ? 'Instagram Video' 
-                : 'Video Player'
-              }
+              {selectedVideo && getVideoType(selectedVideo) === "instagram"
+                ? "Instagram Video"
+                : "Video Player"}
             </DialogTitle>
           </DialogHeader>
-          <div className={`${getVideoType(selectedVideo || '') === 'instagram' ? 'aspect-square max-w-md mx-auto' : 'aspect-video'}`}>
+          <div
+            className={`${
+              getVideoType(selectedVideo || "") === "instagram"
+                ? "aspect-square max-w-md mx-auto"
+                : "aspect-video"
+            }`}
+          >
             {selectedVideo && (
               <iframe
                 src={getEmbedUrl(selectedVideo)}
