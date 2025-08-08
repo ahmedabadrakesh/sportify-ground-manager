@@ -36,6 +36,7 @@ import {
   Phone,
   Mail,
   Clock,
+  DollarSign,
 } from "lucide-react";
 import VideoGallery from "@/components/professionals/components/VideoGallery";
 import ImageGallery from "@/components/professionals/components/ImageGallery";
@@ -582,6 +583,70 @@ const ProfessionalProfile = () => {
                   </Card>
                 )}
 
+              {/* Tournament Participation */}
+              {professional.district_level_tournaments}
+              {(professional.district_level_tournaments ||
+                professional.state_level_tournaments ||
+                professional.national_level_tournaments ||
+                professional.international_level_tournaments) && (
+                <Card className="shadow-elegant">
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2 text-primary">
+                      <Trophy className="w-5 h-5" />
+                      Tournament Participation
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+                      <div className="bg-muted rounded-lg p-4">
+                        <div className="text-2xl font-bold text-primary">
+                          {professional.district_level_tournaments}+
+                        </div>
+                        <div className="text-xs text-muted-foreground">
+                          District Level
+                        </div>
+                      </div>
+                      <div className="bg-muted rounded-lg p-4">
+                        <div className="text-2xl font-bold text-primary">
+                          {professional.state_level_tournaments}
+                        </div>
+                        <div className="text-xs text-muted-foreground">
+                          State Level
+                        </div>
+                      </div>
+                      <div className="bg-muted rounded-lg p-4">
+                        <div className="text-2xl font-bold text-primary">
+                          {professional.national_level_tournaments}
+                        </div>
+                        <div className="text-xs text-muted-foreground">
+                          National Level
+                        </div>
+                      </div>
+                      <div className="bg-muted rounded-lg p-4">
+                        <div className="text-2xl font-bold text-primary">
+                          {professional.international_level_tournaments}
+                        </div>
+                        <div className="text-xs text-muted-foreground">
+                          International
+                        </div>
+                      </div>
+                    </div>
+                    <div className="mt-4 p-3 bg-muted rounded-lg">
+                      <p className="text-sm text-center text-muted-foreground">
+                        <strong className="text-primary">
+                          {professional.district_level_tournaments +
+                            professional.state_level_tournaments +
+                            professional.national_level_tournaments +
+                            professional.international_level_tournaments}{" "}
+                          total tournaments{" "}
+                        </strong>
+                        participated as coach and mentor
+                      </p>
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+
               {/* Featured Videos */}
               {professional.videos && professional.videos.length > 0 && (
                 <Card className="bg-white">
@@ -596,6 +661,34 @@ const ProfessionalProfile = () => {
                   </CardContent>
                 </Card>
               )}
+
+              {/* Achievements */}
+              {professional.accomplishments &&
+                professional.accomplishments.length > 0 && (
+                  <Card className="shadow-elegant">
+                    <CardHeader>
+                      <CardTitle className="flex items-center gap-2 text-primary">
+                        <Award className="w-5 h-5" />
+                        Professional Achievements
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {professional.accomplishments.map(
+                          (achievement, index) => (
+                            <div
+                              key={index}
+                              className="flex items-center gap-2"
+                            >
+                              <Star className="w-4 h-4 text-success" />
+                              <span className="text-sm">{achievement}</span>
+                            </div>
+                          )
+                        )}
+                      </div>
+                    </CardContent>
+                  </Card>
+                )}
             </div>
 
             {/* Right Column - Contact & Details */}
@@ -688,48 +781,81 @@ const ProfessionalProfile = () => {
               </Card>
 
               {/* Training Locations */}
-              {professional.training_locations &&
-                professional.training_locations.length > 0 && (
+              {professional.training_locations_detailed &&
+                professional.training_locations_detailed.length > 0 && (
                   <Card className="bg-white">
                     <CardHeader>
-                      <CardTitle>Training Locations</CardTitle>
+                      <CardTitle className="flex items-center gap-2 text-primary">
+                        <MapPin className="w-4 h-4 text-primary" /> Training
+                        Locations
+                      </CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-4">
-                      {professional.training_locations.map(
-                        (location, index) => (
-                          <div
-                            key={index}
-                            className="p-3 bg-gray-50 rounded-lg"
-                          >
-                            <div className="flex items-start gap-3">
-                              <MapPin className="w-4 h-4 text-gray-500 mt-0.5" />
-                              <div>
-                                <p className="font-medium text-sm">
-                                  {location}
-                                </p>
+                      {professional.training_locations_detailed.map(
+                        (training_location, index) => (
+                          <>
+                            <div
+                              key={index}
+                              className="border rounded-lg p-3 bg-muted"
+                            >
+                              <div className="flex items-start gap-2 mb-2">
+                                <MapPin className="w-4 h-4 text-primary mt-0.5" />
+                                <div className="flex-1">
+                                  <p className="text-sm font-semibold text-left">
+                                    {training_location.location}
+                                  </p>
+                                  <p className="text-xs text-muted-foreground  text-left">
+                                    {training_location.address}
+                                  </p>
+                                </div>
+                              </div>
+                              <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                                <Clock className="w-3 h-3" />
+                                <span>{training_location.timings}</span>
                               </div>
                             </div>
-                          </div>
+                          </>
                         )
                       )}
                     </CardContent>
                   </Card>
                 )}
               {/* Pricing */}
-              {professional.fee && (
-                <Card className="bg-white">
+              {professional.one_on_one_price > 0 && (
+                <Card className="shadow-elegant">
                   <CardHeader>
-                    <CardTitle>Pricing</CardTitle>
+                    <CardTitle className="flex items-center gap-2 text-primary">
+                      <DollarSign className="w-4 h-4" />
+                      Pricing
+                    </CardTitle>
                   </CardHeader>
-                  <CardContent>
-                    <div className="text-center p-4 bg-gray-50 rounded-lg">
-                      <div className="text-2xl font-bold text-primary">
-                        ₹{professional.fee}
-                      </div>
-                      <div className="text-sm text-gray-600">
-                        {professional.fee_type}
-                      </div>
+                  <CardContent className="space-y-3">
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm">Personal Training</span>
+                      <span className="font-semibold text-primary">
+                        {`${professional.one_on_one_price} / Per Session`}
+                      </span>
                     </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm">Group Training</span>
+                      <span className="font-semibold text-primary">
+                        {`${professional.group_session_price} / Per Session`}
+                      </span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm">Online Training</span>
+                      <span className="font-semibold text-primary">
+                        {`${professional.online_price} / Per Session`}
+                      </span>
+                    </div>
+                    {professional.free_demo_call && (
+                      <>
+                        <hr />
+                        <p className="text-xs text-center text-success font-medium">
+                          Free 15-min intro call
+                        </p>
+                      </>
+                    )}
                   </CardContent>
                 </Card>
               )}

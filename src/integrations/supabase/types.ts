@@ -578,7 +578,7 @@ export type Database = {
           success_stories: {story_details:string, age:number, client_name:string}[] | null
           total_match_played: number | null
           training_locations: string[] | null
-          training_locations_detailed: Json | null
+          training_locations_detailed: {address:string, timings:number, location:string}[] | null
           updated_at: string
           user_id: string | null
           videos: string[] | null
