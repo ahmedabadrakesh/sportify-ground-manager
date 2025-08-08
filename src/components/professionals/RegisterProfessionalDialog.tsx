@@ -237,131 +237,150 @@ const RegisterProfessionalDialog = ({
 
   useEffect(() => {
     const fillFormData = async () => {
-    if (currentUser && open && !isLoadingProfile) {
-      console.log("Pre-filling form data...");
-      console.log("Is super admin:", isSuperAdmin);
-      console.log("Is update:", isUpdate);
-      console.log("Has existing profile:", hasExistingProfile);
+      if (currentUser && open && !isLoadingProfile) {
+        console.log("Pre-filling form data...");
+        console.log("Is super admin:", isSuperAdmin);
+        console.log("Is update:", isUpdate);
+        console.log("Has existing profile:", hasExistingProfile);
 
-      if (isSuperAdmin && !isUpdate) {
-        console.log("Super admin creating new professional - using fresh form");
-        form.reset({
-          name: "",
-          profession_type: "Athlete",
-          games_played: [],
-          contact_number: "",
-          email: "",
-          fee: 0,
-          fee_type: "Per Hour",
-          city: "",
-          address: "",
-          comments: "",
-          photo: "",
-          years_of_experience: undefined,
-          total_match_played: undefined,
-          awards: [],
-          accomplishments: [],
-          certifications: [],
-          training_locations: [],
-          videos: [],
-          images: [],
-          punch_line: "",
-          instagram_link: "",
-          facebook_link: "",
-          linkedin_link: "",
-          website: "",
-          level: undefined,
-          coaching_availability: [],
-        });
-      } else if (isUpdate && existingProfileData) {
-        console.log("Pre-filling with existing data:", existingProfileData);
+        if (isSuperAdmin && !isUpdate) {
+          console.log(
+            "Super admin creating new professional - using fresh form"
+          );
+          form.reset({
+            name: "",
+            profession_type: "Athlete",
+            games_played: [],
+            contact_number: "",
+            email: "",
+            fee: 0,
+            fee_type: "Per Hour",
+            city: "",
+            address: "",
+            comments: "",
+            photo: "",
+            years_of_experience: undefined,
+            total_match_played: undefined,
+            awards: [],
+            accomplishments: [],
+            certifications: [],
+            training_locations: [],
+            videos: [],
+            images: [],
+            punch_line: "",
+            instagram_link: "",
+            facebook_link: "",
+            linkedin_link: "",
+            website: "",
+            level: undefined,
+            coaching_availability: [],
+          });
+        } else if (isUpdate && existingProfileData) {
+          console.log("Pre-filling with existing data:", existingProfileData);
 
-        // Use form.reset with the complete object to ensure proper type handling
-        form.reset({
-          // Basic Info
-          name: existingProfileData.name || "",
-          profession_type: existingProfileData.profession_type || "Athlete",
-          photo: existingProfileData.photo || "",
-          academy_name: existingProfileData.academy_name || "",
-          years_of_experience: existingProfileData.years_of_experience || 0,
-          games_played: [],
-          is_certified: existingProfileData.is_certified || false,
-          
-          // Contact & Social Details
-          contact_number: existingProfileData.contact_number || "",
-          whatsapp: existingProfileData.whatsapp || "",
-          whatsapp_same_as_phone: existingProfileData.whatsapp_same_as_phone || false,
-          email: userEmail,
-          instagram_link: existingProfileData.instagram_link || "",
-          youtube_link: existingProfileData.youtube_link || "",
-          linkedin_link: existingProfileData.linkedin_link || "",
-          website: existingProfileData.website || "",
-          facebook_link: existingProfileData.facebook_link || "",
-          
-          // Professional Details
-          district_level_tournaments: existingProfileData.district_level_tournaments || 0,
-          state_level_tournaments: existingProfileData.state_level_tournaments || 0,
-          national_level_tournaments: existingProfileData.national_level_tournaments || 0,
-          international_level_tournaments: existingProfileData.international_level_tournaments || 0,
-          specialties: existingProfileData.specialties || [],
-          certifications: existingProfileData.certifications || [],
-          education: existingProfileData.education || [],
-          accomplishments: existingProfileData.accomplishments || [],
-          training_locations_detailed: existingProfileData.training_locations_detailed || [],
-          
-          // Media & Pricing
-          images: existingProfileData.images || [],
-          videos: existingProfileData.videos || [],
-          one_on_one_price: existingProfileData.one_on_one_price || 0,
-          group_session_price: existingProfileData.group_session_price || 0,
-          online_price: existingProfileData.online_price || 0,
-          free_demo_call: existingProfileData.free_demo_call || false,
-          
-          // About Me
-          about_me: existingProfileData.about_me || "",
-          success_stories: existingProfileData.success_stories || [],
-          
-          // Legacy fields
-          city: existingProfileData.city || "",
-          address: existingProfileData.address || "",
-          comments: existingProfileData.comments || "",
-          fee: existingProfileData.fee || 0,
-          fee_type: existingProfileData.fee_type || "Per Hour",
-          total_match_played: existingProfileData.total_match_played || 0,
-          awards: existingProfileData.awards || [],
-          training_locations: existingProfileData.training_locations || [],
-          punch_line: existingProfileData.punch_line || "",
-          level: existingProfileData.level || undefined,
-          coaching_availability: existingProfileData.coaching_availability || [],
-        });
+          // Use form.reset with the complete object to ensure proper type handling
+          form.reset({
+            // Basic Info
+            name: existingProfileData.name || "",
+            profession_type: existingProfileData.profession_type || "Athlete",
+            photo: existingProfileData.photo || "",
+            academy_name: existingProfileData.academy_name || "",
+            years_of_experience: existingProfileData.years_of_experience || 0,
+            games_played: [],
+            is_certified: existingProfileData.is_certified || false,
 
-        // Convert game_ids to game names and set games_played
-        if (existingProfileData.game_ids && Array.isArray(existingProfileData.game_ids) && existingProfileData.game_ids.length > 0) {
-          try {
-            const { data: gameData, error: gameError } = await supabase
-              .from('games')
-              .select('name')
-              .in('id', existingProfileData.game_ids);
-            
-            if (gameData && !gameError) {
-              console.log('Setting games_played:', gameData.map(game => game.name));
-              form.setValue('games_played', gameData.map(game => game.name));
+            // Contact & Social Details
+            contact_number: existingProfileData.contact_number || "",
+            whatsapp: existingProfileData.whatsapp || "",
+            whatsapp_same_as_phone:
+              existingProfileData.whatsapp_same_as_phone || false,
+            email: userEmail,
+            instagram_link: existingProfileData.instagram_link || "",
+            youtube_link: existingProfileData.youtube_link || "",
+            linkedin_link: existingProfileData.linkedin_link || "",
+            website: existingProfileData.website || "",
+            facebook_link: existingProfileData.facebook_link || "",
+
+            // Professional Details
+            district_level_tournaments:
+              existingProfileData.district_level_tournaments || 0,
+            state_level_tournaments:
+              existingProfileData.state_level_tournaments || 0,
+            national_level_tournaments:
+              existingProfileData.national_level_tournaments || 0,
+            international_level_tournaments:
+              existingProfileData.international_level_tournaments || 0,
+            specialties: existingProfileData.specialties || [],
+            certifications: existingProfileData.certifications || [],
+            education: existingProfileData.education || [],
+            accomplishments: existingProfileData.accomplishments || [],
+            training_locations_detailed:
+              existingProfileData.training_locations_detailed || [],
+
+            // Media & Pricing
+            images: existingProfileData.images || [],
+            videos: existingProfileData.videos || [],
+            one_on_one_price: existingProfileData.one_on_one_price || 0,
+            group_session_price: existingProfileData.group_session_price || 0,
+            online_price: existingProfileData.online_price || 0,
+            free_demo_call: existingProfileData.free_demo_call || false,
+
+            // About Me
+            about_me: existingProfileData.about_me || "",
+            success_stories: existingProfileData.success_stories || [],
+
+            // Legacy fields
+            city: existingProfileData.city || "",
+            address: existingProfileData.address || "",
+            comments: existingProfileData.comments || "",
+            fee: existingProfileData.fee || 0,
+            fee_type: existingProfileData.fee_type || "Per Hour",
+            total_match_played: existingProfileData.total_match_played || 0,
+            awards: existingProfileData.awards || [],
+            training_locations: existingProfileData.training_locations || [],
+            punch_line: existingProfileData.punch_line || "",
+            level: existingProfileData.level || undefined,
+            coaching_availability:
+              existingProfileData.coaching_availability || [],
+          });
+
+          // Convert game_ids to game names and set games_played
+          if (
+            existingProfileData.game_ids &&
+            Array.isArray(existingProfileData.game_ids) &&
+            existingProfileData.game_ids.length > 0
+          ) {
+            try {
+              const { data: gameData, error: gameError } = await supabase
+                .from("games")
+                .select("name")
+                .in("id", existingProfileData.game_ids);
+
+              if (gameData && !gameError) {
+                console.log(
+                  "Setting games_played:",
+                  gameData.map((game) => game.name)
+                );
+                form.setValue(
+                  "games_played",
+                  gameData.map((game) => game.name)
+                );
+              }
+            } catch (error) {
+              console.error("Error fetching game names:", error);
             }
-          } catch (error) {
-            console.error('Error fetching game names:', error);
+          }
+
+          console.log("Form values after pre-fill:", form.getValues());
+        } else if (!hasExistingProfile && !isSuperAdmin) {
+          console.log("Regular user creating new profile");
+          form.setValue("name", currentUser.name || "");
+          form.setValue("email", userEmail);
+
+          if (currentUser.phone) {
+            form.setValue("contact_number", currentUser.phone);
           }
         }
-
-        console.log("Form values after pre-fill:", form.getValues());
-      } else if (!hasExistingProfile && !isSuperAdmin) {
-        console.log("Regular user creating new profile");
-        form.setValue("name", currentUser.name || "");
-        form.setValue("email", userEmail);
-
-        if (currentUser.phone) {
-          form.setValue("contact_number", currentUser.phone);
-        }
-      }
       }
     };
 
@@ -408,15 +427,17 @@ const RegisterProfessionalDialog = ({
       <DialogContent className="max-w-6xl md:max-h-[90vh]">
         <div className="grid md:grid-cols-8 gap-4">
           <div className="hidden md:block col-span-2 bg-primary-800">
-            <DialogTitle className="text-left text-white pl-5 pb-4 pt-6">
-              {dialogTitle}
-            </DialogTitle>
-            <hr />
-            <StepperForm
-              currentStep={currentStep}
-              totalSteps={totalSteps}
-              stepTitles={stepTitles}
-            />
+            <ScrollArea className="h-[calc(90vh-40px)]">
+              <DialogTitle className="text-left text-white pl-5 pb-4 pt-6">
+                {dialogTitle}
+              </DialogTitle>
+              <hr />
+              <StepperForm
+                currentStep={currentStep}
+                totalSteps={totalSteps}
+                stepTitles={stepTitles}
+              />
+            </ScrollArea>
           </div>
           <div className="md:col-span-6">
             {isLoadingProfile ? (
