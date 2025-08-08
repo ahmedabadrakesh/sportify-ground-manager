@@ -1,54 +1,63 @@
 import React from "react";
 import { Progress } from "@/components/ui/progress";
+import { Button } from "@/components/ui/button";
 
 interface CircularProgressProps {
   professional: any;
+  handleUpdateProfile: any;
 }
 
-const CircularProgress: React.FC<CircularProgressProps> = ({ professional }) => {
+const CircularProgress: React.FC<CircularProgressProps> = ({
+  professional,
+  handleUpdateProfile,
+}) => {
   const calculateCompletionPercentage = () => {
     if (!professional) return 0;
 
     const fields = [
-      'name',
-      'profession_type', 
-      'about_me',
-      'punch_line',
-      'years_of_experience',
-      'photo',
-      'phone',
-      'city',
-      'state',
-      'country',
-      'pincode',
-      'current_location',
-      'training_locations',
-      'website',
-      'instagram_link',
-      'facebook_link',
-      'linkedin_link',
-      'certifications',
-      'accomplishments',
-      'success_stories',
-      'videos',
-      'images',
-      'game_ids',
-      'games_played',
-      'coaching_availability',
-      'fee_per_hour',
-      'fee_per_session',
-      'district_level_tournaments',
-      'state_level_tournaments',
-      'national_level_tournaments',
-      'international_level_tournaments'
+      "name",
+      "profession_type",
+      "about_me",
+      "punch_line",
+      "years_of_experience",
+      "photo",
+      "phone",
+      "city",
+      "state",
+      "country",
+      "pincode",
+      "current_location",
+      "training_locations",
+      "website",
+      "instagram_link",
+      "facebook_link",
+      "linkedin_link",
+      "certifications",
+      "accomplishments",
+      "success_stories",
+      "videos",
+      "images",
+      "game_ids",
+      "games_played",
+      "coaching_availability",
+      "fee_per_hour",
+      "fee_per_session",
+      "district_level_tournaments",
+      "state_level_tournaments",
+      "national_level_tournaments",
+      "international_level_tournaments",
     ];
 
     let filledFields = 0;
-    
-    fields.forEach(field => {
+
+    fields.forEach((field) => {
       const value = professional[field];
-      if (value !== null && value !== undefined && value !== '' && 
-          !(Array.isArray(value) && value.length === 0)) {
+      if (
+        value !== null &&
+        value !== undefined &&
+        value !== "" &&
+        !(Array.isArray(value) && value.length === 0)
+      ) {
         filledFields++;
       }
     });
@@ -66,7 +75,7 @@ const CircularProgress: React.FC<CircularProgressProps> = ({ professional }) => 
     return "hsl(280, 100%, 70%)"; // purple for >90%
   };
 
-  const radius = 45;
+  const radius = 60;
   const strokeWidth = 8;
   const normalizedRadius = radius - strokeWidth * 2;
   const circumference = normalizedRadius * 2 * Math.PI;
@@ -75,15 +84,15 @@ const CircularProgress: React.FC<CircularProgressProps> = ({ professional }) => 
 
   return (
     <div className="flex flex-col items-center justify-center">
-      <div className="relative w-24 h-24">
+      <div className="relative w-32 h-32">
         <svg
-          className="transform -rotate-90 w-24 h-24"
+          className="transform w-48 h-48"
           width={radius * 2}
           height={radius * 2}
         >
           {/* Background circle */}
           <circle
-            stroke="white"
+            stroke="gray"
             fill="transparent"
             strokeWidth={strokeWidth}
             strokeDasharray={strokeDasharray}
@@ -108,12 +117,15 @@ const CircularProgress: React.FC<CircularProgressProps> = ({ professional }) => 
         </svg>
         {/* Percentage text in center */}
         <div className="absolute inset-0 flex items-center justify-center">
-          <span className="text-white text-sm font-bold">
-            {percentage}%
-          </span>
+          <span className="text-success text-xl font-bold">{percentage}%</span>
         </div>
       </div>
-      <p className="text-white text-xs mt-2 text-center">Profile Complete</p>
+      <Button
+        className="w-full bg-slate-800 hover:bg-slate-700"
+        onClick={handleUpdateProfile}
+      >
+        Complete Your Profile Now
+      </Button>
     </div>
   );
 };

@@ -340,8 +340,6 @@ const ProfessionalProfile = () => {
             <div className="bg-gradient-to-r p-12 flex flex-col lg:flex-row items-center lg:items-start gap-8">
               {/* Avatar and Initials */}
               <div className="relative flex flex-col items-center gap-4">
-                {/* Circular Progress Bar */}
-                <CircularProgress professional={professional} />
                 <div className="w-32 h-32 lg:w-32 ml-32 lg:h-32 rounded-full bg-gradient-to-br from-blue-400 to-purple-600 flex items-center justify-center text-white text-4xl lg:text-6xl font-bold">
                   {professional.photo ? (
                     <Avatar className="w-32 h-32 border-4 border-primary-foreground shadow-elegant">
@@ -717,10 +715,24 @@ const ProfessionalProfile = () => {
 
             {/* Right Column - Contact & Details */}
             <div className="space-y-6">
+              {/* Circular Progress Bar */}
+              <Card className="bg-white top-8">
+                <CardHeader>
+                  <CardTitle className="text-left">Profile Progress</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <CircularProgress
+                    professional={professional}
+                    handleUpdateProfile={handleUpdateProfile}
+                  />
+                </CardContent>
+              </Card>
               {/* Contact Information */}
               <Card className="bg-white top-8">
                 <CardHeader>
-                  <CardTitle>Contact Information</CardTitle>
+                  <CardTitle className="text-left">
+                    Contact Information
+                  </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="space-y-3">
