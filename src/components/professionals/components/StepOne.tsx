@@ -159,8 +159,41 @@ export const StepOne = ({ form }: StepOneProps) => {
         />
       </div>
 
+      {/* Address and City Row */}
+      <div className="grid lg:grid-cols-2 gap-6 pt-4">
+        {/* Left: City */}
+        <FormField
+          name="city"
+          control={form.control}
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>City *</FormLabel>
+              <FormControl>
+                <Input {...field} placeholder="Enter your city" />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        {/* Right: Address */}
+        <FormField
+          name="address"
+          control={form.control}
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Address *</FormLabel>
+              <FormControl>
+                <Input {...field} placeholder="Enter your complete address" />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+      </div>
+
       {/* Bottom Row: Academy Name (Left), Years of Experience (Right) */}
-      <div className="grid lg:grid-cols-2 gap-6">
+      <div className="grid lg:grid-cols-2 gap-6 pt-4">
         {/* Left: Academy Name */}
         <FormField
           name="academy_name"

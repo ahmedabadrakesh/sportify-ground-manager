@@ -11,7 +11,7 @@ export const useFormValidation = (form: UseFormReturn<ProfessionalFormValues>) =
 
     switch (step) {
       case 1:
-        fieldsToValidate = ["name", "email", "contact_number"];
+        fieldsToValidate = ["name", "email", "contact_number", "city", "address"];
         break;
       case 2:
         fieldsToValidate = ["profession_type", "fee", "fee_type"];
