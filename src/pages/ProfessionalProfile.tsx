@@ -385,8 +385,47 @@ const ProfessionalProfile = () => {
                     : "Sports Professional"}
                 </p>
 
+                <div className="block md:hidden grid grid-cols-2 md:grid-cols-4 gap-4 text-centers mb-6">
+                  <div className="bg-muted rounded-lg p-4">
+                    <div className="text-2xl font-bold text-primary">
+                      {professional.years_of_experience}+
+                    </div>
+                    <div className="text-xs text-muted-foreground">
+                      Years Experience
+                    </div>
+                  </div>
+                  <div className="bg-muted rounded-lg p-4">
+                    <div className="text-2xl font-bold text-primary">
+                      {100}+
+                    </div>
+                    <div className="text-xs text-muted-foreground">
+                      Clients Trained
+                    </div>
+                  </div>
+                  <div className="bg-muted rounded-lg p-4">
+                    <div className="text-2xl font-bold text-primary">
+                      {professional.district_level_tournaments +
+                        professional.state_level_tournaments +
+                        professional.national_level_tournaments +
+                        professional.international_level_tournaments}
+                      +
+                    </div>
+                    <div className="text-xs text-muted-foreground">
+                      Match Played
+                    </div>
+                  </div>
+                  <div className="bg-muted rounded-lg p-4">
+                    <div className="flex items-center flex-col mb-2">
+                      <MapPin className="w-6 h-6" color="#000000" />
+                    </div>
+                    <div className="text-xs text-muted-foreground">
+                      {professional.city || "India"}
+                    </div>
+                  </div>
+                </div>
+
                 {/* Achievement Badges */}
-                <div className="flex flex-wrap justify-center lg:justify-start gap-4 mb-6">
+                <div className="hidden md:flex flex-wrap justify-center lg:justify-start gap-4 mb-6">
                   {professional.years_of_experience && (
                     <Badge
                       variant="secondary"
@@ -395,7 +434,6 @@ const ProfessionalProfile = () => {
                       {professional.years_of_experience}+ Years Experience
                     </Badge>
                   )}
-                  {/* {professional.clientsTrained && ( */}
                   <Badge
                     variant="secondary"
                     className="bg-primary-foreground/20 text-primary-foreground border-primary-foreground/30"
@@ -716,20 +754,24 @@ const ProfessionalProfile = () => {
             {/* Right Column - Contact & Details */}
             <div className="space-y-6">
               {/* Circular Progress Bar */}
-              <Card className="bg-white top-8">
-                <CardHeader>
-                  <CardTitle className="text-left">Profile Progress</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <CircularProgress professional={professional} />
-                  <Button
-                    className="w-full bg-slate-800 hover:bg-slate-700"
-                    onClick={handleUpdateProfile}
-                  >
-                    Complete Your Profile Now
-                  </Button>
-                </CardContent>
-              </Card>
+              {professional.user_id === currentUser.id && (
+                <Card className="bg-white top-8">
+                  <CardHeader>
+                    <CardTitle className="text-left">
+                      Profile Progress
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <CircularProgress professional={professional} />
+                    <Button
+                      className="w-full bg-slate-800 hover:bg-slate-700"
+                      onClick={handleUpdateProfile}
+                    >
+                      Complete Your Profile Now
+                    </Button>
+                  </CardContent>
+                </Card>
+              )}
               {/* Contact Information */}
               <Card className="bg-white top-8">
                 <CardHeader>
