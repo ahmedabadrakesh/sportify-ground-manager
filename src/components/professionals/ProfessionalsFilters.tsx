@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   Select,
   SelectContent,
@@ -8,8 +8,9 @@ import {
 } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { X } from "lucide-react";
+import { X, Filter, ChevronUp } from "lucide-react";
 import { useGames } from "@/hooks/useGames";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface FilterOptions {
   city?: string;
@@ -30,6 +31,8 @@ const ProfessionalsFilters = ({
   availableCities,
 }: ProfessionalsFiltersProps) => {
   const { games } = useGames();
+  const isMobile = useIsMobile();
+  const [showFilters, setShowFilters] = useState(false);
 
   const experienceRanges = [
     { value: "0-2", label: "0-2 years" },
@@ -53,9 +56,43 @@ const ProfessionalsFilters = ({
     (value) => value !== undefined
   );
 
+  // On mobile, show filters based on showFilters state
+  const shouldShowFilters = !isMobile || showFilters;
+
   return (
-    <div className="bg-card border rounded-lg p-6 mb-6">
-      <div className="flex flex-col lg:flex-row gap-4">
+    <div className="mb-6">
+      {/* Mobile Filter Toggle Button */}
+      {isMobile && (
+        <Button
+          variant="outline"
+          onClick={() => setShowFilters(!showFilters)}
+          className="w-full mb-4 flex items-center justify-center gap-2"
+        >
+          <Filter className="h-4 w-4" />
+          {showFilters ? "Hide Filters" : "Show Filters"}
+          {showFilters && <ChevronUp className="h-4 w-4" />}
+        </Button>
+      )}
+
+      {/* Filters Container */}
+      {shouldShowFilters && (
+        <div className="bg-card border rounded-lg p-6">
+          {/* Close button for mobile when filters are shown */}
+          {isMobile && (
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-lg font-medium">Filters</h3>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setShowFilters(false)}
+                className="h-8 w-8 p-0"
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            </div>
+          )}
+
+          <div className="flex flex-col lg:flex-row gap-4">
         {/* City Filter */}
         <div className="flex-1">
           <label className="text-sm font-medium text-foreground mb-2 block">
@@ -216,6 +253,8 @@ const ProfessionalsFilters = ({
           <Button variant="outline" size="sm" onClick={clearAllFilters}>
             Clear All
           </Button>
+        </div>
+      )}
         </div>
       )}
     </div>
