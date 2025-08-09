@@ -9,8 +9,10 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { toast } from "sonner";
 import { register, login } from "@/utils/auth";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { supabase } from "@/integrations/supabase/client";
 import ProfileProgressDialog from "@/components/professionals/ProfileProgressDialog";
 import RegisterProfessionalDialog from "@/components/professionals/RegisterProfessionalDialog";
+import OTPVerification from "@/components/auth/OTPVerification";
 
 const Register: React.FC = () => {
   const navigate = useNavigate();
@@ -25,6 +27,8 @@ const Register: React.FC = () => {
   const [isProfileProgressDialogOpen, setIsProfileProgressDialogOpen] = useState(false);
   const [isUpdateDialogOpen, setIsUpdateDialogOpen] = useState(false);
   const [registeredUser, setRegisteredUser] = useState<any>(null);
+  const [showOTPVerification, setShowOTPVerification] = useState(false);
+  const [pendingUserData, setPendingUserData] = useState<any>(null);
   
   // Use a ref to track if submission is in progress
   const isSubmittingRef = useRef(false);
@@ -81,57 +85,53 @@ const Register: React.FC = () => {
         }
       }
 
-      console.log("Starting registration with:", { 
+      console.log("Starting registration with OTP verification:", { 
         name, 
         email: registrationType === "email" ? email : "", 
         phone: registrationType === "phone" ? phone : "", 
         userType 
       });
       
-      const user = await register(
-        name, 
-        registrationType === "email" ? email : "", 
-        registrationType === "phone" ? phone : "", 
+      // First, try to sign up with Supabase (this will send OTP)
+      const signUpData = {
+        email: registrationType === "email" ? email : `${phone}@phone.user`,
         password,
-        userType
-      );
-      
-      console.log("Registration result:", user);
-      
-      if (user) {
-        console.log("Registration successful, user:", user);
-        
-        // Auto-login the user after successful registration
-        try {
-          const loginIdentifier = registrationType === "email" ? email : phone;
-          const loggedInUser = await login(loginIdentifier, password);
-          
-          if (loggedInUser) {
-            const successMessage = userType === 'sports_professional' 
-              ? "Registration successful! Your sports professional profile has been created. Welcome to SportifyGround!"
-              : "Registration successful! Welcome to SportifyGround!";
-            
-            toast.success(successMessage);
-            
-            // Show profile progress dialog for sports professionals
-            if (userType === 'sports_professional') {
-              setRegisteredUser(loggedInUser);
-              setIsProfileProgressDialogOpen(true);
-            } else {
-              navigate("/");
-            }
-          } else {
-            throw new Error("Auto-login failed");
-          }
-        } catch (loginError) {
-          console.error("Auto-login error:", loginError);
-          toast.success("Registration successful! Please login to continue.");
-          navigate("/login");
+        options: {
+          data: {
+            name,
+            user_type: userType
+          },
+          emailRedirectTo: `${window.location.origin}/`
         }
-      } else {
-        console.log("Registration failed: no user returned");
-        toast.error("Registration failed. Please try again.");
+      };
+      
+      const { data, error } = await supabase.auth.signUp(signUpData);
+      
+      if (error) {
+        console.error("Supabase auth signup error:", error);
+        
+        if (error.status === 429 || error.message?.includes("rate limit")) {
+          throw new Error("Too many registration attempts. Please wait a few minutes before trying again.");
+        }
+        
+        throw error;
       }
+      
+      console.log("Supabase signup successful, OTP should be sent:", data);
+      
+      // Store pending user data for after OTP verification
+      setPendingUserData({
+        name,
+        email: registrationType === "email" ? email : "",
+        phone: registrationType === "phone" ? phone : "",
+        password,
+        userType,
+        authUser: data.user
+      });
+      
+      // Show OTP verification screen
+      setShowOTPVerification(true);
+      toast.success(`Verification code sent to your ${registrationType}!`);
     } catch (error: any) {
       console.error("Registration error:", error);
       
@@ -157,6 +157,105 @@ const Register: React.FC = () => {
       isSubmittingRef.current = false;
     }
   };
+
+  const handleOTPVerificationSuccess = async () => {
+    if (!pendingUserData) return;
+    
+    try {
+      setIsLoading(true);
+      
+      // Complete the registration process with our custom register function
+      const user = await register(
+        pendingUserData.name,
+        pendingUserData.email,
+        pendingUserData.phone,
+        pendingUserData.password,
+        pendingUserData.userType
+      );
+      
+      if (user) {
+        console.log("Registration completed successfully:", user);
+        
+        const successMessage = pendingUserData.userType === 'sports_professional' 
+          ? "Registration successful! Your sports professional profile has been created. Welcome to SportifyGround!"
+          : "Registration successful! Welcome to SportifyGround!";
+        
+        toast.success(successMessage);
+        
+        // Show profile progress dialog for sports professionals
+        if (pendingUserData.userType === 'sports_professional') {
+          setRegisteredUser(user);
+          setIsProfileProgressDialogOpen(true);
+        } else {
+          navigate("/");
+        }
+      }
+      
+      setShowOTPVerification(false);
+      setPendingUserData(null);
+    } catch (error: any) {
+      console.error("Registration completion error:", error);
+      toast.error("Registration completion failed. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleResendOTP = async () => {
+    if (!pendingUserData) return;
+    
+    try {
+      const { error } = await supabase.auth.resend({
+        type: registrationType === "email" ? "signup" : "sms",
+        email: registrationType === "email" ? pendingUserData.email : undefined,
+        phone: registrationType === "phone" ? `+91${pendingUserData.phone}` : undefined
+      });
+      
+      if (error) {
+        console.error("Resend OTP error:", error);
+        toast.error("Failed to resend OTP. Please try again.");
+      }
+    } catch (error) {
+      console.error("Resend OTP error:", error);
+      toast.error("Failed to resend OTP. Please try again.");
+    }
+  };
+
+  // Show OTP verification screen if needed
+  if (showOTPVerification && pendingUserData) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4 py-8">
+        <div className="w-full max-w-md">
+          <div className="text-center mb-8">
+            <Link to="/" className="inline-block">
+              <h1 className="text-3xl font-bold text-primary-800">SportifyGround</h1>
+            </Link>
+          </div>
+          
+          <OTPVerification
+            email={pendingUserData.email}
+            phone={pendingUserData.phone}
+            registrationType={registrationType}
+            onVerificationSuccess={handleOTPVerificationSuccess}
+            onResendOTP={handleResendOTP}
+          />
+          
+          <div className="text-center mt-4">
+            <Button
+              variant="link"
+              onClick={() => {
+                setShowOTPVerification(false);
+                setPendingUserData(null);
+              }}
+              className="text-sm"
+            >
+              Back to Registration
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4 py-8">
