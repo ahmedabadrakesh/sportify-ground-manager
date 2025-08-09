@@ -8,6 +8,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { login } from "@/utils/auth";
 import { toast } from "sonner";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import ProfileProgressDialog from "@/components/professionals/ProfileProgressDialog";
 
 const Login: React.FC = () => {
   const navigate = useNavigate();
@@ -16,6 +17,8 @@ const Login: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [loginMethod, setLoginMethod] = useState<"email" | "phone">("email");
   const [loginError, setLoginError] = useState<string | null>(null);
+  const [showProgressDialog, setShowProgressDialog] = useState(false);
+  const [loggedInUserId, setLoggedInUserId] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -37,6 +40,13 @@ const Login: React.FC = () => {
       
       if (user) {
         toast.success(`Welcome back, ${user.name}!`);
+        
+        // Show progress dialog for sports professionals
+        if (user.role === 'sports_professional') {
+          setLoggedInUserId(user.id);
+          setShowProgressDialog(true);
+          return; // Don't navigate yet, let dialog handle it
+        }
         
         // Redirect based on user role
         if (user.role === 'admin' || user.role === 'super_admin') {
@@ -161,6 +171,18 @@ const Login: React.FC = () => {
             </Button>
           </CardFooter>
         </Card>
+
+        {/* Profile Progress Dialog for Sports Professionals */}
+        {loggedInUserId && (
+          <ProfileProgressDialog
+            isOpen={showProgressDialog}
+            onClose={() => {
+              setShowProgressDialog(false);
+              navigate('/'); // Navigate to home after closing dialog
+            }}
+            userId={loggedInUserId}
+          />
+        )}
       </div>
     </div>
   );
