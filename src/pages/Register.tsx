@@ -9,10 +9,8 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { toast } from "sonner";
 import { register, login } from "@/utils/auth";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { supabase } from "@/integrations/supabase/client";
 import ProfileProgressDialog from "@/components/professionals/ProfileProgressDialog";
 import RegisterProfessionalDialog from "@/components/professionals/RegisterProfessionalDialog";
-import OTPVerification from "@/components/auth/OTPVerification";
 
 const Register: React.FC = () => {
   const navigate = useNavigate();
@@ -27,8 +25,6 @@ const Register: React.FC = () => {
   const [isProfileProgressDialogOpen, setIsProfileProgressDialogOpen] = useState(false);
   const [isUpdateDialogOpen, setIsUpdateDialogOpen] = useState(false);
   const [registeredUser, setRegisteredUser] = useState<any>(null);
-  const [showOTPVerification, setShowOTPVerification] = useState(false);
-  const [pendingUserData, setPendingUserData] = useState<any>(null);
   
   // Use a ref to track if submission is in progress
   const isSubmittingRef = useRef(false);
@@ -85,84 +81,57 @@ const Register: React.FC = () => {
         }
       }
 
-      console.log("Starting registration with OTP verification:", { 
+      console.log("Starting registration with:", { 
         name, 
         email: registrationType === "email" ? email : "", 
         phone: registrationType === "phone" ? phone : "", 
         userType 
       });
       
-      // First, try to sign up with Supabase (this will send OTP)
-      const signUpData = {
-        email: registrationType === "email" ? email : `${phone}@phone.user`,
+      const user = await register(
+        name, 
+        registrationType === "email" ? email : "", 
+        registrationType === "phone" ? phone : "", 
         password,
-        options: {
-          data: {
-            name,
-            user_type: userType
-          },
-          emailRedirectTo: `${window.location.origin}/`
-        }
-      };
+        userType
+      );
       
-      const { data, error } = await supabase.auth.signUp(signUpData);
+      console.log("Registration result:", user);
       
-      if (error) {
-        console.error("Supabase auth signup error:", error);
+      if (user) {
+        console.log("Registration successful, user:", user);
         
-        // Handle existing user - check if they need email confirmation
-        if (error.message?.includes("User already registered")) {
-          try {
-            // Try to resend confirmation email for existing user
-            const { error: resendError } = await supabase.auth.resend({
-              type: 'signup',
-              email: registrationType === "email" ? email : `${phone}@phone.user`
-            });
+        // Auto-login the user after successful registration
+        try {
+          const loginIdentifier = registrationType === "email" ? email : phone;
+          const loggedInUser = await login(loginIdentifier, password);
+          
+          if (loggedInUser) {
+            const successMessage = userType === 'sports_professional' 
+              ? "Registration successful! Your sports professional profile has been created. Welcome to SportifyGround!"
+              : "Registration successful! Welcome to SportifyGround!";
             
-            if (!resendError) {
-              // Store pending user data for OTP verification
-              setPendingUserData({
-                name,
-                email: registrationType === "email" ? email : "",
-                phone: registrationType === "phone" ? phone : "",
-                password,
-                userType,
-                authUser: null // We don't have the user object yet
-              });
-              
-              setShowOTPVerification(true);
-              toast.success("Verification code sent to your email! Please check and verify to complete registration.");
-              return;
+            toast.success(successMessage);
+            
+            // Show profile progress dialog for sports professionals
+            if (userType === 'sports_professional') {
+              setRegisteredUser(loggedInUser);
+              setIsProfileProgressDialogOpen(true);
             } else {
-              throw new Error("This email is already registered and verified. Please try logging in instead.");
+              navigate("/");
             }
-          } catch (resendError) {
-            throw new Error("This email is already registered and verified. Please try logging in instead.");
+          } else {
+            throw new Error("Auto-login failed");
           }
+        } catch (loginError) {
+          console.error("Auto-login error:", loginError);
+          toast.success("Registration successful! Please login to continue.");
+          navigate("/login");
         }
-        
-        if (error.status === 429 || error.message?.includes("rate limit")) {
-          throw new Error("Too many registration attempts. Please wait a few minutes before trying again.");
-        }
-        
-        throw error;
+      } else {
+        console.log("Registration failed: no user returned");
+        toast.error("Registration failed. Please try again.");
       }
-      
-      console.log("Supabase signup successful, OTP should be sent:", data);
-      
-      // Store pending user data for after OTP verification
-      setPendingUserData({
-        name,
-        email: registrationType === "email" ? email : "",
-        phone: registrationType === "phone" ? phone : "",
-        password,
-        userType,
-        authUser: data.user
-      });
-      
-      // Show OTP verification screen
-      setShowOTPVerification(true);
-      toast.success(`Verification code sent to your ${registrationType}!`);
     } catch (error: any) {
       console.error("Registration error:", error);
       
@@ -188,105 +157,6 @@ const Register: React.FC = () => {
       isSubmittingRef.current = false;
     }
   };
-
-  const handleOTPVerificationSuccess = async () => {
-    if (!pendingUserData) return;
-    
-    try {
-      setIsLoading(true);
-      
-      // Complete the registration process with our custom register function
-      const user = await register(
-        pendingUserData.name,
-        pendingUserData.email,
-        pendingUserData.phone,
-        pendingUserData.password,
-        pendingUserData.userType
-      );
-      
-      if (user) {
-        console.log("Registration completed successfully:", user);
-        
-        const successMessage = pendingUserData.userType === 'sports_professional' 
-          ? "Registration successful! Your sports professional profile has been created. Welcome to SportifyGround!"
-          : "Registration successful! Welcome to SportifyGround!";
-        
-        toast.success(successMessage);
-        
-        // Show profile progress dialog for sports professionals
-        if (pendingUserData.userType === 'sports_professional') {
-          setRegisteredUser(user);
-          setIsProfileProgressDialogOpen(true);
-        } else {
-          navigate("/");
-        }
-      }
-      
-      setShowOTPVerification(false);
-      setPendingUserData(null);
-    } catch (error: any) {
-      console.error("Registration completion error:", error);
-      toast.error("Registration completion failed. Please try again.");
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleResendOTP = async () => {
-    if (!pendingUserData) return;
-    
-    try {
-      const { error } = await supabase.auth.resend({
-        type: registrationType === "email" ? "signup" : "sms",
-        email: registrationType === "email" ? pendingUserData.email : undefined,
-        phone: registrationType === "phone" ? `+91${pendingUserData.phone}` : undefined
-      });
-      
-      if (error) {
-        console.error("Resend OTP error:", error);
-        toast.error("Failed to resend OTP. Please try again.");
-      }
-    } catch (error) {
-      console.error("Resend OTP error:", error);
-      toast.error("Failed to resend OTP. Please try again.");
-    }
-  };
-
-  // Show OTP verification screen if needed
-  if (showOTPVerification && pendingUserData) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4 py-8">
-        <div className="w-full max-w-md">
-          <div className="text-center mb-8">
-            <Link to="/" className="inline-block">
-              <h1 className="text-3xl font-bold text-primary-800">SportifyGround</h1>
-            </Link>
-          </div>
-          
-          <OTPVerification
-            email={pendingUserData.email}
-            phone={pendingUserData.phone}
-            registrationType={registrationType}
-            onVerificationSuccess={handleOTPVerificationSuccess}
-            onResendOTP={handleResendOTP}
-          />
-          
-          <div className="text-center mt-4">
-            <Button
-              variant="link"
-              onClick={() => {
-                setShowOTPVerification(false);
-                setPendingUserData(null);
-              }}
-              className="text-sm"
-            >
-              Back to Registration
-            </Button>
-          </div>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4 py-8">
