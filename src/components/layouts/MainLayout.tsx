@@ -7,6 +7,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { toast } from "sonner";
 import jokovaLogoTextImage from "/public/green_text_only_logo.png";
 import jokovaLogoSymbolImage from "/public/green_jokova_symbol.png";
+import MobileBottomNav from "./MobileBottomNav";
 
 interface MainLayoutProps {
   children: React.ReactNode;
@@ -136,119 +137,23 @@ const MainLayout = ({ children }: MainLayoutProps) => {
               )}
             </div>
 
-            {/* Mobile menu button */}
+            {/* Mobile cart icon */}
             <div className="md:hidden">
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              >
-                {mobileMenuOpen ? (
-                  <X className="h-6 w-6" />
-                ) : (
-                  <Menu className="h-6 w-6" />
-                )}
-              </Button>
+              <Link to="/cart">
+                <Button variant="ghost" size="icon">
+                  <ShoppingCart className="h-5 w-5" />
+                </Button>
+              </Link>
             </div>
           </div>
         </div>
 
-        {/* Mobile menu */}
-        {mobileMenuOpen && (
-          <div className="md:hidden">
-            <div className="space-y-1 px-4 py-4">
-              <Link
-                to="/search"
-                className="block py-2 hover:bg-gray-100 rounded-md"
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                Grounds
-              </Link>
-              <Link
-                to="/bookings"
-                className="block py-2 hover:bg-gray-100 rounded-md"
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                Bookings
-              </Link>
-              <Link
-                to="/sports-professionals"
-                className="block py-2 hover:bg-gray-100 rounded-md"
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                Professionals
-              </Link>
-              <Link
-                to="/events"
-                className="block py-2 hover:bg-gray-100 rounded-md"
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                Events
-              </Link>
-              <Link
-                to="/shop"
-                className="block py-2 hover:bg-gray-100 rounded-md"
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                Shop
-              </Link>
-              <Link
-                to="/api-documentation"
-                className="block py-2 hover:bg-gray-100 rounded-md"
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                API Docs
-              </Link>
-              <Link
-                to="/cart"
-                className="block py-2 hover:bg-gray-100 rounded-md"
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                Cart
-              </Link>
-              {authenticated ? (
-                <>
-                  <Link
-                    to="/admin/dashboard"
-                    className="block py-2 hover:bg-gray-100 rounded-md"
-                    onClick={() => setMobileMenuOpen(false)}
-                  >
-                    Dashboard
-                  </Link>
-                  <button
-                    onClick={() => {
-                      handleLogout();
-                      setMobileMenuOpen(false);
-                    }}
-                    className="block w-full text-left py-2 hover:bg-gray-100 rounded-md"
-                  >
-                    Logout
-                  </button>
-                </>
-              ) : (
-                <>
-                  <Link
-                    to="/login"
-                    className="block py-2 hover:bg-gray-100 rounded-md"
-                    onClick={() => setMobileMenuOpen(false)}
-                  >
-                    Login
-                  </Link>
-                  <Link
-                    to="/register"
-                    className="block py-2 hover:bg-gray-100 rounded-md"
-                    onClick={() => setMobileMenuOpen(false)}
-                  >
-                    Register
-                  </Link>
-                </>
-              )}
-            </div>
-          </div>
-        )}
       </header>
 
-      <main className="flex-1">{children}</main>
+      <main className="flex-1 pb-16 md:pb-0">{children}</main>
+      
+      {/* Mobile Bottom Navigation */}
+      <MobileBottomNav />
 
       <footer className="bg-gray-100 mt-auto">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">

@@ -58,11 +58,18 @@ const PopularSportsSection = () => {
   const navigate = useNavigate();
 
   const { games } = useGames();
-  const sports =
-    games?.map((game) => ({
-      name: game.name,
-      image: game.game_images,
-    })) || [];
+  
+  // Fallback sports with static images
+  const fallbackSports = [
+    { name: "Football", image: "/game-icons/football.svg" },
+    { name: "Cricket", image: "/game-icons/cricket.svg" },
+    { name: "Badminton", image: "/game-icons/badminton.svg" },
+    { name: "Basketball", image: "/game-icons/basketball.svg" },
+    { name: "Chess", image: "/game-icons/chess.svg" },
+    { name: "Swimming", image: "/game-icons/swimming.svg" },
+  ];
+  
+  const sports = fallbackSports; // Use fallback sports for now
 
   const handleSportClick = (sportName: string) => {
     navigate(
