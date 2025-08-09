@@ -110,6 +110,37 @@ const Register: React.FC = () => {
       if (error) {
         console.error("Supabase auth signup error:", error);
         
+        // Handle existing user - check if they need email confirmation
+        if (error.message?.includes("User already registered")) {
+          try {
+            // Try to resend confirmation email for existing user
+            const { error: resendError } = await supabase.auth.resend({
+              type: 'signup',
+              email: registrationType === "email" ? email : `${phone}@phone.user`
+            });
+            
+            if (!resendError) {
+              // Store pending user data for OTP verification
+              setPendingUserData({
+                name,
+                email: registrationType === "email" ? email : "",
+                phone: registrationType === "phone" ? phone : "",
+                password,
+                userType,
+                authUser: null // We don't have the user object yet
+              });
+              
+              setShowOTPVerification(true);
+              toast.success("Verification code sent to your email! Please check and verify to complete registration.");
+              return;
+            } else {
+              throw new Error("This email is already registered and verified. Please try logging in instead.");
+            }
+          } catch (resendError) {
+            throw new Error("This email is already registered and verified. Please try logging in instead.");
+          }
+        }
+        
         if (error.status === 429 || error.message?.includes("rate limit")) {
           throw new Error("Too many registration attempts. Please wait a few minutes before trying again.");
         }
