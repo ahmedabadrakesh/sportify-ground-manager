@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import ProfessionalCard from "./ProfessionalCard";
 import AuthRequiredDialog from "@/components/auth/AuthRequiredDialog";
 import ProfessionalsFilters from "./ProfessionalsFilters";
+import { useGames } from "@/hooks/useGames";
 
 interface FilterOptions {
   city?: string;
@@ -19,6 +20,7 @@ interface ProfessionalsListProps {
 const ProfessionalsList = ({ sportFilter }: ProfessionalsListProps) => {
   const [isAuthDialogOpen, setIsAuthDialogOpen] = useState(false);
   const [filters, setFilters] = useState<FilterOptions>({});
+  const { games } = useGames();
 
   const {
     data: allProfessionals,
@@ -69,10 +71,14 @@ const ProfessionalsList = ({ sportFilter }: ProfessionalsListProps) => {
         return false;
       }
 
-      // Sport filter from props (existing functionality)
-      if (sportFilter && prof.game_ids) {
-        // We'll need to check game names, but for now just skip this filter
-        // as it requires a join with games table
+      // Sport filter from props (URL parameter)
+      if (sportFilter && games && prof.game_ids) {
+        const sportGame = games.find(game => 
+          game.name.toLowerCase() === sportFilter.toLowerCase()
+        );
+        if (sportGame && !prof.game_ids.includes(sportGame.id)) {
+          return false;
+        }
       }
 
       // Certification filter
