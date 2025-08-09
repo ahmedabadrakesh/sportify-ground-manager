@@ -72,12 +72,19 @@ const ProfessionalsList = ({ sportFilter }: ProfessionalsListProps) => {
       }
 
       // Sport filter from props (URL parameter)
-      if (sportFilter && games && prof.game_ids) {
+      if (sportFilter && games) {
         const sportGame = games.find(game => 
           game.name.toLowerCase() === sportFilter.toLowerCase()
         );
-        if (sportGame && !prof.game_ids.includes(sportGame.id)) {
-          return false;
+        if (sportGame) {
+          // If professional has no game_ids or empty array, exclude them
+          if (!prof.game_ids || prof.game_ids.length === 0) {
+            return false;
+          }
+          // Check if professional's games include the filtered sport
+          if (!prof.game_ids.includes(sportGame.id)) {
+            return false;
+          }
         }
       }
 
