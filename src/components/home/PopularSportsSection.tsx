@@ -1,4 +1,3 @@
-
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import Autoplay from "embla-carousel-autoplay";
@@ -9,53 +8,61 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
+import { useGames } from "@/hooks/useGames";
 
-const sports = [
-  {
-    name: "Football",
-    image: "/game-icons/football.svg",
-    color: "bg-amber-100",
-  },
-  {
-    name: "Cricket",
-    //image: "/lovable-uploads/27625342-e6fd-422e-ae14-de07f6d2b609.png",
-    image: "/game-icons/cricket.svg",
-    color: "bg-green-100",
-  },
-  {
-    name: "Badminton",
-    image: "/game-icons/badminton.svg",
-    color: "bg-pink-100",
-  },
-  {
-    name: "Pickleball",
-    image: "/game-icons/pickleball.svg",
-    color: "bg-orange-100",
-  },
-  {
-    name: "Basketball",
-    image: "/game-icons/basketball.svg",
-    color: "bg-purple-100",
-  },
-  {
-    name: "Chess",
-    image: "/game-icons/chess.svg",
-    color: "bg-purple-100",
-  },
-  {
-    name: "Swimming",
-    image: "/game-icons/swimming.svg",
-    color: "bg-purple-100",
-  },
-  {
-    name: "Table-Tennis",
-    image: "/game-icons/tabletennis.svg",
-    color: "bg-purple-100",
-  },
-];
+// const sports = [
+//   {
+//     name: "Football",
+//     image: "/game-icons/football.svg",
+//     color: "bg-amber-100",
+//   },
+//   {
+//     name: "Cricket",
+//     //image: "/lovable-uploads/27625342-e6fd-422e-ae14-de07f6d2b609.png",
+//     image: "/game-icons/cricket.svg",
+//     color: "bg-green-100",
+//   },
+//   {
+//     name: "Badminton",
+//     image: "/game-icons/badminton.svg",
+//     color: "bg-pink-100",
+//   },
+//   {
+//     name: "Pickleball",
+//     image: "/game-icons/pickleball.svg",
+//     color: "bg-orange-100",
+//   },
+//   {
+//     name: "Basketball",
+//     image: "/game-icons/basketball.svg",
+//     color: "bg-purple-100",
+//   },
+//   {
+//     name: "Chess",
+//     image: "/game-icons/chess.svg",
+//     color: "bg-purple-100",
+//   },
+//   {
+//     name: "Swimming",
+//     image: "/game-icons/swimming.svg",
+//     color: "bg-purple-100",
+//   },
+//   {
+//     name: "Table-Tennis",
+//     image: "/game-icons/tabletennis.svg",
+//     color: "bg-purple-100",
+//   },
+// ];
 
 const PopularSportsSection = () => {
   const navigate = useNavigate();
+
+  const { games } = useGames();
+  const sports =
+    games?.map((game) => ({
+      name: game.name,
+      image: game.game_images,
+    })) || [];
 
   const handleSportClick = (sportName: string) => {
     navigate(
@@ -103,7 +110,7 @@ const PopularSportsSection = () => {
                   transition={{ duration: 0.5, delay: index * 0.1 }}
                   onClick={() => handleSportClick(sport.name)}
                 >
-                  <div className={`relative ${sport.color} overflow-hidden`}>
+                  <div className={`relative bg-amber-100 overflow-hidden`}>
                     <img
                       src={sport.image}
                       alt={sport.name}
