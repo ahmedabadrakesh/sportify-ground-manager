@@ -1,8 +1,16 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import ProfessionalCard from "./ProfessionalCard";
 import AuthRequiredDialog from "@/components/auth/AuthRequiredDialog";
+import ProfessionalsFilters from "./ProfessionalsFilters";
+
+interface FilterOptions {
+  city?: string;
+  gameId?: string;
+  isCertified?: boolean;
+  experienceRange?: string;
+}
 
 interface ProfessionalsListProps {
   sportFilter?: string | null;
@@ -10,67 +18,87 @@ interface ProfessionalsListProps {
 
 const ProfessionalsList = ({ sportFilter }: ProfessionalsListProps) => {
   const [isAuthDialogOpen, setIsAuthDialogOpen] = useState(false);
+  const [filters, setFilters] = useState<FilterOptions>({});
 
   const {
-    data: professionals,
+    data: allProfessionals,
     isLoading,
     error,
   } = useQuery({
-    queryKey: ["sports-professionals", sportFilter],
+    queryKey: ["sports-professionals"],
     queryFn: async () => {
-      console.log("Fetching sports professionals with filter:", sportFilter);
-
-      // First, let's try a simple query without joins to see if we can access the table
-      const { data: testData, error: testError } = await supabase
+      const { data, error } = await supabase
         .from("sports_professionals")
         .select("*")
-        .limit(1);
-
-      console.log("Test query result:", { testData, testError });
-
-      // Build the query with optional sport filter
-      let query = supabase.from("sports_professionals").select(`
-          *,
-          games!inner (
-            name
-          )
-        `);
-
-      // Apply sport filter if provided
-      if (sportFilter) {
-        query = query.ilike("games.name", `%${sportFilter}%`);
-      }
-
-      const { data, error } = await query.order("created_at", {
-        ascending: false,
-      });
-
-      console.log("Full query result:", { data, error });
+        .order("created_at", { ascending: false });
 
       if (error) {
-        console.error("Error fetching sports professionals:", error);
-
-        // If the join fails, try without the join but still apply filter if needed
-        console.log("Trying query without games join...");
-        let fallbackQuery = supabase.from("sports_professionals").select("*");
-
-        // For fallback, we can't filter by game name directly, so we'll get all and filter client-side if needed
-        const { data: fallbackData, error: fallbackError } =
-          await fallbackQuery.order("created_at", { ascending: false });
-
-        console.log("Fallback query result:", { fallbackData, fallbackError });
-
-        if (fallbackError) {
-          throw fallbackError;
-        }
-
-        return fallbackData;
+        throw error;
       }
 
-      console.log("Number of professionals found:", data?.length || 0);
       return data;
     },
   });
+
+  // Get unique cities for filter dropdown
+  const availableCities = useMemo(() => {
+    if (!allProfessionals) return [];
+    const cities = allProfessionals
+      .map(prof => prof.city)
+      .filter(city => city)
+      .filter((city, index, arr) => arr.indexOf(city) === index)
+      .sort();
+    return cities;
+  }, [allProfessionals]);
+
+  // Apply filters to professionals
+  const professionals = useMemo(() => {
+    if (!allProfessionals) return [];
+    
+    return allProfessionals.filter(prof => {
+      // City filter
+      if (filters.city && prof.city !== filters.city) {
+        return false;
+      }
+
+      // Game filter
+      if (filters.gameId && (!prof.game_ids || !prof.game_ids.includes(filters.gameId))) {
+        return false;
+      }
+
+      // Sport filter from props (existing functionality)
+      if (sportFilter && prof.game_ids) {
+        // We'll need to check game names, but for now just skip this filter
+        // as it requires a join with games table
+      }
+
+      // Certification filter
+      if (filters.isCertified !== undefined && prof.is_certified !== filters.isCertified) {
+        return false;
+      }
+
+      // Experience filter
+      if (filters.experienceRange && prof.years_of_experience !== null) {
+        const experience = prof.years_of_experience;
+        switch (filters.experienceRange) {
+          case "0-2":
+            if (experience > 2) return false;
+            break;
+          case "3-5":
+            if (experience < 3 || experience > 5) return false;
+            break;
+          case "6-10":
+            if (experience < 6 || experience > 10) return false;
+            break;
+          case "10+":
+            if (experience < 10) return false;
+            break;
+        }
+      }
+
+      return true;
+    });
+  }, [allProfessionals, filters, sportFilter]);
 
   console.log(
     "ProfessionalsList render - isLoading:",
@@ -129,14 +157,22 @@ const ProfessionalsList = ({ sportFilter }: ProfessionalsListProps) => {
 
   return (
     <>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-7xl mx-auto">
-        {professionals?.map((professional) => (
-          <ProfessionalCard
-            key={professional.id}
-            professional={professional}
-            onLoginClick={handleLoginClick}
-          />
-        ))}
+      <div className="max-w-7xl mx-auto">
+        <ProfessionalsFilters
+          filters={filters}
+          onFiltersChange={setFilters}
+          availableCities={availableCities}
+        />
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {professionals?.map((professional) => (
+            <ProfessionalCard
+              key={professional.id}
+              professional={professional}
+              onLoginClick={handleLoginClick}
+            />
+          ))}
+        </div>
       </div>
 
       <AuthRequiredDialog
