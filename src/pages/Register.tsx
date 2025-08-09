@@ -7,8 +7,10 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { toast } from "sonner";
-import { register } from "@/utils/auth";
+import { register, login } from "@/utils/auth";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import ProfileProgressDialog from "@/components/professionals/ProfileProgressDialog";
+import RegisterProfessionalDialog from "@/components/professionals/RegisterProfessionalDialog";
 
 const Register: React.FC = () => {
   const navigate = useNavigate();
@@ -20,6 +22,9 @@ const Register: React.FC = () => {
   const [userType, setUserType] = useState<'user' | 'sports_professional'>('user');
   const [isLoading, setIsLoading] = useState(false);
   const [registrationType, setRegistrationType] = useState<"email" | "phone">("email");
+  const [isProfileProgressDialogOpen, setIsProfileProgressDialogOpen] = useState(false);
+  const [isUpdateDialogOpen, setIsUpdateDialogOpen] = useState(false);
+  const [registeredUser, setRegisteredUser] = useState<any>(null);
   
   // Use a ref to track if submission is in progress
   const isSubmittingRef = useRef(false);
@@ -94,18 +99,34 @@ const Register: React.FC = () => {
       console.log("Registration result:", user);
       
       if (user) {
-        const successMessage = userType === 'sports_professional' 
-          ? "Registration successful! Your sports professional profile has been created. Welcome to SportifyGround!"
-          : "Registration successful! Welcome to SportifyGround!";
-        
-        toast.success(successMessage);
         console.log("Registration successful, user:", user);
         
-        // Redirect based on user type
-        if (userType === 'sports_professional') {
-          navigate("/sports-professionals");
-        } else {
-          navigate("/");
+        // Auto-login the user after successful registration
+        try {
+          const loginIdentifier = registrationType === "email" ? email : phone;
+          const loggedInUser = await login(loginIdentifier, password);
+          
+          if (loggedInUser) {
+            const successMessage = userType === 'sports_professional' 
+              ? "Registration successful! Your sports professional profile has been created. Welcome to SportifyGround!"
+              : "Registration successful! Welcome to SportifyGround!";
+            
+            toast.success(successMessage);
+            
+            // Show profile progress dialog for sports professionals
+            if (userType === 'sports_professional') {
+              setRegisteredUser(loggedInUser);
+              setIsProfileProgressDialogOpen(true);
+            } else {
+              navigate("/");
+            }
+          } else {
+            throw new Error("Auto-login failed");
+          }
+        } catch (loginError) {
+          console.error("Auto-login error:", loginError);
+          toast.success("Registration successful! Please login to continue.");
+          navigate("/login");
         }
       } else {
         console.log("Registration failed: no user returned");
@@ -307,6 +328,34 @@ const Register: React.FC = () => {
           </CardFooter>
         </Card>
       </div>
+
+      {/* Profile Progress Dialog for Sports Professionals */}
+      {registeredUser && (
+        <ProfileProgressDialog
+          isOpen={isProfileProgressDialogOpen}
+          onClose={() => {
+            setIsProfileProgressDialogOpen(false);
+            navigate("/sports-professionals");
+          }}
+          userId={registeredUser.id}
+          setIsUpdateDialogOpen={setIsUpdateDialogOpen}
+        />
+      )}
+
+      {/* Register Professional Dialog */}
+      {registeredUser && (
+        <RegisterProfessionalDialog
+          open={isUpdateDialogOpen}
+          onOpenChange={(open) => {
+            setIsUpdateDialogOpen(open);
+            if (!open) {
+              setIsProfileProgressDialogOpen(false);
+              navigate("/sports-professionals");
+            }
+          }}
+          isUpdate={true}
+        />
+      )}
     </div>
   );
 };
