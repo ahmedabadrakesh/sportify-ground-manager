@@ -32,6 +32,39 @@ export const StepTwo = ({ form, userEmail, isUpdate }: StepTwoProps) => {
       <h2 className="text-2xl font-bold mb-4">Contact & Social Details</h2>
       <hr className="pb-6" />
 
+      {/* Address and City Row */}
+      <div className="grid lg:grid-cols-2 gap-6 pb-4">
+        {/* Left: Address */}
+        <FormField
+          name="address"
+          control={form.control}
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Address *</FormLabel>
+              <FormControl>
+                <Input {...field} placeholder="Enter your complete address" />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        {/* Right: City */}
+        <FormField
+          name="city"
+          control={form.control}
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>City *</FormLabel>
+              <FormControl>
+                <Input {...field} placeholder="Enter your city" />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+      </div>
+
       {/* Contact Number & Email in Single Row */}
       <div className="grid lg:grid-cols-2 gap-6">
         <FormField
