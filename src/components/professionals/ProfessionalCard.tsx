@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { MapPin, Phone, Mail, Camera, Target } from "lucide-react";
+import { MapPin, Phone, Mail, Camera, Target, BadgeCheck } from "lucide-react";
 import { getCurrentUserSync } from "@/utils/auth";
 
 const ProfessionalCard = ({
@@ -61,8 +61,19 @@ const ProfessionalCard = ({
         {/* Main Content */}
         <div className="flex-1 min-w-0 text-left">
           {/* Name and Profession */}
-          <h3 className="text-lg font-semibold text-gray-900 mb-1">
-            {professional.name}
+          <h3 className="flex flex-row text-lg font-semibold text-gray-900 mb-1">
+            <>
+              {professional.name}
+              {professional.is_certified && (
+                <BadgeCheck
+                  size={20}
+                  color="white"
+                  className="ml-2"
+                  fill="#1f2ce0"
+                  type="button"
+                />
+              )}
+            </>
           </h3>
           <p className="text-sm text-gray-600 mb-2">
             {professional.profession_type}
@@ -85,12 +96,14 @@ const ProfessionalCard = ({
           >
             {getClientCount()}
           </Badge>
-          <Badge
-            variant="secondary"
-            className="text-xs bg-gray-100 text-gray-700 border-0"
-          >
-            Certified
-          </Badge>
+          {professional.is_certified && (
+            <Badge
+              variant="secondary"
+              className="text-xs bg-gray-100 text-gray-700 border-0"
+            >
+              Certified
+            </Badge>
+          )}
         </div>
 
         {/* Specialties */}
@@ -102,8 +115,10 @@ const ProfessionalCard = ({
             </span>
           </div>
           <p className="text-xs text-left text-gray-600">
-            {professional.game_ids && professional.game_ids.length > 0 ? 'Multi-Sport Training' : "Sports Training"},{" "}
-            {professional.profession_type} +2 more
+            {professional.game_ids && professional.game_ids.length > 0
+              ? "Multi-Sport Training"
+              : "Sports Training"}
+            , {professional.profession_type} +2 more
           </p>
         </div>
 

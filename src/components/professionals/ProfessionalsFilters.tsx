@@ -1,5 +1,11 @@
 import React from "react";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { X } from "lucide-react";
@@ -18,7 +24,11 @@ interface ProfessionalsFiltersProps {
   availableCities: string[];
 }
 
-const ProfessionalsFilters = ({ filters, onFiltersChange, availableCities }: ProfessionalsFiltersProps) => {
+const ProfessionalsFilters = ({
+  filters,
+  onFiltersChange,
+  availableCities,
+}: ProfessionalsFiltersProps) => {
   const { games } = useGames();
 
   const experienceRanges = [
@@ -39,15 +49,22 @@ const ProfessionalsFilters = ({ filters, onFiltersChange, availableCities }: Pro
     onFiltersChange({});
   };
 
-  const hasActiveFilters = Object.values(filters).some(value => value !== undefined);
+  const hasActiveFilters = Object.values(filters).some(
+    (value) => value !== undefined
+  );
 
   return (
     <div className="bg-card border rounded-lg p-6 mb-6">
       <div className="flex flex-col lg:flex-row gap-4">
         {/* City Filter */}
         <div className="flex-1">
-          <label className="text-sm font-medium text-foreground mb-2 block">City</label>
-          <Select value={filters.city || "all"} onValueChange={(value) => handleFilterChange("city", value)}>
+          <label className="text-sm font-medium text-foreground mb-2 block">
+            City
+          </label>
+          <Select
+            value={filters.city || "all"}
+            onValueChange={(value) => handleFilterChange("city", value)}
+          >
             <SelectTrigger>
               <SelectValue placeholder="All Cities" />
             </SelectTrigger>
@@ -64,8 +81,13 @@ const ProfessionalsFilters = ({ filters, onFiltersChange, availableCities }: Pro
 
         {/* Game Filter */}
         <div className="flex-1">
-          <label className="text-sm font-medium text-foreground mb-2 block">Sport</label>
-          <Select value={filters.gameId || "all"} onValueChange={(value) => handleFilterChange("gameId", value)}>
+          <label className="text-sm font-medium text-foreground mb-2 block">
+            Sport
+          </label>
+          <Select
+            value={filters.gameId || "all"}
+            onValueChange={(value) => handleFilterChange("gameId", value)}
+          >
             <SelectTrigger>
               <SelectValue placeholder="All Sports" />
             </SelectTrigger>
@@ -82,10 +104,27 @@ const ProfessionalsFilters = ({ filters, onFiltersChange, availableCities }: Pro
 
         {/* Certification Filter */}
         <div className="flex-1">
-          <label className="text-sm font-medium text-foreground mb-2 block">Certification</label>
-          <Select 
-            value={filters.isCertified === undefined ? "all" : filters.isCertified ? "certified" : "not-certified"} 
-            onValueChange={(value) => handleFilterChange("isCertified", value === "all" ? undefined : value === "certified")}
+          <label className="text-sm font-medium text-foreground mb-2 block">
+            Certification
+          </label>
+          <Select
+            value={
+              filters.isCertified === undefined
+                ? "all"
+                : filters.isCertified
+                ? "certified"
+                : "not-certified"
+            }
+            onValueChange={(value) =>
+              handleFilterChange(
+                "isCertified",
+                value === "all"
+                  ? undefined
+                  : value === "certified"
+                  ? true
+                  : false
+              )
+            }
           >
             <SelectTrigger>
               <SelectValue placeholder="All" />
@@ -100,8 +139,15 @@ const ProfessionalsFilters = ({ filters, onFiltersChange, availableCities }: Pro
 
         {/* Experience Filter */}
         <div className="flex-1">
-          <label className="text-sm font-medium text-foreground mb-2 block">Experience</label>
-          <Select value={filters.experienceRange || "all"} onValueChange={(value) => handleFilterChange("experienceRange", value)}>
+          <label className="text-sm font-medium text-foreground mb-2 block">
+            Experience
+          </label>
+          <Select
+            value={filters.experienceRange || "all"}
+            onValueChange={(value) =>
+              handleFilterChange("experienceRange", value)
+            }
+          >
             <SelectTrigger>
               <SelectValue placeholder="All Experience" />
             </SelectTrigger>
@@ -121,47 +167,52 @@ const ProfessionalsFilters = ({ filters, onFiltersChange, availableCities }: Pro
       {hasActiveFilters && (
         <div className="flex flex-wrap items-center gap-2 mt-4 pt-4 border-t">
           <span className="text-sm text-muted-foreground">Active filters:</span>
-          
+
           {filters.city && (
             <Badge variant="secondary" className="flex items-center gap-1">
               City: {filters.city}
-              <X 
-                className="h-3 w-3 cursor-pointer" 
+              <X
+                className="h-3 w-3 cursor-pointer"
                 onClick={() => handleFilterChange("city", undefined)}
               />
             </Badge>
           )}
-          
+
           {filters.gameId && (
             <Badge variant="secondary" className="flex items-center gap-1">
-              Sport: {games?.find(g => g.id === filters.gameId)?.name}
-              <X 
-                className="h-3 w-3 cursor-pointer" 
+              Sport: {games?.find((g) => g.id === filters.gameId)?.name}
+              <X
+                className="h-3 w-3 cursor-pointer"
                 onClick={() => handleFilterChange("gameId", undefined)}
               />
             </Badge>
           )}
-          
+
           {filters.isCertified !== undefined && (
             <Badge variant="secondary" className="flex items-center gap-1">
               {filters.isCertified ? "Certified" : "Not Certified"}
-              <X 
-                className="h-3 w-3 cursor-pointer" 
+              <X
+                className="h-3 w-3 cursor-pointer"
                 onClick={() => handleFilterChange("isCertified", undefined)}
               />
             </Badge>
           )}
-          
+
           {filters.experienceRange && (
             <Badge variant="secondary" className="flex items-center gap-1">
-              Experience: {experienceRanges.find(r => r.value === filters.experienceRange)?.label}
-              <X 
-                className="h-3 w-3 cursor-pointer" 
+              Experience:{" "}
+              {
+                experienceRanges.find(
+                  (r) => r.value === filters.experienceRange
+                )?.label
+              }
+              <X
+                className="h-3 w-3 cursor-pointer"
                 onClick={() => handleFilterChange("experienceRange", undefined)}
               />
             </Badge>
           )}
-          
+
           <Button variant="outline" size="sm" onClick={clearAllFilters}>
             Clear All
           </Button>

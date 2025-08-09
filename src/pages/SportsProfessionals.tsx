@@ -99,8 +99,8 @@ const SportsProfessionals = () => {
     <MainLayout>
       {/* Hero Section */}
       <div className="bg-background border-b">
-        <div className="container mx-auto py-8">
-          <div className="text-center mb-6">
+        <div className="grid grid-cols-8 mx-auto text-left py-4 mt-4">
+          <div className="c mb-6 col-span-6">
             <h1 className="text-3xl font-bold text-foreground mb-2">
               Find Your Perfect Coach
             </h1>
@@ -110,7 +110,7 @@ const SportsProfessionals = () => {
           </div>
 
           {shouldShowButton() && (
-            <div className="flex justify-center">
+            <div className="col-span-2 justify-center text-right">
               <Button
                 onClick={handleRegisterClick}
                 disabled={checkingProfile}
@@ -124,7 +124,7 @@ const SportsProfessionals = () => {
       </div>
 
       {/* Main Content */}
-      <div className="mx-auto py-8">
+      <div className="mx-auto py-4">
         <ProfessionalsList sportFilter={sportFilter} />
 
         <RegisterProfessionalDialog

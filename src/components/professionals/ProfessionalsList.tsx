@@ -44,8 +44,8 @@ const ProfessionalsList = ({ sportFilter }: ProfessionalsListProps) => {
   const availableCities = useMemo(() => {
     if (!allProfessionals) return [];
     const cities = allProfessionals
-      .map(prof => prof.city)
-      .filter(city => city)
+      .map((prof) => prof.city)
+      .filter((city) => city)
       .filter((city, index, arr) => arr.indexOf(city) === index)
       .sort();
     return cities;
@@ -54,15 +54,18 @@ const ProfessionalsList = ({ sportFilter }: ProfessionalsListProps) => {
   // Apply filters to professionals
   const professionals = useMemo(() => {
     if (!allProfessionals) return [];
-    
-    return allProfessionals.filter(prof => {
+
+    return allProfessionals.filter((prof) => {
       // City filter
       if (filters.city && prof.city !== filters.city) {
         return false;
       }
 
       // Game filter
-      if (filters.gameId && (!prof.game_ids || !prof.game_ids.includes(filters.gameId))) {
+      if (
+        filters.gameId &&
+        (!prof.game_ids || !prof.game_ids.includes(filters.gameId))
+      ) {
         return false;
       }
 
@@ -73,8 +76,16 @@ const ProfessionalsList = ({ sportFilter }: ProfessionalsListProps) => {
       }
 
       // Certification filter
-      if (filters.isCertified !== undefined && prof.is_certified !== filters.isCertified) {
+      if (
+        filters.isCertified !== undefined &&
+        prof.is_certified !== filters.isCertified
+      ) {
         return false;
+      } else if (
+        filters.isCertified !== undefined &&
+        prof.is_certified === filters.isCertified
+      ) {
+        return true;
       }
 
       // Experience filter
@@ -146,7 +157,12 @@ const ProfessionalsList = ({ sportFilter }: ProfessionalsListProps) => {
       : "No sports professionals found. Be the first to register!";
 
     return (
-      <div className="text-center py-8">
+      <div className="text-center">
+        <ProfessionalsFilters
+          filters={filters}
+          onFiltersChange={setFilters}
+          availableCities={availableCities}
+        />
         <p className="text-gray-600">{noDataMessage}</p>
         <p className="text-sm text-gray-500 mt-2">
           If you expect to see data here, there might be a permissions issue.
@@ -163,7 +179,7 @@ const ProfessionalsList = ({ sportFilter }: ProfessionalsListProps) => {
           onFiltersChange={setFilters}
           availableCities={availableCities}
         />
-        
+
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {professionals?.map((professional) => (
             <ProfessionalCard
