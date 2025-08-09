@@ -721,10 +721,13 @@ const ProfessionalProfile = () => {
                   <CardTitle className="text-left">Profile Progress</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  <CircularProgress
-                    professional={professional}
-                    handleUpdateProfile={handleUpdateProfile}
-                  />
+                  <CircularProgress professional={professional} />
+                  <Button
+                    className="w-full bg-slate-800 hover:bg-slate-700"
+                    onClick={handleUpdateProfile}
+                  >
+                    Complete Your Profile Now
+                  </Button>
                 </CardContent>
               </Card>
               {/* Contact Information */}

@@ -1,5 +1,10 @@
 import React, { useState, useEffect } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import CircularProgress from "./CircularProgress";
@@ -9,12 +14,14 @@ interface ProfileProgressDialogProps {
   isOpen: boolean;
   onClose: () => void;
   userId: string;
+  setIsUpdateDialogOpen: (boolean) => void;
 }
 
 const ProfileProgressDialog: React.FC<ProfileProgressDialogProps> = ({
   isOpen,
   onClose,
   userId,
+  setIsUpdateDialogOpen,
 }) => {
   const [professional, setProfessional] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -48,11 +55,6 @@ const ProfileProgressDialog: React.FC<ProfileProgressDialogProps> = ({
     }
   };
 
-  const handleUpdateProfile = () => {
-    onClose();
-    navigate("/sports-professionals");
-  };
-
   const handleSkip = () => {
     onClose();
   };
@@ -82,26 +84,28 @@ const ProfileProgressDialog: React.FC<ProfileProgressDialogProps> = ({
             Complete Your Profile
           </DialogTitle>
         </DialogHeader>
-        
-        <div className="flex flex-col items-center space-y-6 py-4">
-          <div className="text-center">
-            <p className="text-gray-600 mb-4">
-              Your sports professional profile is incomplete. Complete it to get more visibility and attract more clients!
+
+        <div>
+          <div className="flex flex-row items-center">
+            <CircularProgress professional={professional} />
+            <p className="text-gray-600">
+              Your sports professional profile is incomplete. Complete it to get
+              more visibility and attract more clients!
             </p>
           </div>
-
-          <CircularProgress 
-            professional={professional}
-            handleUpdateProfile={handleUpdateProfile}
-          />
-
+        </div>
+        <div>
           <div className="flex space-x-3 w-full">
-            <Button 
-              variant="outline" 
-              onClick={handleSkip}
-              className="flex-1"
-            >
+            <Button variant="outline" onClick={handleSkip} className="flex-1">
               Skip for Now
+            </Button>
+            <Button
+              className="w-full bg-slate-800 hover:bg-slate-700"
+              onClick={() => {
+                setIsUpdateDialogOpen(true);
+              }}
+            >
+              Complete Your Profile Now
             </Button>
           </div>
         </div>

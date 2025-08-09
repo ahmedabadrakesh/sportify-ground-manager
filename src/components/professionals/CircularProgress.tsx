@@ -4,12 +4,10 @@ import { Button } from "@/components/ui/button";
 
 interface CircularProgressProps {
   professional: any;
-  handleUpdateProfile: any;
 }
 
 const CircularProgress: React.FC<CircularProgressProps> = ({
   professional,
-  handleUpdateProfile,
 }) => {
   const calculateCompletionPercentage = () => {
     if (!professional) return 0;
@@ -27,7 +25,6 @@ const CircularProgress: React.FC<CircularProgressProps> = ({
       "country",
       "pincode",
       "current_location",
-      "training_locations",
       "website",
       "instagram_link",
       "facebook_link",
@@ -75,7 +72,7 @@ const CircularProgress: React.FC<CircularProgressProps> = ({
     return "hsl(280, 100%, 70%)"; // purple for >90%
   };
 
-  const radius = 60;
+  const radius = 80;
   const strokeWidth = 8;
   const normalizedRadius = radius - strokeWidth * 2;
   const circumference = normalizedRadius * 2 * Math.PI;
@@ -84,9 +81,9 @@ const CircularProgress: React.FC<CircularProgressProps> = ({
 
   return (
     <div className="flex flex-col items-center justify-center">
-      <div className="relative w-32 h-32">
+      <div className="relative w-40 h-40">
         <svg
-          className="transform w-48 h-48"
+          className="transform w-40 h-40 "
           width={radius * 2}
           height={radius * 2}
         >
@@ -120,12 +117,6 @@ const CircularProgress: React.FC<CircularProgressProps> = ({
           <span className="text-success text-xl font-bold">{percentage}%</span>
         </div>
       </div>
-      <Button
-        className="w-full bg-slate-800 hover:bg-slate-700"
-        onClick={handleUpdateProfile}
-      >
-        Complete Your Profile Now
-      </Button>
     </div>
   );
 };
