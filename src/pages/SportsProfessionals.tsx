@@ -99,7 +99,7 @@ const SportsProfessionals = () => {
     <MainLayout>
       {/* Hero Section */}
       <div className="bg-background border-b">
-        <div className="grid grid-cols-8 mx-auto text-left py-4 mt-4">
+        <div className="grid md:grid-cols-8 mx-auto text-left py-4 mt-4">
           <div className="c mb-6 col-span-6">
             <h1 className="text-3xl font-bold text-foreground mb-2">
               Find Your Perfect Coach
@@ -110,7 +110,7 @@ const SportsProfessionals = () => {
           </div>
 
           {shouldShowButton() && (
-            <div className="col-span-2 justify-center text-right">
+            <div className="md:col-span-2 justify-center text-right">
               <Button
                 onClick={handleRegisterClick}
                 disabled={checkingProfile}

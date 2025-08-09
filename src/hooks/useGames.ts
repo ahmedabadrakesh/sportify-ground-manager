@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
 export interface Game {
+  game_images: any;
   id: string;
   name: string;
 }
