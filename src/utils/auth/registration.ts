@@ -219,7 +219,7 @@ const createSportsProfessionalEntry = async (
       user_id: userId,
       name: name,
       profession_type: 'Athlete' as const,
-      game_id: games[0].id,
+      game_ids: [games[0].id], // Fixed: changed from game_id to game_ids (array)
       contact_number: contactNumber,
       fee: 0,
       fee_type: 'Per Hour' as const,
