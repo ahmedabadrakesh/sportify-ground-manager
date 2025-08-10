@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from "react";
-import { Boxes, BarChart3 } from "lucide-react";
+import { Boxes, BarChart3, Edit, Trash2 } from "lucide-react";
 import AdminLayout from "@/components/layouts/AdminLayout";
+import { DataTable } from "@/components/ui/data-table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Button } from "@/components/ui/button";
 import AddItemForm from "@/components/inventory/AddItemForm";
 import EditItemForm from "@/components/inventory/EditItemForm";
 import { InventoryItem, GroundInventory, Ground } from "@/types/models";
@@ -10,11 +12,10 @@ import { toast } from "sonner";
 import { getAllInventoryItems } from "@/utils/inventory";
 import { getGroundInventory } from "@/utils/inventory/inventory-ground";
 import { supabase } from "@/integrations/supabase/client";
-
 import InventoryHeader from "@/components/admin/inventory/InventoryHeader";
-import InventoryItemsTab from "@/components/admin/inventory/InventoryItemsTab";
 import GroundAllocationTab from "@/components/admin/inventory/GroundAllocationTab";
 import DeleteItemDialog from "@/components/admin/inventory/DeleteItemDialog";
+import { ColumnDef } from "@tanstack/react-table";
 
 const AdminInventory: React.FC = () => {
   const [inventoryItems, setInventoryItems] = useState<InventoryItem[]>([]);
@@ -98,8 +99,6 @@ const AdminInventory: React.FC = () => {
   
   useEffect(() => {
     fetchData();
-    // Only re-run this effect when these specific dependencies change
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleItemAdded = () => {
@@ -146,6 +145,69 @@ const AdminInventory: React.FC = () => {
     }
   };
 
+  const inventoryColumns: ColumnDef<InventoryItem>[] = [
+    {
+      accessorKey: "name",
+      header: "Item Name",
+      cell: ({ row }) => (
+        <div className="font-medium">{row.getValue("name")}</div>
+      ),
+    },
+    {
+      accessorKey: "category",
+      header: "Category",
+      cell: ({ row }) => (
+        <div>{row.getValue("category")}</div>
+      ),
+    },
+    {
+      accessorKey: "price",
+      header: "Price",
+      cell: ({ row }) => (
+        <div>₹{parseFloat(row.getValue("price")).toFixed(2)}</div>
+      ),
+    },
+    {
+      accessorKey: "quantity",
+      header: "Available",
+      cell: ({ row }) => (
+        <div className="text-center">{row.getValue("quantity")}</div>
+      ),
+    },
+    {
+      accessorKey: "purchase_quantity",
+      header: "Purchased",
+      cell: ({ row }) => (
+        <div className="text-center">{row.getValue("purchase_quantity") || 0}</div>
+      ),
+    },
+    {
+      id: "actions",
+      header: "Actions",
+      cell: ({ row }) => {
+        const item = row.original;
+        return (
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => handleEditItem(item.id)}
+            >
+              <Edit className="h-4 w-4" />
+            </Button>
+            <Button
+              variant="destructive"
+              size="sm"
+              onClick={() => handleDeleteItem(item.id)}
+            >
+              <Trash2 className="h-4 w-4" />
+            </Button>
+          </div>
+        );
+      },
+    },
+  ];
+
   return (
     <AdminLayout>
       <InventoryHeader onAddItem={() => setIsAddItemOpen(true)} />
@@ -168,10 +230,11 @@ const AdminInventory: React.FC = () => {
           </TabsList>
           
           <TabsContent value="items">
-            <InventoryItemsTab 
-              inventoryItems={inventoryItems}
-              onEditItem={handleEditItem}
-              onDeleteItem={handleDeleteItem}
+            <DataTable
+              columns={inventoryColumns}
+              data={inventoryItems}
+              searchKey="name"
+              searchPlaceholder="Search inventory items..."
             />
           </TabsContent>
           

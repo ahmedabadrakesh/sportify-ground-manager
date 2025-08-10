@@ -1,24 +1,32 @@
-
 import React, { useState, useEffect } from "react";
-import { PlusCircle } from "lucide-react";
+import { PlusCircle, Edit, Trash2 } from "lucide-react";
 import AdminLayout from "@/components/layouts/AdminLayout";
+import { DataTable } from "@/components/ui/data-table";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
+  DialogHeader,
+  DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { hasRoleSync } from "@/utils/auth";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import AddOwnerForm from "@/components/admin/owners/AddOwnerForm";
-import OwnerTable from "@/components/admin/owners/OwnerTable";
+import EditOwnerForm from "@/components/admin/owners/EditOwnerForm";
+import DeleteOwnerDialog from "@/components/admin/owners/DeleteOwnerDialog";
+import { ColumnDef } from "@tanstack/react-table";
 
 const GroundOwners: React.FC = () => {
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [owners, setOwners] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [editOwner, setEditOwner] = useState<any>(null);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [deleteOwner, setDeleteOwner] = useState<any>(null);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
   useEffect(() => {
     const fetchOwners = async () => {
@@ -38,7 +46,6 @@ const GroundOwners: React.FC = () => {
         }
         
         console.log("Ground owners data:", data);
-        // TypeScript will accept this as data is an array or null
         setOwners(data || []);
       } catch (error: any) {
         console.error("Error fetching ground owners:", error);
@@ -86,7 +93,83 @@ const GroundOwners: React.FC = () => {
         owner.id === updatedOwner.id ? updatedOwner : owner
       )
     );
+    setIsEditDialogOpen(false);
+    setEditOwner(null);
   };
+
+  const openEditDialog = (owner: any) => {
+    setEditOwner(owner);
+    setIsEditDialogOpen(true);
+  };
+
+  const openDeleteDialog = (owner: any) => {
+    setDeleteOwner(owner);
+    setIsDeleteDialogOpen(true);
+  };
+
+  const handleDeleteSuccess = () => {
+    if (deleteOwner) {
+      handleDeleteOwner(deleteOwner.id);
+    }
+    setIsDeleteDialogOpen(false);
+    setDeleteOwner(null);
+  };
+
+  const columns: ColumnDef<any>[] = [
+    {
+      accessorKey: "name",
+      header: "Name",
+      cell: ({ row }) => (
+        <div className="font-medium">{row.getValue("name")}</div>
+      ),
+    },
+    {
+      accessorKey: "email",
+      header: "Email",
+      cell: ({ row }) => (
+        <div>{row.getValue("email")}</div>
+      ),
+    },
+    {
+      accessorKey: "phone",
+      header: "Phone",
+      cell: ({ row }) => (
+        <div>{row.getValue("phone")}</div>
+      ),
+    },
+    {
+      accessorKey: "whatsapp",
+      header: "WhatsApp",
+      cell: ({ row }) => (
+        <div>{row.getValue("whatsapp") || "N/A"}</div>
+      ),
+    },
+    {
+      id: "actions",
+      header: "Actions",
+      cell: ({ row }) => {
+        const owner = row.original;
+        return (
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => openEditDialog(owner)}
+            >
+              <Edit className="h-4 w-4" />
+            </Button>
+            <Button
+              variant="destructive"
+              size="sm"
+              onClick={() => openDeleteDialog(owner)}
+            >
+              <Trash2 className="h-4 w-4" />
+            </Button>
+          </div>
+        );
+      },
+    },
+  ];
 
   return (
     <AdminLayout>
@@ -127,12 +210,37 @@ const GroundOwners: React.FC = () => {
           <p className="text-gray-500">Loading ground owners data...</p>
         </div>
       ) : (
-        <OwnerTable 
-          owners={owners}
-          onDeleteOwner={handleDeleteOwner}
-          onEditOwner={handleEditOwner}
+        <DataTable
+          columns={columns}
+          data={owners}
+          searchKey="name"
+          searchPlaceholder="Search owners..."
         />
       )}
+
+      <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Edit Ground Owner</DialogTitle>
+          </DialogHeader>
+          {editOwner && (
+            <EditOwnerForm
+              ownerId={editOwner.id}
+              ownerData={editOwner}
+              onSuccess={handleEditOwner}
+              onCancel={() => setIsEditDialogOpen(false)}
+            />
+          )}
+        </DialogContent>
+      </Dialog>
+
+      <DeleteOwnerDialog
+        open={isDeleteDialogOpen}
+        onOpenChange={setIsDeleteDialogOpen}
+        ownerId={deleteOwner?.id}
+        onConfirm={handleDeleteSuccess}
+        onCancel={() => setIsDeleteDialogOpen(false)}
+      />
     </AdminLayout>
   );
 };

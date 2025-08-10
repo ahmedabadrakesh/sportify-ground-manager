@@ -1,7 +1,7 @@
-
 import React, { useState, useEffect } from "react";
-import { Calendar } from "lucide-react";
+import { Calendar, Eye, X } from "lucide-react";
 import AdminLayout from "@/components/layouts/AdminLayout";
+import { DataTable } from "@/components/ui/data-table";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { fetchBookings, cancelBooking } from "@/services/booking";
@@ -9,9 +9,10 @@ import { fetchGrounds } from "@/services/groundsService";
 import { getCurrentUserSync, hasRoleSync } from "@/utils/auth";
 import { toast } from "sonner";
 import { Booking, Ground } from "@/types/models";
-import BookingsTable from "@/components/admin/bookings/BookingsTable";
 import BookingDetailsDialog from "@/components/admin/bookings/BookingDetailsDialog";
 import AddBookingDialog from "@/components/admin/bookings/AddBookingDialog";
+import { StatusBadge } from "@/components/admin/bookings/StatusBadge";
+import { ColumnDef } from "@tanstack/react-table";
 
 const AdminBookings: React.FC = () => {
   const [selectedBooking, setSelectedBooking] = useState<Booking | null>(null);
@@ -50,7 +51,6 @@ const AdminBookings: React.FC = () => {
   };
   
   useEffect(() => {
-    // Only fetch data on initial mount, not on every render
     fetchData();
   }, []);
   
@@ -82,6 +82,86 @@ const AdminBookings: React.FC = () => {
     setSelectedBooking(booking);
     setIsDetailsOpen(true);
   };
+
+  const columns: ColumnDef<Booking>[] = [
+    {
+      accessorKey: "id",
+      header: "Booking ID",
+      cell: ({ row }) => (
+        <div className="font-mono text-sm">
+          {row.getValue("id")?.toString().slice(0, 8)}...
+        </div>
+      ),
+    },
+    {
+      accessorKey: "user_id",
+      header: "Customer",
+      cell: ({ row }) => (
+        <div className="font-medium">
+          Customer {row.getValue("user_id")?.toString().slice(0, 8)}
+        </div>
+      ),
+    },
+    {
+      accessorKey: "ground_id",
+      header: "Ground",
+      cell: ({ row }) => {
+        const ground = grounds.find(g => g.id === row.getValue("ground_id"));
+        return <div className="font-medium">{ground?.name || "Unknown Ground"}</div>;
+      },
+    },
+    {
+      accessorKey: "date",
+      header: "Date",
+      cell: ({ row }) => {
+        const date = new Date(row.getValue("date"));
+        return <div>{date.toLocaleDateString()}</div>;
+      },
+    },
+    {
+      accessorKey: "bookingStatus",
+      header: "Status",
+      cell: ({ row }) => (
+        <StatusBadge status={row.getValue("bookingStatus")} />
+      ),
+    },
+    {
+      accessorKey: "total_amount",
+      header: "Amount",
+      cell: ({ row }) => (
+        <div className="font-medium">
+          ₹{parseFloat(row.getValue("total_amount")).toFixed(2)}
+        </div>
+      ),
+    },
+    {
+      id: "actions",
+      header: "Actions",
+      cell: ({ row }) => {
+        const booking = row.original;
+        return (
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => handleViewDetails(booking)}
+            >
+              <Eye className="h-4 w-4" />
+            </Button>
+            {booking.bookingStatus === "confirmed" && (
+              <Button
+                variant="destructive"
+                size="sm"
+                onClick={() => handleCancelBooking(booking.id)}
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            )}
+          </div>
+        );
+      },
+    },
+  ];
 
   return (
     <AdminLayout>
@@ -123,9 +203,11 @@ const AdminBookings: React.FC = () => {
           </Button>
         </div>
       ) : (
-        <BookingsTable 
-          bookings={bookings} 
-          onViewDetails={handleViewDetails} 
+        <DataTable
+          columns={columns}
+          data={bookings}
+          searchKey="id"
+          searchPlaceholder="Search bookings..."
         />
       )}
 

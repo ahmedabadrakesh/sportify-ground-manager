@@ -1,36 +1,25 @@
-
 import { useState } from "react";
 import { format, parseISO } from "date-fns";
 import AdminLayout from "@/components/layouts/AdminLayout";
+import { DataTable } from "@/components/ui/data-table";
 import { useEvents } from "@/hooks/useEvents";
 import { useGames } from "@/hooks/useGames";
-import { 
-  Table, TableHeader, TableRow, TableHead, 
-  TableBody, TableCell, TableFooter 
-} from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import EventDialog from "@/components/admin/events/EventDialog";
 import DeleteEventDialog from "@/components/admin/events/DeleteEventDialog";
 import { Event } from "@/types/models";
-import { Calendar, Edit, MapPin, Plus, Search, Trash2 } from "lucide-react";
+import { Edit, Plus, Trash2 } from "lucide-react";
 import { hasRoleSync } from "@/utils/auth";
+import { ColumnDef } from "@tanstack/react-table";
 
 const AdminEvents = () => {
   const isSuperAdmin = hasRoleSync('super_admin');
   const { events, isLoading, deleteEvent } = useEvents();
   const { games } = useGames();
-  const [search, setSearch] = useState("");
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-
-  const filteredEvents = events.filter(event =>
-    event.eventName.toLowerCase().includes(search.toLowerCase()) ||
-    event.address.toLowerCase().includes(search.toLowerCase()) ||
-    event.city.toLowerCase().includes(search.toLowerCase())
-  );
 
   const getSportName = (sportId?: string) => {
     if (!sportId) return "General";
@@ -63,6 +52,95 @@ const AdminEvents = () => {
     }
   };
 
+  const columns: ColumnDef<Event>[] = [
+    {
+      accessorKey: "eventName",
+      header: "Event Name",
+      cell: ({ row }) => (
+        <div className="font-medium">{row.getValue("eventName")}</div>
+      ),
+    },
+    {
+      accessorKey: "eventDate",
+      header: "Date",
+      cell: ({ row }) => (
+        <div>{formatDate(row.getValue("eventDate"))}</div>
+      ),
+    },
+    {
+      accessorKey: "eventTime",
+      header: "Time",
+      cell: ({ row }) => (
+        <div>{row.getValue("eventTime")}</div>
+      ),
+    },
+    {
+      accessorKey: "city",
+      header: "City",
+      cell: ({ row }) => (
+        <div>{row.getValue("city")}</div>
+      ),
+    },
+    {
+      accessorKey: "address",
+      header: "Location",
+      cell: ({ row }) => (
+        <div className="max-w-xs truncate">{row.getValue("address")}</div>
+      ),
+    },
+    {
+      accessorKey: "sportId",
+      header: "Sport",
+      cell: ({ row }) => (
+        <div>{getSportName(row.getValue("sportId"))}</div>
+      ),
+    },
+    {
+      accessorKey: "registrationUrl",
+      header: "Registration",
+      cell: ({ row }) => {
+        const url = row.getValue("registrationUrl") as string;
+        return url ? (
+          <a 
+            href={url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-primary hover:underline"
+          >
+            View Link
+          </a>
+        ) : (
+          "None"
+        );
+      },
+    },
+    {
+      id: "actions",
+      header: "Actions",
+      cell: ({ row }) => {
+        const event = row.original;
+        return (
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => handleEdit(event)}
+            >
+              <Edit className="h-4 w-4" />
+            </Button>
+            <Button
+              variant="destructive"
+              size="sm"
+              onClick={() => handleDelete(event)}
+            >
+              <Trash2 className="h-4 w-4" />
+            </Button>
+          </div>
+        );
+      },
+    },
+  ];
+
   return (
     <AdminLayout>
       <div className="space-y-6">
@@ -78,94 +156,16 @@ const AdminEvents = () => {
           </Button>
         </div>
 
-        <div className="bg-white rounded-lg shadow-sm overflow-hidden border">
-          <div className="p-4 border-b">
-            <div className="relative">
-              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-              <Input
-                placeholder="Search events..."
-                className="pl-8"
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-              />
-            </div>
-          </div>
-
-          <div className="overflow-x-auto">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Event</TableHead>
-                  <TableHead>Date</TableHead>
-                  <TableHead>Time</TableHead>
-                  <TableHead>Location</TableHead>
-                  <TableHead>Sport</TableHead>
-                  <TableHead>Registration</TableHead>
-                  <TableHead>Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {isLoading ? (
-                  <TableRow>
-                    <TableCell colSpan={7} className="text-center py-8 text-gray-500">
-                      Loading events data...
-                    </TableCell>
-                  </TableRow>
-                ) : filteredEvents.length === 0 ? (
-                  <TableRow>
-                    <TableCell colSpan={7} className="text-center py-8 text-gray-500">
-                      No events found
-                    </TableCell>
-                  </TableRow>
-                ) : (
-                  filteredEvents.map((event) => (
-                    <TableRow key={event.id}>
-                      <TableCell className="font-medium">{event.eventName}</TableCell>
-                      <TableCell>{formatDate(event.eventDate)}</TableCell>
-                      <TableCell>{event.eventTime}</TableCell>
-                      <TableCell>{event.city}</TableCell>
-                      <TableCell>{getSportName(event.sportId)}</TableCell>
-                      <TableCell>
-                        {event.registrationUrl ? (
-                          <a 
-                            href={event.registrationUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-primary hover:underline"
-                          >
-                            View Link
-                          </a>
-                        ) : (
-                          "None"
-                        )}
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex gap-2">
-                          <Button 
-                            variant="outline" 
-                            size="sm"
-                            onClick={() => handleEdit(event)}
-                          >
-                            <Edit className="h-4 w-4" />
-                            <span className="sr-only">Edit</span>
-                          </Button>
-                          <Button 
-                            variant="ghost" 
-                            size="sm"
-                            onClick={() => handleDelete(event)}
-                          >
-                            <Trash2 className="h-4 w-4 text-destructive" />
-                            <span className="sr-only">Delete</span>
-                          </Button>
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  ))
-                )}
-              </TableBody>
-            </Table>
-          </div>
-        </div>
+        {isLoading ? (
+          <div className="text-center py-8">Loading events...</div>
+        ) : (
+          <DataTable
+            columns={columns}
+            data={events}
+            searchKey="eventName"
+            searchPlaceholder="Search events..."
+          />
+        )}
       </div>
       
       {/* Create Event Dialog */}

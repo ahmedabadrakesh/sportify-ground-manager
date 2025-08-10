@@ -106,6 +106,7 @@ export type Database = {
           address: string
           city: string
           created_at: string
+          deleted_at: string | null
           event_date: string
           event_name: string
           event_time: string
@@ -121,6 +122,7 @@ export type Database = {
           address: string
           city: string
           created_at?: string
+          deleted_at?: string | null
           event_date: string
           event_name: string
           event_time: string
@@ -136,6 +138,7 @@ export type Database = {
           address?: string
           city?: string
           created_at?: string
+          deleted_at?: string | null
           event_date?: string
           event_name?: string
           event_time?: string
@@ -272,6 +275,7 @@ export type Database = {
         Row: {
           address: string
           created_at: string
+          deleted_at: string | null
           description: string | null
           facilities: string[] | null
           games: string[] | null
@@ -287,6 +291,7 @@ export type Database = {
         Insert: {
           address: string
           created_at?: string
+          deleted_at?: string | null
           description?: string | null
           facilities?: string[] | null
           games?: string[] | null
@@ -302,6 +307,7 @@ export type Database = {
         Update: {
           address?: string
           created_at?: string
+          deleted_at?: string | null
           description?: string | null
           facilities?: string[] | null
           games?: string[] | null
@@ -328,6 +334,7 @@ export type Database = {
         Row: {
           category: string
           created_at: string
+          deleted_at: string | null
           description: string | null
           id: string
           image: string | null
@@ -341,6 +348,7 @@ export type Database = {
         Insert: {
           category: string
           created_at?: string
+          deleted_at?: string | null
           description?: string | null
           id?: string
           image?: string | null
@@ -354,6 +362,7 @@ export type Database = {
         Update: {
           category?: string
           created_at?: string
+          deleted_at?: string | null
           description?: string | null
           id?: string
           image?: string | null
