@@ -557,7 +557,7 @@ const ProfessionalProfile = () => {
                 )}
 
               {/* Success Stories */}
-              {professional.success_stories &&
+              {Array.isArray(professional.success_stories) &&
                 professional.success_stories.length > 0 && (
                   <Card className="bg-white">
                     <CardHeader>
@@ -567,7 +567,7 @@ const ProfessionalProfile = () => {
                       </CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-6">
-                      {professional.success_stories.map((story, index) => (
+                      {(professional.success_stories as any[]).map((story, index) => (
                         <div
                           key={index}
                           className="border-l-4 border-success pl-4"
@@ -862,7 +862,7 @@ const ProfessionalProfile = () => {
               </Card>
 
               {/* Training Locations */}
-              {professional.training_locations_detailed &&
+              {Array.isArray(professional.training_locations_detailed) &&
                 professional.training_locations_detailed.length > 0 && (
                   <Card className="bg-white">
                     <CardHeader>
@@ -872,7 +872,7 @@ const ProfessionalProfile = () => {
                       </CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-4">
-                      {professional.training_locations_detailed.map(
+                      {(professional.training_locations_detailed as any[]).map(
                         (training_location, index) => (
                           <>
                             <div

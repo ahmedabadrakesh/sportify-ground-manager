@@ -183,14 +183,17 @@ export type Database = {
       }
       games: {
         Row: {
+          game_images: string | null
           id: string
           name: string
         }
         Insert: {
+          game_images?: string | null
           id?: string
           name: string
         }
         Update: {
+          game_images?: string | null
           id?: string
           name?: string
         }
@@ -551,6 +554,7 @@ export type Database = {
           comments: string | null
           contact_number: string
           created_at: string
+          deleted_at: string | null
           district_level_tournaments: number | null
           education: string[] | null
           facebook_link: string | null
@@ -575,10 +579,10 @@ export type Database = {
           punch_line: string | null
           specialties: string[] | null
           state_level_tournaments: number | null
-          success_stories: {story_details:string, age:number, client_name:string}[] | null
+          success_stories: Json | null
           total_match_played: number | null
           training_locations: string[] | null
-          training_locations_detailed: {address:string, timings:number, location:string}[] | null
+          training_locations_detailed: Json | null
           updated_at: string
           user_id: string | null
           videos: string[] | null
@@ -600,6 +604,7 @@ export type Database = {
           comments?: string | null
           contact_number: string
           created_at?: string
+          deleted_at?: string | null
           district_level_tournaments?: number | null
           education?: string[] | null
           facebook_link?: string | null
@@ -649,6 +654,7 @@ export type Database = {
           comments?: string | null
           contact_number?: string
           created_at?: string
+          deleted_at?: string | null
           district_level_tournaments?: number | null
           education?: string[] | null
           facebook_link?: string | null
