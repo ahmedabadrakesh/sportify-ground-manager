@@ -1,6 +1,7 @@
 
 import { Product, CartItem } from "@/types/models";
 import { toast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 // Helper to get cart from localStorage
 export const getCart = (): CartItem[] => {
@@ -130,8 +131,67 @@ export const processCheckout = async (checkoutData: {
   totalAmount: number;
 }): Promise<{ success: boolean; message: string; orderId?: string }> => {
   try {
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1500));
+    // Get current user
+    const { data: { user } } = await supabase.auth.getUser();
+    
+    if (!user) {
+      return {
+        success: false,
+        message: "Please log in to place an order."
+      };
+    }
+
+    const orderNumber = `ORD-${Date.now()}`;
+    
+    // Create order in database
+    const { data: order, error: orderError } = await supabase
+      .from('orders')
+      .insert({
+        user_id: user.id,
+        order_number: orderNumber,
+        customer_name: checkoutData.customer.name,
+        customer_email: checkoutData.customer.email,
+        customer_phone: checkoutData.customer.phone,
+        shipping_address: checkoutData.customer.address,
+        payment_method: checkoutData.paymentMethod,
+        payment_status: checkoutData.paymentMethod === 'cod' ? 'pending' : 'paid',
+        order_status: 'confirmed',
+        total_amount: checkoutData.totalAmount
+      })
+      .select()
+      .single();
+
+    if (orderError) {
+      console.error("Error creating order:", orderError);
+      return {
+        success: false,
+        message: "Failed to create order. Please try again."
+      };
+    }
+
+    // Create order items
+    const orderItems = checkoutData.items.map(item => ({
+      order_id: order.id,
+      product_id: item.productId,
+      product_name: item.name,
+      quantity: item.quantity,
+      unit_price: item.price,
+      total_price: item.price * item.quantity
+    }));
+
+    const { error: itemsError } = await supabase
+      .from('order_items')
+      .insert(orderItems);
+
+    if (itemsError) {
+      console.error("Error creating order items:", itemsError);
+      // Try to clean up the order if items creation failed
+      await supabase.from('orders').delete().eq('id', order.id);
+      return {
+        success: false,
+        message: "Failed to process order items. Please try again."
+      };
+    }
     
     // Clear cart after successful checkout
     clearCart();
@@ -139,7 +199,7 @@ export const processCheckout = async (checkoutData: {
     return {
       success: true,
       message: "Order placed successfully!",
-      orderId: `ORD-${Date.now()}`
+      orderId: orderNumber
     };
   } catch (error) {
     console.error("Error processing checkout:", error);
