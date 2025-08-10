@@ -336,6 +336,7 @@ export type Database = {
           created_at: string
           deleted_at: string | null
           description: string | null
+          featured: boolean | null
           id: string
           image: string | null
           name: string
@@ -350,6 +351,7 @@ export type Database = {
           created_at?: string
           deleted_at?: string | null
           description?: string | null
+          featured?: boolean | null
           id?: string
           image?: string | null
           name: string
@@ -364,6 +366,7 @@ export type Database = {
           created_at?: string
           deleted_at?: string | null
           description?: string | null
+          featured?: boolean | null
           id?: string
           image?: string | null
           name?: string
@@ -374,86 +377,6 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
-      }
-      order_items: {
-        Row: {
-          order_id: string
-          price: number
-          product_id: string
-          quantity: number
-        }
-        Insert: {
-          order_id: string
-          price: number
-          product_id: string
-          quantity: number
-        }
-        Update: {
-          order_id?: string
-          price?: number
-          product_id?: string
-          quantity?: number
-        }
-        Relationships: [
-          {
-            foreignKeyName: "order_items_order_id_fkey"
-            columns: ["order_id"]
-            isOneToOne: false
-            referencedRelation: "orders"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "order_items_product_id_fkey"
-            columns: ["product_id"]
-            isOneToOne: false
-            referencedRelation: "products"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      orders: {
-        Row: {
-          created_at: string
-          id: string
-          payment_method: string
-          payment_status: string
-          shipping_address: string
-          status: string
-          total_amount: number
-          updated_at: string
-          user_id: string
-        }
-        Insert: {
-          created_at?: string
-          id?: string
-          payment_method: string
-          payment_status: string
-          shipping_address: string
-          status: string
-          total_amount: number
-          updated_at?: string
-          user_id: string
-        }
-        Update: {
-          created_at?: string
-          id?: string
-          payment_method?: string
-          payment_status?: string
-          shipping_address?: string
-          status?: string
-          total_amount?: number
-          updated_at?: string
-          user_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "orders_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "users"
-            referencedColumns: ["id"]
-          },
-        ]
       }
       phone_registrations: {
         Row: {
@@ -482,45 +405,6 @@ export type Database = {
           phone?: string
           updated_at?: string
           user_type?: string
-        }
-        Relationships: []
-      }
-      products: {
-        Row: {
-          category: string
-          created_at: string
-          description: string | null
-          featured: boolean | null
-          id: string
-          images: string[] | null
-          name: string
-          price: number
-          stock: number
-          updated_at: string
-        }
-        Insert: {
-          category: string
-          created_at?: string
-          description?: string | null
-          featured?: boolean | null
-          id?: string
-          images?: string[] | null
-          name: string
-          price: number
-          stock?: number
-          updated_at?: string
-        }
-        Update: {
-          category?: string
-          created_at?: string
-          description?: string | null
-          featured?: boolean | null
-          id?: string
-          images?: string[] | null
-          name?: string
-          price?: number
-          stock?: number
-          updated_at?: string
         }
         Relationships: []
       }
