@@ -23,12 +23,7 @@ const AdminSportsProfessionals = () => {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("sports_professionals")
-        .select(`
-          *,
-          games (
-            name
-          )
-        `)
+        .select("*")
         .order("created_at", { ascending: false });
 
       if (error) throw error;
