@@ -48,30 +48,6 @@ const Home: React.FC = () => {
     };
   }, []);
 
-  // SEO: Home page meta
-  useEffect(() => {
-    document.title = "Jokova — Sports Pros & Events | Black & White Home";
-    const metaDesc =
-      "Find sports professionals, events, and more. Sleek black & white homepage experience.";
-    let desc = document.querySelector('meta[name="description"]');
-    if (!desc) {
-      desc = document.createElement("meta");
-      desc.setAttribute("name", "description");
-      document.head.appendChild(desc);
-    }
-    desc.setAttribute("content", metaDesc);
-
-    // Canonical
-    const canonicalHref = `${window.location.origin}/`;
-    let link: HTMLLinkElement | null = document.querySelector('link[rel="canonical"]');
-    if (!link) {
-      link = document.createElement("link");
-      link.setAttribute("rel", "canonical");
-      document.head.appendChild(link);
-    }
-    link.setAttribute("href", canonicalHref);
-  }, []);
-
   const handleSearch = (term: string) => {
     if (term.trim()) {
       setSearchTerm(term);
@@ -90,7 +66,7 @@ const Home: React.FC = () => {
   return (
     <MainLayout>
       <HeroSection onSearch={handleSearch} />
-      <div className="filter grayscale animate-fade-in">
+      <div>
         <PopularSportsSection />
         <SportsProfessionalsPromotion />
         <SearchResultsSection
@@ -124,7 +100,7 @@ const Home: React.FC = () => {
         <StatBanner />
       </div>
 
-      <div className="container mx-auto px-4 filter grayscale animate-fade-in">
+      <div className="container mx-auto px-4">
         {/* <HowItWorksSection /> */}
         <TestimonialsSection />
         <ShopPromotionSection />
