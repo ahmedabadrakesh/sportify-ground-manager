@@ -3,27 +3,28 @@ import { Product } from "@/types/models";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
-// Get all products
+// Get all products from inventory_items
 export const getAllProducts = async (): Promise<Product[]> => {
   try {
     const { data, error } = await supabase
-      .from('products')
-      .select('*');
+      .from('inventory_items')
+      .select('*')
+      .is('deleted_at', null);
     
     if (error) {
       console.error("Error fetching products:", error);
       throw error;
     }
     
-    return data.map(product => ({
-      id: product.id,
-      name: product.name,
-      description: product.description || '',
-      price: product.price,
-      category: product.category,
-      stock: product.stock,
-      featured: product.featured || false,
-      images: product.images || ["/placeholder.svg"]
+    return data.map(item => ({
+      id: item.id,
+      name: item.name,
+      description: item.description || '',
+      price: item.price,
+      category: item.category,
+      stock: item.quantity || 0,
+      featured: false, // inventory_items doesn't have featured field
+      images: item.image ? [item.image] : ["/placeholder.svg"]
     }));
   } catch (error) {
     console.error("Error in getAllProducts:", error);
@@ -32,13 +33,14 @@ export const getAllProducts = async (): Promise<Product[]> => {
   }
 };
 
-// Get product by ID
+// Get product by ID from inventory_items
 export const getProductById = async (productId: string): Promise<Product | undefined> => {
   try {
     const { data, error } = await supabase
-      .from('products')
+      .from('inventory_items')
       .select('*')
       .eq('id', productId)
+      .is('deleted_at', null)
       .single();
     
     if (error) {
@@ -52,9 +54,9 @@ export const getProductById = async (productId: string): Promise<Product | undef
       description: data.description || '',
       price: data.price,
       category: data.category,
-      stock: data.stock,
-      featured: data.featured || false,
-      images: data.images || ["/placeholder.svg"]
+      stock: data.quantity || 0,
+      featured: false,
+      images: data.image ? [data.image] : ["/placeholder.svg"]
     };
   } catch (error) {
     console.error("Error in getProductById:", error);
@@ -63,19 +65,20 @@ export const getProductById = async (productId: string): Promise<Product | undef
   }
 };
 
-// Add new product
+// Add new product to inventory_items
 export const addProduct = async (productData: Omit<Product, 'id' | 'images'>): Promise<Product | null> => {
   try {
     const { data, error } = await supabase
-      .from('products')
+      .from('inventory_items')
       .insert({
         name: productData.name,
         description: productData.description,
         price: productData.price,
         category: productData.category,
-        stock: productData.stock,
-        featured: productData.featured,
-        images: ["/placeholder.svg"] // Default image
+        quantity: productData.stock,
+        purchase_price: productData.price * 0.7, // Assume 30% markup
+        purchase_quantity: productData.stock,
+        image: "/placeholder.svg" // Default image
       })
       .select()
       .single();
@@ -91,9 +94,9 @@ export const addProduct = async (productData: Omit<Product, 'id' | 'images'>): P
       description: data.description || '',
       price: data.price,
       category: data.category,
-      stock: data.stock,
-      featured: data.featured || false,
-      images: data.images || ["/placeholder.svg"]
+      stock: data.quantity || 0,
+      featured: false,
+      images: data.image ? [data.image] : ["/placeholder.svg"]
     };
   } catch (error) {
     console.error("Error in addProduct:", error);
@@ -102,15 +105,22 @@ export const addProduct = async (productData: Omit<Product, 'id' | 'images'>): P
   }
 };
 
-// Update product
+// Update product in inventory_items
 export const updateProduct = async (
   productId: string, 
   productData: Partial<Omit<Product, 'id' | 'images'>>
 ): Promise<Product | null> => {
   try {
+    const updateData: any = {};
+    if (productData.name) updateData.name = productData.name;
+    if (productData.description) updateData.description = productData.description;
+    if (productData.price) updateData.price = productData.price;
+    if (productData.category) updateData.category = productData.category;
+    if (productData.stock !== undefined) updateData.quantity = productData.stock;
+    
     const { data, error } = await supabase
-      .from('products')
-      .update(productData)
+      .from('inventory_items')
+      .update(updateData)
       .eq('id', productId)
       .select()
       .single();
@@ -126,9 +136,9 @@ export const updateProduct = async (
       description: data.description || '',
       price: data.price,
       category: data.category,
-      stock: data.stock,
-      featured: data.featured || false,
-      images: data.images || ["/placeholder.svg"]
+      stock: data.quantity || 0,
+      featured: false,
+      images: data.image ? [data.image] : ["/placeholder.svg"]
     };
   } catch (error) {
     console.error("Error in updateProduct:", error);
@@ -137,12 +147,12 @@ export const updateProduct = async (
   }
 };
 
-// Delete product
+// Delete product (soft delete in inventory_items)
 export const deleteProduct = async (productId: string): Promise<boolean> => {
   try {
     const { error } = await supabase
-      .from('products')
-      .delete()
+      .from('inventory_items')
+      .update({ deleted_at: new Date().toISOString() })
       .eq('id', productId);
     
     if (error) {
@@ -158,28 +168,29 @@ export const deleteProduct = async (productId: string): Promise<boolean> => {
   }
 };
 
-// Get featured products
+// Get featured products (return first 6 products since inventory_items doesn't have featured field)
 export const getFeaturedProducts = async (): Promise<Product[]> => {
   try {
     const { data, error } = await supabase
-      .from('products')
+      .from('inventory_items')
       .select('*')
-      .eq('featured', true);
+      .is('deleted_at', null)
+      .limit(6);
     
     if (error) {
       console.error("Error fetching featured products:", error);
       throw error;
     }
     
-    return data.map(product => ({
-      id: product.id,
-      name: product.name,
-      description: product.description || '',
-      price: product.price,
-      category: product.category,
-      stock: product.stock,
-      featured: product.featured || false,
-      images: product.images || ["/placeholder.svg"]
+    return data.map(item => ({
+      id: item.id,
+      name: item.name,
+      description: item.description || '',
+      price: item.price,
+      category: item.category,
+      stock: item.quantity || 0,
+      featured: true, // Mark as featured since this is the featured list
+      images: item.image ? [item.image] : ["/placeholder.svg"]
     }));
   } catch (error) {
     console.error("Error in getFeaturedProducts:", error);
@@ -188,28 +199,29 @@ export const getFeaturedProducts = async (): Promise<Product[]> => {
   }
 };
 
-// Get products by category
+// Get products by category from inventory_items
 export const getProductsByCategory = async (category: string): Promise<Product[]> => {
   try {
     const { data, error } = await supabase
-      .from('products')
+      .from('inventory_items')
       .select('*')
-      .eq('category', category);
+      .eq('category', category)
+      .is('deleted_at', null);
     
     if (error) {
       console.error("Error fetching products by category:", error);
       throw error;
     }
     
-    return data.map(product => ({
-      id: product.id,
-      name: product.name,
-      description: product.description || '',
-      price: product.price,
-      category: product.category,
-      stock: product.stock,
-      featured: product.featured || false,
-      images: product.images || ["/placeholder.svg"]
+    return data.map(item => ({
+      id: item.id,
+      name: item.name,
+      description: item.description || '',
+      price: item.price,
+      category: item.category,
+      stock: item.quantity || 0,
+      featured: false,
+      images: item.image ? [item.image] : ["/placeholder.svg"]
     }));
   } catch (error) {
     console.error("Error in getProductsByCategory:", error);
@@ -218,15 +230,16 @@ export const getProductsByCategory = async (category: string): Promise<Product[]
   }
 };
 
-// Search products
+// Search products in inventory_items
 export const searchProducts = async (query: string): Promise<Product[]> => {
   try {
     const searchTerm = query.toLowerCase();
     
-    // Ideally this would use a fulltext search, but for simplicity we'll load all and filter
+    // Load all inventory items and filter
     const { data, error } = await supabase
-      .from('products')
-      .select('*');
+      .from('inventory_items')
+      .select('*')
+      .is('deleted_at', null);
     
     if (error) {
       console.error("Error fetching products for search:", error);
@@ -234,20 +247,20 @@ export const searchProducts = async (query: string): Promise<Product[]> => {
     }
     
     return data
-      .filter(product => 
-        product.name.toLowerCase().includes(searchTerm) || 
-        (product.description && product.description.toLowerCase().includes(searchTerm)) || 
-        product.category.toLowerCase().includes(searchTerm)
+      .filter(item => 
+        item.name.toLowerCase().includes(searchTerm) || 
+        (item.description && item.description.toLowerCase().includes(searchTerm)) || 
+        item.category.toLowerCase().includes(searchTerm)
       )
-      .map(product => ({
-        id: product.id,
-        name: product.name,
-        description: product.description || '',
-        price: product.price,
-        category: product.category,
-        stock: product.stock,
-        featured: product.featured || false,
-        images: product.images || ["/placeholder.svg"]
+      .map(item => ({
+        id: item.id,
+        name: item.name,
+        description: item.description || '',
+        price: item.price,
+        category: item.category,
+        stock: item.quantity || 0,
+        featured: false,
+        images: item.image ? [item.image] : ["/placeholder.svg"]
       }));
   } catch (error) {
     console.error("Error in searchProducts:", error);
