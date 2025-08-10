@@ -1,5 +1,6 @@
 
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import MainLayout from "@/components/layouts/MainLayout";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -18,6 +19,7 @@ import { addToCart } from "@/utils/cart";
 import { toast } from "sonner";
 
 const Shop: React.FC = () => {
+  const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
   const [category, setCategory] = useState<string>("all");
   const [sortBy, setSortBy] = useState<string>("featured");
@@ -170,39 +172,52 @@ const Shop: React.FC = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
               {filteredProducts.map(product => (
                 <Card key={product.id} className="overflow-hidden">
-                  <div className="aspect-square relative bg-gray-100">
-                    <img 
-                      src={product.images?.[0] || "/placeholder.svg"} 
-                      alt={product.name}
-                      className="object-cover w-full h-full"
-                    />
-                    {product.featured && (
-                      <div className="absolute top-2 right-2 bg-primary text-white text-xs font-bold px-2 py-1 rounded">
-                        Featured
-                      </div>
-                    )}
-                  </div>
+                   <div className="aspect-square relative bg-gray-100 cursor-pointer" onClick={() => navigate(`/product/${product.id}`)}>
+                     <img 
+                       src={product.images?.[0] || "/placeholder.svg"} 
+                       alt={product.name}
+                       className="object-cover w-full h-full hover:scale-105 transition-transform duration-300"
+                     />
+                     {product.featured && (
+                       <div className="absolute top-2 right-2 bg-primary text-white text-xs font-bold px-2 py-1 rounded">
+                         Featured
+                       </div>
+                     )}
+                   </div>
                   
-                  <CardContent className="p-4">
-                    <h2 className="font-semibold text-lg mb-1">{product.name}</h2>
-                    <p className="text-gray-500 text-sm mb-2 line-clamp-2">{product.description}</p>
-                    <div className="flex items-center justify-between">
-                      <span className="font-bold text-lg">₹{product.price}</span>
-                      <span className={`text-sm ${product.stock > 0 ? 'text-green-600' : 'text-red-600'}`}>
-                        {product.stock > 0 ? `In Stock (${product.stock})` : 'Out of Stock'}
-                      </span>
-                    </div>
-                  </CardContent>
-                  
-                  <CardFooter className="p-4 pt-0">
-                    <Button 
-                      className="w-full" 
-                      onClick={() => handleAddToCart(product)}
-                      disabled={product.stock === 0}
-                    >
-                      <ShoppingCart className="mr-2 h-4 w-4" /> Add to Cart
-                    </Button>
-                  </CardFooter>
+                   <CardContent className="p-4">
+                     <h2 
+                       className="font-semibold text-lg mb-1 cursor-pointer hover:text-primary transition-colors" 
+                       onClick={() => navigate(`/product/${product.id}`)}
+                     >
+                       {product.name}
+                     </h2>
+                     <p className="text-gray-500 text-sm mb-2 line-clamp-2">{product.description}</p>
+                     <div className="flex items-center justify-between">
+                       <span className="font-bold text-lg">₹{product.price}</span>
+                       <span className={`text-sm ${product.stock > 0 ? 'text-green-600' : 'text-red-600'}`}>
+                         {product.stock > 0 ? `In Stock (${product.stock})` : 'Out of Stock'}
+                       </span>
+                     </div>
+                   </CardContent>
+                   
+                   <CardFooter className="p-4 pt-0">
+                     <div className="flex gap-2">
+                       <Button 
+                         className="flex-1" 
+                         onClick={() => handleAddToCart(product)}
+                         disabled={product.stock === 0}
+                       >
+                         <ShoppingCart className="mr-2 h-4 w-4" /> Add to Cart
+                       </Button>
+                       <Button 
+                         variant="outline" 
+                         onClick={() => navigate(`/product/${product.id}`)}
+                       >
+                         View
+                       </Button>
+                     </div>
+                   </CardFooter>
                 </Card>
               ))}
             </div>

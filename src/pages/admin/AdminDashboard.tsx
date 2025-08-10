@@ -9,11 +9,21 @@ import DashboardHeader from "@/components/admin/dashboard/DashboardHeader";
 import StatsSection from "@/components/admin/dashboard/StatsSection";
 import BookingChart from "@/components/admin/dashboard/BookingChart";
 import RecentActivityCard from "@/components/admin/dashboard/RecentActivityCard";
+import EcommerceStatsCard from "@/components/admin/dashboard/EcommerceStatsCard";
+import { getAllProducts } from "@/utils/ecommerce";
 
 const AdminDashboard: React.FC = () => {
   const currentUser = getCurrentUserSync();
   const isSuperAdmin = hasRoleSync('super_admin');
   const [statsVisible, setStatsVisible] = useState(false);
+  const [products, setProducts] = useState([]);
+  const [ecommerceStats, setEcommerceStats] = useState({
+    totalOrders: 0,
+    totalRevenue: 0,
+    totalProducts: 0,
+    lowStockProducts: 0,
+    recentOrders: []
+  });
   const statsRef = useRef<HTMLDivElement>(null);
   
   // Filter bookings for ground owner
@@ -38,6 +48,56 @@ const AdminDashboard: React.FC = () => {
   const pendingBookings = ownerBookings.filter(
     booking => booking.bookingStatus === 'pending'
   ).length;
+
+  // Load e-commerce data
+  useEffect(() => {
+    const loadEcommerceData = async () => {
+      try {
+        const productsData = await getAllProducts();
+        setProducts(productsData);
+        
+        // Calculate e-commerce stats
+        const lowStock = productsData.filter(p => p.stock <= 5).length;
+        
+        // Mock order data for demo - replace with real data
+        const mockOrders = [
+          {
+            id: "order-1",
+            customerName: "John Doe",
+            total: 1250,
+            status: "completed",
+            date: "Today"
+          },
+          {
+            id: "order-2", 
+            customerName: "Jane Smith",
+            total: 850,
+            status: "pending",
+            date: "Yesterday"
+          },
+          {
+            id: "order-3",
+            customerName: "Mike Johnson", 
+            total: 2100,
+            status: "completed",
+            date: "2 days ago"
+          }
+        ];
+
+        setEcommerceStats({
+          totalOrders: mockOrders.length,
+          totalRevenue: mockOrders.reduce((sum, order) => sum + order.total, 0),
+          totalProducts: productsData.length,
+          lowStockProducts: lowStock,
+          recentOrders: mockOrders
+        });
+      } catch (error) {
+        console.error("Error loading e-commerce data:", error);
+      }
+    };
+
+    loadEcommerceData();
+  }, []);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -80,6 +140,12 @@ const AdminDashboard: React.FC = () => {
       {/* Booking Trends */}
       <div className="mb-8">
         <BookingChart bookings={ownerBookings} />
+      </div>
+
+      {/* E-commerce Stats */}
+      <div className="mb-8">
+        <h2 className="text-xl font-semibold mb-4">E-commerce Overview</h2>
+        <EcommerceStatsCard stats={ecommerceStats} />
       </div>
 
       {/* Recent Activity */}

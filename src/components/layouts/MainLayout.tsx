@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { ShoppingCart, Menu, X, LogIn, UserPlus, Search } from "lucide-react";
+import { Menu, X, LogIn, UserPlus, Search } from "lucide-react";
+import CartIcon from "@/components/cart/CartIcon";
 import { Button } from "@/components/ui/button";
 import { logout, getCurrentUserSync, hasRoleSync } from "@/utils/auth";
 import { Toaster } from "@/components/ui/toaster";
@@ -106,7 +107,7 @@ const MainLayout = ({ children }: MainLayoutProps) => {
             <div className="hidden md:flex items-right space-x-1">
               <Link to="/cart">
                 <Button variant="ghost" size="icon">
-                  <ShoppingCart className="h-5 w-5" />
+                  <CartIcon />
                 </Button>
               </Link>
               {authenticated ? (
@@ -141,7 +142,7 @@ const MainLayout = ({ children }: MainLayoutProps) => {
             <div className="md:hidden">
               <Link to="/cart">
                 <Button variant="ghost" size="icon">
-                  <ShoppingCart className="h-5 w-5" />
+                  <CartIcon />
                 </Button>
               </Link>
             </div>

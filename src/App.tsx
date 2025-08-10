@@ -10,6 +10,7 @@ import Shop from "./pages/Shop";
 import Cart from "./pages/Cart";
 import Checkout from "./pages/Checkout";
 import OrderConfirmation from "./pages/OrderConfirmation";
+import ProductDetail from "./pages/ProductDetail";
 import SearchGrounds from "./pages/SearchGrounds";
 import GroundDetail from "./pages/GroundDetail";
 import Events from "./pages/Events";
@@ -40,6 +41,7 @@ function App() {
         <Route path="/home" element={<Home />} />
         <Route path="/bookings" element={<Bookings />} />
         <Route path="/shop" element={<Shop />} />
+        <Route path="/product/:id" element={<ProductDetail />} />
         <Route path="/cart" element={<Cart />} />
         <Route path="/checkout" element={<Checkout />} />
         <Route path="/order-confirmation" element={<OrderConfirmation />} />
