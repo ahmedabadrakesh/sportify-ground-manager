@@ -56,6 +56,13 @@ export const ContactInformationSection = ({ form, userEmail, isUpdate = false }:
                     ? "Enter email address for new professional" 
                     : "Email address"
                 }
+                onChange={(e) => {
+                  field.onChange(e);
+                  // Clear any validation errors when the field is disabled (editing mode)
+                  if (isEmailDisabled) {
+                    form.clearErrors("email");
+                  }
+                }}
               />
             </FormControl>
             {isEmailDisabled && (
@@ -68,7 +75,8 @@ export const ContactInformationSection = ({ form, userEmail, isUpdate = false }:
                 Enter the email address for the new sports professional. A user account will be created with this email.
               </p>
             )}
-            <FormMessage />
+            {/* Only show validation errors if field is not disabled */}
+            {!isEmailDisabled && <FormMessage />}
           </FormItem>
         )}
       />
