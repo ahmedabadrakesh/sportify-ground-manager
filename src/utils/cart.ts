@@ -1,6 +1,6 @@
 
 import { Product, CartItem } from "@/types/models";
-import { toast } from "sonner";
+import { toast } from "@/hooks/use-toast";
 
 // Helper to get cart from localStorage
 export const getCart = (): CartItem[] => {
@@ -25,6 +25,7 @@ export const addToCart = (product: Product, quantity: number = 1): CartItem | nu
       );
       
       localStorage.setItem("cart", JSON.stringify(newCart));
+      window.dispatchEvent(new Event("cartUpdated"));
       return existingItem;
     } else {
       // Add new item
@@ -39,11 +40,12 @@ export const addToCart = (product: Product, quantity: number = 1): CartItem | nu
       
       const newCart = [...cart, newItem];
       localStorage.setItem("cart", JSON.stringify(newCart));
+      window.dispatchEvent(new Event("cartUpdated"));
       return newItem;
     }
   } catch (error) {
     console.error("Error adding to cart:", error);
-    toast.error("Failed to add item to cart");
+    toast({ title: "Error", description: "Failed to add item to cart", variant: "destructive" });
     return null;
   }
 };
@@ -63,6 +65,7 @@ export const updateCartItemQuantity = (productId: string, quantity: number): boo
     
     cart[itemIndex].quantity = quantity;
     localStorage.setItem("cart", JSON.stringify(cart));
+    window.dispatchEvent(new Event("cartUpdated"));
     return true;
   } catch (error) {
     console.error("Error updating cart item:", error);
@@ -77,6 +80,7 @@ export const removeFromCart = (productId: string): boolean => {
     const newCart = cart.filter(item => item.productId !== productId);
     
     localStorage.setItem("cart", JSON.stringify(newCart));
+    window.dispatchEvent(new Event("cartUpdated"));
     return true;
   } catch (error) {
     console.error("Error removing from cart:", error);
@@ -87,6 +91,7 @@ export const removeFromCart = (productId: string): boolean => {
 // Clear cart
 export const clearCart = (): void => {
   localStorage.setItem("cart", JSON.stringify([]));
+  window.dispatchEvent(new Event("cartUpdated"));
 };
 
 // Calculate cart total

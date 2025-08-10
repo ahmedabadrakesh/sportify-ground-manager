@@ -19,11 +19,11 @@ import {
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { toast } from "sonner";
+import { toast } from "@/hooks/use-toast";
 import { ShoppingBag, CreditCard, Truck, Check, ArrowLeft, Loader2 } from "lucide-react";
 import { getCart, getCartTotal, processCheckout } from "@/utils/cart";
-import { CartItem } from "@/types/models";
-import { products } from "@/data/mockData";
+import { CartItem, Product } from "@/types/models";
+import { getProductById } from "@/utils/ecommerce";
 import { getCurrentUserSync } from "@/utils/auth";
 
 const checkoutFormSchema = z.object({
@@ -41,6 +41,7 @@ type CheckoutFormValues = z.infer<typeof checkoutFormSchema>;
 const Checkout: React.FC = () => {
   const navigate = useNavigate();
   const [cart, setCart] = useState<CartItem[]>([]);
+  const [products, setProducts] = useState<Record<string, Product>>({});
   const [loading, setLoading] = useState(true);
   const [processingOrder, setProcessingOrder] = useState(false);
   const currentUser = getCurrentUserSync();
@@ -57,18 +58,44 @@ const Checkout: React.FC = () => {
   });
 
   useEffect(() => {
-    const cartItems = getCart();
-    if (cartItems.length === 0) {
-      toast.error("Your cart is empty");
-      navigate("/cart");
-      return;
-    }
-    setCart(cartItems);
-    setLoading(false);
+    const loadCartData = async () => {
+      try {
+        const cartItems = getCart();
+        if (cartItems.length === 0) {
+          toast({ title: "Error", description: "Your cart is empty", variant: "destructive" });
+          navigate("/cart");
+          return;
+        }
+        
+        setCart(cartItems);
+        
+        // Load product details for each cart item
+        const productDetails: Record<string, Product> = {};
+        for (const item of cartItems) {
+          try {
+            const product = await getProductById(item.productId);
+            if (product) {
+              productDetails[item.productId] = product;
+            }
+          } catch (error) {
+            console.error(`Error loading product ${item.productId}:`, error);
+          }
+        }
+        
+        setProducts(productDetails);
+      } catch (error) {
+        console.error("Error loading checkout data:", error);
+        toast({ title: "Error", description: "Failed to load checkout data", variant: "destructive" });
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    loadCartData();
   }, [navigate]);
 
   const cartItems = cart.map(item => {
-    const product = products.find(p => p.id === item.productId);
+    const product = products[item.productId];
     return { 
       ...item, 
       product,
@@ -95,7 +122,7 @@ const Checkout: React.FC = () => {
       });
       
       if (result.success) {
-        toast.success(result.message);
+        toast({ title: "Success", description: result.message });
         navigate("/order-confirmation", { 
           state: { 
             orderId: result.orderId,
@@ -104,10 +131,10 @@ const Checkout: React.FC = () => {
           } 
         });
       } else {
-        toast.error(result.message);
+        toast({ title: "Error", description: result.message, variant: "destructive" });
       }
     } catch (error) {
-      toast.error("An error occurred during checkout. Please try again.");
+      toast({ title: "Error", description: "An error occurred during checkout. Please try again.", variant: "destructive" });
     } finally {
       setProcessingOrder(false);
     }

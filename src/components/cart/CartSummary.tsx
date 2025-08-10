@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { CreditCard } from "lucide-react";
-import { toast } from "sonner";
+import { toast } from "@/hooks/use-toast";
 
 interface CartSummaryProps {
   totalAmount: number;
@@ -16,7 +16,7 @@ const CartSummary: React.FC<CartSummaryProps> = ({ totalAmount, hasItems }) => {
 
   const handleCheckout = () => {
     if (!hasItems) {
-      toast.error("Your cart is empty");
+      toast({ title: "Error", description: "Your cart is empty", variant: "destructive" });
       return;
     }
     

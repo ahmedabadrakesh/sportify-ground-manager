@@ -16,7 +16,7 @@ import { ShoppingCart, Search } from "lucide-react";
 import { getAllProducts, searchProducts } from "@/utils/ecommerce";
 import { Product } from "@/types/models";
 import { addToCart } from "@/utils/cart";
-import { toast } from "sonner";
+import { toast } from "@/hooks/use-toast";
 
 const Shop: React.FC = () => {
   const navigate = useNavigate();
@@ -45,7 +45,7 @@ const Shop: React.FC = () => {
         applyFilters(allProducts, searchTerm, category, sortBy);
       } catch (error) {
         console.error("Error loading products:", error);
-        toast.error("Failed to load products");
+        toast({ title: "Error", description: "Failed to load products", variant: "destructive" });
       } finally {
         setLoading(false);
       }
@@ -112,8 +112,10 @@ const Shop: React.FC = () => {
 
   // Handle add to cart
   const handleAddToCart = (product: Product) => {
-    addToCart(product);
-    toast.success(`${product.name} added to cart`);
+    const cartItem = addToCart(product);
+    if (cartItem) {
+      toast({ title: "Success", description: `${product.name} added to cart` });
+    }
   };
 
   return (
