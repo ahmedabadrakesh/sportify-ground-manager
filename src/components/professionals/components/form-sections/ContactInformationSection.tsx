@@ -16,7 +16,7 @@ interface ContactInformationSectionProps {
 
 export const ContactInformationSection = ({ form, userEmail, isUpdate = false }: ContactInformationSectionProps) => {
   const isSuperAdmin = hasRoleSync('super_admin');
-  const isEmailDisabled = !isSuperAdmin && !isUpdate && !!userEmail;
+  const isEmailDisabled = isUpdate || (!isSuperAdmin && !!userEmail);
 
   return (
     <div className="space-y-4">
@@ -60,7 +60,7 @@ export const ContactInformationSection = ({ form, userEmail, isUpdate = false }:
             </FormControl>
             {isEmailDisabled && (
               <p className="text-xs text-muted-foreground">
-                This is your registration email and cannot be changed.
+                {isUpdate ? "Email cannot be changed during profile updates." : "This is your registration email and cannot be changed."}
               </p>
             )}
             {isSuperAdmin && !isUpdate && (

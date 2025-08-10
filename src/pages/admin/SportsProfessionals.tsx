@@ -6,7 +6,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Plus, Edit, Trash2 } from "lucide-react";
 import RegisterProfessionalDialog from "@/components/professionals/RegisterProfessionalDialog";
-import EditProfessionalDialog from "@/components/admin/professionals/EditProfessionalDialog";
 import { ColumnDef } from "@tanstack/react-table";
 import { getCurrentUserSync, hasRoleSync } from "@/utils/auth";
 import { toast } from "sonner";
@@ -184,9 +183,10 @@ const AdminSportsProfessionals = () => {
       />
 
       {editingProfessional && (
-        <EditProfessionalDialog
+        <RegisterProfessionalDialog
           open={!!editingProfessional}
           onOpenChange={() => setEditingProfessional(null)}
+          isUpdate={true}
           professional={editingProfessional}
         />
       )}

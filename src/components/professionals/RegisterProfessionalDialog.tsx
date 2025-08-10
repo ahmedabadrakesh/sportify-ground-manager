@@ -21,6 +21,7 @@ interface RegisterProfessionalProps {
   onOpenChange: (open: boolean) => void;
   hasExistingProfile?: boolean;
   isUpdate?: boolean;
+  professional?: any;
 }
 
 const RegisterProfessionalDialog = ({
@@ -28,6 +29,7 @@ const RegisterProfessionalDialog = ({
   onOpenChange,
   hasExistingProfile = false,
   isUpdate = false,
+  professional,
 }: RegisterProfessionalProps) => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
   const [currentUser, setCurrentUser] = useState<any>(null);
@@ -78,7 +80,7 @@ const RegisterProfessionalDialog = ({
 
   useEffect(() => {
     const fetchExistingProfile = async () => {
-      if (isUpdate && currentUser && open && !isSuperAdmin) {
+      if (isUpdate && currentUser && open && !isSuperAdmin && !professional) {
         setIsLoadingProfile(true);
         try {
           console.log("Fetching existing profile for user:", currentUser);
@@ -275,86 +277,87 @@ const RegisterProfessionalDialog = ({
             level: undefined,
             coaching_availability: [],
           });
-        } else if (isUpdate && existingProfileData) {
-          console.log("Pre-filling with existing data:", existingProfileData);
+        } else if (isUpdate && (existingProfileData || professional)) {
+          const profileData = professional || existingProfileData;
+          console.log("Pre-filling with existing data:", profileData);
 
           // Use form.reset with the complete object to ensure proper type handling
           form.reset({
             // Basic Info
-            name: existingProfileData.name || "",
-            profession_type: existingProfileData.profession_type || "Athlete",
-            photo: existingProfileData.photo || "",
-            academy_name: existingProfileData.academy_name || "",
-            years_of_experience: existingProfileData.years_of_experience || 0,
+            name: profileData.name || "",
+            profession_type: profileData.profession_type || "Athlete",
+            photo: profileData.photo || "",
+            academy_name: profileData.academy_name || "",
+            years_of_experience: profileData.years_of_experience || 0,
             games_played: [],
-            is_certified: existingProfileData.is_certified || false,
+            is_certified: profileData.is_certified || false,
 
             // Contact & Social Details
-            contact_number: existingProfileData.contact_number || "",
-            whatsapp: existingProfileData.whatsapp || "",
+            contact_number: profileData.contact_number || "",
+            whatsapp: profileData.whatsapp || "",
             whatsapp_same_as_phone:
-              existingProfileData.whatsapp_same_as_phone || false,
-            email: userEmail,
-            instagram_link: existingProfileData.instagram_link || "",
-            youtube_link: existingProfileData.youtube_link || "",
-            linkedin_link: existingProfileData.linkedin_link || "",
-            website: existingProfileData.website || "",
-            facebook_link: existingProfileData.facebook_link || "",
+              profileData.whatsapp_same_as_phone || false,
+            email: profileData.email || userEmail,
+            instagram_link: profileData.instagram_link || "",
+            youtube_link: profileData.youtube_link || "",
+            linkedin_link: profileData.linkedin_link || "",
+            website: profileData.website || "",
+            facebook_link: profileData.facebook_link || "",
 
             // Professional Details
             district_level_tournaments:
-              existingProfileData.district_level_tournaments || 0,
+              profileData.district_level_tournaments || 0,
             state_level_tournaments:
-              existingProfileData.state_level_tournaments || 0,
+              profileData.state_level_tournaments || 0,
             national_level_tournaments:
-              existingProfileData.national_level_tournaments || 0,
+              profileData.national_level_tournaments || 0,
             international_level_tournaments:
-              existingProfileData.international_level_tournaments || 0,
-            specialties: existingProfileData.specialties || [],
-            certifications: existingProfileData.certifications || [],
-            education: existingProfileData.education || [],
-            accomplishments: existingProfileData.accomplishments || [],
+              profileData.international_level_tournaments || 0,
+            specialties: profileData.specialties || [],
+            certifications: profileData.certifications || [],
+            education: profileData.education || [],
+            accomplishments: profileData.accomplishments || [],
             training_locations_detailed:
-              existingProfileData.training_locations_detailed || [],
+              profileData.training_locations_detailed || [],
 
             // Media & Pricing
-            images: existingProfileData.images || [],
-            videos: existingProfileData.videos || [],
-            one_on_one_price: existingProfileData.one_on_one_price || 0,
-            group_session_price: existingProfileData.group_session_price || 0,
-            online_price: existingProfileData.online_price || 0,
-            free_demo_call: existingProfileData.free_demo_call || false,
+            images: profileData.images || [],
+            videos: profileData.videos || [],
+            one_on_one_price: profileData.one_on_one_price || 0,
+            group_session_price: profileData.group_session_price || 0,
+            online_price: profileData.online_price || 0,
+            free_demo_call: profileData.free_demo_call || false,
 
             // About Me
-            about_me: existingProfileData.about_me || "",
-            success_stories: existingProfileData.success_stories || [],
+            about_me: profileData.about_me || "",
+            success_stories: profileData.success_stories || [],
 
             // Legacy fields
-            city: existingProfileData.city || "",
-            address: existingProfileData.address || "",
-            comments: existingProfileData.comments || "",
-            fee: existingProfileData.fee || 0,
-            fee_type: existingProfileData.fee_type || "Per Hour",
-            total_match_played: existingProfileData.total_match_played || 0,
-            awards: existingProfileData.awards || [],
-            training_locations: existingProfileData.training_locations || [],
-            punch_line: existingProfileData.punch_line || "",
-            level: existingProfileData.level || undefined,
+            city: profileData.city || "",
+            address: profileData.address || "",
+            comments: profileData.comments || "",
+            fee: profileData.fee || 0,
+            fee_type: profileData.fee_type || "Per Hour",
+            total_match_played: profileData.total_match_played || 0,
+            awards: profileData.awards || [],
+            training_locations: profileData.training_locations || [],
+            punch_line: profileData.punch_line || "",
+            level: profileData.level || undefined,
             coaching_availability:
-              existingProfileData.coaching_availability || [],
+              profileData.coaching_availability || [],
           });
 
           // Convert game_ids to game names and set games_played
           if (
-            existingProfileData.game_ids &&
-            Array.isArray(existingProfileData.game_ids) &&
-            existingProfileData.game_ids.length > 0
+            profileData.game_ids &&
+            Array.isArray(profileData.game_ids) &&
+            profileData.game_ids.length > 0
           ) {
             try {
               const { data: gameData, error: gameError } = await supabase
                 .from("games")
                 .select("name")
-                .in("id", existingProfileData.game_ids);
+                .in("id", profileData.game_ids);
 
               if (gameData && !gameError) {
                 console.log(
@@ -397,6 +400,7 @@ const RegisterProfessionalDialog = ({
     isLoadingProfile,
     userEmail,
     isSuperAdmin,
+    professional,
   ]);
 
   const handleDialogClose = (open: boolean) => {
