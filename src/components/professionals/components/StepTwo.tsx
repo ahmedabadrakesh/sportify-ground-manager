@@ -89,7 +89,12 @@ export const StepTwo = ({ form, userEmail, isUpdate }: StepTwoProps) => {
               <FormItem>
                 <FormLabel>Email *</FormLabel>
                 <FormControl>
-                  <Input {...field} type="email" placeholder="Email address" />
+                  <Input
+                    disabled={isUpdate}
+                    {...field}
+                    type="email"
+                    placeholder="Email address"
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>

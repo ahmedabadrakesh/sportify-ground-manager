@@ -1,4 +1,3 @@
-
 import React from "react";
 import { UseFormReturn } from "react-hook-form";
 import { ProfessionalFormValues } from "../schemas/professionalFormSchema";
@@ -16,12 +15,17 @@ interface StepContentRendererProps {
   isUpdate?: boolean;
 }
 
-export const StepContentRenderer = ({ currentStep, form, userEmail, isUpdate }: StepContentRendererProps) => {
+export const StepContentRenderer = ({
+  currentStep,
+  form,
+  userEmail,
+  isUpdate,
+}: StepContentRendererProps) => {
   switch (currentStep) {
     case 1:
       return <StepOne form={form} userEmail={userEmail} isUpdate={isUpdate} />;
     case 2:
-      return <StepTwo form={form} />;
+      return <StepTwo form={form} userEmail={userEmail} isUpdate={isUpdate} />;
     case 3:
       return <StepThree form={form} />;
     case 4:
