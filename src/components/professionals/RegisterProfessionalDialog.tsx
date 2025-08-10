@@ -58,7 +58,23 @@ const RegisterProfessionalDialog = ({
 
   useEffect(() => {
     const fetchUserEmail = async () => {
-      if (currentUser && !isSuperAdmin && !professional) {
+      if (professional && professional.user_id) {
+        // Fetch email from users table for the professional being edited
+        try {
+          const { data: userData, error } = await supabase
+            .from("users")
+            .select("email")
+            .eq("id", professional.user_id)
+            .single();
+
+          if (userData && !error) {
+            setUserEmail(userData.email);
+          }
+        } catch (error) {
+          console.error("Error fetching professional's email:", error);
+        }
+      } else if (currentUser && !isSuperAdmin && !professional) {
+        // Fetch email for current user when creating new profile
         try {
           const { data: userData, error } = await supabase
             .from("users")
@@ -72,9 +88,6 @@ const RegisterProfessionalDialog = ({
         } catch (error) {
           console.error("Error fetching user email:", error);
         }
-      } else if (professional && professional.email) {
-        // Use the professional's email when editing
-        setUserEmail(professional.email);
       }
     };
 
@@ -300,7 +313,7 @@ const RegisterProfessionalDialog = ({
             whatsapp: profileData.whatsapp || "",
             whatsapp_same_as_phone:
               profileData.whatsapp_same_as_phone || false,
-            email: profileData.email || userEmail || "",
+            email: userEmail || "",
             instagram_link: profileData.instagram_link || "",
             youtube_link: profileData.youtube_link || "",
             linkedin_link: profileData.linkedin_link || "",
