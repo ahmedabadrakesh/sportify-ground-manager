@@ -238,6 +238,7 @@ const GroundOwners: React.FC = () => {
         open={isDeleteDialogOpen}
         onOpenChange={setIsDeleteDialogOpen}
         ownerId={deleteOwner?.id}
+        ownerName={deleteOwner?.name}
         onConfirm={handleDeleteSuccess}
         onCancel={() => setIsDeleteDialogOpen(false)}
       />
