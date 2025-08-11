@@ -309,36 +309,56 @@ const ProfessionalProfile = () => {
     );
   };
 
-  const structuredData = professional ? {
-    "@context": "https://schema.org",
-    "@type": "Person",
-    "name": professional?.name || "Professional",
-    "jobTitle": professional.profession_type,
-    "description": professional.about_me || professional.comments,
-    "url": typeof window !== "undefined" ? window.location.href : "",
-    "address": {
-      "@type": "PostalAddress",
-      "addressLocality": professional.city
-    },
-    "contactPoint": {
-      "@type": "ContactPoint",
-      "telephone": professional.contact_number,
-      "contactType": "customer service"
-    },
-    "sameAs": [
-      professional.instagram_link,
-      professional.facebook_link,
-      professional.linkedin_link,
-      professional.website
-    ].filter(Boolean)
-  } : undefined;
+  const structuredData = professional
+    ? {
+        "@context": "https://schema.org",
+        "@type": "Person",
+        name: professional?.name || "Professional",
+        jobTitle: professional.profession_type,
+        description: professional.about_me || professional.comments,
+        url: typeof window !== "undefined" ? window.location.href : "",
+        address: {
+          "@type": "PostalAddress",
+          addressLocality: professional.city,
+        },
+        contactPoint: {
+          "@type": "ContactPoint",
+          telephone: professional.contact_number,
+          contactType: "customer service",
+        },
+        sameAs: [
+          professional.instagram_link,
+          professional.facebook_link,
+          professional.linkedin_link,
+          professional.website,
+        ].filter(Boolean),
+      }
+    : undefined;
 
   return (
     <MainLayout>
       <SEOHead
-        title={professional?.name ? `${professional.name} - ${professional.profession_type} | Jokova` : "Professional Profile | Jokova"}
-        description={professional?.name ? `${professional.name} is a ${professional.profession_type} in ${professional.city}. ${professional.about_me || professional.comments || 'Book sports training sessions with certified professionals.'}`.substring(0, 160) : "Find and book sessions with certified sports professionals on Jokova."}
-        keywords={professional?.name ? `${professional.name}, ${professional.profession_type}, sports professional, ${professional.city}, sports training, coaching` : "sports professional, coaching, training"}
+        title={
+          professional?.name
+            ? `${professional.name} - ${professional.profession_type} | Jokova`
+            : "Professional Profile | Jokova"
+        }
+        description={
+          professional?.name
+            ? `${professional.name} is a ${professional.profession_type} in ${
+                professional.city
+              }. ${
+                professional.about_me ||
+                professional.comments ||
+                "Book sports training sessions with certified professionals."
+              }`.substring(0, 160)
+            : "Find and book sessions with certified sports professionals on Jokova."
+        }
+        keywords={
+          professional?.name
+            ? `${professional.name}, ${professional.profession_type}, sports professional, ${professional.city}, sports training, coaching`
+            : "sports professional, coaching, training"
+        }
         canonicalUrl={typeof window !== "undefined" ? window.location.href : ""}
         structuredData={structuredData}
       />
@@ -599,19 +619,21 @@ const ProfessionalProfile = () => {
                       </CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-6">
-                      {(professional.success_stories as any[]).map((story, index) => (
-                        <div
-                          key={index}
-                          className="border-l-4 border-success pl-4"
-                        >
-                          <h4 className="font-semibold text-left text-foreground">
-                            {story.client_name} (Age {story.age})
-                          </h4>
-                          <p className="text-sm text-left text-muted-foreground mt-1">
-                            {story.story_details}
-                          </p>
-                        </div>
-                      ))}
+                      {(professional.success_stories as any[]).map(
+                        (story, index) => (
+                          <div
+                            key={index}
+                            className="border-l-4 border-success pl-4"
+                          >
+                            <h4 className="font-semibold text-left text-foreground">
+                              {story.client_name} (Age {story.age})
+                            </h4>
+                            <p className="text-sm text-left text-muted-foreground mt-1">
+                              {story.story_details}
+                            </p>
+                          </div>
+                        )
+                      )}
                     </CardContent>
                   </Card>
                 )}
@@ -857,13 +879,17 @@ const ProfessionalProfile = () => {
                           <p
                             className="cursor-pointer text-sm"
                             onClick={() => {
-                              window.open(professional?.instagram_link, "_blank");
+                              window.open(
+                                professional?.instagram_link,
+                                "_blank"
+                              );
                             }}
                           >
-                            {professional.instagram_link.replace(
-                              "https://www.instagram.com/",
-                              "@"
-                            )}
+                            {professional.instagram_link &&
+                              professional.instagram_link.replace(
+                                "https://www.instagram.com/",
+                                "@"
+                              )}
                           </p>
                         </div>
                       </div>
