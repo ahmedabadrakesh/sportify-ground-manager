@@ -109,7 +109,8 @@ const ProfessionalProfile = () => {
   // Check if current user can edit this profile
   const canEdit =
     isAuthenticated &&
-    (isSuperAdmin || professional?.user_id === currentUser?.id);
+    (isSuperAdmin ||
+      (currentUser && professional?.user_id === currentUser?.id));
 
   const handleContactClick = () => {
     if (!isAuthenticated) {
@@ -808,24 +809,26 @@ const ProfessionalProfile = () => {
             {/* Right Column - Contact & Details */}
             <div className="space-y-6">
               {/* Circular Progress Bar */}
-              {professional.user_id === currentUser.id && (
-                <Card className="bg-white top-8">
-                  <CardHeader>
-                    <CardTitle className="text-left">
-                      Profile Progress
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <CircularProgress professional={professional} />
-                    <Button
-                      className="w-full bg-slate-800 hover:bg-slate-700"
-                      onClick={handleUpdateProfile}
-                    >
-                      Complete Your Profile Now
-                    </Button>
-                  </CardContent>
-                </Card>
-              )}
+              {professional &&
+                currentUser &&
+                professional.user_id === currentUser.id && (
+                  <Card className="bg-white top-8">
+                    <CardHeader>
+                      <CardTitle className="text-left">
+                        Profile Progress
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <CircularProgress professional={professional} />
+                      <Button
+                        className="w-full bg-slate-800 hover:bg-slate-700"
+                        onClick={handleUpdateProfile}
+                      >
+                        Complete Your Profile Now
+                      </Button>
+                    </CardContent>
+                  </Card>
+                )}
               {/* Contact Information */}
               <Card className="bg-white top-8">
                 <CardHeader>
