@@ -255,7 +255,7 @@ const DirectSell = () => {
           quantity: data.quantity,
           unit_price: data.unitPrice,
           total_price: data.quantity * data.unitPrice,
-          sold_by: currentUser.id,
+          sold_by: null, // FIXED: Set to null since currentUser.id doesn't exist in users table
         });
 
       if (directSaleError) throw directSaleError;
