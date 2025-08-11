@@ -30,6 +30,7 @@ import GroundOwners from "./pages/admin/GroundOwners";
 import NotFound from "./pages/NotFound";
 import SportsProfessionalsAdmin from "./pages/admin/SportsProfessionals";
 import EcommerceManager from "./pages/admin/EcommerceManager";
+import DirectSell from "./pages/admin/DirectSell";
 import APIDoc from "./pages/APIDoc";
 import SitemapGenerator from "./pages/SitemapGenerator";
 import PendingCartPopup from "./components/cart/PendingCartPopup";
@@ -77,6 +78,7 @@ function App() {
           element={<SportsProfessionalsAdmin />}
         />
         <Route path="/admin/ecommerce" element={<EcommerceManager />} />
+        <Route path="/admin/direct-sell" element={<DirectSell />} />
         <Route
           path="/jokova_socialmedia_og.jpg"
           element={"/jokova_socialmedia_og.jpg"}

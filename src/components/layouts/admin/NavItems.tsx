@@ -68,6 +68,12 @@ const NavItems: React.FC<NavItemsProps> = ({ isSuperAdmin }) => {
       icon: <ShoppingBag size={18} />,
       active: isActive("/admin/ecommerce"),
     },
+    {
+      name: "Direct Sell",
+      href: "/admin/direct-sell",
+      icon: <CircleUser size={18} />,
+      active: isActive("/admin/direct-sell"),
+    },
   ];
 
   if (isSuperAdmin) {

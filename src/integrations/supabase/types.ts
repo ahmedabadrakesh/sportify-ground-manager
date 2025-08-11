@@ -101,6 +101,74 @@ export type Database = {
           },
         ]
       }
+      direct_sales: {
+        Row: {
+          created_at: string | null
+          ground_id: string | null
+          id: string
+          item_id: string | null
+          order_id: string | null
+          quantity: number
+          sold_by: string | null
+          total_price: number
+          unit_price: number
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          ground_id?: string | null
+          id?: string
+          item_id?: string | null
+          order_id?: string | null
+          quantity: number
+          sold_by?: string | null
+          total_price: number
+          unit_price: number
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          ground_id?: string | null
+          id?: string
+          item_id?: string | null
+          order_id?: string | null
+          quantity?: number
+          sold_by?: string | null
+          total_price?: number
+          unit_price?: number
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "direct_sales_ground_id_fkey"
+            columns: ["ground_id"]
+            isOneToOne: false
+            referencedRelation: "grounds"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "direct_sales_item_id_fkey"
+            columns: ["item_id"]
+            isOneToOne: false
+            referencedRelation: "inventory_items"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "direct_sales_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "direct_sales_sold_by_fkey"
+            columns: ["sold_by"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       events: {
         Row: {
           address: string
@@ -432,6 +500,7 @@ export type Database = {
           customer_email: string
           customer_name: string
           customer_phone: string
+          direct_sell: boolean | null
           id: string
           order_number: string
           order_status: string
@@ -447,6 +516,7 @@ export type Database = {
           customer_email: string
           customer_name: string
           customer_phone: string
+          direct_sell?: boolean | null
           id?: string
           order_number: string
           order_status?: string
@@ -462,6 +532,7 @@ export type Database = {
           customer_email?: string
           customer_name?: string
           customer_phone?: string
+          direct_sell?: boolean | null
           id?: string
           order_number?: string
           order_status?: string
