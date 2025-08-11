@@ -111,8 +111,8 @@ const Shop: React.FC = () => {
   };
 
   // Handle add to cart
-  const handleAddToCart = (product: Product) => {
-    const cartItem = addToCart(product);
+  const handleAddToCart = async (product: Product) => {
+    const cartItem = await addToCart(product);
     if (cartItem) {
       toast({ title: "Success", description: `${product.name} added to cart` });
     }

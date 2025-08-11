@@ -9,25 +9,104 @@ export const getCart = (): CartItem[] => {
   return cartItems ? JSON.parse(cartItems) : [];
 };
 
+// Create or update pending cart in database
+export const createPendingCart = async (items: CartItem[]): Promise<string | null> => {
+  try {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return null;
+
+    const orderNumber = `PENDING-${Date.now()}`;
+    const totalAmount = items.reduce((total, item) => total + (item.price * item.quantity), 0);
+
+    // Check for existing pending order
+    const { data: existingOrder } = await supabase
+      .from('orders')
+      .select('id')
+      .eq('user_id', user.id)
+      .eq('order_status', 'pending')
+      .maybeSingle();
+
+    let orderId: string;
+
+    if (existingOrder) {
+      // Update existing pending order
+      const { data: order, error: orderError } = await supabase
+        .from('orders')
+        .update({
+          total_amount: totalAmount,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', existingOrder.id)
+        .select()
+        .single();
+
+      if (orderError) throw orderError;
+      orderId = order.id;
+
+      // Delete existing order items
+      await supabase.from('order_items').delete().eq('order_id', orderId);
+    } else {
+      // Create new pending order
+      const { data: order, error: orderError } = await supabase
+        .from('orders')
+        .insert({
+          user_id: user.id,
+          order_number: orderNumber,
+          customer_name: '',
+          customer_email: '',
+          customer_phone: '',
+          shipping_address: '',
+          payment_method: '',
+          payment_status: 'pending',
+          order_status: 'pending',
+          total_amount: totalAmount
+        })
+        .select()
+        .single();
+
+      if (orderError) throw orderError;
+      orderId = order.id;
+    }
+
+    // Create order items
+    const orderItems = items.map(item => ({
+      order_id: orderId,
+      product_id: item.productId,
+      product_name: item.name,
+      quantity: item.quantity,
+      unit_price: item.price,
+      total_price: item.price * item.quantity
+    }));
+
+    const { error: itemsError } = await supabase
+      .from('order_items')
+      .insert(orderItems);
+
+    if (itemsError) throw itemsError;
+
+    return orderId;
+  } catch (error) {
+    console.error("Error creating pending cart:", error);
+    return null;
+  }
+};
+
 // Add to cart
-export const addToCart = (product: Product, quantity: number = 1): CartItem | null => {
+export const addToCart = async (product: Product, quantity: number = 1): Promise<CartItem | null> => {
   try {
     const cart = getCart();
     
     // Check if product already in cart
     const existingItem = cart.find(item => item.productId === product.id);
     
+    let newCart: CartItem[];
     if (existingItem) {
       // Update quantity
-      const newCart = cart.map(item => 
+      newCart = cart.map(item => 
         item.productId === product.id 
           ? { ...item, quantity: item.quantity + quantity } 
           : item
       );
-      
-      localStorage.setItem("cart", JSON.stringify(newCart));
-      window.dispatchEvent(new Event("cartUpdated"));
-      return existingItem;
     } else {
       // Add new item
       const newItem: CartItem = {
@@ -39,11 +118,16 @@ export const addToCart = (product: Product, quantity: number = 1): CartItem | nu
         image: product.images?.[0] || undefined
       };
       
-      const newCart = [...cart, newItem];
-      localStorage.setItem("cart", JSON.stringify(newCart));
-      window.dispatchEvent(new Event("cartUpdated"));
-      return newItem;
+      newCart = [...cart, newItem];
     }
+    
+    localStorage.setItem("cart", JSON.stringify(newCart));
+    
+    // Create/update pending cart in database
+    await createPendingCart(newCart);
+    
+    window.dispatchEvent(new Event("cartUpdated"));
+    return existingItem || newCart[newCart.length - 1];
   } catch (error) {
     console.error("Error adding to cart:", error);
     toast({ title: "Error", description: "Failed to add item to cart", variant: "destructive" });
@@ -57,7 +141,7 @@ export const getCartItems = (): CartItem[] => {
 };
 
 // Update cart item quantity
-export const updateCartItemQuantity = (productId: string, quantity: number): boolean => {
+export const updateCartItemQuantity = async (productId: string, quantity: number): Promise<boolean> => {
   try {
     const cart = getCart();
     const itemIndex = cart.findIndex(item => item.productId === productId);
@@ -66,6 +150,10 @@ export const updateCartItemQuantity = (productId: string, quantity: number): boo
     
     cart[itemIndex].quantity = quantity;
     localStorage.setItem("cart", JSON.stringify(cart));
+    
+    // Update pending cart in database
+    await createPendingCart(cart);
+    
     window.dispatchEvent(new Event("cartUpdated"));
     return true;
   } catch (error) {
@@ -75,12 +163,21 @@ export const updateCartItemQuantity = (productId: string, quantity: number): boo
 };
 
 // Remove item from cart
-export const removeFromCart = (productId: string): boolean => {
+export const removeFromCart = async (productId: string): Promise<boolean> => {
   try {
     const cart = getCart();
     const newCart = cart.filter(item => item.productId !== productId);
     
     localStorage.setItem("cart", JSON.stringify(newCart));
+    
+    // Update pending cart in database
+    if (newCart.length > 0) {
+      await createPendingCart(newCart);
+    } else {
+      // Clear pending cart if no items left
+      await clearPendingCart();
+    }
+    
     window.dispatchEvent(new Event("cartUpdated"));
     return true;
   } catch (error) {
@@ -89,9 +186,26 @@ export const removeFromCart = (productId: string): boolean => {
   }
 };
 
+// Clear pending cart from database
+export const clearPendingCart = async (): Promise<void> => {
+  try {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+
+    await supabase
+      .from('orders')
+      .delete()
+      .eq('user_id', user.id)
+      .eq('order_status', 'pending');
+  } catch (error) {
+    console.error("Error clearing pending cart:", error);
+  }
+};
+
 // Clear cart
-export const clearCart = (): void => {
+export const clearCart = async (): Promise<void> => {
   localStorage.setItem("cart", JSON.stringify([]));
+  await clearPendingCart();
   window.dispatchEvent(new Event("cartUpdated"));
 };
 
@@ -194,7 +308,7 @@ export const processCheckout = async (checkoutData: {
     }
     
     // Clear cart after successful checkout
-    clearCart();
+    await clearCart();
     
     return {
       success: true,

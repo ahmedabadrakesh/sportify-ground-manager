@@ -31,11 +31,13 @@ import NotFound from "./pages/NotFound";
 import SportsProfessionalsAdmin from "./pages/admin/SportsProfessionals";
 import EcommerceManager from "./pages/admin/EcommerceManager";
 import APIDoc from "./pages/APIDoc";
+import PendingCartPopup from "./components/cart/PendingCartPopup";
 import "./App.css";
 
 function App() {
   return (
     <Router>
+      <PendingCartPopup />
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/home" element={<Home />} />
