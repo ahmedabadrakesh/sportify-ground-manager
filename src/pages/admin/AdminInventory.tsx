@@ -168,17 +168,21 @@ const AdminInventory: React.FC = () => {
       ),
     },
     {
-      accessorKey: "quantity",
+      accessorKey: "availableQuantity",
       header: "Available",
       cell: ({ row }) => (
-        <div className="text-center">{row.getValue("quantity")}</div>
+        <div className="text-center font-medium text-green-600">
+          {row.getValue("availableQuantity")}
+        </div>
       ),
     },
     {
-      accessorKey: "purchase_quantity",
+      accessorKey: "purchaseQuantity",
       header: "Purchased",
       cell: ({ row }) => (
-        <div className="text-center">{row.getValue("purchase_quantity") || 0}</div>
+        <div className="text-center font-medium text-blue-600">
+          {row.getValue("purchaseQuantity") || 0}
+        </div>
       ),
     },
     {
