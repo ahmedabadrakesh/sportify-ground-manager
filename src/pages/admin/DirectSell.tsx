@@ -20,6 +20,8 @@ const directSellSchema = z.object({
   groundId: z.string().min(1, "Please select a ground"),
   quantity: z.number().min(1, "Quantity must be at least 1"),
   unitPrice: z.number().min(0, "Price must be positive"),
+  paymentStatus: z.string().min(1, "Please select payment status"),
+  paymentMode: z.string().min(1, "Please select payment mode"),
 });
 
 type DirectSellFormData = z.infer<typeof directSellSchema>;
@@ -66,6 +68,8 @@ const DirectSell = () => {
       groundId: "",
       quantity: 1,
       unitPrice: 0,
+      paymentStatus: "",
+      paymentMode: "",
     },
   });
 
@@ -215,9 +219,9 @@ const DirectSell = () => {
           customer_email: "direct@sale.com",
           customer_phone: "0000000000",
           shipping_address: "Direct Sale",
-          payment_method: "direct_sale",
-          payment_status: "completed",
-          order_status: "completed",
+          payment_method: data.paymentMode,
+          payment_status: data.paymentStatus,
+          order_status: data.paymentStatus === "completed" ? "completed" : "confirmed",
           total_amount: data.quantity * data.unitPrice,
           order_number: `DS-${Date.now()}`,
           direct_sell: true,
@@ -437,6 +441,54 @@ const DirectSell = () => {
                             onChange={(e) => field.onChange(parseFloat(e.target.value))}
                           />
                         </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="paymentStatus"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Payment Status</FormLabel>
+                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select payment status" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="completed">Completed</SelectItem>
+                            <SelectItem value="pending">Pending</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="paymentMode"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Payment Mode</FormLabel>
+                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select payment mode" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="cash">Cash</SelectItem>
+                            <SelectItem value="online">Online</SelectItem>
+                            <SelectItem value="cod">COD</SelectItem>
+                            <SelectItem value="upi">UPI</SelectItem>
+                            <SelectItem value="card">Card</SelectItem>
+                            <SelectItem value="cheque">Cheque</SelectItem>
+                          </SelectContent>
+                        </Select>
                         <FormMessage />
                       </FormItem>
                     )}
