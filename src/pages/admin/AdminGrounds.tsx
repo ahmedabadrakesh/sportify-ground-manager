@@ -38,7 +38,7 @@ const AdminGrounds: React.FC = () => {
   const navigate = useNavigate();
 
   const handleEdit = (groundId: string) => {
-    navigate(`/admin/grounds/${groundId}/edit`);
+    navigate(`/admin/edit-ground/${groundId}`);
   };
 
   const handleDelete = async (groundId: string) => {

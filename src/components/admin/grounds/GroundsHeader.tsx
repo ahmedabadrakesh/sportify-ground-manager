@@ -24,7 +24,7 @@ const GroundsHeader: React.FC<GroundsHeaderProps> = ({ isSuperAdmin }) => {
       
       <Button
         className="flex items-center"
-        onClick={() => navigate("/admin/grounds/add")}
+        onClick={() => navigate("/admin/add-ground")}
       >
         <PlusCircle className="h-4 w-4 mr-2" />
         Add New Ground
