@@ -93,8 +93,7 @@ const DirectSell = () => {
           total_price,
           created_at,
           inventory_items(name),
-          grounds(name, owner_id),
-          users(name)
+          grounds(name, owner_id, users(name))
         `)
         .order("created_at", { ascending: false });
 
@@ -104,7 +103,7 @@ const DirectSell = () => {
         id: sale.id,
         itemName: sale.inventory_items?.name || "Unknown Item",
         groundName: sale.grounds?.name || "Unknown Ground",
-        ownerName: sale.users?.name || "Unknown Owner",
+        ownerName: sale.grounds?.users?.name || "Unknown Owner",
         quantity: sale.quantity,
         unitPrice: sale.unit_price,
         totalPrice: sale.total_price,
