@@ -73,11 +73,12 @@ export const generateSitemapXML = async (): Promise<string> => {
     // Fetch all inventory items for shop
     const { data: products } = await supabase
       .from('inventory_items')
-      .select('id, updated_at');
+      .select('id, name, updated_at');
 
     if (products) {
       products.forEach(product => {
-        const productUrl = `/product/${product.id}`;
+        const productName = product.name ? product.name.toLowerCase().replace(/\s+/g, '-') : 'product';
+        const productUrl = `/product/${productName}/${product.id}`;
         const lastmod = product.updated_at ? new Date(product.updated_at).toISOString().split('T')[0] : currentDate;
         
         sitemapXML += `

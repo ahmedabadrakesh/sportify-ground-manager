@@ -173,8 +173,8 @@ const Shop: React.FC = () => {
             {/* Products Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
               {filteredProducts.map(product => (
-                <Card key={product.id} className="overflow-hidden">
-                   <div className="aspect-square relative bg-gray-100 cursor-pointer" onClick={() => navigate(`/product/${product.id}`)}>
+                 <Card key={product.id} className="overflow-hidden">
+                   <div className="aspect-square relative bg-gray-100 cursor-pointer" onClick={() => navigate(`/product/${product.name ? product.name.toLowerCase().replace(/\s+/g, '-') : 'product'}/${product.id}`)}>
                      <img 
                        src={product.images?.[0] || "/placeholder.svg"} 
                        alt={product.name}
@@ -188,10 +188,10 @@ const Shop: React.FC = () => {
                    </div>
                   
                    <CardContent className="p-4">
-                     <h2 
-                       className="font-semibold text-lg mb-1 cursor-pointer hover:text-primary transition-colors" 
-                       onClick={() => navigate(`/product/${product.id}`)}
-                     >
+                      <h2 
+                        className="font-semibold text-lg mb-1 cursor-pointer hover:text-primary transition-colors" 
+                        onClick={() => navigate(`/product/${product.name ? product.name.toLowerCase().replace(/\s+/g, '-') : 'product'}/${product.id}`)}
+                      >
                        {product.name}
                      </h2>
                      <p className="text-gray-500 text-sm mb-2 line-clamp-2">{product.description}</p>
@@ -214,7 +214,7 @@ const Shop: React.FC = () => {
                        </Button>
                        <Button 
                          variant="outline" 
-                         onClick={() => navigate(`/product/${product.id}`)}
+                         onClick={() => navigate(`/product/${product.name ? product.name.toLowerCase().replace(/\s+/g, '-') : 'product'}/${product.id}`)}
                        >
                          View
                        </Button>

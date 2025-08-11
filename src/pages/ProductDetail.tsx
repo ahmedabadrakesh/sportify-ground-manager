@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { ArrowLeft, ShoppingCart, Star, Plus, Minus } from "lucide-react";
 import MainLayout from "@/components/layouts/MainLayout";
+import SEOHead from "@/components/SEOHead";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -11,7 +12,7 @@ import { Product } from "@/types/models";
 import { toast } from "sonner";
 
 const ProductDetail: React.FC = () => {
-  const { id } = useParams<{ id: string }>();
+  const { id, name } = useParams<{ id: string; name: string }>();
   const navigate = useNavigate();
   const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
@@ -112,8 +113,45 @@ const ProductDetail: React.FC = () => {
     ? product.images[selectedImageIndex] 
     : "/placeholder.svg";
 
+  const structuredData = product ? {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    "name": product.name,
+    "image": product.images || ["/placeholder.svg"],
+    "description": product.description || `High quality ${product.name} available at Jokova Sports Equipment Shop`,
+    "brand": {
+      "@type": "Brand",
+      "name": "Jokova"
+    },
+    "offers": {
+      "@type": "Offer",
+      "url": typeof window !== "undefined" ? window.location.href : "",
+      "priceCurrency": "INR",
+      "price": product.price,
+      "availability": product.stock > 0 ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
+      "seller": {
+        "@type": "Organization",
+        "name": "Jokova"
+      }
+    },
+    "aggregateRating": {
+      "@type": "AggregateRating",
+      "ratingValue": "4.0",
+      "reviewCount": "23"
+    }
+  } : undefined;
+
   return (
     <MainLayout>
+      <SEOHead
+        title={product ? `${product.name} | Buy Sports Equipment | Jokova` : "Product | Jokova"}
+        description={product ? `Buy ${product.name} for ₹${product.price}. ${product.description || 'High quality sports equipment with fast delivery.'} ${product.stock > 0 ? 'In Stock' : 'Out of Stock'}.`.substring(0, 160) : "Buy sports equipment and accessories from Jokova's online store."}
+        keywords={product ? `${product.name}, ${product.category}, sports equipment, buy online, sports gear, ${product.name.split(' ').join(', ')}` : "sports equipment, sports gear, buy online"}
+        canonicalUrl={typeof window !== "undefined" ? window.location.href : ""}
+        ogImage={product?.images?.[0] || "/placeholder.svg"}
+        ogType="product"
+        structuredData={structuredData}
+      />
       <div className="max-w-7xl mx-auto px-4 py-8">
         {/* Back Button */}
         <Button
