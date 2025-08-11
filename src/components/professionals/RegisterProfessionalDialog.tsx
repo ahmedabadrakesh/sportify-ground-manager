@@ -222,6 +222,7 @@ const RegisterProfessionalDialog = ({
     handlePrevious,
     resetForm,
     onSubmit,
+    stepDetails,
   } = useRegisterProfessionalForm(() => {
     onOpenChange(false);
     resetForm();
@@ -311,8 +312,7 @@ const RegisterProfessionalDialog = ({
             // Contact & Social Details
             contact_number: profileData.contact_number || "",
             whatsapp: profileData.whatsapp || "",
-            whatsapp_same_as_phone:
-              profileData.whatsapp_same_as_phone || false,
+            whatsapp_same_as_phone: profileData.whatsapp_same_as_phone || false,
             email: userEmail || "",
             instagram_link: profileData.instagram_link || "",
             youtube_link: profileData.youtube_link || "",
@@ -323,8 +323,7 @@ const RegisterProfessionalDialog = ({
             // Professional Details
             district_level_tournaments:
               profileData.district_level_tournaments || 0,
-            state_level_tournaments:
-              profileData.state_level_tournaments || 0,
+            state_level_tournaments: profileData.state_level_tournaments || 0,
             national_level_tournaments:
               profileData.national_level_tournaments || 0,
             international_level_tournaments:
@@ -359,8 +358,7 @@ const RegisterProfessionalDialog = ({
             training_locations: profileData.training_locations || [],
             punch_line: profileData.punch_line || "",
             level: profileData.level || undefined,
-            coaching_availability:
-              profileData.coaching_availability || [],
+            coaching_availability: profileData.coaching_availability || [],
           });
 
           // Convert game_ids to game names and set games_played
@@ -456,6 +454,7 @@ const RegisterProfessionalDialog = ({
                 currentStep={currentStep}
                 totalSteps={totalSteps}
                 stepTitles={stepTitles}
+                stepDetails={stepDetails}
               />
             </ScrollArea>
           </div>
@@ -475,7 +474,7 @@ const RegisterProfessionalDialog = ({
                   <StepperForm
                     currentStep={currentStep}
                     totalSteps={totalSteps}
-                    stepTitles={stepTitles}
+                    stepTitles={stepDetails.title}
                   />
                 </div>
                 <ScrollArea className="h-[calc(90vh-120px)]">

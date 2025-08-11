@@ -74,6 +74,7 @@ export const useRegisterProfessionalForm = (onSuccess: () => void, isUpdate: boo
     handleNext,
     handlePrevious,
     resetNavigation,
+    stepDetails,
   } = useStepNavigation(form);
 
   const { registerMutation } = useProfessionalRegistration(onSuccess, isUpdate);
@@ -126,5 +127,6 @@ export const useRegisterProfessionalForm = (onSuccess: () => void, isUpdate: boo
     handlePrevious,
     resetForm,
     onSubmit,
+    stepDetails,
   };
 };
