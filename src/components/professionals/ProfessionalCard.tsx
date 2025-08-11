@@ -166,7 +166,7 @@ const ProfessionalCard = ({
           </button>
         </div>
 
-        <Link to={`/professional/${professional.id}`}>
+        <Link to={`/professional/${professional.name.toLowerCase().replace(/\s+/g, '-')}/${professional.id}`}>
           <Button
             variant="default"
             size="sm"

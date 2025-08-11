@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import MainLayout from "@/components/layouts/MainLayout";
+import SEOHead from "@/components/SEOHead";
 import HeroSection from "@/components/home/HeroSection";
 import PopularSportsSection from "@/components/home/PopularSportsSection";
 import SearchResultsSection from "@/components/home/SearchResultsSection";
@@ -63,8 +64,34 @@ const Home: React.FC = () => {
     }
   };
 
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "Jokova",
+    "url": "https://jokova.com",
+    "logo": "https://jokova.com/green_text_only_logo.png",
+    "description": "Book sports grounds, find certified sports professionals, and join events. Your one-stop platform for all sports activities.",
+    "contactPoint": {
+      "@type": "ContactPoint",
+      "contactType": "customer service",
+      "availableLanguage": "English"
+    },
+    "sameAs": [
+      "https://twitter.com/jokova",
+      "https://facebook.com/jokova",
+      "https://instagram.com/jokova"
+    ]
+  };
+
   return (
     <MainLayout>
+      <SEOHead
+        title="Jokova - Book Sports Grounds & Find Professional Coaches"
+        description="Book sports grounds, find certified sports professionals, and join events. Jokova is your one-stop platform for all sports activities in India."
+        keywords="sports, ground booking, sports professionals, coaches, sports events, fitness, sports facilities, cricket, football, tennis, badminton"
+        canonicalUrl="https://jokova.com"
+        structuredData={structuredData}
+      />
       <HeroSection onSearch={handleSearch} />
       <div>
         <PopularSportsSection />

@@ -31,6 +31,7 @@ import NotFound from "./pages/NotFound";
 import SportsProfessionalsAdmin from "./pages/admin/SportsProfessionals";
 import EcommerceManager from "./pages/admin/EcommerceManager";
 import APIDoc from "./pages/APIDoc";
+import SitemapGenerator from "./pages/SitemapGenerator";
 import PendingCartPopup from "./components/cart/PendingCartPopup";
 import "./App.css";
 
@@ -53,8 +54,9 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/sports-professionals" element={<SportsProfessionals />} />
-        <Route path="/professional/:id" element={<ProfessionalProfile />} />
+        <Route path="/professional/:name/:id" element={<ProfessionalProfile />} />
         <Route path="/api-documentation" element={<APIDoc />} />
+        <Route path="/generate-sitemap" element={<SitemapGenerator />} />
 
         {/* Admin routes */}
         <Route path="/admin" element={<Navigate to="/admin/dashboard" />} />

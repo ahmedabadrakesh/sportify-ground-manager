@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from "react";
 import { useLocation, useSearchParams } from "react-router-dom";
 import MainLayout from "@/components/layouts/MainLayout";
+import SEOHead from "@/components/SEOHead";
 import GroundCard from "@/components/grounds/GroundCard";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -172,6 +173,12 @@ const SearchGrounds: React.FC = () => {
 
   return (
     <MainLayout>
+      <SEOHead
+        title="Search Sports Grounds | Book Sports Facilities | Jokova"
+        description="Search and book sports grounds, cricket grounds, football fields, tennis courts, and more sports facilities across India. Find the perfect venue for your sports activities."
+        keywords="search sports grounds, book sports facilities, cricket ground, football field, tennis court, sports venue booking"
+        canonicalUrl="https://jokova.com/search"
+      />
       <div className="mb-6">
         <h1 className="text-3xl font-bold text-gray-900 mb-2">Find Your Perfect Ground</h1>
         <p className="text-gray-600">

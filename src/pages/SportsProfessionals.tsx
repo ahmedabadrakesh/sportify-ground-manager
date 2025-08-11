@@ -1,5 +1,6 @@
 import React from "react";
 import MainLayout from "@/components/layouts/MainLayout";
+import SEOHead from "@/components/SEOHead";
 import { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -97,6 +98,12 @@ const SportsProfessionals = () => {
 
   return (
     <MainLayout>
+      <SEOHead
+        title="Sports Professionals & Coaches | Jokova"
+        description="Find certified sports professionals and coaches for cricket, football, tennis, badminton and more. Book training sessions with experienced sports coaches."
+        keywords="sports professionals, coaches, sports training, cricket coach, football coach, tennis coach, badminton coach, personal trainer"
+        canonicalUrl="https://jokova.com/sports-professionals"
+      />
       {/* Hero Section */}
       <div className="bg-background border-b">
         <div className="grid md:grid-cols-8 mx-auto text-left py-4 mt-4">

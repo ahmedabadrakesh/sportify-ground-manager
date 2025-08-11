@@ -3,6 +3,7 @@ import { useParams, Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import MainLayout from "@/components/layouts/MainLayout";
+import SEOHead from "@/components/SEOHead";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -61,7 +62,7 @@ import trainingPhoto1 from "@/assets/coach-profile.jpg";
 import { Separator } from "@radix-ui/react-select";
 
 const ProfessionalProfile = () => {
-  const { id } = useParams<{ id: string }>();
+  const { id, name } = useParams<{ id: string; name: string }>();
   const [isAboutReadMoreOpened, setisAboutReadMoreOpened] =
     useState<boolean>(false);
   const [showContactDetails, setShowContactDetails] = useState<boolean>(false);
@@ -308,8 +309,39 @@ const ProfessionalProfile = () => {
     );
   };
 
+  const structuredData = professional ? {
+    "@context": "https://schema.org",
+    "@type": "Person",
+    "name": professional.name,
+    "jobTitle": professional.profession_type,
+    "description": professional.about_me || professional.comments,
+    "url": typeof window !== "undefined" ? window.location.href : "",
+    "address": {
+      "@type": "PostalAddress",
+      "addressLocality": professional.city
+    },
+    "contactPoint": {
+      "@type": "ContactPoint",
+      "telephone": professional.contact_number,
+      "contactType": "customer service"
+    },
+    "sameAs": [
+      professional.instagram_link,
+      professional.facebook_link,
+      professional.linkedin_link,
+      professional.website
+    ].filter(Boolean)
+  } : undefined;
+
   return (
     <MainLayout>
+      <SEOHead
+        title={professional ? `${professional.name} - ${professional.profession_type} | Jokova` : "Professional Profile | Jokova"}
+        description={professional ? `${professional.name} is a ${professional.profession_type} in ${professional.city}. ${professional.about_me || professional.comments || 'Book sports training sessions with certified professionals.'}`.substring(0, 160) : "Find and book sessions with certified sports professionals on Jokova."}
+        keywords={professional ? `${professional.name}, ${professional.profession_type}, sports professional, ${professional.city}, sports training, coaching` : "sports professional, coaching, training"}
+        canonicalUrl={typeof window !== "undefined" ? window.location.href : ""}
+        structuredData={structuredData}
+      />
       <div>
         {/* Header Section */}
         <div className="from-slate-800 to-slate-900 text-white py-4 ">
