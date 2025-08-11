@@ -34,6 +34,8 @@ interface DirectSaleItem {
   quantity: number;
   unitPrice: number;
   totalPrice: number;
+  paymentStatus: string;
+  paymentMethod: string;
   createdAt: string;
 }
 
@@ -93,7 +95,8 @@ const DirectSell = () => {
           total_price,
           created_at,
           inventory_items(name),
-          grounds(name, owner_id, users(name))
+          grounds(name, owner_id, users(name)),
+          orders(payment_status, payment_method)
         `)
         .order("created_at", { ascending: false });
 
@@ -107,6 +110,8 @@ const DirectSell = () => {
         quantity: sale.quantity,
         unitPrice: sale.unit_price,
         totalPrice: sale.total_price,
+        paymentStatus: sale.orders?.payment_status || "Unknown",
+        paymentMethod: sale.orders?.payment_method || "Unknown",
         createdAt: new Date(sale.created_at).toLocaleDateString(),
       })) || [];
 
@@ -319,6 +324,32 @@ const DirectSell = () => {
       accessorKey: "totalPrice",
       header: "Total Price",
       cell: ({ row }: any) => `₹${row.getValue("totalPrice")}`,
+    },
+    {
+      accessorKey: "paymentStatus",
+      header: "Payment Status",
+      cell: ({ row }: any) => {
+        const status = row.getValue("paymentStatus");
+        return (
+          <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${
+            status === "completed" 
+              ? "bg-green-100 text-green-800" 
+              : status === "pending"
+              ? "bg-yellow-100 text-yellow-800"
+              : "bg-gray-100 text-gray-800"
+          }`}>
+            {status}
+          </span>
+        );
+      },
+    },
+    {
+      accessorKey: "paymentMethod",
+      header: "Payment Method",
+      cell: ({ row }: any) => {
+        const method = row.getValue("paymentMethod");
+        return <span className="capitalize">{method}</span>;
+      },
     },
     {
       accessorKey: "createdAt",
