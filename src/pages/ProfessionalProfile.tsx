@@ -312,7 +312,7 @@ const ProfessionalProfile = () => {
   const structuredData = professional ? {
     "@context": "https://schema.org",
     "@type": "Person",
-    "name": professional.name,
+    "name": professional?.name || "Professional",
     "jobTitle": professional.profession_type,
     "description": professional.about_me || professional.comments,
     "url": typeof window !== "undefined" ? window.location.href : "",
@@ -336,9 +336,9 @@ const ProfessionalProfile = () => {
   return (
     <MainLayout>
       <SEOHead
-        title={professional ? `${professional.name} - ${professional.profession_type} | Jokova` : "Professional Profile | Jokova"}
-        description={professional ? `${professional.name} is a ${professional.profession_type} in ${professional.city}. ${professional.about_me || professional.comments || 'Book sports training sessions with certified professionals.'}`.substring(0, 160) : "Find and book sessions with certified sports professionals on Jokova."}
-        keywords={professional ? `${professional.name}, ${professional.profession_type}, sports professional, ${professional.city}, sports training, coaching` : "sports professional, coaching, training"}
+        title={professional?.name ? `${professional.name} - ${professional.profession_type} | Jokova` : "Professional Profile | Jokova"}
+        description={professional?.name ? `${professional.name} is a ${professional.profession_type} in ${professional.city}. ${professional.about_me || professional.comments || 'Book sports training sessions with certified professionals.'}`.substring(0, 160) : "Find and book sessions with certified sports professionals on Jokova."}
+        keywords={professional?.name ? `${professional.name}, ${professional.profession_type}, sports professional, ${professional.city}, sports training, coaching` : "sports professional, coaching, training"}
         canonicalUrl={typeof window !== "undefined" ? window.location.href : ""}
         structuredData={structuredData}
       />
@@ -384,11 +384,11 @@ const ProfessionalProfile = () => {
                       </AvatarFallback>
                     </Avatar>
                   ) : (
-                    professional.name
-                      .split(" ")
+                    professional?.name
+                      ?.split(" ")
                       .map((n) => n[0])
                       .join("")
-                      .toUpperCase()
+                      .toUpperCase() || "U"
                   )}
                 </div>
               </div>
@@ -396,7 +396,7 @@ const ProfessionalProfile = () => {
               {/* Profile Info */}
               <div className="flex-1 text-center lg:text-left">
                 <h1 className="flex text-4xl lg:text-5xl font-bold mb-1 capitalize">
-                  {toTitleCase(professional.name)}
+                  {toTitleCase(professional?.name || "Professional")}
                   {professional.is_certified && (
                     <>
                       <BadgeCheck
@@ -848,24 +848,26 @@ const ProfessionalProfile = () => {
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center">
-                        <Instagram className="w-4 h-4 fill-white stroke-black text-accent" />
+                    {professional?.instagram_link && (
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center">
+                          <Instagram className="w-4 h-4 fill-white stroke-black text-accent" />
+                        </div>
+                        <div>
+                          <p
+                            className="cursor-pointer text-sm"
+                            onClick={() => {
+                              window.open(professional?.instagram_link, "_blank");
+                            }}
+                          >
+                            {professional.instagram_link.replace(
+                              "https://www.instagram.com/",
+                              "@"
+                            )}
+                          </p>
+                        </div>
                       </div>
-                      <div>
-                        <p
-                          className="cursor-pointer text-sm"
-                          onClick={() => {
-                            window.open(professional?.instagram_link, "_blank");
-                          }}
-                        >
-                          {professional?.instagram_link.replace(
-                            "https://www.instagram.com/",
-                            "@"
-                          )}
-                        </p>
-                      </div>
-                    </div>
+                    )}
 
                     {!isAuthenticated && (
                       <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
