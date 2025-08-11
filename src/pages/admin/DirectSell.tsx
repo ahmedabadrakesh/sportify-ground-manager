@@ -211,6 +211,20 @@ const DirectSell = () => {
       }
 
       // Create order first
+      console.log("Creating order with data:", {
+        user_id: currentUser.id,
+        customer_name: selectedGround.ownerName || "Direct Sale",
+        customer_email: "direct@sale.com",
+        customer_phone: "0000000000",
+        shipping_address: "Direct Sale",
+        payment_method: data.paymentMode,
+        payment_status: data.paymentStatus,
+        order_status: data.paymentStatus === "completed" ? "completed" : "confirmed",
+        total_amount: data.quantity * data.unitPrice,
+        order_number: `DS-${Date.now()}`,
+        direct_sell: true,
+      });
+
       const { data: order, error: orderError } = await supabase
         .from("orders")
         .insert({
