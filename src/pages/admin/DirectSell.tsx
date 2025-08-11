@@ -532,10 +532,30 @@ const DirectSell = () => {
           </CardHeader>
           <CardContent>
             <DataTable columns={columns} data={directSales} />
-            <div className="mt-4 pt-4 border-t">
+            <div className="mt-4 pt-4 border-t space-y-4">
               <div className="flex justify-between items-center">
                 <span className="text-sm font-medium">Total Remaining Inventory:</span>
                 <span className="text-lg font-bold">{totalRemainingQuantity} items</span>
+              </div>
+              
+              {/* Item-wise inventory breakdown */}
+              <div className="bg-gray-50 p-4 rounded-lg">
+                <h4 className="text-sm font-medium mb-3">Item-wise Remaining Inventory:</h4>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
+                  {inventoryItems
+                    .filter(item => item.availableQuantity > 0)
+                    .map((item) => (
+                      <div key={item.id} className="flex justify-between items-center bg-white p-2 rounded border">
+                        <span className="text-sm text-gray-700">{item.name}</span>
+                        <span className="text-sm font-medium text-green-600">{item.availableQuantity}</span>
+                      </div>
+                    ))}
+                  {inventoryItems.filter(item => item.availableQuantity > 0).length === 0 && (
+                    <div className="col-span-full text-center text-gray-500 py-4">
+                      No items available in inventory
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
           </CardContent>
