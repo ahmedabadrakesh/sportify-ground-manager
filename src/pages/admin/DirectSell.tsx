@@ -212,7 +212,7 @@ const DirectSell = () => {
 
       // Create order first
       console.log("Creating order with data:", {
-        user_id: currentUser.id,
+        user_id: null, // Set to null since currentUser.id might not match auth.users
         customer_name: selectedGround.ownerName || "Direct Sale",
         customer_email: "direct@sale.com",
         customer_phone: "0000000000",
@@ -228,7 +228,7 @@ const DirectSell = () => {
       const { data: order, error: orderError } = await supabase
         .from("orders")
         .insert({
-          user_id: currentUser.id,
+          user_id: null, // Set to null to avoid foreign key constraint issues
           customer_name: selectedGround.ownerName || "Direct Sale",
           customer_email: "direct@sale.com",
           customer_phone: "0000000000",
