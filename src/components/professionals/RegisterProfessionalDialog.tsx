@@ -474,7 +474,8 @@ const RegisterProfessionalDialog = ({
                   <StepperForm
                     currentStep={currentStep}
                     totalSteps={totalSteps}
-                    stepTitles={stepDetails.title}
+                    stepTitles={stepTitles}
+                    stepDetails={stepDetails}
                   />
                 </div>
                 <ScrollArea className="h-[calc(90vh-120px)]">
