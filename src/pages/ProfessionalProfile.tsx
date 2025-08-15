@@ -699,7 +699,6 @@ const ProfessionalProfile = () => {
                 )}
 
               {/* Tournament Participation */}
-              {professional.district_level_tournaments}
               {(professional.district_level_tournaments ||
                 professional.state_level_tournaments ||
                 professional.national_level_tournaments ||
