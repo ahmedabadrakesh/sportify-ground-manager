@@ -166,6 +166,9 @@ const Register: React.FC = () => {
   // Handle Google OAuth
   const handleGoogleLogin = async () => {
     try {
+      console.log('Starting Google OAuth flow...');
+      console.log('Redirect URL:', `${window.location.origin}/register`);
+      
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
@@ -173,13 +176,15 @@ const Register: React.FC = () => {
         }
       });
       
+      console.log('Google OAuth response:', { data, error });
+      
       if (error) {
-        console.error('Google login error:', error);
-        toast.error('Google registration failed. Please try again.');
+        console.error('Google OAuth error details:', error);
+        toast.error(`Google registration failed: ${error.message}`);
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Google login error:', error);
-      toast.error('Google registration failed. Please try again.');
+      toast.error(`Google registration failed: ${error.message || 'Unknown error'}`);
     }
   };
 
