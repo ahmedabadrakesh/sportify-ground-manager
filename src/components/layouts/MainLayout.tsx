@@ -221,12 +221,12 @@ const MainLayout = ({ children }: MainLayoutProps) => {
                     </a>
                   </li>
                   <li>
-                    <a
-                      href="#"
+                    <Link
+                      to="/privacy-policy"
                       className="text-sm text-gray-600 hover:text-primary"
                     >
                       Privacy Policy
-                    </a>
+                    </Link>
                   </li>
                 </ul>
               </div>
@@ -236,20 +236,20 @@ const MainLayout = ({ children }: MainLayoutProps) => {
                 </h3>
                 <ul className="mt-4 space-y-2">
                   <li>
-                    <a
-                      href="#"
+                    <Link
+                      to="/terms-of-service"
                       className="text-sm text-gray-600 hover:text-primary"
                     >
                       Terms of Service
-                    </a>
+                    </Link>
                   </li>
                   <li>
-                    <a
-                      href="#"
+                    <Link
+                      to="/privacy-policy"
                       className="text-sm text-gray-600 hover:text-primary"
                     >
                       Privacy Policy
-                    </a>
+                    </Link>
                   </li>
                   <li>
                     <Link

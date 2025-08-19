@@ -33,6 +33,8 @@ import EcommerceManager from "./pages/admin/EcommerceManager";
 import DirectSell from "./pages/admin/DirectSell";
 import APIDoc from "./pages/APIDoc";
 import SitemapGenerator from "./pages/SitemapGenerator";
+import TermsOfService from "./pages/TermsOfService";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
 import PendingCartPopup from "./components/cart/PendingCartPopup";
 import "./App.css";
 
@@ -58,6 +60,8 @@ function App() {
         <Route path="/professional/:name/:id" element={<ProfessionalProfile />} />
         <Route path="/api-documentation" element={<APIDoc />} />
         <Route path="/generate-sitemap" element={<SitemapGenerator />} />
+        <Route path="/terms-of-service" element={<TermsOfService />} />
+        <Route path="/privacy-policy" element={<PrivacyPolicy />} />
 
         {/* Admin routes */}
         <Route path="/admin" element={<Navigate to="/admin/dashboard" />} />
