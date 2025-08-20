@@ -35,6 +35,7 @@ import APIDoc from "./pages/APIDoc";
 import SitemapGenerator from "./pages/SitemapGenerator";
 import TermsOfService from "./pages/TermsOfService";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
+import ResetPassword from "./pages/ResetPassword";
 import PendingCartPopup from "./components/cart/PendingCartPopup";
 import "./App.css";
 
@@ -56,6 +57,7 @@ function App() {
         <Route path="/events" element={<Events />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="/sports-professionals" element={<SportsProfessionals />} />
         <Route path="/professional/:name/:id" element={<ProfessionalProfile />} />
         <Route path="/api-documentation" element={<APIDoc />} />

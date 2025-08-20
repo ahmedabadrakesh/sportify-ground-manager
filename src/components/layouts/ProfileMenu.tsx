@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { User, LogOut, Key, Settings } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -12,15 +12,18 @@ import {
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { logout } from "@/utils/auth";
 import { toast } from "sonner";
+import ResetPasswordDialog from "@/components/auth/ResetPasswordDialog";
 
 interface ProfileMenuProps {
   userName: string;
   userRole: string;
   isSuperAdmin: boolean;
+  userEmail?: string;
 }
 
-const ProfileMenu: React.FC<ProfileMenuProps> = ({ userName, userRole, isSuperAdmin }) => {
+const ProfileMenu: React.FC<ProfileMenuProps> = ({ userName, userRole, isSuperAdmin, userEmail }) => {
   const navigate = useNavigate();
+  const [showResetDialog, setShowResetDialog] = useState(false);
 
   const handleLogout = async () => {
     try {
@@ -34,8 +37,7 @@ const ProfileMenu: React.FC<ProfileMenuProps> = ({ userName, userRole, isSuperAd
   };
 
   const handleResetPassword = () => {
-    // TODO: Implement reset password functionality
-    toast.info("Reset password functionality coming soon");
+    setShowResetDialog(true);
   };
 
   return (
@@ -49,7 +51,7 @@ const ProfileMenu: React.FC<ProfileMenuProps> = ({ userName, userRole, isSuperAd
           </Avatar>
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="w-56 bg-background border shadow-lg" align="end" forceMount>
+      <DropdownMenuContent className="w-56 bg-background border shadow-lg z-50" align="end" forceMount>
         <div className="flex items-center justify-start gap-2 p-2">
           <Avatar className="h-8 w-8">
             <AvatarFallback className="bg-primary text-primary-foreground">
@@ -88,6 +90,12 @@ const ProfileMenu: React.FC<ProfileMenuProps> = ({ userName, userRole, isSuperAd
           <span>Logout</span>
         </DropdownMenuItem>
       </DropdownMenuContent>
+      
+      <ResetPasswordDialog
+        open={showResetDialog}
+        onOpenChange={setShowResetDialog}
+        userEmail={userEmail}
+      />
     </DropdownMenu>
   );
 };

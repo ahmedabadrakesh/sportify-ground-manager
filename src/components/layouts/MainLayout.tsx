@@ -105,6 +105,7 @@ const MainLayout = ({ children }: MainLayoutProps) => {
                   userName={currentUser.name} 
                   userRole={currentUser.role}
                   isSuperAdmin={hasRoleSync("super_admin")}
+                  userEmail={currentUser.email}
                 />
               ) : (
                 <div className="flex items-center">
