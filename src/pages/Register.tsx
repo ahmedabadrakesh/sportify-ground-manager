@@ -471,16 +471,26 @@ const Register: React.FC = () => {
           </CardContent>
           
           <CardFooter className="flex flex-col space-y-4 pt-0">
-            <div className="text-center w-full">
-              <span className="text-sm text-gray-600">
-                Already have an account?{" "}
+            <div className="text-center w-full space-y-2">
+              <div>
+                <span className="text-sm text-gray-600">
+                  Already have an account?{" "}
+                  <Link
+                    to="/login"
+                    className="font-medium text-primary-600 hover:text-primary-800"
+                  >
+                    Login
+                  </Link>
+                </span>
+              </div>
+              <div>
                 <Link
-                  to="/login"
-                  className="font-medium text-primary-600 hover:text-primary-800"
+                  to="/forgot-password"
+                  className="text-sm text-primary-600 hover:text-primary-800"
                 >
-                  Login
+                  Forgot password?
                 </Link>
-              </span>
+              </div>
             </div>
             
             <Button
