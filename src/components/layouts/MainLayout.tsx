@@ -3,12 +3,12 @@ import { Link, useNavigate } from "react-router-dom";
 import { Menu, X, LogIn, UserPlus, Search } from "lucide-react";
 import CartIcon from "@/components/cart/CartIcon";
 import { Button } from "@/components/ui/button";
-import { logout, getCurrentUserSync, hasRoleSync } from "@/utils/auth";
+import { getCurrentUserSync, hasRoleSync } from "@/utils/auth";
 import { Toaster } from "@/components/ui/toaster";
-import { toast } from "sonner";
 import jokovaLogoTextImage from "/public/green_text_only_logo.png";
 import jokovaLogoSymbolImage from "/public/green_jokova_symbol.png";
 import MobileBottomNav from "./MobileBottomNav";
+import ProfileMenu from "./ProfileMenu";
 
 interface MainLayoutProps {
   children: React.ReactNode;
@@ -17,14 +17,15 @@ interface MainLayoutProps {
 const MainLayout = ({ children }: MainLayoutProps) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [authenticated, setAuthenticated] = useState(false);
+  const [currentUser, setCurrentUser] = useState(null);
   const navigate = useNavigate();
-  const isSuperAdmin = hasRoleSync("super_admin");
 
   // Check authentication status on mount and listen for changes
   useEffect(() => {
     const checkAuth = () => {
       const user = getCurrentUserSync();
       setAuthenticated(!!user);
+      setCurrentUser(user);
     };
 
     // Check initial auth state
@@ -41,17 +42,6 @@ const MainLayout = ({ children }: MainLayoutProps) => {
       window.removeEventListener("authStateChanged", handleAuthStateChange);
     };
   }, []);
-
-  const handleLogout = async () => {
-    try {
-      await logout();
-      toast.success("Logged out successfully");
-      navigate("/");
-    } catch (error) {
-      console.error("Logout error:", error);
-      toast.error("Error logging out");
-    }
-  };
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -110,17 +100,12 @@ const MainLayout = ({ children }: MainLayoutProps) => {
                   <CartIcon />
                 </Button>
               </Link>
-              {authenticated ? (
-                <div className="flex items-center space-x-1">
-                  {isSuperAdmin && (
-                    <Link to="/admin/dashboard">
-                      <Button variant="outline">Dashboard</Button>
-                    </Link>
-                  )}
-                  <Button variant="outline" onClick={handleLogout}>
-                    Logout
-                  </Button>
-                </div>
+              {authenticated && currentUser ? (
+                <ProfileMenu 
+                  userName={currentUser.name} 
+                  userRole={currentUser.role}
+                  isSuperAdmin={hasRoleSync("super_admin")}
+                />
               ) : (
                 <div className="flex items-center">
                   <Link to="/login">
