@@ -442,11 +442,11 @@ const RegisterProfessionalDialog = ({
 
   return (
     <Dialog open={open} onOpenChange={handleDialogClose}>
-      <DialogContent className="max-w-6xl md:max-h-[90vh]">
-        <div className="grid md:grid-cols-8 gap-4">
-          <div className="hidden md:block col-span-2 bg-primary-800">
-            <ScrollArea className="h-[calc(90vh-40px)]">
-              <DialogTitle className="text-left text-white pl-5 pb-4 pt-6">
+      <DialogContent className="max-w-6xl md:max-h-[90vh] p--6 border-2 border-primary rounded-4xl">
+        <div className="grid md:grid-cols-8 gap-4 ">
+          <div className="hidden md:block col-span-2 bg-primary ">
+            <ScrollArea className="h-[calc(90vh-40px)] ">
+              <DialogTitle className="text-left text-white pl-4 pb-4 pt-8">
                 {dialogTitle}
               </DialogTitle>
               <hr />
@@ -458,7 +458,7 @@ const RegisterProfessionalDialog = ({
               />
             </ScrollArea>
           </div>
-          <div className="md:col-span-6">
+          <div className="md:col-span-6 p-6">
             {isLoadingProfile ? (
               <div className="flex items-center justify-center h-64">
                 <div className="text-center">
