@@ -76,7 +76,7 @@ export const StepperForm = ({
             Profile Tip
           </h3>
           <p className="text-sm text-white text-muted-foreground">
-            {stepDetails && stepDetails[currentStep].tip}
+            {stepDetails && stepDetails[currentStep - 1].tip}
           </p>
         </div>
       </div>
