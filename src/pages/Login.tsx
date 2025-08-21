@@ -25,7 +25,7 @@ const Login: React.FC = () => {
   const [identifier, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [loginMethod, setLoginMethod] = useState<"email" | "phone">("email");
+  
   const [loginError, setLoginError] = useState<string | null>(null);
   const [showProgressDialog, setShowProgressDialog] = useState(false);
   const [loggedInUserId, setLoggedInUserId] = useState<string | null>(null);
@@ -229,162 +229,169 @@ const Login: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
-      <div className="w-full max-w-md">
+    <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-accent/10 flex items-center justify-center p-4">
+      <div className="w-full max-w-5xl">
+        {/* Header */}
         <div className="text-center mb-8">
           <Link to="/" className="inline-block">
-            <h1 className="text-3xl font-bold text-primary-800">
+            <h1 className="text-4xl font-bold bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
               SportifyGround
             </h1>
           </Link>
+          <p className="text-muted-foreground mt-2">Welcome back to your sports hub</p>
         </div>
 
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-2xl">Login</CardTitle>
-            <CardDescription>
-              Enter your credentials to access your account
-            </CardDescription>
-          </CardHeader>
-
-          <CardContent>
-            {loginError && (
-              <div className="mb-4 p-3 bg-red-50 border-l-4 border-red-400 text-red-800">
-                <p>{loginError}</p>
-              </div>
-            )}
-
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <Tabs
-                defaultValue="email"
-                onValueChange={(value) =>
-                  setLoginMethod(value as "email" | "phone")
-                }
-              >
-                <TabsList className="grid w-full grid-cols-2">
-                  <TabsTrigger value="email">Email</TabsTrigger>
-                  <TabsTrigger value="phone">Phone</TabsTrigger>
-                </TabsList>
-
-                <div className="mt-4 space-y-2">
-                  <Label htmlFor="identifier">
-                    {loginMethod === "email" ? "Email" : "Phone Number"}
-                  </Label>
-                  <Input
-                    id="identifier"
-                    type={loginMethod === "email" ? "email" : "tel"}
-                    placeholder={
-                      loginMethod === "email"
-                        ? "you@example.com"
-                        : "10-digit mobile number"
-                    }
-                    value={identifier}
-                    onChange={(e) => setIdentifier(e.target.value)}
-                    autoComplete={loginMethod === "email" ? "email" : "tel"}
-                  />
-                </div>
-              </Tabs>
-
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <Label htmlFor="password">Password</Label>
-                  <Link
-                    to="/forgot-password"
-                    className="text-sm text-primary-600 hover:text-primary-800"
-                  >
-                    Forgot password?
-                  </Link>
-                </div>
-                <Input
-                  id="password"
-                  type="password"
-                  placeholder="••••••••"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                />
-              </div>
-
-              <Button type="submit" className="w-full" disabled={isLoading}>
-                {isLoading ? "Logging in..." : "Login"}
-              </Button>
-
-              <div className="relative">
-                <div className="absolute inset-0 flex items-center">
-                  <span className="w-full border-t" />
-                </div>
-                <div className="relative flex justify-center text-xs uppercase">
-                  <span className="bg-background px-2 text-muted-foreground">
-                    Or continue with
-                  </span>
-                </div>
-              </div>
-
-              <Button 
-                type="button" 
-                variant="outline" 
-                className="w-full" 
-                onClick={handleGoogleLogin}
-                disabled={isLoading}
-              >
-                <svg
-                  className="mr-2 h-4 w-4"
-                  aria-hidden="true"
-                  focusable="false"
-                  data-prefix="fab"
-                  data-icon="google"
-                  role="img"
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 488 512"
-                >
-                  <path
-                    fill="currentColor"
-                    d="M488 261.8C488 403.3 391.1 504 248 504 110.8 504 0 393.2 0 256S110.8 8 248 8c66.8 0 123 24.5 166.3 64.9l-67.5 64.9C258.5 52.6 94.3 116.6 94.3 256c0 86.5 69.1 156.6 153.7 156.6 98.2 0 135-70.4 140.8-106.9H248v-85.3h240z"
-                  ></path>
-                </svg>
-                Continue with Google
-              </Button>
-
-              <div className="text-sm text-gray-500 text-center mt-6 p-3 bg-gray-50 rounded border border-gray-100">
-                <p className="font-semibold mb-2">Demo Accounts (Working):</p>
-                <ul className="space-y-1">
-                  <li>
-                    <strong>Super Admin:</strong> sa@123456{" "}
-                    <span className="text-xs">(password: 1234)</span>
-                  </li>
-                  <li>
-                    <strong>Admin:</strong> a@123456{" "}
-                    <span className="text-xs">(password: 1234)</span>
-                  </li>
-                </ul>
-                <p className="text-xs mt-2 text-gray-400">
-                  Or register a new account below
+        {/* Main Container */}
+        <div className="bg-gradient-to-r from-primary/95 to-primary/90 backdrop-blur-sm rounded-3xl shadow-2xl overflow-hidden">
+          <div className="grid lg:grid-cols-2 min-h-[600px]">
+            {/* Left Panel - Welcome Content */}
+            <div className="p-12 text-white flex flex-col justify-center space-y-6">
+              <div>
+                <h2 className="text-3xl font-bold mb-4">Welcome Back!</h2>
+                <p className="text-white/90 text-lg leading-relaxed">
+                  Sign in to access your account and continue booking amazing sports grounds, 
+                  connecting with professionals, and managing your sporting activities.
                 </p>
               </div>
-            </form>
-          </CardContent>
+              
+              <div className="space-y-4">
+                <div className="flex items-center space-x-3">
+                  <div className="w-2 h-2 bg-white rounded-full"></div>
+                  <span className="text-white/90">Book premium sports facilities</span>
+                </div>
+                <div className="flex items-center space-x-3">
+                  <div className="w-2 h-2 bg-white rounded-full"></div>
+                  <span className="text-white/90">Connect with sports professionals</span>
+                </div>
+                <div className="flex items-center space-x-3">
+                  <div className="w-2 h-2 bg-white rounded-full"></div>
+                  <span className="text-white/90">Track your bookings & activities</span>
+                </div>
+              </div>
 
-          <CardFooter className="flex flex-col space-y-4 pt-0">
-            <div className="text-center w-full">
-              <span className="text-sm text-gray-600">
-                Don't have an account?{" "}
-                <Link
-                  to="/register"
-                  className="font-medium text-primary-600 hover:text-primary-800"
-                >
-                  Register
-                </Link>
-              </span>
+              {/* Demo Accounts Info */}
+              <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20">
+                <h3 className="font-semibold text-white mb-3 flex items-center">
+                  <div className="w-2 h-2 bg-accent rounded-full mr-2"></div>
+                  Demo Accounts Available
+                </h3>
+                <div className="space-y-2 text-sm text-white/90">
+                  <div><strong>Super Admin:</strong> sa@123456 <span className="text-white/70">(password: 1234)</span></div>
+                  <div><strong>Admin:</strong> a@123456 <span className="text-white/70">(password: 1234)</span></div>
+                </div>
+              </div>
             </div>
 
-            <Button
-              variant="outline"
-              className="w-full"
-              onClick={() => navigate("/")}
-            >
-              Back to Home
-            </Button>
-          </CardFooter>
-        </Card>
+            {/* Right Panel - Login Form */}
+            <div className="bg-white p-12 flex flex-col justify-center">
+              <div className="max-w-md mx-auto w-full">
+                <div className="mb-8">
+                  <h3 className="text-2xl font-bold text-foreground mb-2">Sign In</h3>
+                  <p className="text-muted-foreground">Enter your credentials to access your account</p>
+                </div>
+
+                {loginError && (
+                  <div className="mb-6 p-4 bg-destructive/10 border border-destructive/20 rounded-lg">
+                    <p className="text-destructive font-medium">{loginError}</p>
+                  </div>
+                )}
+
+                <form onSubmit={handleSubmit} className="space-y-6">
+                  <div className="space-y-2">
+                    <Label htmlFor="identifier" className="text-sm font-medium">Email Address</Label>
+                    <Input
+                      id="identifier"
+                      type="email"
+                      placeholder="you@example.com"
+                      value={identifier}
+                      onChange={(e) => setIdentifier(e.target.value)}
+                      className="h-12"
+                      autoComplete="email"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <Label htmlFor="password" className="text-sm font-medium">Password</Label>
+                      <Link
+                        to="/forgot-password"
+                        className="text-sm text-primary hover:text-primary/80 font-medium"
+                      >
+                        Forgot password?
+                      </Link>
+                    </div>
+                    <Input
+                      id="password"
+                      type="password"
+                      placeholder="Enter your password"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      className="h-12"
+                    />
+                  </div>
+
+                  <Button type="submit" className="w-full h-12 text-base font-medium" disabled={isLoading}>
+                    {isLoading ? "Signing in..." : "Sign In"}
+                  </Button>
+
+                  <div className="relative">
+                    <div className="absolute inset-0 flex items-center">
+                      <span className="w-full border-t border-border" />
+                    </div>
+                    <div className="relative flex justify-center text-xs uppercase">
+                      <span className="bg-white px-4 text-muted-foreground font-medium">Or continue with</span>
+                    </div>
+                  </div>
+
+                  <Button 
+                    type="button" 
+                    variant="outline" 
+                    className="w-full h-12" 
+                    onClick={handleGoogleLogin}
+                    disabled={isLoading}
+                  >
+                    <svg
+                      className="mr-3 h-5 w-5"
+                      aria-hidden="true"
+                      focusable="false"
+                      data-prefix="fab"
+                      data-icon="google"
+                      role="img"
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 488 512"
+                    >
+                      <path
+                        fill="currentColor"
+                        d="M488 261.8C488 403.3 391.1 504 248 504 110.8 504 0 393.2 0 256S110.8 8 248 8c66.8 0 123 24.5 166.3 64.9l-67.5 64.9C258.5 52.6 94.3 116.6 94.3 256c0 86.5 69.1 156.6 153.7 156.6 98.2 0 135-70.4 140.8-106.9H248v-85.3h240z"
+                      />
+                    </svg>
+                    Continue with Google
+                  </Button>
+                </form>
+
+                <div className="mt-8 text-center space-y-4">
+                  <p className="text-sm text-muted-foreground">
+                    Don't have an account?{" "}
+                    <Link
+                      to="/register"
+                      className="font-medium text-primary hover:text-primary/80"
+                    >
+                      Create account
+                    </Link>
+                  </p>
+                  
+                  <Button
+                    variant="ghost"
+                    className="text-sm"
+                    onClick={() => navigate("/")}
+                  >
+                    ← Back to Home
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
 
         {/* User Type Selection Dialog */}
         <Dialog open={showUserTypeDialog} onOpenChange={setShowUserTypeDialog}>

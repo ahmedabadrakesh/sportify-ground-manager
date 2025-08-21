@@ -1,15 +1,12 @@
-
 import React, { useState, useRef, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { toast } from "sonner";
 import { register, login } from "@/utils/auth";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import ProfileProgressDialog from "@/components/professionals/ProfileProgressDialog";
 import RegisterProfessionalDialog from "@/components/professionals/RegisterProfessionalDialog";
 import { supabase } from "@/integrations/supabase/client";
@@ -18,12 +15,10 @@ const Register: React.FC = () => {
   const navigate = useNavigate();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
-  const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [userType, setUserType] = useState<'user' | 'sports_professional'>('user');
   const [isLoading, setIsLoading] = useState(false);
-  const [registrationType, setRegistrationType] = useState<"email" | "phone">("email");
   const [isProfileProgressDialogOpen, setIsProfileProgressDialogOpen] = useState(false);
   const [isUpdateDialogOpen, setIsUpdateDialogOpen] = useState(false);
   const [registeredUser, setRegisteredUser] = useState<any>(null);
@@ -39,7 +34,7 @@ const Register: React.FC = () => {
     e.stopPropagation();
     
     console.log("Form submission triggered");
-    console.log("Current form state:", { name, email, phone, password, confirmPassword, userType, registrationType });
+    console.log("Current form state:", { name, email, password, confirmPassword, userType });
     console.log("isLoading:", isLoading, "isSubmittingRef.current:", isSubmittingRef.current);
     
     // Prevent multiple submissions using ref (more reliable than state)
@@ -54,7 +49,7 @@ const Register: React.FC = () => {
 
     try {
       // Simple form validation
-      if (!name || (!email && !phone) || !password || !confirmPassword) {
+      if (!name || !email || !password || !confirmPassword) {
         console.log("Validation failed: missing required fields");
         toast.error("Please fill in all required fields");
         return;
@@ -66,18 +61,8 @@ const Register: React.FC = () => {
         return;
       }
 
-      // Basic validation for phone number format
-      if (registrationType === "phone" && phone) {
-        const phoneRegex = /^\d{10}$/;
-        if (!phoneRegex.test(phone)) {
-          console.log("Validation failed: invalid phone format");
-          toast.error("Please enter a valid 10-digit mobile number");
-          return;
-        }
-      }
-
       // Basic validation for email format
-      if (registrationType === "email" && email) {
+      if (email) {
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (!emailRegex.test(email)) {
           console.log("Validation failed: invalid email format");
@@ -88,15 +73,14 @@ const Register: React.FC = () => {
 
       console.log("Starting registration with:", { 
         name, 
-        email: registrationType === "email" ? email : "", 
-        phone: registrationType === "phone" ? phone : "", 
+        email, 
         userType 
       });
       
       const user = await register(
         name, 
-        registrationType === "email" ? email : "", 
-        registrationType === "phone" ? phone : "", 
+        email, 
+        "", 
         password,
         userType
       );
@@ -108,7 +92,7 @@ const Register: React.FC = () => {
         
         // Auto-login the user after successful registration
         try {
-          const loginIdentifier = registrationType === "email" ? email : phone;
+          const loginIdentifier = email;
           const loggedInUser = await login(loginIdentifier, password);
           
           if (loggedInUser) {
@@ -289,220 +273,238 @@ const Register: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4 py-8">
-      <div className="w-full max-w-md">
+    <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-accent/10 flex items-center justify-center p-4">
+      <div className="w-full max-w-5xl">
+        {/* Header */}
         <div className="text-center mb-8">
           <Link to="/" className="inline-block">
-            <h1 className="text-3xl font-bold text-primary-800">SportifyGround</h1>
+            <h1 className="text-4xl font-bold bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
+              SportifyGround
+            </h1>
           </Link>
+          <p className="text-muted-foreground mt-2">Join the ultimate sports community</p>
         </div>
 
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-2xl">Create an Account</CardTitle>
-            <CardDescription>
-              Register to book sports grounds and track your reservations
-            </CardDescription>
-          </CardHeader>
-          
-          <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="name">Full Name</Label>
-                <Input
-                  id="name"
-                  placeholder="John Smith"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  disabled={isLoading}
-                  required
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label>Account Type</Label>
-                <RadioGroup 
-                  value={userType} 
-                  onValueChange={(value: 'user' | 'sports_professional') => setUserType(value)}
-                  disabled={isLoading}
-                >
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="user" id="user" />
-                    <Label htmlFor="user">Regular User</Label>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="sports_professional" id="sports_professional" />
-                    <Label htmlFor="sports_professional">Sports Professional</Label>
-                  </div>
-                </RadioGroup>
-                {userType === 'sports_professional' && (
-                  <p className="text-xs text-blue-600">
-                    A basic sports professional profile will be created for you, which you can update later.
-                  </p>
-                )}
+        {/* Main Container */}
+        <div className="bg-gradient-to-r from-primary/95 to-primary/90 backdrop-blur-sm rounded-3xl shadow-2xl overflow-hidden">
+          <div className="grid lg:grid-cols-2 min-h-[700px]">
+            {/* Left Panel - Welcome Content */}
+            <div className="p-12 text-white flex flex-col justify-center space-y-6">
+              <div>
+                <h2 className="text-3xl font-bold mb-4">Join SportifyGround</h2>
+                <p className="text-white/90 text-lg leading-relaxed">
+                  Create your account to unlock access to premium sports facilities, 
+                  connect with professional coaches, and manage your sporting journey.
+                </p>
               </div>
               
-              <Tabs 
-                defaultValue="email" 
-                value={registrationType}
-                onValueChange={(value) => setRegistrationType(value as "email" | "phone")}
-              >
-                <TabsList className="grid w-full grid-cols-2">
-                  <TabsTrigger value="email" disabled={isLoading}>Email</TabsTrigger>
-                  <TabsTrigger value="phone" disabled={isLoading}>Phone</TabsTrigger>
-                </TabsList>
-                
-                <TabsContent value="email" className="space-y-2">
-                  <Label htmlFor="email">Email</Label>
-                  <Input
-                    id="email"
-                    type="email"
-                    placeholder="you@example.com"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    disabled={isLoading}
-                    required={registrationType === "email"}
-                  />
-                </TabsContent>
-                
-                <TabsContent value="phone" className="space-y-2">
-                  <Label htmlFor="phone">Phone Number</Label>
-                  <Input
-                    id="phone"
-                    type="tel"
-                    placeholder="10-digit mobile number"
-                    value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
-                    disabled={isLoading}
-                    required={registrationType === "phone"}
-                  />
-                  <p className="text-xs text-gray-500">
-                    Enter your 10-digit mobile number without country code
-                  </p>
-                </TabsContent>
-              </Tabs>
-              
-              <div className="space-y-2">
-                <Label htmlFor="password">Password</Label>
-                <Input
-                  id="password"
-                  type="password"
-                  placeholder="Create a password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  disabled={isLoading}
-                  required
-                />
-              </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="confirm-password">Confirm Password</Label>
-                <Input
-                  id="confirm-password"
-                  type="password"
-                  placeholder="Confirm your password"
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  disabled={isLoading}
-                  required
-                />
-              </div>
-              
-              <div className="text-sm text-gray-500">
-                By registering, you agree to our{" "}
-                <Link to="/terms" className="text-primary-600 hover:text-primary-800">
-                  Terms of Service
-                </Link>{" "}
-                and{" "}
-                <Link to="/privacy" className="text-primary-600 hover:text-primary-800">
-                  Privacy Policy
-                </Link>
-                .
-              </div>
-              
-              <Button 
-                type="submit" 
-                className="w-full" 
-                disabled={isLoading}
-                onClick={(e) => {
-                  console.log("Register button clicked");
-                  // The onClick will bubble up to the form's onSubmit
-                }}
-              >
-                {isLoading ? "Creating account..." : "Register"}
-              </Button>
-
-              <div className="relative">
-                <div className="absolute inset-0 flex items-center">
-                  <span className="w-full border-t" />
+              <div className="space-y-4">
+                <div className="flex items-center space-x-3">
+                  <div className="w-2 h-2 bg-white rounded-full"></div>
+                  <span className="text-white/90">Access to 100+ premium facilities</span>
                 </div>
-                <div className="relative flex justify-center text-xs uppercase">
-                  <span className="bg-background px-2 text-muted-foreground">
-                    Or continue with
-                  </span>
+                <div className="flex items-center space-x-3">
+                  <div className="w-2 h-2 bg-white rounded-full"></div>
+                  <span className="text-white/90">Connect with certified professionals</span>
+                </div>
+                <div className="flex items-center space-x-3">
+                  <div className="w-2 h-2 bg-white rounded-full"></div>
+                  <span className="text-white/90">Real-time booking & scheduling</span>
+                </div>
+                <div className="flex items-center space-x-3">
+                  <div className="w-2 h-2 bg-white rounded-full"></div>
+                  <span className="text-white/90">Join sports events & tournaments</span>
                 </div>
               </div>
 
-              <Button 
-                type="button" 
-                variant="outline" 
-                className="w-full" 
-                onClick={handleGoogleLogin}
-                disabled={isLoading}
-              >
-                <svg
-                  className="mr-2 h-4 w-4"
-                  aria-hidden="true"
-                  focusable="false"
-                  data-prefix="fab"
-                  data-icon="google"
-                  role="img"
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 488 512"
-                >
-                  <path
-                    fill="currentColor"
-                    d="M488 261.8C488 403.3 391.1 504 248 504 110.8 504 0 393.2 0 256S110.8 8 248 8c66.8 0 123 24.5 166.3 64.9l-67.5 64.9C258.5 52.6 94.3 116.6 94.3 256c0 86.5 69.1 156.6 153.7 156.6 98.2 0 135-70.4 140.8-106.9H248v-85.3h240z"
-                  ></path>
-                </svg>
-                Continue with Google
-              </Button>
-            </form>
-          </CardContent>
-          
-          <CardFooter className="flex flex-col space-y-4 pt-0">
-            <div className="text-center w-full space-y-2">
-              <div>
-                <span className="text-sm text-gray-600">
-                  Already have an account?{" "}
-                  <Link
-                    to="/login"
-                    className="font-medium text-primary-600 hover:text-primary-800"
-                  >
-                    Login
-                  </Link>
-                </span>
-              </div>
-              <div>
-                <Link
-                  to="/forgot-password"
-                  className="text-sm text-primary-600 hover:text-primary-800"
-                >
-                  Forgot password?
-                </Link>
+              {/* Registration Tips */}
+              <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20">
+                <h3 className="font-semibold text-white mb-3 flex items-center">
+                  <div className="w-2 h-2 bg-accent rounded-full mr-2"></div>
+                  Quick Registration Tip
+                </h3>
+                <p className="text-sm text-white/90">
+                  Choose "Sports Professional" if you're a coach, trainer, or instructor looking to 
+                  offer your services. You can always update your profile later!
+                </p>
               </div>
             </div>
-            
-            <Button
-              variant="outline"
-              className="w-full"
-              onClick={() => navigate("/")}
-              disabled={isLoading}
-            >
-              Back to Home
-            </Button>
-          </CardFooter>
-        </Card>
+
+            {/* Right Panel - Registration Form */}
+            <div className="bg-white p-12 flex flex-col justify-center">
+              <div className="max-w-md mx-auto w-full">
+                <div className="mb-8">
+                  <h3 className="text-2xl font-bold text-foreground mb-2">Create Account</h3>
+                  <p className="text-muted-foreground">Register to start your sports journey</p>
+                </div>
+
+                <form onSubmit={handleSubmit} className="space-y-6">
+                  <div className="space-y-2">
+                    <Label htmlFor="name" className="text-sm font-medium">Full Name</Label>
+                    <Input
+                      id="name"
+                      placeholder="Enter your full name"
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                      disabled={isLoading}
+                      className="h-12"
+                      required
+                    />
+                  </div>
+
+                  <div className="space-y-3">
+                    <Label className="text-sm font-medium">Account Type</Label>
+                    <RadioGroup 
+                      value={userType} 
+                      onValueChange={(value: 'user' | 'sports_professional') => setUserType(value)}
+                      disabled={isLoading}
+                      className="grid grid-cols-1 gap-3"
+                    >
+                      <div className="flex items-center space-x-3 p-3 border rounded-lg hover:bg-accent/5">
+                        <RadioGroupItem value="user" id="user" />
+                        <Label htmlFor="user" className="font-normal cursor-pointer">Regular User - Book grounds & events</Label>
+                      </div>
+                      <div className="flex items-center space-x-3 p-3 border rounded-lg hover:bg-accent/5">
+                        <RadioGroupItem value="sports_professional" id="sports_professional" />
+                        <Label htmlFor="sports_professional" className="font-normal cursor-pointer">Sports Professional - Offer services</Label>
+                      </div>
+                    </RadioGroup>
+                    {userType === 'sports_professional' && (
+                      <p className="text-xs text-primary/70 bg-primary/5 p-2 rounded">
+                        A basic profile will be created for you to get started quickly.
+                      </p>
+                    )}
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="email" className="text-sm font-medium">Email Address</Label>
+                    <Input
+                      id="email"
+                      type="email"
+                      placeholder="you@example.com"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      disabled={isLoading}
+                      className="h-12"
+                      required
+                    />
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="password" className="text-sm font-medium">Password</Label>
+                    <Input
+                      id="password"
+                      type="password"
+                      placeholder="Create a strong password"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      disabled={isLoading}
+                      className="h-12"
+                      required
+                    />
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="confirm-password" className="text-sm font-medium">Confirm Password</Label>
+                    <Input
+                      id="confirm-password"
+                      type="password"
+                      placeholder="Confirm your password"
+                      value={confirmPassword}
+                      onChange={(e) => setConfirmPassword(e.target.value)}
+                      disabled={isLoading}
+                      className="h-12"
+                      required
+                    />
+                  </div>
+                  
+                  <div className="text-xs text-muted-foreground bg-muted/30 p-3 rounded-lg">
+                    By creating an account, you agree to our{" "}
+                    <Link to="/terms" className="text-primary hover:text-primary/80 font-medium">
+                      Terms of Service
+                    </Link>{" "}
+                    and{" "}
+                    <Link to="/privacy" className="text-primary hover:text-primary/80 font-medium">
+                      Privacy Policy
+                    </Link>
+                  </div>
+                  
+                  <Button 
+                    type="submit" 
+                    className="w-full h-12 text-base font-medium" 
+                    disabled={isLoading}
+                  >
+                    {isLoading ? "Creating account..." : "Create Account"}
+                  </Button>
+
+                  <div className="relative">
+                    <div className="absolute inset-0 flex items-center">
+                      <span className="w-full border-t border-border" />
+                    </div>
+                    <div className="relative flex justify-center text-xs uppercase">
+                      <span className="bg-white px-4 text-muted-foreground font-medium">Or continue with</span>
+                    </div>
+                  </div>
+
+                  <Button 
+                    type="button" 
+                    variant="outline" 
+                    className="w-full h-12" 
+                    onClick={handleGoogleLogin}
+                    disabled={isLoading}
+                  >
+                    <svg
+                      className="mr-3 h-5 w-5"
+                      aria-hidden="true"
+                      focusable="false"
+                      data-prefix="fab"
+                      data-icon="google"
+                      role="img"
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 488 512"
+                    >
+                      <path
+                        fill="currentColor"
+                        d="M488 261.8C488 403.3 391.1 504 248 504 110.8 504 0 393.2 0 256S110.8 8 248 8c66.8 0 123 24.5 166.3 64.9l-67.5 64.9C258.5 52.6 94.3 116.6 94.3 256c0 86.5 69.1 156.6 153.7 156.6 98.2 0 135-70.4 140.8-106.9H248v-85.3h240z"
+                      />
+                    </svg>
+                    Continue with Google
+                  </Button>
+                </form>
+
+                <div className="mt-8 text-center space-y-4">
+                  <p className="text-sm text-muted-foreground">
+                    Already have an account?{" "}
+                    <Link
+                      to="/login"
+                      className="font-medium text-primary hover:text-primary/80"
+                    >
+                      Sign in
+                    </Link>
+                  </p>
+
+                  <p className="text-sm text-muted-foreground">
+                    Forgot your password?{" "}
+                    <Link
+                      to="/forgot-password"
+                      className="font-medium text-primary hover:text-primary/80"
+                    >
+                      Reset it here
+                    </Link>
+                  </p>
+                  
+                  <Button
+                    variant="ghost"
+                    className="text-sm"
+                    onClick={() => navigate("/")}
+                  >
+                    ← Back to Home
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
 
         {/* User Type Selection Dialog */}
         <Dialog open={showUserTypeDialog} onOpenChange={setShowUserTypeDialog}>
@@ -538,35 +540,35 @@ const Register: React.FC = () => {
             </div>
           </DialogContent>
         </Dialog>
-      </div>
 
-      {/* Profile Progress Dialog for Sports Professionals */}
-      {registeredUser && (
-        <ProfileProgressDialog
-          isOpen={isProfileProgressDialogOpen}
-          onClose={() => {
-            setIsProfileProgressDialogOpen(false);
-            navigate("/sports-professionals");
-          }}
-          userId={registeredUser.id}
-          setIsUpdateDialogOpen={setIsUpdateDialogOpen}
-        />
-      )}
-
-      {/* Register Professional Dialog */}
-      {registeredUser && (
-        <RegisterProfessionalDialog
-          open={isUpdateDialogOpen}
-          onOpenChange={(open) => {
-            setIsUpdateDialogOpen(open);
-            if (!open) {
+        {/* Profile Progress Dialog for Sports Professionals */}
+        {registeredUser && (
+          <ProfileProgressDialog
+            isOpen={isProfileProgressDialogOpen}
+            onClose={() => {
               setIsProfileProgressDialogOpen(false);
               navigate("/sports-professionals");
-            }
-          }}
-          isUpdate={true}
-        />
-      )}
+            }}
+            userId={registeredUser.id}
+            setIsUpdateDialogOpen={setIsUpdateDialogOpen}
+          />
+        )}
+
+        {/* Register Professional Dialog */}
+        {registeredUser && (
+          <RegisterProfessionalDialog
+            open={isUpdateDialogOpen}
+            onOpenChange={(open) => {
+              setIsUpdateDialogOpen(open);
+              if (!open) {
+                setIsProfileProgressDialogOpen(false);
+                navigate("/sports-professionals");
+              }
+            }}
+            isUpdate={true}
+          />
+        )}
+      </div>
     </div>
   );
 };
