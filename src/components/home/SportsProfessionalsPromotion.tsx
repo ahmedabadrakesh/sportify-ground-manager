@@ -42,7 +42,7 @@ const SportsProfessionalsPromotion = () => {
           initial={{ opacity: 0, x: 50 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.5, delay: 0.2 }}
-          className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-secondary-600 to-secondary-800 p-8 text-white"
+          className="relative overflow-hidden bg-gradient-to-br from-secondary-600 to-secondary-800 p-8 text-white"
         >
           <div className="flex-row md:flex gap-6">
             <div className="w-full md:w-1/2">

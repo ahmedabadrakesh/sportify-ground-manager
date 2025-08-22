@@ -18,6 +18,10 @@ import { getCurrentUserSync } from "@/utils/auth";
 import AuthRequiredDialog from "@/components/auth/AuthRequiredDialog";
 import EventDialog from "@/components/admin/events/EventDialog";
 import { useNavigate } from "react-router-dom";
+import FeaturedSection from "@/components/home/FeaturedSection";
+import HomeCoachingSection from "@/components/home/HomeCoachingSection";
+import CorporateWellness from "@/components/home/CorporateWellness";
+import ExperienceSection from "@/components/home/ExperienceSection";
 
 const Home: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -67,20 +71,21 @@ const Home: React.FC = () => {
   const structuredData = {
     "@context": "https://schema.org",
     "@type": "Organization",
-    "name": "Jokova",
-    "url": "https://jokova.com",
-    "logo": "https://jokova.com/green_text_only_logo.png",
-    "description": "Book sports grounds, find certified sports professionals, and join events. Your one-stop platform for all sports activities.",
-    "contactPoint": {
+    name: "Jokova",
+    url: "https://jokova.com",
+    logo: "https://jokova.com/green_text_only_logo.png",
+    description:
+      "Book sports grounds, find certified sports professionals, and join events. Your one-stop platform for all sports activities.",
+    contactPoint: {
       "@type": "ContactPoint",
-      "contactType": "customer service",
-      "availableLanguage": "English"
+      contactType: "customer service",
+      availableLanguage: "English",
     },
-    "sameAs": [
+    sameAs: [
       "https://twitter.com/jokova",
       "https://facebook.com/jokova",
-      "https://instagram.com/jokova"
-    ]
+      "https://instagram.com/jokova",
+    ],
   };
 
   return (
@@ -93,8 +98,13 @@ const Home: React.FC = () => {
         structuredData={structuredData}
       />
       <HeroSection onSearch={handleSearch} />
+      <StatBanner />
       <div>
         <PopularSportsSection />
+        <FeaturedSection />
+        <HomeCoachingSection />
+        <CorporateWellness />
+        <ExperienceSection />
         <SportsProfessionalsPromotion />
         <SearchResultsSection
           searchTerm={searchTerm}
@@ -124,12 +134,11 @@ const Home: React.FC = () => {
           </div>
           <EventsPromotion />
         </div>
-        <StatBanner />
+        {/* <StatBanner /> */}
       </div>
 
       <div className="container mx-auto px-4">
         {/* <HowItWorksSection /> */}
-        <TestimonialsSection />
         <ShopPromotionSection />
         {/* <WhyChooseUsSection /> */}
       </div>

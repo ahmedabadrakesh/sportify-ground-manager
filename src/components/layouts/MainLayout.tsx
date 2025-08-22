@@ -101,8 +101,8 @@ const MainLayout = ({ children }: MainLayoutProps) => {
                 </Button>
               </Link>
               {authenticated && currentUser ? (
-                <ProfileMenu 
-                  userName={currentUser.name} 
+                <ProfileMenu
+                  userName={currentUser.name}
                   userRole={currentUser.role}
                   isSuperAdmin={hasRoleSync("super_admin")}
                   userEmail={currentUser.email}
@@ -134,11 +134,10 @@ const MainLayout = ({ children }: MainLayoutProps) => {
             </div>
           </div>
         </div>
-
       </header>
 
       <main className="flex-1 pb-16 md:pb-0">{children}</main>
-      
+
       {/* Mobile Bottom Navigation */}
       <MobileBottomNav />
 

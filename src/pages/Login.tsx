@@ -11,7 +11,13 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { login } from "@/utils/auth";
 import { toast } from "sonner";
@@ -25,13 +31,15 @@ const Login: React.FC = () => {
   const [identifier, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  
+
   const [loginError, setLoginError] = useState<string | null>(null);
   const [showProgressDialog, setShowProgressDialog] = useState(false);
   const [loggedInUserId, setLoggedInUserId] = useState<string | null>(null);
   const [showUserTypeDialog, setShowUserTypeDialog] = useState(false);
   const [googleUserData, setGoogleUserData] = useState<any>(null);
-  const [selectedUserType, setSelectedUserType] = useState<'user' | 'sports_professional'>('user');
+  const [selectedUserType, setSelectedUserType] = useState<
+    "user" | "sports_professional"
+  >("user");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -93,52 +101,55 @@ const Login: React.FC = () => {
   // Handle Google OAuth
   const handleGoogleLogin = async () => {
     try {
-      console.log('Starting Google OAuth flow...');
-      console.log('Redirect URL:', `${window.location.origin}/login`);
-      
+      console.log("Starting Google OAuth flow...");
+      console.log("Redirect URL:", `${window.location.origin}/login`);
+
       const { data, error } = await supabase.auth.signInWithOAuth({
-        provider: 'google',
+        provider: "google",
         options: {
-          redirectTo: `${window.location.origin}/login`
-        }
+          redirectTo: `${window.location.origin}/login`,
+        },
       });
-      
-      console.log('Google OAuth response:', { data, error });
-      
+
+      console.log("Google OAuth response:", { data, error });
+
       if (error) {
-        console.error('Google OAuth error details:', error);
+        console.error("Google OAuth error details:", error);
         toast.error(`Google login failed: ${error.message}`);
       }
     } catch (error: any) {
-      console.error('Google login error:', error);
-      toast.error(`Google login failed: ${error.message || 'Unknown error'}`);
+      console.error("Google login error:", error);
+      toast.error(`Google login failed: ${error.message || "Unknown error"}`);
     }
   };
 
   // Handle the OAuth callback and user type selection
   useEffect(() => {
     const handleAuthChange = async (event: any, session: any) => {
-      if (event === 'SIGNED_IN' && session?.user) {
+      if (event === "SIGNED_IN" && session?.user) {
         try {
           // Check if user already exists in our database
           const { data: existingUser, error } = await supabase
-            .from('users')
-            .select('*')
-            .eq('auth_id', session.user.id)
+            .from("users")
+            .select("*")
+            .eq("auth_id", session.user.id)
             .single();
 
           if (existingUser && !error) {
             // User exists, log them in normally
-            localStorage.setItem('currentUser', JSON.stringify(existingUser));
+            localStorage.setItem("currentUser", JSON.stringify(existingUser));
             toast.success(`Welcome back, ${existingUser.name}!`);
-            
+
             if (existingUser.role === "sports_professional") {
               setLoggedInUserId(existingUser.id);
               setShowProgressDialog(true);
               return;
             }
-            
-            if (existingUser.role === "admin" || existingUser.role === "super_admin") {
+
+            if (
+              existingUser.role === "admin" ||
+              existingUser.role === "super_admin"
+            ) {
               navigate("/admin");
             } else if (existingUser.role === "ground_owner") {
               navigate("/admin/grounds");
@@ -151,80 +162,85 @@ const Login: React.FC = () => {
             setShowUserTypeDialog(true);
           }
         } catch (error) {
-          console.error('Error handling Google auth:', error);
-          toast.error('Authentication error. Please try again.');
+          console.error("Error handling Google auth:", error);
+          toast.error("Authentication error. Please try again.");
         }
       }
     };
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(handleAuthChange);
-    
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange(handleAuthChange);
+
     return () => subscription.unsubscribe();
   }, [navigate]);
 
   const handleUserTypeSelection = async () => {
     if (!googleUserData) return;
-    
+
     try {
       const userData = {
         auth_id: googleUserData.id,
-        name: googleUserData.user_metadata?.full_name || googleUserData.email?.split('@')[0] || 'User',
+        name:
+          googleUserData.user_metadata?.full_name ||
+          googleUserData.email?.split("@")[0] ||
+          "User",
         email: googleUserData.email,
         phone: googleUserData.phone || null,
-        role: selectedUserType
+        role: selectedUserType,
       };
 
       const { data: newUser, error } = await supabase
-        .from('users')
+        .from("users")
         .insert([userData])
         .select()
         .single();
 
       if (error) {
-        console.error('Error creating user:', error);
-        toast.error('Failed to create user profile. Please try again.');
+        console.error("Error creating user:", error);
+        toast.error("Failed to create user profile. Please try again.");
         return;
       }
 
       // Create sports professional entry if needed
-      if (selectedUserType === 'sports_professional') {
+      if (selectedUserType === "sports_professional") {
         // Get first available game
         const { data: games } = await supabase
-          .from('games')
-          .select('id')
+          .from("games")
+          .select("id")
           .limit(1)
           .single();
 
         if (games) {
-          await supabase
-            .from('sports_professionals')
-            .insert([{
+          await supabase.from("sports_professionals").insert([
+            {
               user_id: newUser.id,
               name: userData.name,
-              profession_type: 'Coach',
+              profession_type: "Coach",
               game_ids: [games.id],
-              contact_number: googleUserData.phone || '',
+              contact_number: googleUserData.phone || "",
               fee: 0,
-              fee_type: 'Per Hour',
-              address: '',
-              city: ''
-            }]);
+              fee_type: "Per Hour",
+              address: "",
+              city: "",
+            },
+          ]);
         }
       }
 
-      localStorage.setItem('currentUser', JSON.stringify(newUser));
+      localStorage.setItem("currentUser", JSON.stringify(newUser));
       toast.success(`Welcome to SportifyGround, ${newUser.name}!`);
       setShowUserTypeDialog(false);
 
-      if (selectedUserType === 'sports_professional') {
+      if (selectedUserType === "sports_professional") {
         setLoggedInUserId(newUser.id);
         setShowProgressDialog(true);
       } else {
         navigate("/");
       }
     } catch (error) {
-      console.error('Error creating user profile:', error);
-      toast.error('Failed to complete registration. Please try again.');
+      console.error("Error creating user profile:", error);
+      toast.error("Failed to complete registration. Please try again.");
     }
   };
 
@@ -238,7 +254,9 @@ const Login: React.FC = () => {
               SportifyGround
             </h1>
           </Link>
-          <p className="text-muted-foreground mt-2">Welcome back to your sports hub</p>
+          <p className="text-muted-foreground mt-2">
+            Welcome back to your sports hub
+          </p>
         </div>
 
         {/* Main Container */}
@@ -249,28 +267,35 @@ const Login: React.FC = () => {
               <div>
                 <h2 className="text-3xl font-bold mb-4">Welcome Back!</h2>
                 <p className="text-white/90 text-lg leading-relaxed">
-                  Sign in to access your account and continue booking amazing sports grounds, 
-                  connecting with professionals, and managing your sporting activities.
+                  Sign in to access your account and continue booking amazing
+                  sports grounds, connecting with professionals, and managing
+                  your sporting activities.
                 </p>
               </div>
-              
+
               <div className="space-y-4">
                 <div className="flex items-center space-x-3">
                   <div className="w-2 h-2 bg-white rounded-full"></div>
-                  <span className="text-white/90">Book premium sports facilities</span>
+                  <span className="text-white/90">
+                    Book premium sports facilities
+                  </span>
                 </div>
                 <div className="flex items-center space-x-3">
                   <div className="w-2 h-2 bg-white rounded-full"></div>
-                  <span className="text-white/90">Connect with sports professionals</span>
+                  <span className="text-white/90">
+                    Connect with sports professionals
+                  </span>
                 </div>
                 <div className="flex items-center space-x-3">
                   <div className="w-2 h-2 bg-white rounded-full"></div>
-                  <span className="text-white/90">Track your bookings & activities</span>
+                  <span className="text-white/90">
+                    Track your bookings & activities
+                  </span>
                 </div>
               </div>
 
               {/* Demo Accounts Info */}
-              <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20">
+              {/* <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20">
                 <h3 className="font-semibold text-white mb-3 flex items-center">
                   <div className="w-2 h-2 bg-accent rounded-full mr-2"></div>
                   Demo Accounts Available
@@ -279,15 +304,19 @@ const Login: React.FC = () => {
                   <div><strong>Super Admin:</strong> sa@123456 <span className="text-white/70">(password: 1234)</span></div>
                   <div><strong>Admin:</strong> a@123456 <span className="text-white/70">(password: 1234)</span></div>
                 </div>
-              </div>
+              </div> */}
             </div>
 
             {/* Right Panel - Login Form */}
             <div className="bg-white p-12 flex flex-col justify-center">
               <div className="max-w-md mx-auto w-full">
                 <div className="mb-8">
-                  <h3 className="text-2xl font-bold text-foreground mb-2">Sign In</h3>
-                  <p className="text-muted-foreground">Enter your credentials to access your account</p>
+                  <h3 className="text-2xl font-bold text-foreground mb-2">
+                    Sign In
+                  </h3>
+                  <p className="text-muted-foreground">
+                    Enter your credentials to access your account
+                  </p>
                 </div>
 
                 {loginError && (
@@ -298,7 +327,9 @@ const Login: React.FC = () => {
 
                 <form onSubmit={handleSubmit} className="space-y-6">
                   <div className="space-y-2">
-                    <Label htmlFor="identifier" className="text-sm font-medium">Email Address</Label>
+                    <Label htmlFor="identifier" className="text-sm font-medium">
+                      Email Address
+                    </Label>
                     <Input
                       id="identifier"
                       type="email"
@@ -312,7 +343,9 @@ const Login: React.FC = () => {
 
                   <div className="space-y-2">
                     <div className="flex items-center justify-between">
-                      <Label htmlFor="password" className="text-sm font-medium">Password</Label>
+                      <Label htmlFor="password" className="text-sm font-medium">
+                        Password
+                      </Label>
                       <Link
                         to="/forgot-password"
                         className="text-sm text-primary hover:text-primary/80 font-medium"
@@ -330,7 +363,11 @@ const Login: React.FC = () => {
                     />
                   </div>
 
-                  <Button type="submit" className="w-full h-12 text-base font-medium" disabled={isLoading}>
+                  <Button
+                    type="submit"
+                    className="w-full h-12 text-base font-medium"
+                    disabled={isLoading}
+                  >
                     {isLoading ? "Signing in..." : "Sign In"}
                   </Button>
 
@@ -339,14 +376,16 @@ const Login: React.FC = () => {
                       <span className="w-full border-t border-border" />
                     </div>
                     <div className="relative flex justify-center text-xs uppercase">
-                      <span className="bg-white px-4 text-muted-foreground font-medium">Or continue with</span>
+                      <span className="bg-white px-4 text-muted-foreground font-medium">
+                        Or continue with
+                      </span>
                     </div>
                   </div>
 
-                  <Button 
-                    type="button" 
-                    variant="outline" 
-                    className="w-full h-12" 
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="w-full h-12"
                     onClick={handleGoogleLogin}
                     disabled={isLoading}
                   >
@@ -379,7 +418,7 @@ const Login: React.FC = () => {
                       Create account
                     </Link>
                   </p>
-                  
+
                   <Button
                     variant="ghost"
                     className="text-sm"
@@ -399,26 +438,33 @@ const Login: React.FC = () => {
             <DialogHeader>
               <DialogTitle>Select Account Type</DialogTitle>
               <DialogDescription>
-                Please select whether you're a regular user or a sports professional.
+                Please select whether you're a regular user or a sports
+                professional.
               </DialogDescription>
             </DialogHeader>
             <div className="space-y-4">
-              <RadioGroup 
-                value={selectedUserType} 
-                onValueChange={(value: 'user' | 'sports_professional') => setSelectedUserType(value)}
+              <RadioGroup
+                value={selectedUserType}
+                onValueChange={(value: "user" | "sports_professional") =>
+                  setSelectedUserType(value)
+                }
               >
                 <div className="flex items-center space-x-2">
                   <RadioGroupItem value="user" id="user-type" />
                   <Label htmlFor="user-type">Regular User</Label>
                 </div>
                 <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="sports_professional" id="professional-type" />
+                  <RadioGroupItem
+                    value="sports_professional"
+                    id="professional-type"
+                  />
                   <Label htmlFor="professional-type">Sports Professional</Label>
                 </div>
               </RadioGroup>
-              {selectedUserType === 'sports_professional' && (
+              {selectedUserType === "sports_professional" && (
                 <p className="text-xs text-blue-600">
-                  A basic sports professional profile will be created for you, which you can update later.
+                  A basic sports professional profile will be created for you,
+                  which you can update later.
                 </p>
               )}
               <Button onClick={handleUserTypeSelection} className="w-full">

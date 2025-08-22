@@ -58,7 +58,7 @@ const PopularSportsSection = () => {
   const navigate = useNavigate();
 
   const { games } = useGames();
-  
+
   // Fallback sports with static images
   const fallbackSports = [
     { name: "Football", image: "/game-icons/football.svg" },
@@ -68,7 +68,7 @@ const PopularSportsSection = () => {
     { name: "Chess", image: "/game-icons/chess.svg" },
     { name: "Swimming", image: "/game-icons/swimming.svg" },
   ];
-  
+
   const sports = fallbackSports; // Use fallback sports for now
 
   const handleSportClick = (sportName: string) => {
@@ -81,12 +81,11 @@ const PopularSportsSection = () => {
 
   return (
     <div className="mb-16">
-      <h2 className="text-2xl font-bold text-gray-900 mt-6 mb-6 md:mb-0">
-        Discover Experts in Your Favorite Sport Find inspiration
+      <h2 className="text-3xl font-bold text-gray-900 mt-6 mb-6 md:mb-0">
+        LOVE A SPORT?
       </h2>
-      <p className="mb-6 hidden md:block">
-        learn from their experiences, and connect with like-minded enthusiasts.
-        What's your favorite sport?
+      <p className="text-xl mb-6 hidden md:block">
+        Learn from their experiences. Select your favorite sport.
       </p>
       <div className="relative px-4">
         <Carousel
