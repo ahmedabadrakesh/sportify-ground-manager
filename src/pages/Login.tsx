@@ -17,7 +17,6 @@ import { login } from "@/utils/auth";
 import { toast } from "sonner";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import ProfileProgressDialog from "@/components/professionals/ProfileProgressDialog";
-import RegisterProfessionalDialog from "@/components/professionals/RegisterProfessionalDialog";
 import { supabase } from "@/integrations/supabase/client";
 
 const Login: React.FC = () => {
@@ -34,7 +33,6 @@ const Login: React.FC = () => {
   const [selectedUserType, setSelectedUserType] = useState<'user' | 'sports_professional'>('user');
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
     setIsLoading(true);
     setLoginError(null);
 
@@ -84,10 +82,10 @@ const Login: React.FC = () => {
     }
   };
 
-  const [isUpdateDialogOpen, setIsUpdateDialogOpen] = useState(false);
-
   const handleUpdateProfile = () => {
-    setIsUpdateDialogOpen(true);
+    navigate("/update-professional", { 
+      state: { returnPath: "/" } 
+    });
   };
 
   // Handle Google OAuth
@@ -437,17 +435,7 @@ const Login: React.FC = () => {
               navigate("/"); // Navigate to home after closing dialog
             }}
             userId={loggedInUserId}
-            setIsUpdateDialogOpen={setIsUpdateDialogOpen}
-          />
-        )}
-
-        {/* Dialogs */}
-        {isUpdateDialogOpen && (
-          <RegisterProfessionalDialog
-            open={isUpdateDialogOpen}
-            onOpenChange={setIsUpdateDialogOpen}
-            hasExistingProfile={true}
-            isUpdate={true}
+            setIsUpdateDialogOpen={() => handleUpdateProfile()}
           />
         )}
       </div>

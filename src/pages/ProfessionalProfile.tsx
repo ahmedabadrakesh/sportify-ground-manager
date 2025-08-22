@@ -46,7 +46,6 @@ import VideoGallery from "@/components/professionals/components/VideoGallery";
 import ImageGallery from "@/components/professionals/components/ImageGallery";
 import ContactDetails from "@/components/professionals/components/ContactDetails";
 import { getCurrentUserSync, hasRoleSync } from "@/utils/auth";
-import RegisterProfessionalDialog from "@/components/professionals/RegisterProfessionalDialog";
 import AuthRequiredDialog from "@/components/auth/AuthRequiredDialog";
 import CircularProgress from "@/components/professionals/CircularProgress";
 import coachProfileImage from "@/assets/coach-profile.jpg";
@@ -1082,13 +1081,6 @@ const ProfessionalProfile = () => {
       </div>
 
       {/* Dialogs */}
-      <RegisterProfessionalDialog
-        open={isUpdateDialogOpen}
-        onOpenChange={setIsUpdateDialogOpen}
-        hasExistingProfile={true}
-        isUpdate={true}
-      />
-
       <AuthRequiredDialog
         open={isAuthDialogOpen}
         onOpenChange={setIsAuthDialogOpen}

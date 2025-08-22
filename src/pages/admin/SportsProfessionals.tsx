@@ -5,15 +5,13 @@ import { DataTable } from "@/components/ui/data-table";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Plus, Edit, Trash2 } from "lucide-react";
-import RegisterProfessionalDialog from "@/components/professionals/RegisterProfessionalDialog";
 import { ColumnDef } from "@tanstack/react-table";
 import { getCurrentUserSync, hasRoleSync } from "@/utils/auth";
 import { toast } from "sonner";
+import { useNavigate } from "react-router-dom";
 
 const AdminSportsProfessionals = () => {
-  const [isRegisterDialogOpen, setIsRegisterDialogOpen] = React.useState(false);
-  const [editingProfessional, setEditingProfessional] = React.useState<any>(null);
-
+  const navigate = useNavigate();
   const currentUser = getCurrentUserSync();
   const isSuperAdmin = hasRoleSync("super_admin");
 
@@ -30,14 +28,6 @@ const AdminSportsProfessionals = () => {
       return data || [];
     },
   });
-
-  const handleEdit = (professional: any) => {
-    if (!isSuperAdmin && professional.user_id !== currentUser?.id) {
-      toast.error("You can only edit your own profile");
-      return;
-    }
-    setEditingProfessional(professional);
-  };
 
   const handleSoftDelete = async (id: string) => {
     if (!isSuperAdmin) {
@@ -119,42 +109,30 @@ const AdminSportsProfessionals = () => {
     {
       id: "actions",
       header: "Actions",
-      cell: ({ row }) => {
-        const professional = row.original;
-        return (
-          <div className="flex items-center gap-2">
+      cell: ({ row }) => (
+        <div className="flex space-x-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => navigate(`/update-professional/${row.original.id}`, {
+              state: { returnPath: "/admin/sports-professionals" }
+            })}
+          >
+            <Edit className="h-4 w-4" />
+          </Button>
+          {isSuperAdmin && (
             <Button
-              variant="outline"
+              variant="destructive"
               size="sm"
-              onClick={() => handleEdit(professional)}
+              onClick={() => handleSoftDelete(row.original.id)}
             >
-              <Edit className="h-4 w-4" />
+              <Trash2 className="h-4 w-4" />
             </Button>
-            {isSuperAdmin && (
-              <Button
-                variant="destructive"
-                size="sm"
-                onClick={() => handleSoftDelete(professional.id)}
-              >
-                <Trash2 className="h-4 w-4" />
-              </Button>
-            )}
-          </div>
-        );
-      },
+          )}
+        </div>
+      ),
     },
   ];
-
-  if (isLoading) {
-    return (
-      <AdminLayout>
-        <div className="animate-pulse space-y-4">
-          <div className="h-8 bg-gray-200 rounded w-1/4"></div>
-          <div className="h-64 bg-gray-200 rounded"></div>
-        </div>
-      </AdminLayout>
-    );
-  }
 
   return (
     <AdminLayout>
@@ -163,7 +141,12 @@ const AdminSportsProfessionals = () => {
           <h1 className="text-2xl font-bold">Sports Professionals</h1>
           <p className="text-gray-600">Manage sports professionals and their profiles</p>
         </div>
-        <Button onClick={() => setIsRegisterDialogOpen(true)}>
+        <Button
+          onClick={() => navigate("/register-professional", { 
+            state: { returnPath: "/admin/sports-professionals" } 
+          })}
+          className="mb-4"
+        >
           <Plus className="w-4 h-4 mr-2" />
           Add Professional
         </Button>
@@ -175,21 +158,6 @@ const AdminSportsProfessionals = () => {
         searchKey="name"
         searchPlaceholder="Search professionals..."
       />
-
-      <RegisterProfessionalDialog
-        open={isRegisterDialogOpen}
-        onOpenChange={setIsRegisterDialogOpen}
-        isUpdate={false}
-      />
-
-      {editingProfessional && (
-        <RegisterProfessionalDialog
-          open={!!editingProfessional}
-          onOpenChange={() => setEditingProfessional(null)}
-          isUpdate={true}
-          professional={editingProfessional}
-        />
-      )}
     </AdminLayout>
   );
 };
