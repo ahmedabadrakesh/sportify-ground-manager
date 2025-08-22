@@ -2,19 +2,20 @@ import React from "react";
 import MainLayout from "@/components/layouts/MainLayout";
 import SEOHead from "@/components/SEOHead";
 import { useState, useEffect } from "react";
-import { useSearchParams, useNavigate } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import ProfessionalsList from "@/components/professionals/ProfessionalsList";
+import RegisterProfessionalDialog from "@/components/professionals/RegisterProfessionalDialog";
 import { getCurrentUserSync, hasRoleSync } from "@/utils/auth";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
 const SportsProfessionals = () => {
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [hasExistingProfile, setHasExistingProfile] = useState(false);
   const [checkingProfile, setCheckingProfile] = useState(true);
   const [searchParams] = useSearchParams();
-  const navigate = useNavigate();
   const sportFilter = searchParams.get("sport");
 
   const currentUser = getCurrentUserSync();
@@ -54,20 +55,11 @@ const SportsProfessionals = () => {
 
   const handleRegisterClick = () => {
     if (!currentUser) {
-      toast.error("Please log in first");
-      navigate("/login", { state: { returnPath: "/sports-professionals" } });
+      toast.error("Please login to register as a professional");
       return;
     }
 
-    if (isSuperAdmin) {
-      navigate("/register-professional", { 
-        state: { returnPath: "/sports-professionals" } 
-      });
-    } else {
-      navigate(hasExistingProfile ? "/update-professional" : "/register-professional", { 
-        state: { returnPath: "/sports-professionals" } 
-      });
-    }
+    setIsDialogOpen(true);
   };
 
   const getButtonText = () => {
@@ -141,6 +133,13 @@ const SportsProfessionals = () => {
       {/* Main Content */}
       <div className="mx-auto py-4">
         <ProfessionalsList sportFilter={sportFilter} />
+
+        <RegisterProfessionalDialog
+          open={isDialogOpen}
+          onOpenChange={setIsDialogOpen}
+          hasExistingProfile={hasExistingProfile}
+          isUpdate={isUpdateMode()}
+        />
       </div>
     </MainLayout>
   );

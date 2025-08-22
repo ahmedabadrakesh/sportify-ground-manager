@@ -37,7 +37,6 @@ import TermsOfService from "./pages/TermsOfService";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import ResetPassword from "./pages/ResetPassword";
 import ForgotPassword from "./pages/ForgotPassword";
-import RegisterProfessional from "./pages/RegisterProfessional";
 import PendingCartPopup from "./components/cart/PendingCartPopup";
 import "./App.css";
 
@@ -63,8 +62,6 @@ function App() {
         <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="/sports-professionals" element={<SportsProfessionals />} />
         <Route path="/professional/:name/:id" element={<ProfessionalProfile />} />
-        <Route path="/register-professional" element={<RegisterProfessional />} />
-        <Route path="/update-professional/:id?" element={<RegisterProfessional />} />
         <Route path="/api-documentation" element={<APIDoc />} />
         <Route path="/generate-sitemap" element={<SitemapGenerator />} />
         <Route path="/terms-of-service" element={<TermsOfService />} />

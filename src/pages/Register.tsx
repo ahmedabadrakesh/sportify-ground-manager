@@ -8,6 +8,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { toast } from "sonner";
 import { register, login } from "@/utils/auth";
 import ProfileProgressDialog from "@/components/professionals/ProfileProgressDialog";
+import RegisterProfessionalDialog from "@/components/professionals/RegisterProfessionalDialog";
 import { supabase } from "@/integrations/supabase/client";
 
 const Register: React.FC = () => {
@@ -18,11 +19,12 @@ const Register: React.FC = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [userType, setUserType] = useState<'user' | 'sports_professional'>('user');
   const [isLoading, setIsLoading] = useState(false);
+  const [isProfileProgressDialogOpen, setIsProfileProgressDialogOpen] = useState(false);
+  const [isUpdateDialogOpen, setIsUpdateDialogOpen] = useState(false);
   const [registeredUser, setRegisteredUser] = useState<any>(null);
-  const [showProgressDialog, setShowProgressDialog] = useState(false);
+  const [showUserTypeDialog, setShowUserTypeDialog] = useState(false);
   const [googleUserData, setGoogleUserData] = useState<any>(null);
   const [selectedUserType, setSelectedUserType] = useState<'user' | 'sports_professional'>('user');
-  const [showUserTypeDialog, setShowUserTypeDialog] = useState(false);
   
   // Use a ref to track if submission is in progress
   const isSubmittingRef = useRef(false);
@@ -100,9 +102,10 @@ const Register: React.FC = () => {
             
             toast.success(successMessage);
             
+            // Show profile progress dialog for sports professionals
             if (userType === 'sports_professional') {
               setRegisteredUser(loggedInUser);
-              setShowProgressDialog(true);
+              setIsProfileProgressDialogOpen(true);
             } else {
               navigate("/");
             }
@@ -259,7 +262,7 @@ const Register: React.FC = () => {
 
       if (selectedUserType === 'sports_professional') {
         setRegisteredUser(newUser);
-        setShowProgressDialog(true);
+        setIsProfileProgressDialogOpen(true);
       } else {
         navigate("/");
       }
@@ -541,17 +544,28 @@ const Register: React.FC = () => {
         {/* Profile Progress Dialog for Sports Professionals */}
         {registeredUser && (
           <ProfileProgressDialog
-            isOpen={showProgressDialog}
+            isOpen={isProfileProgressDialogOpen}
             onClose={() => {
-              setShowProgressDialog(false);
+              setIsProfileProgressDialogOpen(false);
               navigate("/sports-professionals");
             }}
             userId={registeredUser.id}
-            setIsUpdateDialogOpen={() => {
-              navigate("/register-professional", { 
-                state: { returnPath: "/register" } 
-              });
+            setIsUpdateDialogOpen={setIsUpdateDialogOpen}
+          />
+        )}
+
+        {/* Register Professional Dialog */}
+        {registeredUser && (
+          <RegisterProfessionalDialog
+            open={isUpdateDialogOpen}
+            onOpenChange={(open) => {
+              setIsUpdateDialogOpen(open);
+              if (!open) {
+                setIsProfileProgressDialogOpen(false);
+                navigate("/sports-professionals");
+              }
             }}
+            isUpdate={true}
           />
         )}
       </div>
