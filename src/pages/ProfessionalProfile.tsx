@@ -80,7 +80,8 @@ const ProfessionalProfile = () => {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("sports_professionals")
-        .select(`
+        .select(
+          `
           id, profession_type, name, fee, fee_type, address, city, comments,
           photo, user_id, created_at, updated_at, awards, accomplishments,
           certifications, training_locations, videos, images, punch_line,
@@ -92,7 +93,8 @@ const ProfessionalProfile = () => {
           specialties, education, one_on_one_price, group_session_price,
           online_price, free_demo_call, about_me, success_stories,
           training_locations_detailed, is_certified, game_ids, deleted_at
-        `)
+        `
+        )
         .eq("id", id)
         .maybeSingle();
 
@@ -100,6 +102,19 @@ const ProfessionalProfile = () => {
       return data;
     },
     enabled: !!id,
+  });
+
+  const { data: gameData } = useQuery({
+    queryKey: ["id"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("games")
+        .select("*")
+        .order("name");
+
+      if (error) throw error;
+      return data;
+    },
   });
 
   // Check if current user can edit this profile
@@ -306,6 +321,14 @@ const ProfessionalProfile = () => {
     );
   };
 
+  const findNameById = (idToFind) => {
+    let foundObject = {};
+    if (gameData) {
+      foundObject = gameData.find((item) => item.id === idToFind);
+    }
+    return foundObject ? foundObject.name : "Name not found";
+  };
+
   const structuredData = professional
     ? {
         "@context": "https://schema.org",
@@ -426,14 +449,23 @@ const ProfessionalProfile = () => {
                   )}
                 </h1>
 
-                <p className="text-lg lg:text-lg text-gray-300 mb-4">
-                  {professional.profession_type},{" "}
-                  {professional.game_ids && professional.game_ids.length > 0
-                    ? "Multi-Sport Professional"
-                    : "Sports Professional"}
+                <p className="text-sm lg:text-lg text-gray-300">
+                  {professional.profession_type},{" Sports Professional"}
                 </p>
+                <>
+                  {professional.game_ids.map((gameId) => {
+                    return (
+                      <Badge
+                        variant="secondary"
+                        className="text-sm bg-gray-100 text-gray-700 border-0 mt-2 mb-4 mr-2"
+                      >
+                        {findNameById(gameId)}
+                      </Badge>
+                    );
+                  })}
+                </>
 
-                <div className="block md:hidden grid grid-cols-2 md:grid-cols-4 gap-4 text-centers mb-6">
+                <div className="block md:hidden grid grid-cols-2 md:grid-cols-5 gap-4 text-centers mb-6">
                   <div className="bg-muted rounded-lg p-4">
                     <div className="text-2xl font-bold text-primary">
                       {professional.years_of_experience}+
@@ -829,8 +861,8 @@ const ProfessionalProfile = () => {
                   <CardTitle className="flex items-center justify-between text-left">
                     Contact Information
                     {isAuthenticated && (
-                      <Eye 
-                        className="w-5 h-5 text-primary cursor-pointer hover:text-primary/80" 
+                      <Eye
+                        className="w-5 h-5 text-primary cursor-pointer hover:text-primary/80"
                         onClick={handleContactClick}
                       />
                     )}
@@ -858,7 +890,7 @@ const ProfessionalProfile = () => {
                       </div>
                       <div>
                         <p className="text-sm">
-                          {maskEmail("contact@professional.com")}
+                          {maskEmail("xxxxxx@xxxxxx.com")}
                         </p>
                       </div>
                     </div>

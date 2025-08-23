@@ -37,7 +37,7 @@ const ProfessionalCard = ({
     return `${baseClients}+ Clients`;
   };
 
-  const handleContactClick = (type: 'phone' | 'email') => {
+  const handleContactClick = (type: "phone" | "email") => {
     if (!isAuthenticated) {
       onLoginClick?.();
       return;
@@ -139,7 +139,6 @@ const ProfessionalCard = ({
             <span className="text-sm text-gray-600">{professional.city}</span>
           </div>
         )}
-
         {/* Description */}
         {professional.comments && (
           <p className="text-sm text-gray-600 mb-2 text-left line-clamp-2">
@@ -155,7 +154,7 @@ const ProfessionalCard = ({
             onClick={(e) => {
               e.preventDefault();
               e.stopPropagation();
-              handleContactClick('phone');
+              handleContactClick("phone");
             }}
             className="p-1.5 rounded hover:bg-gray-100 transition-colors"
             title={isAuthenticated ? "View Phone" : "Login to view phone"}
@@ -166,7 +165,7 @@ const ProfessionalCard = ({
             onClick={(e) => {
               e.preventDefault();
               e.stopPropagation();
-              handleContactClick('email');
+              handleContactClick("email");
             }}
             className="p-1.5 rounded hover:bg-gray-100 transition-colors"
             title={isAuthenticated ? "View Email" : "Login to view email"}
@@ -181,7 +180,13 @@ const ProfessionalCard = ({
           </button>
         </div>
 
-        <Link to={`/professional/${professional.name ? professional.name.toLowerCase().replace(/\s+/g, '-') : 'unknown'}/${professional.id}`}>
+        <Link
+          to={`/professional/${
+            professional.name
+              ? professional.name.toLowerCase().replace(/\s+/g, "-")
+              : "unknown"
+          }/${professional.id}`}
+        >
           <Button
             variant="default"
             size="sm"
