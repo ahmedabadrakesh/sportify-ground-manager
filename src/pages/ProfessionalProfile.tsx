@@ -45,6 +45,7 @@ import {
 import VideoGallery from "@/components/professionals/components/VideoGallery";
 import ImageGallery from "@/components/professionals/components/ImageGallery";
 import ContactDetails from "@/components/professionals/components/ContactDetails";
+import ContactDetailsPopup from "@/components/professionals/ContactDetailsPopup";
 import { getCurrentUserSync, hasRoleSync } from "@/utils/auth";
 import RegisterProfessionalDialog from "@/components/professionals/RegisterProfessionalDialog";
 import AuthRequiredDialog from "@/components/auth/AuthRequiredDialog";
@@ -66,6 +67,7 @@ const ProfessionalProfile = () => {
   const [isAboutReadMoreOpened, setisAboutReadMoreOpened] =
     useState<boolean>(false);
   const [showContactDetails, setShowContactDetails] = useState<boolean>(false);
+  const [contactPopupOpen, setContactPopupOpen] = useState<boolean>(false);
   const [isUpdateDialogOpen, setIsUpdateDialogOpen] = useState(false);
   const [isAuthDialogOpen, setIsAuthDialogOpen] = useState(false);
 
@@ -117,7 +119,7 @@ const ProfessionalProfile = () => {
       setIsAuthDialogOpen(true);
       return;
     }
-    setShowContactDetails(!showContactDetails);
+    setContactPopupOpen(true);
   };
 
   const handleUpdateProfile = () => {
@@ -831,8 +833,14 @@ const ProfessionalProfile = () => {
               {/* Contact Information */}
               <Card className="bg-white top-8">
                 <CardHeader>
-                  <CardTitle className="text-left">
+                  <CardTitle className="flex items-center justify-between text-left">
                     Contact Information
+                    {isAuthenticated && (
+                      <Eye 
+                        className="w-5 h-5 text-primary cursor-pointer hover:text-primary/80" 
+                        onClick={handleContactClick}
+                      />
+                    )}
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
@@ -842,13 +850,8 @@ const ProfessionalProfile = () => {
                         <Phone className="w-4 h-4 fill-white stroke-black text-accent" />
                       </div>
                       <div>
-                        <p
-                          className="cursor-pointer text-sm text-left"
-                          onClick={handleContactClick}
-                        >
-                          {showContactDetails
-                            ? professional.contact_number
-                            : maskPhone(professional.contact_number)}
+                        <p className="text-sm text-left">
+                          {maskPhone(professional.contact_number)}
                         </p>
                         <p className="text-xs text-muted-foreground">
                           WhatsApp Available
@@ -861,13 +864,8 @@ const ProfessionalProfile = () => {
                         <Mail className="w-4 h-4 fill-white stroke-black text-accent" />
                       </div>
                       <div>
-                        <p
-                          className="cursor-pointer text-sm"
-                          onClick={handleContactClick}
-                        >
-                          {showContactDetails
-                            ? professionalUser?.email
-                            : maskEmail(professionalUser?.email || "")}
+                        <p className="text-sm">
+                          {maskEmail(professionalUser?.email || "")}
                         </p>
                       </div>
                     </div>
@@ -916,8 +914,16 @@ const ProfessionalProfile = () => {
                     <Button
                       className="w-full bg-slate-800 hover:bg-slate-700"
                       onClick={handleContactClick}
+                      disabled={!isAuthenticated}
                     >
-                      Contact Me
+                      {isAuthenticated ? (
+                        <>
+                          <Eye className="w-4 h-4 mr-2" />
+                          View Contact Details
+                        </>
+                      ) : (
+                        "Login to Contact"
+                      )}
                     </Button>
                   </div>
                 </CardContent>
@@ -1094,6 +1100,13 @@ const ProfessionalProfile = () => {
         onOpenChange={setIsAuthDialogOpen}
         title="Login Required"
         description="Please login or register to view contact details and access all features."
+      />
+
+      <ContactDetailsPopup
+        open={contactPopupOpen}
+        onOpenChange={setContactPopupOpen}
+        professionalId={professional?.id || ""}
+        professionalName={professional?.name || "Professional"}
       />
     </MainLayout>
   );
