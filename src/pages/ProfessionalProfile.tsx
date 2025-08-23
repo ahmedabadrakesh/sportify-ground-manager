@@ -80,7 +80,19 @@ const ProfessionalProfile = () => {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("sports_professionals")
-        .select("*")
+        .select(`
+          id, profession_type, name, fee, fee_type, address, city, comments,
+          photo, user_id, created_at, updated_at, awards, accomplishments,
+          certifications, training_locations, videos, images, punch_line,
+          instagram_link, facebook_link, linkedin_link, website, level,
+          coaching_availability, youtube_link, years_of_experience,
+          total_match_played, academy_name, whatsapp, whatsapp_same_as_phone,
+          district_level_tournaments, state_level_tournaments,
+          national_level_tournaments, international_level_tournaments,
+          specialties, education, one_on_one_price, group_session_price,
+          online_price, free_demo_call, about_me, success_stories,
+          training_locations_detailed, is_certified, game_ids, deleted_at
+        `)
         .eq("id", id)
         .maybeSingle();
 
@@ -88,24 +100,6 @@ const ProfessionalProfile = () => {
       return data;
     },
     enabled: !!id,
-  });
-
-  // Fetch professional's email from users table
-  const { data: professionalUser } = useQuery({
-    queryKey: ["professional-user", professional?.user_id],
-    queryFn: async () => {
-      if (!professional?.user_id) return null;
-
-      const { data, error } = await supabase
-        .from("users")
-        .select("email")
-        .eq("id", professional.user_id)
-        .maybeSingle();
-
-      if (error) throw error;
-      return data;
-    },
-    enabled: !!professional?.user_id,
   });
 
   // Check if current user can edit this profile
@@ -326,7 +320,6 @@ const ProfessionalProfile = () => {
         },
         contactPoint: {
           "@type": "ContactPoint",
-          telephone: professional.contact_number,
           contactType: "customer service",
         },
         sameAs: [
@@ -851,7 +844,7 @@ const ProfessionalProfile = () => {
                       </div>
                       <div>
                         <p className="text-sm text-left">
-                          {maskPhone(professional.contact_number)}
+                          {maskPhone("**********")}
                         </p>
                         <p className="text-xs text-muted-foreground">
                           WhatsApp Available
@@ -865,7 +858,7 @@ const ProfessionalProfile = () => {
                       </div>
                       <div>
                         <p className="text-sm">
-                          {maskEmail(professionalUser?.email || "")}
+                          {maskEmail("contact@professional.com")}
                         </p>
                       </div>
                     </div>
