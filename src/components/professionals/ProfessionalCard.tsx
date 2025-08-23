@@ -1,10 +1,11 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { MapPin, Phone, Mail, Camera, Target, BadgeCheck } from "lucide-react";
 import { getCurrentUserSync } from "@/utils/auth";
+import ContactDetailsPopup from "./ContactDetailsPopup";
 
 const ProfessionalCard = ({
   professional,
@@ -15,6 +16,7 @@ const ProfessionalCard = ({
 }) => {
   const currentUser = getCurrentUserSync();
   const isAuthenticated = !!currentUser;
+  const [contactPopupOpen, setContactPopupOpen] = useState(false);
 
   // Extract years of experience from comments or use a default
   const getExperience = () => {
@@ -33,6 +35,14 @@ const ProfessionalCard = ({
     const experience = parseInt(getExperience()) || 1;
     const baseClients = Math.floor(experience * 50 + Math.random() * 200);
     return `${baseClients}+ Clients`;
+  };
+
+  const handleContactClick = (type: 'phone' | 'email') => {
+    if (!isAuthenticated) {
+      onLoginClick?.();
+      return;
+    }
+    setContactPopupOpen(true);
   };
 
   return (
@@ -145,16 +155,21 @@ const ProfessionalCard = ({
             onClick={(e) => {
               e.preventDefault();
               e.stopPropagation();
-              if (!isAuthenticated) onLoginClick?.();
+              handleContactClick('phone');
             }}
             className="p-1.5 rounded hover:bg-gray-100 transition-colors"
-            title="Phone"
+            title={isAuthenticated ? "View Phone" : "Login to view phone"}
           >
             📞
           </button>
           <button
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              handleContactClick('email');
+            }}
             className="p-1.5 rounded hover:bg-gray-100 transition-colors"
-            title="Email"
+            title={isAuthenticated ? "View Email" : "Login to view email"}
           >
             ✉️
           </button>
@@ -176,6 +191,13 @@ const ProfessionalCard = ({
           </Button>
         </Link>
       </div>
+
+      <ContactDetailsPopup
+        open={contactPopupOpen}
+        onOpenChange={setContactPopupOpen}
+        professionalId={professional.id}
+        professionalName={professional.name}
+      />
     </Card>
   );
 };

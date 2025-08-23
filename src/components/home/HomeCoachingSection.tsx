@@ -80,7 +80,7 @@ const HomeCoachingSection = () => {
               </div>
             </div>
 
-            <Button variant="hero" size="lg">
+            <Button variant="default" size="lg">
               Start Home Coaching
             </Button>
           </div>
