@@ -4,7 +4,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
 import { toast } from "sonner";
 import { register, login } from "@/utils/auth";
 import ProfileProgressDialog from "@/components/professionals/ProfileProgressDialog";
@@ -17,26 +23,42 @@ const Register: React.FC = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [userType, setUserType] = useState<'user' | 'sports_professional'>('user');
+  const [userType, setUserType] = useState<"user" | "sports_professional">(
+    "user"
+  );
   const [isLoading, setIsLoading] = useState(false);
-  const [isProfileProgressDialogOpen, setIsProfileProgressDialogOpen] = useState(false);
+  const [isProfileProgressDialogOpen, setIsProfileProgressDialogOpen] =
+    useState(false);
   const [isUpdateDialogOpen, setIsUpdateDialogOpen] = useState(false);
   const [registeredUser, setRegisteredUser] = useState<any>(null);
   const [showUserTypeDialog, setShowUserTypeDialog] = useState(false);
   const [googleUserData, setGoogleUserData] = useState<any>(null);
-  const [selectedUserType, setSelectedUserType] = useState<'user' | 'sports_professional'>('user');
-  
+  const [selectedUserType, setSelectedUserType] = useState<
+    "user" | "sports_professional"
+  >("user");
+
   // Use a ref to track if submission is in progress
   const isSubmittingRef = useRef(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    
+
     console.log("Form submission triggered");
-    console.log("Current form state:", { name, email, password, confirmPassword, userType });
-    console.log("isLoading:", isLoading, "isSubmittingRef.current:", isSubmittingRef.current);
-    
+    console.log("Current form state:", {
+      name,
+      email,
+      password,
+      confirmPassword,
+      userType,
+    });
+    console.log(
+      "isLoading:",
+      isLoading,
+      "isSubmittingRef.current:",
+      isSubmittingRef.current
+    );
+
     // Prevent multiple submissions using ref (more reliable than state)
     if (isLoading || isSubmittingRef.current) {
       console.log("Registration already in progress, ignoring submission");
@@ -71,39 +93,34 @@ const Register: React.FC = () => {
         }
       }
 
-      console.log("Starting registration with:", { 
-        name, 
-        email, 
-        userType 
+      console.log("Starting registration with:", {
+        name,
+        email,
+        userType,
       });
-      
-      const user = await register(
-        name, 
-        email, 
-        "", 
-        password,
-        userType
-      );
-      
+
+      const user = await register(name, email, "", password, userType);
+
       console.log("Registration result:", user);
-      
+
       if (user) {
         console.log("Registration successful, user:", user);
-        
+
         // Auto-login the user after successful registration
         try {
           const loginIdentifier = email;
           const loggedInUser = await login(loginIdentifier, password);
-          
+
           if (loggedInUser) {
-            const successMessage = userType === 'sports_professional' 
-              ? "Registration successful! Your sports professional profile has been created. Welcome to SportifyGround!"
-              : "Registration successful! Welcome to SportifyGround!";
-            
+            const successMessage =
+              userType === "sports_professional"
+                ? "Registration successful! Your sports professional profile has been created. Welcome to SportifyGround!"
+                : "Registration successful! Welcome to SportifyGround!";
+
             toast.success(successMessage);
-            
+
             // Show profile progress dialog for sports professionals
-            if (userType === 'sports_professional') {
+            if (userType === "sports_professional") {
               setRegisteredUser(loggedInUser);
               setIsProfileProgressDialogOpen(true);
             } else {
@@ -123,22 +140,37 @@ const Register: React.FC = () => {
       }
     } catch (error: any) {
       console.error("Registration error:", error);
-      
+
       // Handle specific error messages
       if (error.message?.includes("User already registered")) {
-        toast.error("This email is already registered. Please use a different email or try logging in.");
+        toast.error(
+          "This email is already registered. Please use a different email or try logging in."
+        );
       } else if (error.message?.includes("email_address_invalid")) {
         toast.error("Please enter a valid email address.");
       } else if (error.message?.includes("password")) {
         toast.error("Password must be at least 6 characters long.");
       } else if (error.message?.includes("phone_provider_disabled")) {
-        toast.error("Phone number registration is currently disabled. Please use email instead.");
-      } else if (error.message?.includes("rate limit") || error.status === 429 || error.code === "over_email_send_rate_limit") {
-        toast.error("Too many registration attempts. Please wait a few minutes before trying again.");
+        toast.error(
+          "Phone number registration is currently disabled. Please use email instead."
+        );
+      } else if (
+        error.message?.includes("rate limit") ||
+        error.status === 429 ||
+        error.code === "over_email_send_rate_limit"
+      ) {
+        toast.error(
+          "Too many registration attempts. Please wait a few minutes before trying again."
+        );
       } else if (error.message?.includes("No games available")) {
-        toast.error("Sports professional registration is temporarily unavailable. Please contact support.");
+        toast.error(
+          "Sports professional registration is temporarily unavailable. Please contact support."
+        );
       } else {
-        toast.error(error.message || "Registration failed. Please check your details and try again.");
+        toast.error(
+          error.message ||
+            "Registration failed. Please check your details and try again."
+        );
       }
     } finally {
       console.log("Registration process completed, resetting loading state");
@@ -150,44 +182,48 @@ const Register: React.FC = () => {
   // Handle Google OAuth
   const handleGoogleLogin = async () => {
     try {
-      console.log('Starting Google OAuth flow...');
-      console.log('Redirect URL:', `${window.location.origin}/register`);
-      
+      console.log("Starting Google OAuth flow...");
+      console.log("Redirect URL:", `${window.location.origin}/register`);
+
       const { data, error } = await supabase.auth.signInWithOAuth({
-        provider: 'google',
+        provider: "google",
         options: {
-          redirectTo: `${window.location.origin}/register`
-        }
+          redirectTo: `${window.location.origin}/register`,
+        },
       });
-      
-      console.log('Google OAuth response:', { data, error });
-      
+
+      console.log("Google OAuth response:", { data, error });
+
       if (error) {
-        console.error('Google OAuth error details:', error);
+        console.error("Google OAuth error details:", error);
         toast.error(`Google registration failed: ${error.message}`);
       }
     } catch (error: any) {
-      console.error('Google login error:', error);
-      toast.error(`Google registration failed: ${error.message || 'Unknown error'}`);
+      console.error("Google login error:", error);
+      toast.error(
+        `Google registration failed: ${error.message || "Unknown error"}`
+      );
     }
   };
 
   // Handle the OAuth callback and user type selection
   useEffect(() => {
     const handleAuthChange = async (event: any, session: any) => {
-      if (event === 'SIGNED_IN' && session?.user) {
+      if (event === "SIGNED_IN" && session?.user) {
         try {
           // Check if user already exists in our database
           const { data: existingUser, error } = await supabase
-            .from('users')
-            .select('*')
-            .eq('auth_id', session.user.id)
+            .from("users")
+            .select("*")
+            .eq("auth_id", session.user.id)
             .single();
 
           if (existingUser && !error) {
             // User exists, redirect to login
-            localStorage.setItem('currentUser', JSON.stringify(existingUser));
-            toast.success(`Welcome back, ${existingUser.name}! Redirecting to home...`);
+            localStorage.setItem("currentUser", JSON.stringify(existingUser));
+            toast.success(
+              `Welcome back, ${existingUser.name}! Redirecting to home...`
+            );
             navigate("/");
           } else {
             // New user, show user type selection
@@ -195,80 +231,85 @@ const Register: React.FC = () => {
             setShowUserTypeDialog(true);
           }
         } catch (error) {
-          console.error('Error handling Google auth:', error);
-          toast.error('Authentication error. Please try again.');
+          console.error("Error handling Google auth:", error);
+          toast.error("Authentication error. Please try again.");
         }
       }
     };
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(handleAuthChange);
-    
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange(handleAuthChange);
+
     return () => subscription.unsubscribe();
   }, [navigate]);
 
   const handleUserTypeSelection = async () => {
     if (!googleUserData) return;
-    
+
     try {
       const userData = {
         auth_id: googleUserData.id,
-        name: googleUserData.user_metadata?.full_name || googleUserData.email?.split('@')[0] || 'User',
+        name:
+          googleUserData.user_metadata?.full_name ||
+          googleUserData.email?.split("@")[0] ||
+          "User",
         email: googleUserData.email,
         phone: googleUserData.phone || null,
-        role: selectedUserType
+        role: selectedUserType,
       };
 
       const { data: newUser, error } = await supabase
-        .from('users')
+        .from("users")
         .insert([userData])
         .select()
         .single();
 
       if (error) {
-        console.error('Error creating user:', error);
-        toast.error('Failed to create user profile. Please try again.');
+        console.error("Error creating user:", error);
+        toast.error("Failed to create user profile. Please try again.");
         return;
       }
 
       // Create sports professional entry if needed
-      if (selectedUserType === 'sports_professional') {
+      if (selectedUserType === "sports_professional") {
         // Get first available game
         const { data: games } = await supabase
-          .from('games')
-          .select('id')
+          .from("games")
+          .select("id")
           .limit(1)
           .single();
 
         if (games) {
-          await supabase
-            .from('sports_professionals')
-            .insert([{
+          await supabase.from("sports_professionals").insert([
+            {
               user_id: newUser.id,
               name: userData.name,
-              profession_type: 'Coach',
+              profession_type: "Coach",
               game_ids: [games.id],
-              contact_number: googleUserData.phone || '',
+              contact_number: googleUserData.phone || "",
               fee: 0,
-              fee_type: 'Per Hour',
-              address: '',
-              city: ''
-            }]);
+              fee_type: "Per Hour",
+              address: "",
+              city: "",
+            },
+          ]);
         }
       }
 
-      localStorage.setItem('currentUser', JSON.stringify(newUser));
+      localStorage.setItem("currentUser", JSON.stringify(newUser));
       toast.success(`Welcome to SportifyGround, ${newUser.name}!`);
       setShowUserTypeDialog(false);
 
-      if (selectedUserType === 'sports_professional') {
+      if (selectedUserType === "sports_professional") {
         setRegisteredUser(newUser);
         setIsProfileProgressDialogOpen(true);
       } else {
         navigate("/");
       }
     } catch (error) {
-      console.error('Error creating user profile:', error);
-      toast.error('Failed to complete registration. Please try again.');
+      console.error("Error creating user profile:", error);
+      toast.error("Failed to complete registration. Please try again.");
     }
   };
 
@@ -282,7 +323,9 @@ const Register: React.FC = () => {
               SportifyGround
             </h1>
           </Link>
-          <p className="text-muted-foreground mt-2">Join the ultimate sports community</p>
+          <p className="text-muted-foreground mt-2">
+            Join the ultimate sports community
+          </p>
         </div>
 
         {/* Main Container */}
@@ -293,27 +336,36 @@ const Register: React.FC = () => {
               <div>
                 <h2 className="text-3xl font-bold mb-4">Join SportifyGround</h2>
                 <p className="text-white/90 text-lg leading-relaxed">
-                  Create your account to unlock access to premium sports facilities, 
-                  connect with professional coaches, and manage your sporting journey.
+                  Create your account to unlock access to premium sports
+                  facilities, connect with professional coaches, and manage your
+                  sporting journey.
                 </p>
               </div>
-              
+
               <div className="space-y-4">
                 <div className="flex items-center space-x-3">
                   <div className="w-2 h-2 bg-white rounded-full"></div>
-                  <span className="text-white/90">Access to 100+ premium facilities</span>
+                  <span className="text-white/90">
+                    Access to 100+ premium facilities
+                  </span>
                 </div>
                 <div className="flex items-center space-x-3">
                   <div className="w-2 h-2 bg-white rounded-full"></div>
-                  <span className="text-white/90">Connect with certified professionals</span>
+                  <span className="text-white/90">
+                    Connect with certified professionals
+                  </span>
                 </div>
                 <div className="flex items-center space-x-3">
                   <div className="w-2 h-2 bg-white rounded-full"></div>
-                  <span className="text-white/90">Real-time booking & scheduling</span>
+                  <span className="text-white/90">
+                    Real-time booking & scheduling
+                  </span>
                 </div>
                 <div className="flex items-center space-x-3">
                   <div className="w-2 h-2 bg-white rounded-full"></div>
-                  <span className="text-white/90">Join sports events & tournaments</span>
+                  <span className="text-white/90">
+                    Join sports events & tournaments
+                  </span>
                 </div>
               </div>
 
@@ -324,8 +376,9 @@ const Register: React.FC = () => {
                   Quick Registration Tip
                 </h3>
                 <p className="text-sm text-white/90">
-                  Choose "Sports Professional" if you're a coach, trainer, or instructor looking to 
-                  offer your services. You can always update your profile later!
+                  Choose "Sports Professional" if you're a coach, trainer, or
+                  instructor looking to offer your services. You can always
+                  update your profile later!
                 </p>
               </div>
             </div>
@@ -334,122 +387,19 @@ const Register: React.FC = () => {
             <div className="bg-white p-12 flex flex-col justify-center">
               <div className="max-w-md mx-auto w-full">
                 <div className="mb-8">
-                  <h3 className="text-2xl font-bold text-foreground mb-2">Create Account</h3>
-                  <p className="text-muted-foreground">Register to start your sports journey</p>
+                  <h3 className="text-2xl font-bold text-foreground mb-2">
+                    Create Account
+                  </h3>
+                  <p className="text-muted-foreground">
+                    Register to start your sports journey
+                  </p>
                 </div>
 
                 <form onSubmit={handleSubmit} className="space-y-6">
-                  <div className="space-y-2">
-                    <Label htmlFor="name" className="text-sm font-medium">Full Name</Label>
-                    <Input
-                      id="name"
-                      placeholder="Enter your full name"
-                      value={name}
-                      onChange={(e) => setName(e.target.value)}
-                      disabled={isLoading}
-                      className="h-12"
-                      required
-                    />
-                  </div>
-
-                  <div className="space-y-3">
-                    <Label className="text-sm font-medium">Account Type</Label>
-                    <RadioGroup 
-                      value={userType} 
-                      onValueChange={(value: 'user' | 'sports_professional') => setUserType(value)}
-                      disabled={isLoading}
-                      className="grid grid-cols-1 gap-3"
-                    >
-                      <div className="flex items-center space-x-3 p-3 border rounded-lg hover:bg-accent/5">
-                        <RadioGroupItem value="user" id="user" />
-                        <Label htmlFor="user" className="font-normal cursor-pointer">Regular User - Book grounds & events</Label>
-                      </div>
-                      <div className="flex items-center space-x-3 p-3 border rounded-lg hover:bg-accent/5">
-                        <RadioGroupItem value="sports_professional" id="sports_professional" />
-                        <Label htmlFor="sports_professional" className="font-normal cursor-pointer">Sports Professional - Offer services</Label>
-                      </div>
-                    </RadioGroup>
-                    {userType === 'sports_professional' && (
-                      <p className="text-xs text-primary/70 bg-primary/5 p-2 rounded">
-                        A basic profile will be created for you to get started quickly.
-                      </p>
-                    )}
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="email" className="text-sm font-medium">Email Address</Label>
-                    <Input
-                      id="email"
-                      type="email"
-                      placeholder="you@example.com"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      disabled={isLoading}
-                      className="h-12"
-                      required
-                    />
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <Label htmlFor="password" className="text-sm font-medium">Password</Label>
-                    <Input
-                      id="password"
-                      type="password"
-                      placeholder="Create a strong password"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      disabled={isLoading}
-                      className="h-12"
-                      required
-                    />
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <Label htmlFor="confirm-password" className="text-sm font-medium">Confirm Password</Label>
-                    <Input
-                      id="confirm-password"
-                      type="password"
-                      placeholder="Confirm your password"
-                      value={confirmPassword}
-                      onChange={(e) => setConfirmPassword(e.target.value)}
-                      disabled={isLoading}
-                      className="h-12"
-                      required
-                    />
-                  </div>
-                  
-                  <div className="text-xs text-muted-foreground bg-muted/30 p-3 rounded-lg">
-                    By creating an account, you agree to our{" "}
-                    <Link to="/terms" className="text-primary hover:text-primary/80 font-medium">
-                      Terms of Service
-                    </Link>{" "}
-                    and{" "}
-                    <Link to="/privacy" className="text-primary hover:text-primary/80 font-medium">
-                      Privacy Policy
-                    </Link>
-                  </div>
-                  
-                  <Button 
-                    type="submit" 
-                    className="w-full h-12 text-base font-medium" 
-                    disabled={isLoading}
-                  >
-                    {isLoading ? "Creating account..." : "Create Account"}
-                  </Button>
-
-                  <div className="relative">
-                    <div className="absolute inset-0 flex items-center">
-                      <span className="w-full border-t border-border" />
-                    </div>
-                    <div className="relative flex justify-center text-xs uppercase">
-                      <span className="bg-white px-4 text-muted-foreground font-medium">Or continue with</span>
-                    </div>
-                  </div>
-
-                  <Button 
-                    type="button" 
-                    variant="outline" 
-                    className="w-full h-12" 
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="w-full h-12"
                     onClick={handleGoogleLogin}
                     disabled={isLoading}
                   >
@@ -468,7 +418,149 @@ const Register: React.FC = () => {
                         d="M488 261.8C488 403.3 391.1 504 248 504 110.8 504 0 393.2 0 256S110.8 8 248 8c66.8 0 123 24.5 166.3 64.9l-67.5 64.9C258.5 52.6 94.3 116.6 94.3 256c0 86.5 69.1 156.6 153.7 156.6 98.2 0 135-70.4 140.8-106.9H248v-85.3h240z"
                       />
                     </svg>
-                    Continue with Google
+                    Register with Google
+                  </Button>
+
+                  <div className="relative">
+                    <div className="absolute inset-0 flex items-center">
+                      <span className="w-full border-t border-primary-700 border-border" />
+                    </div>
+                    <div className="relative flex justify-center text-xs uppercase">
+                      <span className="bg-white px-4 text-muted-foreground font-medium">
+                        Or continue with
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="name" className="text-sm font-medium">
+                      Full Name
+                    </Label>
+                    <Input
+                      id="name"
+                      placeholder="Enter your full name"
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                      disabled={isLoading}
+                      className="h-12"
+                      required
+                    />
+                  </div>
+
+                  <div className="space-y-3">
+                    <Label className="text-sm font-medium">Account Type</Label>
+                    <RadioGroup
+                      value={userType}
+                      onValueChange={(value: "user" | "sports_professional") =>
+                        setUserType(value)
+                      }
+                      disabled={isLoading}
+                      className="grid grid-cols-1 gap-3"
+                    >
+                      <div className="flex items-center space-x-3 p-3 border rounded-lg hover:bg-accent/5">
+                        <RadioGroupItem value="user" id="user" />
+                        <Label
+                          htmlFor="user"
+                          className="font-normal cursor-pointer"
+                        >
+                          Regular User - Book grounds & events
+                        </Label>
+                      </div>
+                      <div className="flex items-center space-x-3 p-3 border rounded-lg hover:bg-accent/5">
+                        <RadioGroupItem
+                          value="sports_professional"
+                          id="sports_professional"
+                        />
+                        <Label
+                          htmlFor="sports_professional"
+                          className="font-normal cursor-pointer"
+                        >
+                          Sports Professional - Offer services
+                        </Label>
+                      </div>
+                    </RadioGroup>
+                    {userType === "sports_professional" && (
+                      <p className="text-xs text-primary/70 bg-primary/5 p-2 rounded">
+                        A basic profile will be created for you to get started
+                        quickly.
+                      </p>
+                    )}
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="email" className="text-sm font-medium">
+                      Email Address
+                    </Label>
+                    <Input
+                      id="email"
+                      type="email"
+                      placeholder="you@example.com"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      disabled={isLoading}
+                      className="h-12"
+                      required
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="password" className="text-sm font-medium">
+                      Password
+                    </Label>
+                    <Input
+                      id="password"
+                      type="password"
+                      placeholder="Create a strong password"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      disabled={isLoading}
+                      className="h-12"
+                      required
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label
+                      htmlFor="confirm-password"
+                      className="text-sm font-medium"
+                    >
+                      Confirm Password
+                    </Label>
+                    <Input
+                      id="confirm-password"
+                      type="password"
+                      placeholder="Confirm your password"
+                      value={confirmPassword}
+                      onChange={(e) => setConfirmPassword(e.target.value)}
+                      disabled={isLoading}
+                      className="h-12"
+                      required
+                    />
+                  </div>
+
+                  <div className="text-xs text-muted-foreground bg-muted/30 p-3 rounded-lg">
+                    By creating an account, you agree to our{" "}
+                    <Link
+                      to="/terms"
+                      className="text-primary hover:text-primary/80 font-medium"
+                    >
+                      Terms of Service
+                    </Link>{" "}
+                    and{" "}
+                    <Link
+                      to="/privacy"
+                      className="text-primary hover:text-primary/80 font-medium"
+                    >
+                      Privacy Policy
+                    </Link>
+                  </div>
+
+                  <Button
+                    type="submit"
+                    className="w-full h-12 text-base font-medium"
+                    disabled={isLoading}
+                  >
+                    {isLoading ? "Creating account..." : "Create Account"}
                   </Button>
                 </form>
 
@@ -492,7 +584,7 @@ const Register: React.FC = () => {
                       Reset it here
                     </Link>
                   </p>
-                  
+
                   <Button
                     variant="ghost"
                     className="text-sm"
@@ -512,26 +604,35 @@ const Register: React.FC = () => {
             <DialogHeader>
               <DialogTitle>Select Account Type</DialogTitle>
               <DialogDescription>
-                Please select whether you're a regular user or a sports professional.
+                Please select whether you're a regular user or a sports
+                professional.
               </DialogDescription>
             </DialogHeader>
             <div className="space-y-4">
-              <RadioGroup 
-                value={selectedUserType} 
-                onValueChange={(value: 'user' | 'sports_professional') => setSelectedUserType(value)}
+              <RadioGroup
+                value={selectedUserType}
+                onValueChange={(value: "user" | "sports_professional") =>
+                  setSelectedUserType(value)
+                }
               >
                 <div className="flex items-center space-x-2">
                   <RadioGroupItem value="user" id="user-register-type" />
                   <Label htmlFor="user-register-type">Regular User</Label>
                 </div>
                 <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="sports_professional" id="professional-register-type" />
-                  <Label htmlFor="professional-register-type">Sports Professional</Label>
+                  <RadioGroupItem
+                    value="sports_professional"
+                    id="professional-register-type"
+                  />
+                  <Label htmlFor="professional-register-type">
+                    Sports Professional
+                  </Label>
                 </div>
               </RadioGroup>
-              {selectedUserType === 'sports_professional' && (
+              {selectedUserType === "sports_professional" && (
                 <p className="text-xs text-blue-600">
-                  A basic sports professional profile will be created for you, which you can update later.
+                  A basic sports professional profile will be created for you,
+                  which you can update later.
                 </p>
               )}
               <Button onClick={handleUserTypeSelection} className="w-full">
