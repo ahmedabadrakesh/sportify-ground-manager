@@ -3,9 +3,20 @@ import { Link } from "react-router-dom";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { MapPin, Phone, Mail, Camera, Target, BadgeCheck } from "lucide-react";
+import {
+  MapPin,
+  Phone,
+  Mail,
+  Camera,
+  Target,
+  BadgeCheck,
+  Volleyball,
+} from "lucide-react";
 import { getCurrentUserSync } from "@/utils/auth";
 import ContactDetailsPopup from "./ContactDetailsPopup";
+import { findNameById } from "@/lib/utils";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 
 const ProfessionalCard = ({
   professional,
@@ -17,6 +28,19 @@ const ProfessionalCard = ({
   const currentUser = getCurrentUserSync();
   const isAuthenticated = !!currentUser;
   const [contactPopupOpen, setContactPopupOpen] = useState(false);
+
+  const { data: gameData } = useQuery({
+    queryKey: ["id"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("games")
+        .select("*")
+        .order("name");
+
+      if (error) throw error;
+      return data;
+    },
+  });
 
   // Extract years of experience from comments or use a default
   const getExperience = () => {
@@ -114,6 +138,26 @@ const ProfessionalCard = ({
               Certified
             </Badge>
           )}
+        </div>
+
+        <div className="mb-4 mt-4">
+          <div className="flex items-center gap-2 mb-2">
+            <Volleyball className="h-4 w-4 text-gray-500" />
+            <span className="text-xs font-semibold text-gray-700">Sports</span>
+          </div>
+          <div className="flex items-center gap-2 mb-2 mt-2">
+            {professional.game_ids &&
+              professional.game_ids.map((gameId) => {
+                return (
+                  <Badge
+                    variant="secondary"
+                    className="text-xs   bg-gray-100 text-gray-700 border-0"
+                  >
+                    {findNameById(gameData, gameId)}
+                  </Badge>
+                );
+              })}
+          </div>
         </div>
 
         {/* Specialties */}

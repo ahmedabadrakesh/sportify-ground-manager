@@ -15,3 +15,11 @@ export const toTitleCase = (str) => {
     text => text.charAt(0).toUpperCase() + text.substring(1).toLowerCase()
   );
 }
+
+export   const findNameById = (gameData, idToFind) => {
+    let foundObject = {};
+    if (gameData) {
+      foundObject = gameData.find((item) => item.id === idToFind);
+    }
+    return foundObject ? foundObject.name : "Name not found";
+  };

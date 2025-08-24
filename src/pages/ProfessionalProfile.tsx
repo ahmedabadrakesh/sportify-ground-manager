@@ -51,7 +51,7 @@ import RegisterProfessionalDialog from "@/components/professionals/RegisterProfe
 import AuthRequiredDialog from "@/components/auth/AuthRequiredDialog";
 import CircularProgress from "@/components/professionals/CircularProgress";
 import coachProfileImage from "@/assets/coach-profile.jpg";
-import { getInitials, toTitleCase } from "@/lib/utils";
+import { findNameById, getInitials, toTitleCase } from "@/lib/utils";
 import {
   Carousel,
   CarouselContent,
@@ -103,6 +103,15 @@ const ProfessionalProfile = () => {
     },
     enabled: !!id,
   });
+
+  const howManyMatchPlayed = () => {
+    return (
+      professional.district_level_tournaments +
+      professional.state_level_tournaments +
+      professional.national_level_tournaments +
+      professional.international_level_tournaments
+    );
+  };
 
   const { data: gameData } = useQuery({
     queryKey: ["id"],
@@ -321,14 +330,6 @@ const ProfessionalProfile = () => {
     );
   };
 
-  const findNameById = (idToFind) => {
-    let foundObject = {};
-    if (gameData) {
-      foundObject = gameData.find((item) => item.id === idToFind);
-    }
-    return foundObject ? foundObject.name : "Name not found";
-  };
-
   const structuredData = professional
     ? {
         "@context": "https://schema.org",
@@ -453,16 +454,17 @@ const ProfessionalProfile = () => {
                   {professional.profession_type},{" Sports Professional"}
                 </p>
                 <>
-                  {professional.game_ids.map((gameId) => {
-                    return (
-                      <Badge
-                        variant="secondary"
-                        className="text-sm bg-gray-100 text-gray-700 border-0 mt-2 mb-4 mr-2"
-                      >
-                        {findNameById(gameId)}
-                      </Badge>
-                    );
-                  })}
+                  {professional.game_ids &&
+                    professional.game_ids.map((gameId) => {
+                      return (
+                        <Badge
+                          variant="secondary"
+                          className="text-sm bg-gray-100 text-gray-700 border-0 mt-2 mb-4 mr-2"
+                        >
+                          {findNameById(gameData, gameId)}
+                        </Badge>
+                      );
+                    })}
                 </>
 
                 <div className="block md:hidden grid grid-cols-2 md:grid-cols-5 gap-4 text-centers mb-6">
@@ -482,18 +484,20 @@ const ProfessionalProfile = () => {
                       Clients Trained
                     </div>
                   </div>
-                  <div className="bg-muted rounded-lg p-4">
-                    <div className="text-2xl font-bold text-primary">
-                      {professional.district_level_tournaments +
-                        professional.state_level_tournaments +
-                        professional.national_level_tournaments +
-                        professional.international_level_tournaments}
-                      +
+                  {howManyMatchPlayed() !== 0 && (
+                    <div className="bg-muted rounded-lg p-4">
+                      <div className="text-2xl font-bold text-primary">
+                        {professional.district_level_tournaments +
+                          professional.state_level_tournaments +
+                          professional.national_level_tournaments +
+                          professional.international_level_tournaments}
+                        +
+                      </div>
+                      <div className="text-xs text-muted-foreground">
+                        Match Played
+                      </div>
                     </div>
-                    <div className="text-xs text-muted-foreground">
-                      Match Played
-                    </div>
-                  </div>
+                  )}
                   <div className="bg-muted rounded-lg p-4">
                     <div className="flex items-center flex-col mb-2">
                       <MapPin className="w-6 h-6" color="#000000" />
@@ -520,17 +524,15 @@ const ProfessionalProfile = () => {
                   >
                     {100}+ Clients Trained
                   </Badge>
-                  {/* )} */}
-                  <Badge
-                    variant="secondary"
-                    className="bg-primary-foreground/20 text-primary-foreground border-primary-foreground/30"
-                  >
-                    {professional.district_level_tournaments +
-                      professional.state_level_tournaments +
-                      professional.national_level_tournaments +
-                      professional.international_level_tournaments}
-                    + Match Played
-                  </Badge>
+
+                  {howManyMatchPlayed() !== 0 && (
+                    <Badge
+                      variant="secondary"
+                      className="bg-primary-foreground/20 text-primary-foreground border-primary-foreground/30"
+                    >
+                      {howManyMatchPlayed()}+ Match Played
+                    </Badge>
+                  )}
                   <Badge
                     variant="secondary"
                     className="bg-primary-foreground/20 text-primary-foreground border-primary-foreground/30"
