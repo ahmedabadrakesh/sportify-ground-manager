@@ -1,8 +1,20 @@
 import React from "react";
 import { UseFormReturn } from "react-hook-form";
-import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
+import {
+  FormField,
+  FormItem,
+  FormLabel,
+  FormControl,
+  FormMessage,
+} from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { ProfessionalFormValues } from "../../schemas/professionalFormSchema";
 import { Database } from "@/integrations/supabase/types";
 import { useGames } from "@/hooks/useGames";
@@ -13,24 +25,32 @@ interface EnhancedBasicInfoSectionProps {
   form: UseFormReturn<ProfessionalFormValues>;
 }
 
-export const EnhancedBasicInfoSection = ({ form }: EnhancedBasicInfoSectionProps) => {
+export const EnhancedBasicInfoSection = ({
+  form,
+}: EnhancedBasicInfoSectionProps) => {
   const professionTypes: ProfessionType[] = [
-    "Athlete", "Coach", "Trainer", "Sports Manager", "Support Staff", "Player", "Umpire"
+    "Athlete",
+    "Coach",
+    "Trainer",
+    "Sports Manager",
+    "Support Staff",
+    "Player",
+    "Umpire",
   ];
-  
+
   const levelOptions: string[] = ["Beginner", "Intermediate", "Professional"];
   const { games } = useGames();
 
   return (
     <div className="space-y-4">
       <h3 className="text-lg font-semibold">Basic Information</h3>
-      
+
       <FormField
         name="name"
         control={form.control}
         render={({ field }) => (
           <FormItem>
-            <FormLabel>Coach Name *</FormLabel>
+            <FormLabel>Full Name *</FormLabel>
             <FormControl>
               <Input {...field} />
             </FormControl>
@@ -98,7 +118,10 @@ export const EnhancedBasicInfoSection = ({ form }: EnhancedBasicInfoSectionProps
         render={({ field }) => (
           <FormItem>
             <FormLabel>Games/Sport *</FormLabel>
-            <Select onValueChange={(value) => field.onChange([value])} value={field.value?.[0] || ""}>
+            <Select
+              onValueChange={(value) => field.onChange([value])}
+              value={field.value?.[0] || ""}
+            >
               <FormControl>
                 <SelectTrigger>
                   <SelectValue placeholder="Select a game/sport" />
@@ -124,8 +147,8 @@ export const EnhancedBasicInfoSection = ({ form }: EnhancedBasicInfoSectionProps
           <FormItem>
             <FormLabel>Years of Experience</FormLabel>
             <FormControl>
-              <Input 
-                type="number" 
+              <Input
+                type="number"
                 {...field}
                 onChange={(e) => field.onChange(Number(e.target.value) || 0)}
                 value={field.value || 0}

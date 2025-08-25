@@ -90,7 +90,7 @@ export const StepOne = ({ form }: StepOneProps) => {
             control={form.control}
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Coach Name *</FormLabel>
+                <FormLabel>Full Name *</FormLabel>
                 <FormControl>
                   <Input {...field} placeholder="Enter your full name" />
                 </FormControl>
@@ -158,7 +158,6 @@ export const StepOne = ({ form }: StepOneProps) => {
           )}
         />
       </div>
-
 
       {/* Bottom Row: Academy Name (Left), Years of Experience (Right) */}
       <div className="grid lg:grid-cols-2 gap-6 pt-4">

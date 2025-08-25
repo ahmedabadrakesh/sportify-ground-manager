@@ -99,18 +99,32 @@ const ProfessionalCard = ({
             <>
               {professional.name}
               {professional.is_certified && (
-                <BadgeCheck
-                  size={20}
-                  color="white"
-                  className="ml-2"
-                  fill="#1f2ce0"
-                  type="button"
-                />
+                <div className="relative group">
+                  <BadgeCheck
+                    size={20}
+                    color="white"
+                    className="ml-2"
+                    fill="#1f2ce0"
+                    type="button"
+                  />
+                  <div className="absolute left-1/2 transform -translate-x-1/2 bottom-full mb-2 hidden group-hover:block bg-gray-800 text-white text-xs rounded py-1 px-2 z-10">
+                    {"Certified"}
+                  </div>
+                </div>
               )}
             </>
           </h3>
-          <p className="text-sm text-gray-600 mb-2">
+          <p className="flex items-center gap-2 mb-2 text-sm text-gray-600">
             {professional.profession_type}
+            {/* Location */}
+            {professional.city && (
+              <>
+                <MapPin className="h-4 w-4 text-xs text-gray-500" />
+                <span className="text-sm text-gray-600">
+                  {professional.city}
+                </span>
+              </>
+            )}
           </p>
         </div>
       </div>
@@ -140,14 +154,16 @@ const ProfessionalCard = ({
           )}
         </div>
 
-        <div className="mb-4 mt-4">
-          <div className="flex items-center gap-2 mb-2">
-            <Volleyball className="h-4 w-4 text-gray-500" />
-            <span className="text-xs font-semibold text-gray-700">Sports</span>
-          </div>
-          <div className="flex items-center gap-2 mb-2 mt-2">
-            {professional.game_ids &&
-              professional.game_ids.map((gameId) => {
+        {professional.game_ids && (
+          <div className="mb-4 mt-4">
+            <div className="flex items-center gap-2 mb-2">
+              <Volleyball className="h-4 w-4 text-gray-500" />
+              <span className="text-xs font-semibold text-gray-700">
+                Sports
+              </span>
+            </div>
+            <div className="flex items-center gap-2 mb-2 mt-2">
+              {professional.game_ids.map((gameId) => {
                 return (
                   <Badge
                     variant="secondary"
@@ -157,8 +173,9 @@ const ProfessionalCard = ({
                   </Badge>
                 );
               })}
+            </div>
           </div>
-        </div>
+        )}
 
         {/* Specialties */}
         <div className="mb-4 mt-4">
@@ -175,20 +192,6 @@ const ProfessionalCard = ({
             , {professional.profession_type} +2 more
           </p>
         </div>
-
-        {/* Location */}
-        {professional.city && (
-          <div className="flex items-center gap-2 mb-2">
-            <MapPin className="h-4 w-4 text-xs text-gray-500" />
-            <span className="text-sm text-gray-600">{professional.city}</span>
-          </div>
-        )}
-        {/* Description */}
-        {professional.comments && (
-          <p className="text-sm text-gray-600 mb-2 text-left line-clamp-2">
-            {professional.comments}
-          </p>
-        )}
       </div>
       {/* Bottom Row - Contact Icons and Button */}
       <hr className="m-2" />
