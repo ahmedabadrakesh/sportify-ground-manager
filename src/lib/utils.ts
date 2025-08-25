@@ -16,10 +16,10 @@ export const toTitleCase = (str) => {
   );
 }
 
-export   const findNameById = (gameData, idToFind) => {
-    let foundObject = {};
+export const findNameById = (gameData, idToFind) => {
     if (gameData) {
-      foundObject = gameData.find((item) => item.id === idToFind);
+      const foundObject = gameData.find((item) => item.id === idToFind);
+      return foundObject ? foundObject.name : "Name not found";
     }
-    return foundObject ? foundObject.name : "Name not found";
+    return "Name not found";
   };

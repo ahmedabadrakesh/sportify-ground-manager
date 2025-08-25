@@ -765,7 +765,7 @@ const ProfessionalProfile = () => {
                           </div>
                         </div>
                       )}
-                      {professional.national_level_tournament !== 0 && (
+                      {professional.national_level_tournaments !== 0 && (
                         <div className="bg-muted rounded-lg p-4">
                           <div className="text-2xl font-bold text-primary">
                             {professional.national_level_tournaments}

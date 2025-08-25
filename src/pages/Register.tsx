@@ -3,39 +3,23 @@ import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-} from "@/components/ui/dialog";
 import { toast } from "sonner";
-import { register, login } from "@/utils/auth";
-import ProfileProgressDialog from "@/components/professionals/ProfileProgressDialog";
+import { UserTypeSelectionDialog } from "@/components/auth/UserTypeSelectionDialog";
+import { SportsProfessionalWelcome } from "@/components/auth/SportsProfessionalWelcome";
 import RegisterProfessionalDialog from "@/components/professionals/RegisterProfessionalDialog";
 import { supabase } from "@/integrations/supabase/client";
 
 const Register: React.FC = () => {
   const navigate = useNavigate();
-  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [userType, setUserType] = useState<"user" | "sports_professional">(
-    "user"
-  );
   const [isLoading, setIsLoading] = useState(false);
-  const [isProfileProgressDialogOpen, setIsProfileProgressDialogOpen] =
-    useState(false);
-  const [isUpdateDialogOpen, setIsUpdateDialogOpen] = useState(false);
   const [registeredUser, setRegisteredUser] = useState<any>(null);
   const [showUserTypeDialog, setShowUserTypeDialog] = useState(false);
+  const [showWelcomeDialog, setShowWelcomeDialog] = useState(false);
+  const [isRegisterDialogOpen, setIsRegisterDialogOpen] = useState(false);
   const [googleUserData, setGoogleUserData] = useState<any>(null);
-  const [selectedUserType, setSelectedUserType] = useState<
-    "user" | "sports_professional"
-  >("user");
 
   // Use a ref to track if submission is in progress
   const isSubmittingRef = useRef(false);
@@ -44,136 +28,69 @@ const Register: React.FC = () => {
     e.preventDefault();
     e.stopPropagation();
 
-    console.log("Form submission triggered");
-    console.log("Current form state:", {
-      name,
-      email,
-      password,
-      confirmPassword,
-      userType,
-    });
-    console.log(
-      "isLoading:",
-      isLoading,
-      "isSubmittingRef.current:",
-      isSubmittingRef.current
-    );
-
-    // Prevent multiple submissions using ref (more reliable than state)
     if (isLoading || isSubmittingRef.current) {
-      console.log("Registration already in progress, ignoring submission");
       return;
     }
 
-    // Set the ref immediately to block any other submissions
     isSubmittingRef.current = true;
     setIsLoading(true);
 
     try {
       // Simple form validation
-      if (!name || !email || !password || !confirmPassword) {
-        console.log("Validation failed: missing required fields");
+      if (!email || !password || !confirmPassword) {
         toast.error("Please fill in all required fields");
         return;
       }
 
       if (password !== confirmPassword) {
-        console.log("Validation failed: passwords don't match");
         toast.error("Passwords do not match");
         return;
       }
 
       // Basic validation for email format
-      if (email) {
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!emailRegex.test(email)) {
-          console.log("Validation failed: invalid email format");
-          toast.error("Please enter a valid email address");
-          return;
-        }
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(email)) {
+        toast.error("Please enter a valid email address");
+        return;
       }
 
-      console.log("Starting registration with:", {
-        name,
+      if (password.length < 6) {
+        toast.error("Password must be at least 6 characters long");
+        return;
+      }
+
+      console.log("Starting registration with email:", email);
+
+      // Use Supabase auth directly for simple registration
+      const { data, error } = await supabase.auth.signUp({
         email,
-        userType,
+        password,
+        options: {
+          emailRedirectTo: `${window.location.origin}/`,
+        },
       });
 
-      const user = await register(name, email, "", password, userType);
+      if (error) {
+        throw error;
+      }
 
-      console.log("Registration result:", user);
-
-      if (user) {
-        console.log("Registration successful, user:", user);
-
-        // Auto-login the user after successful registration
-        try {
-          const loginIdentifier = email;
-          const loggedInUser = await login(loginIdentifier, password);
-
-          if (loggedInUser) {
-            const successMessage =
-              userType === "sports_professional"
-                ? "Registration successful! Your sports professional profile has been created. Welcome to SportifyGround!"
-                : "Registration successful! Welcome to SportifyGround!";
-
-            toast.success(successMessage);
-
-            // Show profile progress dialog for sports professionals
-            if (userType === "sports_professional") {
-              setRegisteredUser(loggedInUser);
-              setIsProfileProgressDialogOpen(true);
-            } else {
-              navigate("/");
-            }
-          } else {
-            throw new Error("Auto-login failed");
-          }
-        } catch (loginError) {
-          console.error("Auto-login error:", loginError);
-          toast.success("Registration successful! Please login to continue.");
-          navigate("/login");
-        }
-      } else {
-        console.log("Registration failed: no user returned");
-        toast.error("Registration failed. Please try again.");
+      if (data.user) {
+        // Set temp user data and show user type selection
+        setGoogleUserData(data.user);
+        setShowUserTypeDialog(true);
+        toast.success("Registration successful! Please select your account type.");
       }
     } catch (error: any) {
       console.error("Registration error:", error);
 
-      // Handle specific error messages
       if (error.message?.includes("User already registered")) {
-        toast.error(
-          "This email is already registered. Please use a different email or try logging in."
-        );
-      } else if (error.message?.includes("email_address_invalid")) {
-        toast.error("Please enter a valid email address.");
-      } else if (error.message?.includes("password")) {
-        toast.error("Password must be at least 6 characters long.");
-      } else if (error.message?.includes("phone_provider_disabled")) {
-        toast.error(
-          "Phone number registration is currently disabled. Please use email instead."
-        );
-      } else if (
-        error.message?.includes("rate limit") ||
-        error.status === 429 ||
-        error.code === "over_email_send_rate_limit"
-      ) {
-        toast.error(
-          "Too many registration attempts. Please wait a few minutes before trying again."
-        );
-      } else if (error.message?.includes("No games available")) {
-        toast.error(
-          "Sports professional registration is temporarily unavailable. Please contact support."
-        );
+        toast.error("This email is already registered. Please try logging in.");
+      } else if (error.message?.includes("rate limit")) {
+        toast.error("Too many registration attempts. Please wait before trying again.");
       } else {
-        toast.error(
-          error.message ||
-            "Registration failed. Please check your details and try again."
-        );
+        toast.error(error.message || "Registration failed. Please try again.");
       }
     } finally {
-      console.log("Registration process completed, resetting loading state");
       setIsLoading(false);
       isSubmittingRef.current = false;
     }
@@ -244,7 +161,7 @@ const Register: React.FC = () => {
     return () => subscription.unsubscribe();
   }, [navigate]);
 
-  const handleUserTypeSelection = async () => {
+  const handleUserTypeSelection = async (userType: "user" | "sports_professional") => {
     if (!googleUserData) return;
 
     try {
@@ -256,7 +173,7 @@ const Register: React.FC = () => {
           "User",
         email: googleUserData.email,
         phone: googleUserData.phone || null,
-        role: selectedUserType,
+        role: userType,
       };
 
       const { data: newUser, error } = await supabase
@@ -272,7 +189,7 @@ const Register: React.FC = () => {
       }
 
       // Create sports professional entry if needed
-      if (selectedUserType === "sports_professional") {
+      if (userType === "sports_professional") {
         // Get first available game
         const { data: games } = await supabase
           .from("games")
@@ -298,13 +215,13 @@ const Register: React.FC = () => {
       }
 
       localStorage.setItem("currentUser", JSON.stringify(newUser));
-      toast.success(`Welcome to SportifyGround, ${newUser.name}!`);
+      setRegisteredUser(newUser);
       setShowUserTypeDialog(false);
 
-      if (selectedUserType === "sports_professional") {
-        setRegisteredUser(newUser);
-        setIsProfileProgressDialogOpen(true);
+      if (userType === "sports_professional") {
+        setShowWelcomeDialog(true);
       } else {
+        toast.success(`Welcome to SportifyGround, ${newUser.name}!`);
         navigate("/");
       }
     } catch (error) {
@@ -330,15 +247,15 @@ const Register: React.FC = () => {
 
         {/* Main Container */}
         <div className="bg-gradient-to-r from-primary/95 to-primary/90 backdrop-blur-sm rounded-3xl shadow-2xl overflow-hidden">
-          <div className="grid lg:grid-cols-2 min-h-[700px]">
+          <div className="grid lg:grid-cols-2 min-h-[600px]">
             {/* Left Panel - Welcome Content */}
             <div className="p-12 text-white flex flex-col justify-center space-y-6">
               <div>
                 <h2 className="text-3xl font-bold mb-4">Join SportifyGround</h2>
                 <p className="text-white/90 text-lg leading-relaxed">
                   Create your account to unlock access to premium sports
-                  facilities, connect with professional coaches, and manage your
-                  sporting journey.
+                  facilities, connect with professional coaches, and join our
+                  amazing sports community.
                 </p>
               </div>
 
@@ -373,12 +290,11 @@ const Register: React.FC = () => {
               <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20">
                 <h3 className="font-semibold text-white mb-3 flex items-center">
                   <div className="w-2 h-2 bg-accent rounded-full mr-2"></div>
-                  Quick Registration Tip
+                  Quick & Easy Setup
                 </h3>
                 <p className="text-sm text-white/90">
-                  Choose "Sports Professional" if you're a coach, trainer, or
-                  instructor looking to offer your services. You can always
-                  update your profile later!
+                  After registration, we'll ask if you're a sports professional 
+                  to customize your experience. You can always change this later!
                 </p>
               </div>
             </div>
@@ -430,61 +346,6 @@ const Register: React.FC = () => {
                         Or continue with
                       </span>
                     </div>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="name" className="text-sm font-medium">
-                      Full Name
-                    </Label>
-                    <Input
-                      id="name"
-                      placeholder="Enter your full name"
-                      value={name}
-                      onChange={(e) => setName(e.target.value)}
-                      disabled={isLoading}
-                      className="h-12"
-                      required
-                    />
-                  </div>
-
-                  <div className="space-y-3">
-                    <Label className="text-sm font-medium">Account Type</Label>
-                    <RadioGroup
-                      value={userType}
-                      onValueChange={(value: "user" | "sports_professional") =>
-                        setUserType(value)
-                      }
-                      disabled={isLoading}
-                      className="grid grid-cols-1 gap-3"
-                    >
-                      <div className="flex items-center space-x-3 p-3 border rounded-lg hover:bg-accent/5">
-                        <RadioGroupItem value="user" id="user" />
-                        <Label
-                          htmlFor="user"
-                          className="font-normal cursor-pointer"
-                        >
-                          Regular User - Book grounds & events
-                        </Label>
-                      </div>
-                      <div className="flex items-center space-x-3 p-3 border rounded-lg hover:bg-accent/5">
-                        <RadioGroupItem
-                          value="sports_professional"
-                          id="sports_professional"
-                        />
-                        <Label
-                          htmlFor="sports_professional"
-                          className="font-normal cursor-pointer"
-                        >
-                          Sports Professional - Offer services
-                        </Label>
-                      </div>
-                    </RadioGroup>
-                    {userType === "sports_professional" && (
-                      <p className="text-xs text-primary/70 bg-primary/5 p-2 rounded">
-                        A basic profile will be created for you to get started
-                        quickly.
-                      </p>
-                    )}
                   </div>
 
                   <div className="space-y-2">
@@ -575,16 +436,6 @@ const Register: React.FC = () => {
                     </Link>
                   </p>
 
-                  <p className="text-sm text-muted-foreground">
-                    Forgot your password?{" "}
-                    <Link
-                      to="/forgot-password"
-                      className="font-medium text-primary hover:text-primary/80"
-                    >
-                      Reset it here
-                    </Link>
-                  </p>
-
                   <Button
                     variant="ghost"
                     className="text-sm"
@@ -599,74 +450,33 @@ const Register: React.FC = () => {
         </div>
 
         {/* User Type Selection Dialog */}
-        <Dialog open={showUserTypeDialog} onOpenChange={setShowUserTypeDialog}>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Select Account Type</DialogTitle>
-              <DialogDescription>
-                Please select whether you're a regular user or a sports
-                professional.
-              </DialogDescription>
-            </DialogHeader>
-            <div className="space-y-4">
-              <RadioGroup
-                value={selectedUserType}
-                onValueChange={(value: "user" | "sports_professional") =>
-                  setSelectedUserType(value)
-                }
-              >
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="user" id="user-register-type" />
-                  <Label htmlFor="user-register-type">Regular User</Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem
-                    value="sports_professional"
-                    id="professional-register-type"
-                  />
-                  <Label htmlFor="professional-register-type">
-                    Sports Professional
-                  </Label>
-                </div>
-              </RadioGroup>
-              {selectedUserType === "sports_professional" && (
-                <p className="text-xs text-blue-600">
-                  A basic sports professional profile will be created for you,
-                  which you can update later.
-                </p>
-              )}
-              <Button onClick={handleUserTypeSelection} className="w-full">
-                Continue
-              </Button>
-            </div>
-          </DialogContent>
-        </Dialog>
+        <UserTypeSelectionDialog
+          open={showUserTypeDialog}
+          onOpenChange={setShowUserTypeDialog}
+          onUserTypeSelect={handleUserTypeSelection}
+        />
 
-        {/* Profile Progress Dialog for Sports Professionals */}
-        {registeredUser && (
-          <ProfileProgressDialog
-            isOpen={isProfileProgressDialogOpen}
-            onClose={() => {
-              setIsProfileProgressDialogOpen(false);
-              navigate("/sports-professionals");
-            }}
-            userId={registeredUser.id}
-            setIsUpdateDialogOpen={setIsUpdateDialogOpen}
-          />
-        )}
+        {/* Sports Professional Welcome Dialog */}
+        <SportsProfessionalWelcome
+          open={showWelcomeDialog}
+          onOpenChange={setShowWelcomeDialog}
+          onStartProfile={() => {
+            setShowWelcomeDialog(false);
+            setIsRegisterDialogOpen(true);
+          }}
+          userName={registeredUser?.name || ""}
+        />
 
-        {/* Register Professional Dialog */}
-        {registeredUser && (
+        {/* Professional Registration Dialog */}
+        {isRegisterDialogOpen && registeredUser && (
           <RegisterProfessionalDialog
-            open={isUpdateDialogOpen}
-            onOpenChange={(open) => {
-              setIsUpdateDialogOpen(open);
-              if (!open) {
-                setIsProfileProgressDialogOpen(false);
-                navigate("/sports-professionals");
-              }
+            open={isRegisterDialogOpen}
+            onOpenChange={setIsRegisterDialogOpen}
+            userId={registeredUser.id}
+            onComplete={() => {
+              setIsRegisterDialogOpen(false);
+              navigate("/");
             }}
-            isUpdate={true}
           />
         )}
       </div>

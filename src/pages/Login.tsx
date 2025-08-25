@@ -3,26 +3,10 @@ import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-} from "@/components/ui/dialog";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { login } from "@/utils/auth";
 import { toast } from "sonner";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import ProfileProgressDialog from "@/components/professionals/ProfileProgressDialog";
+import { UserTypeSelectionDialog } from "@/components/auth/UserTypeSelectionDialog";
+import { SportsProfessionalWelcome } from "@/components/auth/SportsProfessionalWelcome";
 import RegisterProfessionalDialog from "@/components/professionals/RegisterProfessionalDialog";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -33,13 +17,11 @@ const Login: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
 
   const [loginError, setLoginError] = useState<string | null>(null);
-  const [showProgressDialog, setShowProgressDialog] = useState(false);
-  const [loggedInUserId, setLoggedInUserId] = useState<string | null>(null);
   const [showUserTypeDialog, setShowUserTypeDialog] = useState(false);
+  const [showWelcomeDialog, setShowWelcomeDialog] = useState(false);
+  const [isRegisterDialogOpen, setIsRegisterDialogOpen] = useState(false);
+  const [registeredUser, setRegisteredUser] = useState<any>(null);
   const [googleUserData, setGoogleUserData] = useState<any>(null);
-  const [selectedUserType, setSelectedUserType] = useState<
-    "user" | "sports_professional"
-  >("user");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -62,10 +44,10 @@ const Login: React.FC = () => {
       if (user) {
         toast.success(`Welcome back, ${user.name}!`);
 
-        // Show progress dialog for sports professionals
+        // Show welcome dialog for sports professionals
         if (user.role === "sports_professional") {
-          setLoggedInUserId(user.id);
-          setShowProgressDialog(true);
+          setRegisteredUser(user);
+          setShowWelcomeDialog(true);
           return; // Don't navigate yet, let dialog handle it
         }
 
@@ -90,12 +72,6 @@ const Login: React.FC = () => {
     } finally {
       setIsLoading(false);
     }
-  };
-
-  const [isUpdateDialogOpen, setIsUpdateDialogOpen] = useState(false);
-
-  const handleUpdateProfile = () => {
-    setIsUpdateDialogOpen(true);
   };
 
   // Handle Google OAuth
@@ -141,8 +117,8 @@ const Login: React.FC = () => {
             toast.success(`Welcome back, ${existingUser.name}!`);
 
             if (existingUser.role === "sports_professional") {
-              setLoggedInUserId(existingUser.id);
-              setShowProgressDialog(true);
+              setRegisteredUser(existingUser);
+              setShowWelcomeDialog(true);
               return;
             }
 
@@ -175,7 +151,7 @@ const Login: React.FC = () => {
     return () => subscription.unsubscribe();
   }, [navigate]);
 
-  const handleUserTypeSelection = async () => {
+  const handleUserTypeSelection = async (userType: "user" | "sports_professional") => {
     if (!googleUserData) return;
 
     try {
@@ -187,7 +163,7 @@ const Login: React.FC = () => {
           "User",
         email: googleUserData.email,
         phone: googleUserData.phone || null,
-        role: selectedUserType,
+        role: userType,
       };
 
       const { data: newUser, error } = await supabase
@@ -203,7 +179,7 @@ const Login: React.FC = () => {
       }
 
       // Create sports professional entry if needed
-      if (selectedUserType === "sports_professional") {
+      if (userType === "sports_professional") {
         // Get first available game
         const { data: games } = await supabase
           .from("games")
@@ -229,13 +205,13 @@ const Login: React.FC = () => {
       }
 
       localStorage.setItem("currentUser", JSON.stringify(newUser));
-      toast.success(`Welcome to SportifyGround, ${newUser.name}!`);
+      setRegisteredUser(newUser);
       setShowUserTypeDialog(false);
 
-      if (selectedUserType === "sports_professional") {
-        setLoggedInUserId(newUser.id);
-        setShowProgressDialog(true);
+      if (userType === "sports_professional") {
+        setShowWelcomeDialog(true);
       } else {
+        toast.success(`Welcome to SportifyGround, ${newUser.name}!`);
         navigate("/");
       }
     } catch (error) {
@@ -293,18 +269,6 @@ const Login: React.FC = () => {
                   </span>
                 </div>
               </div>
-
-              {/* Demo Accounts Info */}
-              {/* <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20">
-                <h3 className="font-semibold text-white mb-3 flex items-center">
-                  <div className="w-2 h-2 bg-accent rounded-full mr-2"></div>
-                  Demo Accounts Available
-                </h3>
-                <div className="space-y-2 text-sm text-white/90">
-                  <div><strong>Super Admin:</strong> sa@123456 <span className="text-white/70">(password: 1234)</span></div>
-                  <div><strong>Admin:</strong> a@123456 <span className="text-white/70">(password: 1234)</span></div>
-                </div>
-              </div> */}
             </div>
 
             {/* Right Panel - Login Form */}
@@ -433,67 +397,33 @@ const Login: React.FC = () => {
         </div>
 
         {/* User Type Selection Dialog */}
-        <Dialog open={showUserTypeDialog} onOpenChange={setShowUserTypeDialog}>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Select Account Type</DialogTitle>
-              <DialogDescription>
-                Please select whether you're a regular user or a sports
-                professional.
-              </DialogDescription>
-            </DialogHeader>
-            <div className="space-y-4">
-              <RadioGroup
-                value={selectedUserType}
-                onValueChange={(value: "user" | "sports_professional") =>
-                  setSelectedUserType(value)
-                }
-              >
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="user" id="user-type" />
-                  <Label htmlFor="user-type">Regular User</Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem
-                    value="sports_professional"
-                    id="professional-type"
-                  />
-                  <Label htmlFor="professional-type">Sports Professional</Label>
-                </div>
-              </RadioGroup>
-              {selectedUserType === "sports_professional" && (
-                <p className="text-xs text-blue-600">
-                  A basic sports professional profile will be created for you,
-                  which you can update later.
-                </p>
-              )}
-              <Button onClick={handleUserTypeSelection} className="w-full">
-                Continue
-              </Button>
-            </div>
-          </DialogContent>
-        </Dialog>
+        <UserTypeSelectionDialog
+          open={showUserTypeDialog}
+          onOpenChange={setShowUserTypeDialog}
+          onUserTypeSelect={handleUserTypeSelection}
+        />
 
-        {/* Profile Progress Dialog for Sports Professionals */}
-        {loggedInUserId && (
-          <ProfileProgressDialog
-            isOpen={showProgressDialog}
-            onClose={() => {
-              setShowProgressDialog(false);
-              navigate("/"); // Navigate to home after closing dialog
-            }}
-            userId={loggedInUserId}
-            setIsUpdateDialogOpen={setIsUpdateDialogOpen}
-          />
-        )}
+        {/* Sports Professional Welcome Dialog */}
+        <SportsProfessionalWelcome
+          open={showWelcomeDialog}
+          onOpenChange={setShowWelcomeDialog}
+          onStartProfile={() => {
+            setShowWelcomeDialog(false);
+            setIsRegisterDialogOpen(true);
+          }}
+          userName={registeredUser?.name || ""}
+        />
 
-        {/* Dialogs */}
-        {isUpdateDialogOpen && (
+        {/* Professional Registration Dialog */}
+        {isRegisterDialogOpen && registeredUser && (
           <RegisterProfessionalDialog
-            open={isUpdateDialogOpen}
-            onOpenChange={setIsUpdateDialogOpen}
-            hasExistingProfile={true}
-            isUpdate={true}
+            open={isRegisterDialogOpen}
+            onOpenChange={setIsRegisterDialogOpen}
+            userId={registeredUser.id}
+            onComplete={() => {
+              setIsRegisterDialogOpen(false);
+              navigate("/");
+            }}
           />
         )}
       </div>
