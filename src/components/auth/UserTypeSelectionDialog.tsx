@@ -14,12 +14,14 @@ interface UserTypeSelectionDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onUserTypeSelect: (userType: "user" | "sports_professional") => void;
+  onSkip?: () => void;
 }
 
 export const UserTypeSelectionDialog: React.FC<UserTypeSelectionDialogProps> = ({
   open,
   onOpenChange,
   onUserTypeSelect,
+  onSkip,
 }) => {
   const [selectedUserType, setSelectedUserType] = useState<"user" | "sports_professional">("user");
 
@@ -79,12 +81,23 @@ export const UserTypeSelectionDialog: React.FC<UserTypeSelectionDialogProps> = (
           )}
         </div>
         
-        <Button 
-          onClick={() => onUserTypeSelect(selectedUserType)} 
-          className="w-full"
-        >
-          Continue
-        </Button>
+        <div className="flex gap-3">
+          {onSkip && (
+            <Button 
+              variant="outline" 
+              onClick={onSkip}
+              className="flex-1"
+            >
+              Skip for now
+            </Button>
+          )}
+          <Button 
+            onClick={() => onUserTypeSelect(selectedUserType)} 
+            className="flex-1"
+          >
+            Continue
+          </Button>
+        </div>
       </DialogContent>
     </Dialog>
   );

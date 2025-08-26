@@ -212,12 +212,47 @@ const Login: React.FC = () => {
         setShowWelcomeDialog(true);
       } else {
         toast.success(`Welcome to SportifyGround, ${newUser.name}!`);
-        navigate("/");
+        // Redirect to last visited page or home
+        const lastVisitedPage = localStorage.getItem("lastVisitedPage");
+        navigate(lastVisitedPage || "/");
       }
     } catch (error) {
       console.error("Error creating user profile:", error);
       toast.error("Failed to complete registration. Please try again.");
     }
+  };
+
+  const handleSkipUserTypeSelection = () => {
+    if (!googleUserData) return;
+
+    // Create user with default role
+    const defaultUserData = {
+      auth_id: googleUserData.id,
+      name:
+        googleUserData.user_metadata?.full_name ||
+        googleUserData.email?.split("@")[0] ||
+        "User",
+      email: googleUserData.email,
+      phone: googleUserData.phone || null,
+      role: "user" as const,
+    };
+
+    supabase.from("users").insert([defaultUserData]).select().single()
+      .then(({ data: newUser, error }) => {
+        if (error) {
+          console.error("Error creating user:", error);
+          toast.error("Failed to create user profile. Please try again.");
+          return;
+        }
+
+        localStorage.setItem("currentUser", JSON.stringify(newUser));
+        setShowUserTypeDialog(false);
+        toast.success(`Welcome to SportifyGround, ${newUser.name}!`);
+        
+        // Redirect to last visited page or home
+        const lastVisitedPage = localStorage.getItem("lastVisitedPage");
+        navigate(lastVisitedPage || "/");
+      });
   };
 
   return (
@@ -401,6 +436,7 @@ const Login: React.FC = () => {
           open={showUserTypeDialog}
           onOpenChange={setShowUserTypeDialog}
           onUserTypeSelect={handleUserTypeSelection}
+          onSkip={handleSkipUserTypeSelection}
         />
 
         {/* Sports Professional Welcome Dialog */}
