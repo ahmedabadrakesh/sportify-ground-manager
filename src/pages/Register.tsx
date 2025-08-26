@@ -471,11 +471,11 @@ const Register: React.FC = () => {
         {isRegisterDialogOpen && registeredUser && (
           <RegisterProfessionalDialog
             open={isRegisterDialogOpen}
-            onOpenChange={setIsRegisterDialogOpen}
-            userId={registeredUser.id}
-            onComplete={() => {
-              setIsRegisterDialogOpen(false);
-              navigate("/");
+            onOpenChange={(open) => {
+              setIsRegisterDialogOpen(open);
+              if (!open) {
+                navigate("/");
+              }
             }}
           />
         )}
