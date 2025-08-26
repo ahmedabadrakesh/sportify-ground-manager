@@ -15,12 +15,14 @@ const Register: React.FC = () => {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  
+
   // Track the referring page for navigation after login/registration
   const referringPage = React.useRef(
-    document.referrer && !document.referrer.includes('/login') && !document.referrer.includes('/register') 
-      ? document.referrer 
-      : '/'
+    document.referrer &&
+      !document.referrer.includes("/login") &&
+      !document.referrer.includes("/register")
+      ? document.referrer
+      : "/"
   );
   const [registeredUser, setRegisteredUser] = useState<any>(null);
   const [showUserTypeDialog, setShowUserTypeDialog] = useState(false);
@@ -85,7 +87,9 @@ const Register: React.FC = () => {
         // Set temp user data and show user type selection
         setGoogleUserData(data.user);
         setShowUserTypeDialog(true);
-        toast.success("Registration successful! Please select your account type.");
+        toast.success(
+          "Registration successful! Please select your account type."
+        );
       }
     } catch (error: any) {
       console.error("Registration error:", error);
@@ -93,7 +97,9 @@ const Register: React.FC = () => {
       if (error.message?.includes("User already registered")) {
         toast.error("This email is already registered. Please try logging in.");
       } else if (error.message?.includes("rate limit")) {
-        toast.error("Too many registration attempts. Please wait before trying again.");
+        toast.error(
+          "Too many registration attempts. Please wait before trying again."
+        );
       } else {
         toast.error(error.message || "Registration failed. Please try again.");
       }
@@ -168,7 +174,9 @@ const Register: React.FC = () => {
     return () => subscription.unsubscribe();
   }, [navigate]);
 
-  const handleUserTypeSelection = async (userType: "user" | "sports_professional") => {
+  const handleUserTypeSelection = async (
+    userType: "user" | "sports_professional"
+  ) => {
     if (!googleUserData) return;
 
     try {
@@ -300,8 +308,9 @@ const Register: React.FC = () => {
                   Quick & Easy Setup
                 </h3>
                 <p className="text-sm text-white/90">
-                  After registration, we'll ask if you're a sports professional 
-                  to customize your experience. You can always change this later!
+                  After registration, we'll ask if you're a sports professional
+                  to customize your experience. You can always change this
+                  later!
                 </p>
               </div>
             </div>
@@ -473,7 +482,7 @@ const Register: React.FC = () => {
           }}
           onSkip={() => {
             setShowWelcomeDialog(false);
-            navigate(referringPage.current);
+            navigate(-1);
           }}
           userName={registeredUser?.name || ""}
         />
@@ -485,9 +494,10 @@ const Register: React.FC = () => {
             onOpenChange={(open) => {
               setIsRegisterDialogOpen(open);
               if (!open) {
-                navigate(referringPage.current);
+                navigate(-1);
               }
             }}
+            isUpdate={true}
           />
         )}
       </div>

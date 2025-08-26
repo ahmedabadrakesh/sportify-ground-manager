@@ -105,7 +105,7 @@ const SportsProfessionals = () => {
         canonicalUrl="https://jokova.com/sports-professionals"
       />
       {/* Hero Section */}
-      <div className="bg-background border-b">
+      <div className="container bg-background border-b">
         <div className="grid md:grid-cols-8 mx-auto text-left py-4 mt-4">
           <div className="c mb-6 col-span-6">
             <h1 className="text-3xl font-bold text-foreground mb-2">

@@ -15,12 +15,14 @@ const Login: React.FC = () => {
   const [identifier, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  
+
   // Track the referring page for navigation after login/registration
   const referringPage = React.useRef(
-    document.referrer && !document.referrer.includes('/login') && !document.referrer.includes('/register') 
-      ? document.referrer 
-      : '/'
+    document.referrer &&
+      !document.referrer.includes("/login") &&
+      !document.referrer.includes("/register")
+      ? document.referrer
+      : "/"
   );
 
   const [loginError, setLoginError] = useState<string | null>(null);
@@ -158,7 +160,9 @@ const Login: React.FC = () => {
     return () => subscription.unsubscribe();
   }, [navigate]);
 
-  const handleUserTypeSelection = async (userType: "user" | "sports_professional") => {
+  const handleUserTypeSelection = async (
+    userType: "user" | "sports_professional"
+  ) => {
     if (!googleUserData) return;
 
     try {
@@ -420,7 +424,8 @@ const Login: React.FC = () => {
           }}
           onSkip={() => {
             setShowWelcomeDialog(false);
-            navigate(referringPage.current);
+            //navigate(referringPage.current);
+            navigate(-1);
           }}
           userName={registeredUser?.name || ""}
         />
@@ -428,11 +433,12 @@ const Login: React.FC = () => {
         {/* Professional Registration Dialog */}
         {isRegisterDialogOpen && registeredUser && (
           <RegisterProfessionalDialog
+            isUpdate={true}
             open={isRegisterDialogOpen}
             onOpenChange={(open) => {
               setIsRegisterDialogOpen(open);
               if (!open) {
-                navigate(referringPage.current);
+                navigate(-1);
               }
             }}
           />
