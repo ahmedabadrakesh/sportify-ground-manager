@@ -59,6 +59,8 @@ export const login = async (identifier: string, password: string): Promise<User 
     }
     
     if (authData?.user) {
+      console.log("Supabase auth successful, fetching user profile for:", authData.user.id);
+      
       // Fetch user profile from our database
       const { data: userData, error: userError } = await supabase
         .from('users')
@@ -66,10 +68,46 @@ export const login = async (identifier: string, password: string): Promise<User 
         .eq('auth_id', authData.user.id)
         .single();
       
+      console.log("User profile fetch result:", { userData, userError });
+      
       if (userError || !userData) {
         console.error("User data error:", userError);
-        return null;
+        console.log("Creating user profile from auth data...");
+        
+        // Create user profile if it doesn't exist
+        const newUserData = {
+          auth_id: authData.user.id,
+          name: authData.user.user_metadata?.name || authData.user.email?.split('@')[0] || 'User',
+          email: authData.user.email,
+          phone: authData.user.phone || null,
+          role: authData.user.user_metadata?.user_type || 'user',
+        };
+        
+        const { data: createdUser, error: createError } = await supabase
+          .from('users')
+          .insert([newUserData])
+          .select()
+          .single();
+          
+        if (createError) {
+          console.error("Failed to create user profile:", createError);
+          return null;
+        }
+        
+        console.log("User profile created:", createdUser);
+        
+        // Store user in localStorage for compatibility
+        localStorage.setItem('currentUser', JSON.stringify(createdUser));
+        
+        // Trigger a custom event to notify other components
+        window.dispatchEvent(new CustomEvent('authStateChanged', { 
+          detail: { user: createdUser, session: authData.session } 
+        }));
+        
+        return createdUser as User;
       }
+      
+      console.log("User profile found:", userData);
       
       // Store user in localStorage for compatibility
       localStorage.setItem('currentUser', JSON.stringify(userData));
