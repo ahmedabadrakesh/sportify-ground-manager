@@ -13,6 +13,7 @@ interface SportsProfessionalWelcomeProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onStartProfile: () => void;
+  onSkip: () => void;
   userName: string;
 }
 
@@ -20,6 +21,7 @@ export const SportsProfessionalWelcome: React.FC<SportsProfessionalWelcomeProps>
   open,
   onOpenChange,
   onStartProfile,
+  onSkip,
   userName,
 }) => {
   return (
@@ -73,13 +75,13 @@ export const SportsProfessionalWelcome: React.FC<SportsProfessionalWelcomeProps>
         <div className="flex space-x-3">
           <Button 
             variant="outline" 
-            onClick={() => onOpenChange(false)} 
+            onClick={onSkip}
             className="flex-1"
           >
             Skip for now
           </Button>
           <Button 
-            onClick={onStartProfile} 
+            onClick={onStartProfile}
             className="flex-1"
           >
             Let's Start

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -15,6 +15,13 @@ const Login: React.FC = () => {
   const [identifier, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  
+  // Track the referring page for navigation after login/registration
+  const referringPage = React.useRef(
+    document.referrer && !document.referrer.includes('/login') && !document.referrer.includes('/register') 
+      ? document.referrer 
+      : '/'
+  );
 
   const [loginError, setLoginError] = useState<string | null>(null);
   const [showUserTypeDialog, setShowUserTypeDialog] = useState(false);
@@ -411,6 +418,10 @@ const Login: React.FC = () => {
             setShowWelcomeDialog(false);
             setIsRegisterDialogOpen(true);
           }}
+          onSkip={() => {
+            setShowWelcomeDialog(false);
+            navigate(referringPage.current);
+          }}
           userName={registeredUser?.name || ""}
         />
 
@@ -421,7 +432,7 @@ const Login: React.FC = () => {
             onOpenChange={(open) => {
               setIsRegisterDialogOpen(open);
               if (!open) {
-                navigate("/");
+                navigate(referringPage.current);
               }
             }}
           />

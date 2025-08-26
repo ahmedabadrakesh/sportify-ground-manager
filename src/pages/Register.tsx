@@ -15,6 +15,13 @@ const Register: React.FC = () => {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  
+  // Track the referring page for navigation after login/registration
+  const referringPage = React.useRef(
+    document.referrer && !document.referrer.includes('/login') && !document.referrer.includes('/register') 
+      ? document.referrer 
+      : '/'
+  );
   const [registeredUser, setRegisteredUser] = useState<any>(null);
   const [showUserTypeDialog, setShowUserTypeDialog] = useState(false);
   const [showWelcomeDialog, setShowWelcomeDialog] = useState(false);
@@ -464,6 +471,10 @@ const Register: React.FC = () => {
             setShowWelcomeDialog(false);
             setIsRegisterDialogOpen(true);
           }}
+          onSkip={() => {
+            setShowWelcomeDialog(false);
+            navigate(referringPage.current);
+          }}
           userName={registeredUser?.name || ""}
         />
 
@@ -474,7 +485,7 @@ const Register: React.FC = () => {
             onOpenChange={(open) => {
               setIsRegisterDialogOpen(open);
               if (!open) {
-                navigate("/");
+                navigate(referringPage.current);
               }
             }}
           />
