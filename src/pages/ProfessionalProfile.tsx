@@ -463,9 +463,10 @@ const ProfessionalProfile = () => {
                 </p>
                 <>
                   {professional.game_ids &&
-                    professional.game_ids.map((gameId) => {
+                    professional.game_ids.map((gameId, index) => {
                       return (
                         <Badge
+                          key={`game-${gameId}-${index}`}
                           variant="secondary"
                           className="text-sm bg-gray-100 text-gray-700 border-0 mt-2 mb-4 mr-2"
                         >
@@ -520,6 +521,7 @@ const ProfessionalProfile = () => {
                 <div className="hidden md:flex flex-wrap justify-center lg:justify-start gap-4 mb-6">
                   {professional.years_of_experience && (
                     <Badge
+                      key="experience"
                       variant="secondary"
                       className="bg-primary-foreground/20 text-primary-foreground border-primary-foreground/30"
                     >
@@ -527,6 +529,7 @@ const ProfessionalProfile = () => {
                     </Badge>
                   )}
                   <Badge
+                    key="clients"
                     variant="secondary"
                     className="bg-primary-foreground/20 text-primary-foreground border-primary-foreground/30"
                   >
@@ -535,6 +538,7 @@ const ProfessionalProfile = () => {
 
                   {howManyMatchPlayed() !== 0 && (
                     <Badge
+                      key="matches"
                       variant="secondary"
                       className="bg-primary-foreground/20 text-primary-foreground border-primary-foreground/30"
                     >
@@ -542,12 +546,31 @@ const ProfessionalProfile = () => {
                     </Badge>
                   )}
                   <Badge
+                    key="location"
                     variant="secondary"
                     className="bg-primary-foreground/20 text-primary-foreground border-primary-foreground/30"
                   >
                     <MapPin className="w-4 h-4 mr-2" />
                     {professional.city || "India"}
                   </Badge>
+                  {professional.age && (
+                    <Badge
+                      key="age"
+                      variant="secondary"
+                      className="bg-primary-foreground/20 text-primary-foreground border-primary-foreground/30"
+                    >
+                      Age {professional.age}
+                    </Badge>
+                  )}
+                  {professional.sex && (
+                    <Badge
+                      key="gender"
+                      variant="secondary"
+                      className="bg-primary-foreground/20 text-primary-foreground border-primary-foreground/30"
+                    >
+                      {professional.sex}
+                    </Badge>
+                  )}
                   {/* {professional.total_match_played && (
                     <div className="bg-white/10 backdrop-blur-sm rounded-lg px-4 py-2 text-center">
                       <div className="text-2xl font-bold">
