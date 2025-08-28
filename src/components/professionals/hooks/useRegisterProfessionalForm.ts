@@ -11,6 +11,8 @@ export const useRegisterProfessionalForm = (onSuccess: () => void, isUpdate: boo
     defaultValues: {
       // Basic Info
       name: "",
+      age: 0,
+      sex: undefined,
       profession_type: "Athlete",
       photo: "",
       academy_name: "",
@@ -101,6 +103,7 @@ export const useRegisterProfessionalForm = (onSuccess: () => void, isUpdate: boo
     // Ensure numeric fields are properly converted
     const processedValues = {
       ...values,
+      age: Number(values.age) || 0,
       fee: Number(values.fee) || 0,
       years_of_experience: Number(values.years_of_experience) || 0,
       total_match_played: Number(values.total_match_played) || 0,

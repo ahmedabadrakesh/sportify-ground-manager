@@ -7,7 +7,7 @@ export type Json =
   | Json[]
 
 export type Database = {
-  // Allows to automatically instanciate createClient with right options
+  // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
     PostgrestVersion: "12.2.3 (519615d)"
@@ -615,6 +615,7 @@ export type Database = {
           academy_name: string | null
           accomplishments: string[] | null
           address: string
+          age: number | null
           awards: string[] | null
           certifications: string[] | null
           city: string
@@ -645,6 +646,7 @@ export type Database = {
           photo: string | null
           profession_type: Database["public"]["Enums"]["sport_profession_type"]
           punch_line: string | null
+          sex: string | null
           specialties: string[] | null
           state_level_tournaments: number | null
           success_stories: Json | null
@@ -665,6 +667,7 @@ export type Database = {
           academy_name?: string | null
           accomplishments?: string[] | null
           address: string
+          age?: number | null
           awards?: string[] | null
           certifications?: string[] | null
           city: string
@@ -695,6 +698,7 @@ export type Database = {
           photo?: string | null
           profession_type: Database["public"]["Enums"]["sport_profession_type"]
           punch_line?: string | null
+          sex?: string | null
           specialties?: string[] | null
           state_level_tournaments?: number | null
           success_stories?: Json | null
@@ -715,6 +719,7 @@ export type Database = {
           academy_name?: string | null
           accomplishments?: string[] | null
           address?: string
+          age?: number | null
           awards?: string[] | null
           certifications?: string[] | null
           city?: string
@@ -745,6 +750,7 @@ export type Database = {
           photo?: string | null
           profession_type?: Database["public"]["Enums"]["sport_profession_type"]
           punch_line?: string | null
+          sex?: string | null
           specialties?: string[] | null
           state_level_tournaments?: number | null
           success_stories?: Json | null
@@ -860,8 +866,8 @@ export type Database = {
     Functions: {
       add_admin_user: {
         Args: {
-          user_name: string
           user_email: string
+          user_name: string
           user_phone: string
           user_whatsapp: string
         }

@@ -108,6 +108,20 @@ const AdminSportsProfessionals = () => {
       },
     },
     {
+      accessorKey: "age",
+      header: "Age",
+      cell: ({ row }) => (
+        <div className="text-center">{row.original.age || "N/A"}</div>
+      ),
+    },
+    {
+      accessorKey: "sex",
+      header: "Gender",
+      cell: ({ row }) => (
+        <div className="capitalize">{row.original.sex || "N/A"}</div>
+      ),
+    },
+    {
       accessorKey: "profession_type",
       header: "Profession Type",
       cell: ({ row }) => (

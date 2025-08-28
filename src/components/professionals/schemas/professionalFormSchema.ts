@@ -9,6 +9,8 @@ type FeeType = Database["public"]["Enums"]["fee_type"];
 export const professionalFormSchema = z.object({
   // Basic Info
   name: z.string().min(2, "Name must be at least 2 characters"),
+  age: z.union([z.string(), z.number()]).transform((val) => Number(val) || 0).optional(),
+  sex: z.enum(["Male", "Female"] as const).optional(),
   profession_type: z.enum(["Athlete", "Coach", "Trainer", "Sports Manager", "Support Staff", "Player", "Umpire"] as const),
   photo: z.string().optional(),
   academy_name: z.string().optional(),

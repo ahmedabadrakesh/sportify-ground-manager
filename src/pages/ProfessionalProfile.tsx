@@ -84,18 +84,19 @@ const ProfessionalProfile = () => {
         .from("sports_professionals")
         .select(
           `
-          id, profession_type, name, fee, fee_type, address, city, comments,
-          photo, user_id, created_at, updated_at, awards, accomplishments,
-          certifications, training_locations, videos, images, punch_line,
-          instagram_link, facebook_link, linkedin_link, website, level,
-          coaching_availability, youtube_link, years_of_experience,
-          total_match_played, academy_name, whatsapp, whatsapp_same_as_phone,
-          district_level_tournaments, state_level_tournaments,
-          national_level_tournaments, international_level_tournaments,
-          specialties, education, one_on_one_price, group_session_price,
-          online_price, free_demo_call, about_me, success_stories,
-          training_locations_detailed, is_certified, game_ids, deleted_at
-        `
+           id, profession_type, name, fee, fee_type, address, city, comments,
+           photo, user_id, created_at, updated_at, awards, accomplishments,
+           certifications, training_locations, videos, images, punch_line,
+           instagram_link, facebook_link, linkedin_link, website, level,
+           coaching_availability, youtube_link, years_of_experience,
+           total_match_played, academy_name, whatsapp, whatsapp_same_as_phone,
+           district_level_tournaments, state_level_tournaments,
+           national_level_tournaments, international_level_tournaments,
+           specialties, education, one_on_one_price, group_session_price,
+           online_price, free_demo_call, about_me, success_stories,
+           training_locations_detailed, is_certified, game_ids, deleted_at,
+           age, sex
+         `
         )
         .eq("id", id)
         .maybeSingle();
@@ -457,6 +458,8 @@ const ProfessionalProfile = () => {
 
                 <p className="text-sm lg:text-lg text-gray-300">
                   {professional.profession_type},{" Sports Professional"}
+                  {professional.age && ` • Age ${professional.age}`}
+                  {professional.sex && ` • ${professional.sex}`}
                 </p>
                 <>
                   {professional.game_ids &&

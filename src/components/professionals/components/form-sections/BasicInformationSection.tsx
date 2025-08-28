@@ -4,6 +4,7 @@ import { UseFormReturn } from "react-hook-form";
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { ProfessionalFormValues } from "../../schemas/professionalFormSchema";
 import { useGames } from "@/hooks/useGames";
 import { Database } from "@/integrations/supabase/types";
@@ -41,6 +42,60 @@ export const BasicInformationSection = ({ form }: BasicInformationSectionProps) 
           </FormItem>
         )}
       />
+
+      <div className="grid grid-cols-2 gap-4">
+        <FormField
+          name="age"
+          control={form.control}
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Age</FormLabel>
+              <Select onValueChange={(value) => field.onChange(Number(value))} value={field.value?.toString() || ""}>
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select age" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  {Array.from({ length: 41 }, (_, i) => i + 10).map((age) => (
+                    <SelectItem key={age} value={age.toString()}>
+                      {age}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          name="sex"
+          control={form.control}
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Gender</FormLabel>
+              <FormControl>
+                <RadioGroup
+                  onValueChange={field.onChange}
+                  value={field.value}
+                  className="flex flex-row space-x-4"
+                >
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="Male" id="male" />
+                    <label htmlFor="male">Male</label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="Female" id="female" />
+                    <label htmlFor="female">Female</label>
+                  </div>
+                </RadioGroup>
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+      </div>
 
       <FormField
         name="punch_line"
