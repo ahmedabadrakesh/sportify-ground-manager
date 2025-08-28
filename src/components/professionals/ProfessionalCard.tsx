@@ -72,180 +72,188 @@ const ProfessionalCard = ({
 
   return (
     <Card className="p-4 hover:shadow-md transition-shadow bg-white border border-gray-200">
-      <div className="flex items-start gap-4 mb-2">
-        {/* Profile Image */}
-        <div className="flex-shrink-0">
-          <div className="w-12 h-12 rounded-full overflow-hidden bg-gray-200">
-            {professional.photo ? (
-              <img
-                src={professional.photo}
-                alt={professional.name}
-                className="w-full h-full object-cover"
-              />
-            ) : (
-              <div className="w-full uppercase h-full bg-gray-300 flex items-center justify-center text-secondary-900 font-bold text-lg">
-                {professional.name
-                  ?.split(" ")
-                  .map((n) => n[0])
-                  .join("") || "P"}
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* Main Content */}
-        <div className="flex-1 min-w-0 text-left">
-          {/* Name and Profession */}
-          <h3 className="flex flex-row text-lg font-semibold text-gray-900 mb-1">
-            <>
-              {professional.name}
-              {professional.is_certified && (
-                <div className="relative group">
-                  <Award
-                    size={20}
-                    color="white"
-                    className="ml-2"
-                    fill="#1f2ce0"
-                    type="button"
-                  />
-                  <div className="absolute left-1/2 transform -translate-x-1/2 bottom-full mb-2 hidden group-hover:block bg-gray-800 text-white text-xs rounded py-1 px-2 z-10">
-                    {"Certified"}
-                  </div>
+      <Link
+        to={`/professional/${
+          professional.name
+            ? professional.name.toLowerCase().replace(/\s+/g, "-")
+            : "unknown"
+        }/${professional.id}`}
+      >
+        <div className="flex items-start gap-4 mb-2">
+          {/* Profile Image */}
+          <div className="flex-shrink-0">
+            <div className="w-12 h-12 rounded-full overflow-hidden bg-gray-200">
+              {professional.photo ? (
+                <img
+                  src={professional.photo}
+                  alt={professional.name}
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <div className="w-full uppercase h-full bg-gray-300 flex items-center justify-center text-secondary-900 font-bold text-lg">
+                  {professional.name
+                    ?.split(" ")
+                    .map((n) => n[0])
+                    .join("") || "P"}
                 </div>
               )}
-            </>
-          </h3>
-          <p className="flex items-center gap-2 mb-2 text-sm text-gray-600">
-            {professional.profession_type}
-            {/* Location */}
-            {professional.city && (
+            </div>
+          </div>
+
+          {/* Main Content */}
+          <div className="flex-1 min-w-0 text-left">
+            {/* Name and Profession */}
+            <h3 className="flex flex-row text-lg font-semibold text-gray-900 mb-1">
               <>
-                <MapPin className="h-4 w-4 text-xs text-gray-500" />
-                <span className="text-sm text-gray-600">
-                  {professional.city}
-                </span>
+                {professional.name}
+                {professional.is_certified && (
+                  <div className="relative group">
+                    <Award
+                      size={20}
+                      color="white"
+                      className="ml-2"
+                      fill="#1f2ce0"
+                      type="button"
+                    />
+                    <div className="absolute left-1/2 transform -translate-x-1/2 bottom-full mb-2 hidden group-hover:block bg-gray-800 text-white text-xs rounded py-1 px-2 z-10">
+                      {"Certified"}
+                    </div>
+                  </div>
+                )}
               </>
+            </h3>
+            <p className="flex items-center gap-2 mb-2 text-sm text-gray-600">
+              {professional.profession_type}
+              {/* Location */}
+              {professional.city && (
+                <>
+                  <MapPin className="h-4 w-4 text-xs text-gray-500" />
+                  <span className="text-sm text-gray-600">
+                    {professional.city}
+                  </span>
+                </>
+              )}
+            </p>
+          </div>
+        </div>
+
+        <div className="md:h-40">
+          {/* Stats Row */}
+          <div className="flex items-center gap-2">
+            {professional.years_of_experience && (
+              <Badge
+                variant="secondary"
+                className="text-xs bg-gray-100 text-gray-700 border-0"
+              >
+                {`${professional.years_of_experience} Years`}
+              </Badge>
             )}
-          </p>
-        </div>
-      </div>
-
-      <div className="md:h-40">
-        {/* Stats Row */}
-        <div className="flex items-center gap-2">
-          {professional.years_of_experience && (
             <Badge
               variant="secondary"
               className="text-xs bg-gray-100 text-gray-700 border-0"
             >
-              {`${professional.years_of_experience} Years`}
+              {getClientCount()}
             </Badge>
-          )}
-          <Badge
-            variant="secondary"
-            className="text-xs bg-gray-100 text-gray-700 border-0"
-          >
-            {getClientCount()}
-          </Badge>
-          {professional.is_certified && (
-            <Badge
-              variant="secondary"
-              className="text-xs bg-gray-100 text-gray-700 border-0"
-            >
-              Certified
-            </Badge>
-          )}
-        </div>
+            {professional.is_certified && (
+              <Badge
+                variant="secondary"
+                className="text-xs bg-gray-100 text-gray-700 border-0"
+              >
+                Certified
+              </Badge>
+            )}
+          </div>
 
-        {professional.game_ids && (
+          {professional.game_ids && (
+            <div className="mb-4 mt-4">
+              <div className="flex items-center gap-2 mb-2">
+                <Volleyball className="h-4 w-4 text-gray-500" />
+                <span className="text-xs font-semibold text-gray-700">
+                  Sports
+                </span>
+              </div>
+              <div className="flex items-center gap-2 mb-2 mt-2">
+                {professional.game_ids.map((gameId) => {
+                  return (
+                    <Badge
+                      variant="secondary"
+                      className="text-xs   bg-gray-100 text-gray-700 border-0"
+                    >
+                      {findNameById(gameData, gameId)}
+                    </Badge>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
+          {/* Specialties */}
           <div className="mb-4 mt-4">
             <div className="flex items-center gap-2 mb-2">
-              <Volleyball className="h-4 w-4 text-gray-500" />
+              <Target className="h-4 w-4 text-gray-500" />
               <span className="text-xs font-semibold text-gray-700">
-                Sports
+                Specialties
               </span>
             </div>
-            <div className="flex items-center gap-2 mb-2 mt-2">
-              {professional.game_ids.map((gameId) => {
-                return (
-                  <Badge
-                    variant="secondary"
-                    className="text-xs   bg-gray-100 text-gray-700 border-0"
-                  >
-                    {findNameById(gameData, gameId)}
-                  </Badge>
-                );
-              })}
-            </div>
+            <p className="text-xs text-left text-gray-600">
+              {professional.game_ids && professional.game_ids.length > 0
+                ? "Multi-Sport Training"
+                : "Sports Training"}
+              , {professional.profession_type} +2 more
+            </p>
           </div>
-        )}
-
-        {/* Specialties */}
-        <div className="mb-4 mt-4">
-          <div className="flex items-center gap-2 mb-2">
-            <Target className="h-4 w-4 text-gray-500" />
-            <span className="text-xs font-semibold text-gray-700">
-              Specialties
-            </span>
+        </div>
+        {/* Bottom Row - Contact Icons and Button */}
+        <hr className="m-2" />
+        <div className="flex items-center justify-between align-bottom">
+          <div className="flex gap-2">
+            <button
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                handleContactClick("phone");
+              }}
+              className="p-1.5 rounded hover:bg-gray-100 transition-colors"
+              title={isAuthenticated ? "View Phone" : "Login to view phone"}
+            >
+              📞
+            </button>
+            <button
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                handleContactClick("email");
+              }}
+              className="p-1.5 rounded hover:bg-gray-100 transition-colors"
+              title={isAuthenticated ? "View Email" : "Login to view email"}
+            >
+              ✉️
+            </button>
+            <button
+              className="p-1.5 rounded hover:bg-gray-100 transition-colors"
+              title="Gallery"
+            >
+              📷
+            </button>
           </div>
-          <p className="text-xs text-left text-gray-600">
-            {professional.game_ids && professional.game_ids.length > 0
-              ? "Multi-Sport Training"
-              : "Sports Training"}
-            , {professional.profession_type} +2 more
-          </p>
-        </div>
-      </div>
-      {/* Bottom Row - Contact Icons and Button */}
-      <hr className="m-2" />
-      <div className="flex items-center justify-between align-bottom">
-        <div className="flex gap-2">
-          <button
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              handleContactClick("phone");
-            }}
-            className="p-1.5 rounded hover:bg-gray-100 transition-colors"
-            title={isAuthenticated ? "View Phone" : "Login to view phone"}
-          >
-            📞
-          </button>
-          <button
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              handleContactClick("email");
-            }}
-            className="p-1.5 rounded hover:bg-gray-100 transition-colors"
-            title={isAuthenticated ? "View Email" : "Login to view email"}
-          >
-            ✉️
-          </button>
-          <button
-            className="p-1.5 rounded hover:bg-gray-100 transition-colors"
-            title="Gallery"
-          >
-            📷
-          </button>
-        </div>
 
-        <Link
-          to={`/professional/${
-            professional.name
-              ? professional.name.toLowerCase().replace(/\s+/g, "-")
-              : "unknown"
-          }/${professional.id}`}
-        >
-          <Button
-            variant="default"
-            size="sm"
-            className="bg-secondary-900 text-white hover:bg-gray-700 px-4 py-2 text-sm"
+          <Link
+            to={`/professional/${
+              professional.name
+                ? professional.name.toLowerCase().replace(/\s+/g, "-")
+                : "unknown"
+            }/${professional.id}`}
           >
-            View Profile
-          </Button>
-        </Link>
-      </div>
+            <Button
+              variant="default"
+              size="sm"
+              className="bg-secondary-900 text-white hover:bg-gray-700 px-4 py-2 text-sm"
+            >
+              View Profile
+            </Button>
+          </Link>
+        </div>
+      </Link>
 
       <ContactDetailsPopup
         open={contactPopupOpen}

@@ -324,12 +324,12 @@ const RegisterProfessionalDialog = ({
 
             // Professional Details
             district_level_tournaments:
-              profileData.district_level_tournaments || 0,
-            state_level_tournaments: profileData.state_level_tournaments || 0,
+              profileData.district_level_tournaments || "",
+            state_level_tournaments: profileData.state_level_tournaments || "",
             national_level_tournaments:
-              profileData.national_level_tournaments || 0,
+              profileData.national_level_tournaments || "",
             international_level_tournaments:
-              profileData.international_level_tournaments || 0,
+              profileData.international_level_tournaments || "",
             specialties: profileData.specialties || [],
             certifications: profileData.certifications || [],
             education: profileData.education || [],
