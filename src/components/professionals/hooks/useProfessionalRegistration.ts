@@ -213,6 +213,8 @@ export const useProfessionalRegistration = (onSuccess: () => void, isUpdate: boo
         free_demo_call: values.free_demo_call || false,
         about_me: values.about_me || null,
         success_stories: values.success_stories || [],
+        age: values.age || 0,
+        sex: values.sex || null
       };
       
       console.log('Professional data to save:', professionalData);

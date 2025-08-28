@@ -121,7 +121,7 @@ const SportsProfessionals = () => {
               <Button
                 onClick={handleRegisterClick}
                 disabled={checkingProfile}
-                className="bg-foreground text-background hover:bg-foreground/90"
+                className="bg-secondary-900 text-background hover:bg-foreground/90"
               >
                 {checkingProfile ? "Checking..." : getButtonText()}
               </Button>

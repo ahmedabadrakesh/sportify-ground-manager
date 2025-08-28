@@ -137,11 +137,9 @@ const Home: React.FC = () => {
         {/* <StatBanner /> */}
       </div>
 
-      <div className="container mx-auto px-4">
-        {/* <HowItWorksSection /> */}
-        <ShopPromotionSection />
-        {/* <WhyChooseUsSection /> */}
-      </div>
+      {/* <HowItWorksSection /> */}
+      <ShopPromotionSection />
+      {/* <WhyChooseUsSection /> */}
 
       {/* Authentication Required Dialog */}
       <AuthRequiredDialog

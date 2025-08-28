@@ -107,18 +107,23 @@ export const StepOne = ({ form }: StepOneProps) => {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Age</FormLabel>
-                  <Select onValueChange={(value) => field.onChange(Number(value))} value={field.value?.toString() || ""}>
+                  <Select
+                    onValueChange={(value) => field.onChange(Number(value))}
+                    value={field.value?.toString() || ""}
+                  >
                     <FormControl>
                       <SelectTrigger>
                         <SelectValue placeholder="Select age" />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      {Array.from({ length: 41 }, (_, i) => i + 10).map((age) => (
-                        <SelectItem key={age} value={age.toString()}>
-                          {age}
-                        </SelectItem>
-                      ))}
+                      {Array.from({ length: 41 }, (_, i) => i + 10).map(
+                        (age) => (
+                          <SelectItem key={age} value={age.toString()}>
+                            {age}
+                          </SelectItem>
+                        )
+                      )}
                     </SelectContent>
                   </Select>
                   <FormMessage />
@@ -140,11 +145,15 @@ export const StepOne = ({ form }: StepOneProps) => {
                     >
                       <div className="flex items-center space-x-2">
                         <RadioGroupItem value="Male" id="male" />
-                        <label htmlFor="male" className="text-sm font-medium">Male</label>
+                        <label htmlFor="male" className="text-sm font-medium">
+                          Male
+                        </label>
                       </div>
                       <div className="flex items-center space-x-2">
                         <RadioGroupItem value="Female" id="female" />
-                        <label htmlFor="female" className="text-sm font-medium">Female</label>
+                        <label htmlFor="female" className="text-sm font-medium">
+                          Female
+                        </label>
                       </div>
                     </RadioGroup>
                   </FormControl>
@@ -188,18 +197,22 @@ export const StepOne = ({ form }: StepOneProps) => {
           control={form.control}
           render={({ field }) => (
             <FormItem className="flex flex-col justify-between rounded-lg border p-4">
-              <FormLabel className="items-left">Punch Line</FormLabel>
-              <FormControl>
-                <Input
-                  {...field}
-                  value={suggestedPunchLine}
-                  onChange={(e) => {
-                    setSuggestedPunchLine(e.target.value);
-                    field.onChange(e.target.value);
-                  }}
-                  placeholder="A catchy phrase about yourself"
-                />
-              </FormControl>
+              <div className="flex flex-row justify-between items-center rounded-lg border p-4">
+                <FormLabel className="items-left min-w-20 ">
+                  Punch Line
+                </FormLabel>
+                <FormControl>
+                  <Input
+                    {...field}
+                    value={suggestedPunchLine}
+                    onChange={(e) => {
+                      setSuggestedPunchLine(e.target.value);
+                      field.onChange(e.target.value);
+                    }}
+                    placeholder="A catchy phrase about yourself"
+                  />
+                </FormControl>
+              </div>
               <FormMessage />
               <TextSuggestionCarousel
                 suggestions={punchLineData}
@@ -215,7 +228,7 @@ export const StepOne = ({ form }: StepOneProps) => {
       </div>
 
       {/* Bottom Row: Academy Name (Left), Years of Experience (Right) */}
-      <div className="grid lg:grid-cols-2 gap-6 pt-4">
+      <div className="grid lg:grid-cols-2 gap-6 pt-2">
         {/* Left: Academy Name */}
         <FormField
           name="academy_name"
@@ -266,7 +279,7 @@ export const StepOne = ({ form }: StepOneProps) => {
           name="is_certified"
           control={form.control}
           render={({ field }) => (
-            <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+            <FormItem className="flex flex-row items-center justify-between">
               <div className="space-y-0.5">
                 <FormLabel className="text-base">
                   Are you a certified Professional?

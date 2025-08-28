@@ -196,7 +196,9 @@ const ProfessionalProfile = () => {
           <div className="text-center">
             <h1 className="text-2xl font-bold mb-4">Professional not found</h1>
             <Link to="/sports-professionals">
-              <Button>Back to Professionals</Button>
+              <Button className="bg-secondary-900">
+                Back to Professionals
+              </Button>
             </Link>
           </div>
         </div>
@@ -392,10 +394,7 @@ const ProfessionalProfile = () => {
             {/* Back button and Update Profile button */}
             <div className="mb-8 flex justify-between items-center">
               <Link to="/sports-professionals">
-                <Button
-                  variant="ghost"
-                  className="flex bg-gradient-to-r items-center gap-2 hover:bg-white"
-                >
+                <Button className="flex bg-secondary-900 items-center gap-2 hover:bg-secondary-600">
                   <ArrowLeft className="h-4 w-4" />
                   Back to Professionals
                 </Button>
@@ -412,7 +411,7 @@ const ProfessionalProfile = () => {
             </div>
 
             {/* Profile Header */}
-            <div className="bg-gradient-to-r p-12 flex flex-col lg:flex-row items-center lg:items-start gap-8">
+            <div className="bg-gradient-to-br from-secondary-600 to-secondary-900 p-12 flex flex-col lg:flex-row items-center lg:items-start gap-8">
               {/* Avatar and Initials */}
               <div className="relative flex flex-col items-center gap-4 w-full lg:w-auto">
                 <div className="w-32 h-32 lg:w-32 lg:h-32 rounded-full bg-gradient-to-br from-blue-400 to-purple-600 flex items-center justify-center text-white text-4xl lg:text-6xl font-bold mx-auto lg:mx-0">
@@ -442,8 +441,8 @@ const ProfessionalProfile = () => {
                   {toTitleCase(professional?.name || "Professional")}
                   {professional.is_certified && (
                     <div className="relative group">
-                      <FileBadge
-                        size={32}
+                      <Award
+                        size={20}
                         color="white"
                         className="ml-2"
                         fill="#1f2ce0"
@@ -604,8 +603,8 @@ const ProfessionalProfile = () => {
             <div className="lg:col-span-2 space-y-8">
               {/* About Me Section */}
               {professional.about_me && (
-                <Card className="shadow-elegant border-2 border-primary bg-muted/20">
-                  <CardHeader className="bg-primary text-primary-foreground">
+                <Card className="shadow-elegant border-2 border-secondary-900 bg-muted/20">
+                  <CardHeader className="bg-gradient-to-br from-secondary-600 to-secondary-900  text-primary-foreground">
                     <CardTitle className="flex items-center gap-2">
                       <Quote className="h-5 w-5" />
                       About Me
@@ -888,7 +887,7 @@ const ProfessionalProfile = () => {
                     <CardContent className="space-y-4">
                       <CircularProgress professional={professional} />
                       <Button
-                        className="w-full bg-slate-800 hover:bg-slate-700"
+                        className="w-full bg-secondary-900 hover:bg-slate-700"
                         onClick={handleUpdateProfile}
                       >
                         Complete Your Profile Now
@@ -901,12 +900,6 @@ const ProfessionalProfile = () => {
                 <CardHeader>
                   <CardTitle className="flex items-center justify-between text-left">
                     Contact Information
-                    {isAuthenticated && (
-                      <Eye
-                        className="w-5 h-5 text-primary cursor-pointer hover:text-primary/80"
-                        onClick={handleContactClick}
-                      />
-                    )}
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
@@ -978,7 +971,7 @@ const ProfessionalProfile = () => {
                     )}
 
                     <Button
-                      className="w-full bg-slate-800 hover:bg-slate-700"
+                      className="w-full bg-secondary-900 hover:bg-slate-700"
                       onClick={handleContactClick}
                       disabled={!isAuthenticated}
                     >

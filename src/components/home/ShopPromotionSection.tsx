@@ -10,7 +10,7 @@ const ShopPromotionSection = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="mb-16 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-xl overflow-hidden text-white">
+    <div className="mb-16 bg-gradient-to-r from-secondary-600 to-secondary-900  overflow-hidden text-white">
       <div className="container mx-auto px-4 py-12 flex flex-col md:flex-row items-center">
         <div className="md:w-3/5 mb-8 md:mb-0 md:pr-12">
           <h2 className="text-3xl font-bold mb-4">

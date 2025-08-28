@@ -33,11 +33,11 @@ export const PhotoUpload = ({ form }: PhotoUploadProps) => {
           <FormControl>
             <div className="flex flex-col items-center space-y-4 border-2 border-primary  border-dashed">
               {currentPhoto ? (
-                <div className="relative w-32 h-32">
+                <div className="relative w-32 h-48">
                   <img
                     src={currentPhoto}
                     alt="Preview"
-                    className="w-full h-full object-cover rounded-lg"
+                    className="w-full h-44 object-cover rounded-lg"
                   />
                   <Button
                     type="button"

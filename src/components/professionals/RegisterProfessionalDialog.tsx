@@ -308,6 +308,8 @@ const RegisterProfessionalDialog = ({
             years_of_experience: profileData.years_of_experience || 0,
             games_played: [],
             is_certified: profileData.is_certified || false,
+            age: profileData.age || 0,
+            sex: profileData.sex || "",
 
             // Contact & Social Details
             contact_number: profileData.contact_number || "",

@@ -11,6 +11,7 @@ import {
   Target,
   BadgeCheck,
   Volleyball,
+  Award,
 } from "lucide-react";
 import { getCurrentUserSync } from "@/utils/auth";
 import ContactDetailsPopup from "./ContactDetailsPopup";
@@ -82,7 +83,7 @@ const ProfessionalCard = ({
                 className="w-full h-full object-cover"
               />
             ) : (
-              <div className="w-full h-full bg-gray-300 flex items-center justify-center text-gray-600 font-bold text-sm">
+              <div className="w-full uppercase h-full bg-gray-300 flex items-center justify-center text-secondary-900 font-bold text-lg">
                 {professional.name
                   ?.split(" ")
                   .map((n) => n[0])
@@ -100,7 +101,7 @@ const ProfessionalCard = ({
               {professional.name}
               {professional.is_certified && (
                 <div className="relative group">
-                  <BadgeCheck
+                  <Award
                     size={20}
                     color="white"
                     className="ml-2"
@@ -239,7 +240,7 @@ const ProfessionalCard = ({
           <Button
             variant="default"
             size="sm"
-            className="bg-gray-800 text-white hover:bg-gray-700 px-4 py-2 text-sm"
+            className="bg-secondary-900 text-white hover:bg-gray-700 px-4 py-2 text-sm"
           >
             View Profile
           </Button>

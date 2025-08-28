@@ -38,14 +38,14 @@ const ExperienceSection = () => {
           {testimonials.map((testimonial, index) => (
             <div
               key={index}
-              className="bg-gray-300 p-8 rounded-lg shadow-sport athletic-transition hover:shadow-glow"
+              className="bg-gradient-to-br from-secondary-600 to-secondary-800 p-8 rounded-lg shadow-sport athletic-transition hover:shadow-glow"
             >
               {/* Stars */}
               <div className="flex justify-center mb-4">
                 {[...Array(testimonial.rating)].map((_, i) => (
                   <svg
                     key={i}
-                    className="h-5 w-5 text-primary"
+                    className="h-5 w-5 text-background"
                     fill="currentColor"
                     viewBox="0 0 24 24"
                   >
@@ -55,16 +55,16 @@ const ExperienceSection = () => {
               </div>
 
               {/* Quote */}
-              <blockquote className="text-foreground mb-6 italic">
+              <blockquote className="text-background mb-6 italic">
                 &quot;{testimonial.quote}&quot;
               </blockquote>
 
               {/* Author */}
               <div>
-                <p className="font-semibold text-foreground">
+                <p className="font-semibold text-background">
                   {testimonial.name}
                 </p>
-                <p className="text-primary text-sm">
+                <p className="text-background text-sm">
                   {testimonial.sport} Athlete
                 </p>
               </div>
@@ -73,7 +73,7 @@ const ExperienceSection = () => {
         </div>
 
         <div className="mt-12">
-          <div className="bg-secondary/90 p-8 rounded-lg shadow-sport max-w-4xl mx-auto">
+          <div className="bg-secondary/90 p-8 rounded-lg shadow-sport  mx-auto">
             <div className="grid grid-cols-1 md:grid-cols-4 gap-8 text-center">
               <div>
                 <div className="text-3xl font-bold  text-white/90 mb-2">

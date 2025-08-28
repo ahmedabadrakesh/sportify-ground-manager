@@ -40,7 +40,7 @@ const StatBanner = () => {
   return (
     <div className="mb-16">
       <motion.div
-        className="bg-gradient-to-r bg-lime-700 overflow-hidden"
+        className="bg-gradient-to-r from-secondary-600 to-secondary-900 overflow-hidden"
         initial={{ y: 50, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.6 }}

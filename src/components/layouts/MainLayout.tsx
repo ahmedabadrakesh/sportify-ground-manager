@@ -75,19 +75,19 @@ const MainLayout = ({ children }: MainLayoutProps) => {
               </Link> */}
               <Link
                 to="/sports-professionals"
-                className="text-green-700 font-bold  hover:text-primary"
+                className="text-secondary-900 font-bold  hover:text-primary"
               >
                 Sport Professionals
               </Link>
               <Link
                 to="/events"
-                className="text-green-700 font-bold  hover:text-primary"
+                className="text-secondary-900 font-bold  hover:text-primary"
               >
                 Events
               </Link>
               <Link
                 to="/shop"
-                className="text-green-700 font-bold  hover:text-primary"
+                className="text-secondary-900 font-bold  hover:text-primary"
               >
                 Shop
               </Link>

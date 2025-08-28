@@ -42,12 +42,13 @@ const SportsProfessionalsPromotion = () => {
           initial={{ opacity: 0, x: 50 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.5, delay: 0.2 }}
-          className="relative overflow-hidden bg-gradient-to-br from-secondary-600 to-secondary-800 p-8 text-white"
+          className="relative overflow-hidden bg-gradient-to-br from-secondary-600 to-secondary-900 p-8 text-white"
         >
           <div className="flex-row md:flex gap-6">
             <div className="w-full md:w-1/2">
-              <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full transform translate-x-16 -translate-y-16" />
-              {/* <UserPlus className="w-12 h-12 mb-4" /> */}
+              <div className="absolute top-0 right-0 w-32 h-32 bg-white/20 rounded-full transform translate-x-16 -translate-y-16" />
+              <div className="absolute -bottom-36 -left--24 w-32 h-32 bg-white/20 rounded-full transform translate-x-16 -translate-y-16" />
+
               <img
                 src={allsports}
                 alt={"all Sports"}
@@ -55,6 +56,8 @@ const SportsProfessionalsPromotion = () => {
               />
             </div>
             <div className="flex-grow content-center md:text-left">
+              <div className="absolute top-190px left-90 w-32 h-32 bg-white/10 rounded-full transform translate-x-16 -translate-y-16" />
+
               <div className="relative z-10 ">
                 <h3 className="text-2xl font-bold mb-4">
                   Want to join JOKOVO's Professional Squad?

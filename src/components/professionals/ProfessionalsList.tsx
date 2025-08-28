@@ -11,6 +11,7 @@ interface FilterOptions {
   gameId?: string;
   isCertified?: boolean;
   experienceRange?: string;
+  sex?: string;
 }
 
 interface ProfessionalsListProps {
@@ -31,7 +32,8 @@ const ProfessionalsList = ({ sportFilter }: ProfessionalsListProps) => {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("sports_professionals")
-        .select(`
+        .select(
+          `
           id, profession_type, name, fee, fee_type, address, city, comments,
           photo, user_id, created_at, updated_at, awards, accomplishments,
           certifications, training_locations, videos, images, punch_line,
@@ -42,8 +44,9 @@ const ProfessionalsList = ({ sportFilter }: ProfessionalsListProps) => {
           national_level_tournaments, international_level_tournaments,
           specialties, education, one_on_one_price, group_session_price,
           online_price, free_demo_call, about_me, success_stories,
-          training_locations_detailed, is_certified, game_ids, deleted_at
-        `)
+          training_locations_detailed, is_certified, game_ids, deleted_at,sex
+        `
+        )
         .order("created_at", { ascending: false });
 
       if (error) {
@@ -75,6 +78,11 @@ const ProfessionalsList = ({ sportFilter }: ProfessionalsListProps) => {
         return false;
       }
 
+      // sex filter
+      if (filters.sex && prof.sex !== filters.sex) {
+        return false;
+      }
+
       // Game filter
       if (
         filters.gameId &&
@@ -85,8 +93,8 @@ const ProfessionalsList = ({ sportFilter }: ProfessionalsListProps) => {
 
       // Sport filter from props (URL parameter)
       if (sportFilter && games) {
-        const sportGame = games.find(game => 
-          game.name.toLowerCase() === sportFilter.toLowerCase()
+        const sportGame = games.find(
+          (game) => game.name.toLowerCase() === sportFilter.toLowerCase()
         );
         if (sportGame) {
           // If professional has no game_ids or empty array, exclude them
@@ -182,7 +190,7 @@ const ProfessionalsList = ({ sportFilter }: ProfessionalsListProps) => {
       : "No sports professionals found. Be the first to register!";
 
     return (
-      <div className="text-center">
+      <div className="container text-center max-w-7xl">
         <ProfessionalsFilters
           filters={filters}
           onFiltersChange={setFilters}
