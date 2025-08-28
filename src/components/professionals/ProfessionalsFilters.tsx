@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { X, Filter, ChevronUp } from "lucide-react";
 import { useGames } from "@/hooks/useGames";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { Switch } from "@/components/ui/switch";
 
 interface FilterOptions {
   city?: string;
@@ -41,7 +42,8 @@ const ProfessionalsFilters = ({
   ];
 
   const experienceRanges = [
-    { value: "0-2", label: "0-2 years" },
+    { value: ">1", label: "Less than 1 year" },
+    { value: "1-2", label: "1-2 years" },
     { value: "3-5", label: "3-5 years" },
     { value: "6-10", label: "6-10 years" },
     { value: "10+", label: "10+ years" },
@@ -168,12 +170,52 @@ const ProfessionalsFilters = ({
               </Select>
             </div>
 
-            {/* Certification Filter */}
+            {/* Experience Filter */}
             <div className="flex-1">
               <label className="text-sm font-medium text-foreground mb-2 block">
-                Certification
+                Experience
               </label>
               <Select
+                value={filters.experienceRange || "all"}
+                onValueChange={(value) =>
+                  handleFilterChange("experienceRange", value)
+                }
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="All Experience" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Experience</SelectItem>
+                  {experienceRanges.map((range) => (
+                    <SelectItem key={range.value} value={range.value}>
+                      {range.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Certification Filter */}
+            <div className="shrink items-center">
+              <label className="text-sm font-medium text-foreground mb-2 block">
+                Certified?
+              </label>
+              <div className="items-center pt-2">
+                <Switch
+                  checked={
+                    filters.isCertified === undefined
+                      ? false
+                      : filters.isCertified
+                      ? true
+                      : false
+                  }
+                  onCheckedChange={(value) =>
+                    handleFilterChange("isCertified", value)
+                  }
+                />
+              </div>
+
+              {/* <Select
                 value={
                   filters.isCertified === undefined
                     ? "all"
@@ -200,32 +242,7 @@ const ProfessionalsFilters = ({
                   <SelectItem value="certified">Certified</SelectItem>
                   <SelectItem value="not-certified">Not Certified</SelectItem>
                 </SelectContent>
-              </Select>
-            </div>
-
-            {/* Experience Filter */}
-            <div className="flex-1">
-              <label className="text-sm font-medium text-foreground mb-2 block">
-                Experience
-              </label>
-              <Select
-                value={filters.experienceRange || "all"}
-                onValueChange={(value) =>
-                  handleFilterChange("experienceRange", value)
-                }
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="All Experience" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Experience</SelectItem>
-                  {experienceRanges.map((range) => (
-                    <SelectItem key={range.value} value={range.value}>
-                      {range.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              </Select> */}
             </div>
           </div>
 
@@ -256,15 +273,21 @@ const ProfessionalsFilters = ({
                 </Badge>
               )}
 
-              {filters.isCertified !== undefined && (
-                <Badge variant="secondary" className="flex items-center gap-1">
-                  {filters.isCertified ? "Certified" : "Not Certified"}
-                  <X
-                    className="h-3 w-3 cursor-pointer"
-                    onClick={() => handleFilterChange("isCertified", undefined)}
-                  />
-                </Badge>
-              )}
+              {filters.isCertified !== undefined &&
+                filters.isCertified !== false && (
+                  <Badge
+                    variant="secondary"
+                    className="flex items-center gap-1"
+                  >
+                    {filters.isCertified ? "Certified" : "Not Certified"}
+                    <X
+                      className="h-3 w-3 cursor-pointer"
+                      onClick={() =>
+                        handleFilterChange("isCertified", undefined)
+                      }
+                    />
+                  </Badge>
+                )}
 
               {filters.experienceRange && (
                 <Badge variant="secondary" className="flex items-center gap-1">

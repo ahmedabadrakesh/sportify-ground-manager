@@ -71,7 +71,7 @@ const ProfessionalsList = ({ sportFilter }: ProfessionalsListProps) => {
   // Apply filters to professionals
   const professionals = useMemo(() => {
     if (!allProfessionals) return [];
-
+    let filterSet = false;
     return allProfessionals.filter((prof) => {
       // City filter
       if (filters.city && prof.city !== filters.city) {
@@ -123,10 +123,14 @@ const ProfessionalsList = ({ sportFilter }: ProfessionalsListProps) => {
 
       // Experience filter
       if (filters.experienceRange && prof.years_of_experience !== null) {
+        filterSet = true;
         const experience = prof.years_of_experience;
         switch (filters.experienceRange) {
-          case "0-2":
-            if (experience > 2) return false;
+          case ">1":
+            if (experience > 1) return false;
+            break;
+          case "1-2":
+            if (experience < 1 || experience > 2) return false;
             break;
           case "3-5":
             if (experience < 3 || experience > 5) return false;
@@ -137,6 +141,8 @@ const ProfessionalsList = ({ sportFilter }: ProfessionalsListProps) => {
           case "10+":
             if (experience < 10) return false;
             break;
+          default:
+            return false;
         }
       }
 
