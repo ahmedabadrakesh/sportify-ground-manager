@@ -42,6 +42,7 @@ import {
   CircleCheck,
   BadgeCheck,
   AwardIcon,
+  FileBadge,
 } from "lucide-react";
 import VideoGallery from "@/components/professionals/components/VideoGallery";
 import ImageGallery from "@/components/professionals/components/ImageGallery";
@@ -440,7 +441,7 @@ const ProfessionalProfile = () => {
                   {toTitleCase(professional?.name || "Professional")}
                   {professional.is_certified && (
                     <div className="relative group">
-                      <BadgeCheck
+                      <FileBadge
                         size={32}
                         color="white"
                         className="ml-2"
