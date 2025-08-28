@@ -71,7 +71,7 @@ export const StepThree = ({ form }: StepThreeProps) => {
                 <FormItem>
                   <FormLabel>District Level</FormLabel>
                   <FormControl>
-                    <Input type="number" {...field} placeholder="" />
+                    <Input type="text" {...field} placeholder="" />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -85,7 +85,7 @@ export const StepThree = ({ form }: StepThreeProps) => {
                 <FormItem>
                   <FormLabel>State Level</FormLabel>
                   <FormControl>
-                    <Input type="number" {...field} placeholder="" />
+                    <Input type="text" {...field} placeholder="" />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -99,7 +99,7 @@ export const StepThree = ({ form }: StepThreeProps) => {
                 <FormItem>
                   <FormLabel>National Level</FormLabel>
                   <FormControl>
-                    <Input type="number" {...field} placeholder="" />
+                    <Input type="text" {...field} placeholder="" />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -113,7 +113,12 @@ export const StepThree = ({ form }: StepThreeProps) => {
                 <FormItem>
                   <FormLabel>International</FormLabel>
                   <FormControl>
-                    <Input type="number" {...field} placeholder="" />
+                    <Input
+                      type="text"
+                      {...field}
+                      placeholder=""
+                      maxLength={4}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

@@ -132,12 +132,14 @@ const ProfessionalCard = ({
       <div className="md:h-40">
         {/* Stats Row */}
         <div className="flex items-center gap-2">
-          <Badge
-            variant="secondary"
-            className="text-xs bg-gray-100 text-gray-700 border-0"
-          >
-            {getExperience()}
-          </Badge>
+          {professional.years_of_experience && (
+            <Badge
+              variant="secondary"
+              className="text-xs bg-gray-100 text-gray-700 border-0"
+            >
+              {`${professional.years_of_experience} Years`}
+            </Badge>
+          )}
           <Badge
             variant="secondary"
             className="text-xs bg-gray-100 text-gray-700 border-0"

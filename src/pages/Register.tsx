@@ -8,6 +8,7 @@ import { UserTypeSelectionDialog } from "@/components/auth/UserTypeSelectionDial
 import { SportsProfessionalWelcome } from "@/components/auth/SportsProfessionalWelcome";
 import RegisterProfessionalDialog from "@/components/professionals/RegisterProfessionalDialog";
 import { supabase } from "@/integrations/supabase/client";
+import MainLayout from "@/components/layouts/MainLayout";
 
 const Register: React.FC = () => {
   const navigate = useNavigate();
@@ -246,262 +247,254 @@ const Register: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-accent/10 flex items-center justify-center p-4">
-      <div className="w-full max-w-5xl">
-        {/* Header */}
-        <div className="text-center mb-8">
-          <Link to="/" className="inline-block">
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
-              SportifyGround
-            </h1>
-          </Link>
-          <p className="text-muted-foreground mt-2">
-            Join the ultimate sports community
-          </p>
-        </div>
-
-        {/* Main Container */}
-        <div className="bg-gradient-to-r from-primary/95 to-primary/90 backdrop-blur-sm rounded-3xl shadow-2xl overflow-hidden">
-          <div className="grid lg:grid-cols-2 min-h-[600px]">
-            {/* Left Panel - Welcome Content */}
-            <div className="p-12 text-white flex flex-col justify-center space-y-6">
-              <div>
-                <h2 className="text-3xl font-bold mb-4">Join SportifyGround</h2>
-                <p className="text-white/90 text-lg leading-relaxed">
-                  Create your account to unlock access to premium sports
-                  facilities, connect with professional coaches, and join our
-                  amazing sports community.
-                </p>
-              </div>
-
-              <div className="space-y-4">
-                <div className="flex items-center space-x-3">
-                  <div className="w-2 h-2 bg-white rounded-full"></div>
-                  <span className="text-white/90">
-                    Access to 100+ premium facilities
-                  </span>
+    <MainLayout>
+      <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-accent/10 flex items-center justify-center p-4">
+        <div className="w-full max-w-5xl">
+          {/* Main Container */}
+          <div className="bg-gradient-to-r from-primary/95 to-primary/90 backdrop-blur-sm rounded-3xl shadow-2xl overflow-hidden">
+            <div className="grid lg:grid-cols-2 min-h-[600px]">
+              {/* Left Panel - Welcome Content */}
+              <div className="p-12 text-white flex flex-col justify-center space-y-6">
+                <div>
+                  <h2 className="text-3xl font-bold mb-4">
+                    Join SportifyGround
+                  </h2>
+                  <p className="text-white/90 text-lg leading-relaxed">
+                    Create your account to unlock access to premium sports
+                    facilities, connect with professional coaches, and join our
+                    amazing sports community.
+                  </p>
                 </div>
-                <div className="flex items-center space-x-3">
-                  <div className="w-2 h-2 bg-white rounded-full"></div>
-                  <span className="text-white/90">
-                    Connect with certified professionals
-                  </span>
-                </div>
-                <div className="flex items-center space-x-3">
-                  <div className="w-2 h-2 bg-white rounded-full"></div>
-                  <span className="text-white/90">
-                    Real-time booking & scheduling
-                  </span>
-                </div>
-                <div className="flex items-center space-x-3">
-                  <div className="w-2 h-2 bg-white rounded-full"></div>
-                  <span className="text-white/90">
-                    Join sports events & tournaments
-                  </span>
-                </div>
-              </div>
 
-              {/* Registration Tips */}
-              <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20">
-                <h3 className="font-semibold text-white mb-3 flex items-center">
-                  <div className="w-2 h-2 bg-accent rounded-full mr-2"></div>
-                  Quick & Easy Setup
-                </h3>
-                <p className="text-sm text-white/90">
-                  After registration, we'll ask if you're a sports professional
-                  to customize your experience. You can always change this
-                  later!
-                </p>
-              </div>
-            </div>
+                <div className="space-y-4">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-2 h-2 bg-white rounded-full"></div>
+                    <span className="text-white/90">
+                      Access to 100+ premium facilities
+                    </span>
+                  </div>
+                  <div className="flex items-center space-x-3">
+                    <div className="w-2 h-2 bg-white rounded-full"></div>
+                    <span className="text-white/90">
+                      Connect with certified professionals
+                    </span>
+                  </div>
+                  <div className="flex items-center space-x-3">
+                    <div className="w-2 h-2 bg-white rounded-full"></div>
+                    <span className="text-white/90">
+                      Real-time booking & scheduling
+                    </span>
+                  </div>
+                  <div className="flex items-center space-x-3">
+                    <div className="w-2 h-2 bg-white rounded-full"></div>
+                    <span className="text-white/90">
+                      Join sports events & tournaments
+                    </span>
+                  </div>
+                </div>
 
-            {/* Right Panel - Registration Form */}
-            <div className="bg-white p-12 flex flex-col justify-center">
-              <div className="max-w-md mx-auto w-full">
-                <div className="mb-8">
-                  <h3 className="text-2xl font-bold text-foreground mb-2">
-                    Create Account
+                {/* Registration Tips */}
+                <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20">
+                  <h3 className="font-semibold text-white mb-3 flex items-center">
+                    <div className="w-2 h-2 bg-accent rounded-full mr-2"></div>
+                    Quick & Easy Setup
                   </h3>
-                  <p className="text-muted-foreground">
-                    Register to start your sports journey
+                  <p className="text-sm text-white/90">
+                    After registration, we'll ask if you're a sports
+                    professional to customize your experience. You can always
+                    change this later!
                   </p>
                 </div>
+              </div>
 
-                <form onSubmit={handleSubmit} className="space-y-6">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    className="w-full h-12"
-                    onClick={handleGoogleLogin}
-                    disabled={isLoading}
-                  >
-                    <svg
-                      className="mr-3 h-5 w-5"
-                      aria-hidden="true"
-                      focusable="false"
-                      data-prefix="fab"
-                      data-icon="google"
-                      role="img"
-                      xmlns="http://www.w3.org/2000/svg"
-                      viewBox="0 0 488 512"
+              {/* Right Panel - Registration Form */}
+              <div className="bg-white p-8 flex flex-col justify-center">
+                <div className="max-w-md mx-auto w-full">
+                  <div className="mb-8">
+                    <h3 className="text-2xl font-bold text-foreground mb-2">
+                      Create Account
+                    </h3>
+                    <p className="text-muted-foreground">
+                      Register to start your sports journey
+                    </p>
+                  </div>
+
+                  <form onSubmit={handleSubmit} className="space-y-4">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      className="w-full h-12 text-white bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-blue-300 dark:focus:ring-blue-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2"
+                      onClick={handleGoogleLogin}
+                      disabled={isLoading}
                     >
-                      <path
-                        fill="currentColor"
-                        d="M488 261.8C488 403.3 391.1 504 248 504 110.8 504 0 393.2 0 256S110.8 8 248 8c66.8 0 123 24.5 166.3 64.9l-67.5 64.9C258.5 52.6 94.3 116.6 94.3 256c0 86.5 69.1 156.6 153.7 156.6 98.2 0 135-70.4 140.8-106.9H248v-85.3h240z"
+                      <svg
+                        className="mr-3 h-5 w-5"
+                        aria-hidden="true"
+                        focusable="false"
+                        data-prefix="fab"
+                        data-icon="google"
+                        role="img"
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 488 512"
+                      >
+                        <path
+                          fill="currentColor"
+                          d="M488 261.8C488 403.3 391.1 504 248 504 110.8 504 0 393.2 0 256S110.8 8 248 8c66.8 0 123 24.5 166.3 64.9l-67.5 64.9C258.5 52.6 94.3 116.6 94.3 256c0 86.5 69.1 156.6 153.7 156.6 98.2 0 135-70.4 140.8-106.9H248v-85.3h240z"
+                        />
+                      </svg>
+                      Register with Google
+                    </Button>
+
+                    <div className="relative">
+                      <div className="absolute inset-0 flex items-center">
+                        <span className="w-full border-t border-primary-700 border-border" />
+                      </div>
+                      <div className="relative flex justify-center text-xs uppercase">
+                        <span className="bg-white px-4 text-muted-foreground font-medium">
+                          Or continue with
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="email" className="text-sm font-medium">
+                        Email Address
+                      </Label>
+                      <Input
+                        id="email"
+                        type="email"
+                        placeholder="you@example.com"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        disabled={isLoading}
+                        className="h-12"
+                        required
                       />
-                    </svg>
-                    Register with Google
-                  </Button>
-
-                  <div className="relative">
-                    <div className="absolute inset-0 flex items-center">
-                      <span className="w-full border-t border-primary-700 border-border" />
                     </div>
-                    <div className="relative flex justify-center text-xs uppercase">
-                      <span className="bg-white px-4 text-muted-foreground font-medium">
-                        Or continue with
-                      </span>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="password" className="text-sm font-medium">
+                        Password
+                      </Label>
+                      <Input
+                        id="password"
+                        type="password"
+                        placeholder="Create a strong password"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        disabled={isLoading}
+                        className="h-12"
+                        required
+                      />
                     </div>
-                  </div>
 
-                  <div className="space-y-2">
-                    <Label htmlFor="email" className="text-sm font-medium">
-                      Email Address
-                    </Label>
-                    <Input
-                      id="email"
-                      type="email"
-                      placeholder="you@example.com"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
+                    <div className="space-y-2">
+                      <Label
+                        htmlFor="confirm-password"
+                        className="text-sm font-medium"
+                      >
+                        Confirm Password
+                      </Label>
+                      <Input
+                        id="confirm-password"
+                        type="password"
+                        placeholder="Confirm your password"
+                        value={confirmPassword}
+                        onChange={(e) => setConfirmPassword(e.target.value)}
+                        disabled={isLoading}
+                        className="h-12"
+                        required
+                      />
+                    </div>
+
+                    <div className="text-xs text-muted-foreground bg-muted/30 p-3 rounded-lg">
+                      By creating an account, you agree to our{" "}
+                      <Link
+                        to="/terms"
+                        className="text-primary hover:text-primary/80 font-medium"
+                      >
+                        Terms of Service
+                      </Link>{" "}
+                      and{" "}
+                      <Link
+                        to="/privacy"
+                        className="text-primary hover:text-primary/80 font-medium"
+                      >
+                        Privacy Policy
+                      </Link>
+                    </div>
+
+                    <Button
+                      type="submit"
+                      className="w-full h-12 text-base font-medium"
                       disabled={isLoading}
-                      className="h-12"
-                      required
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="password" className="text-sm font-medium">
-                      Password
-                    </Label>
-                    <Input
-                      id="password"
-                      type="password"
-                      placeholder="Create a strong password"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      disabled={isLoading}
-                      className="h-12"
-                      required
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label
-                      htmlFor="confirm-password"
-                      className="text-sm font-medium"
                     >
-                      Confirm Password
-                    </Label>
-                    <Input
-                      id="confirm-password"
-                      type="password"
-                      placeholder="Confirm your password"
-                      value={confirmPassword}
-                      onChange={(e) => setConfirmPassword(e.target.value)}
-                      disabled={isLoading}
-                      className="h-12"
-                      required
-                    />
+                      {isLoading ? "Creating account..." : "Create Account"}
+                    </Button>
+                  </form>
+
+                  <div className="mt-4 text-center space-y-2">
+                    <p className="text-sm text-muted-foreground">
+                      Already have an account?{" "}
+                      <Link
+                        to="/login"
+                        className="font-medium text-primary hover:text-primary/80"
+                      >
+                        Sign in
+                      </Link>
+                    </p>
+
+                    <Button
+                      variant="ghost"
+                      className="text-sm"
+                      onClick={() => navigate("/")}
+                    >
+                      ← Back to Home
+                    </Button>
                   </div>
-
-                  <div className="text-xs text-muted-foreground bg-muted/30 p-3 rounded-lg">
-                    By creating an account, you agree to our{" "}
-                    <Link
-                      to="/terms"
-                      className="text-primary hover:text-primary/80 font-medium"
-                    >
-                      Terms of Service
-                    </Link>{" "}
-                    and{" "}
-                    <Link
-                      to="/privacy"
-                      className="text-primary hover:text-primary/80 font-medium"
-                    >
-                      Privacy Policy
-                    </Link>
-                  </div>
-
-                  <Button
-                    type="submit"
-                    className="w-full h-12 text-base font-medium"
-                    disabled={isLoading}
-                  >
-                    {isLoading ? "Creating account..." : "Create Account"}
-                  </Button>
-                </form>
-
-                <div className="mt-8 text-center space-y-4">
-                  <p className="text-sm text-muted-foreground">
-                    Already have an account?{" "}
-                    <Link
-                      to="/login"
-                      className="font-medium text-primary hover:text-primary/80"
-                    >
-                      Sign in
-                    </Link>
-                  </p>
-
-                  <Button
-                    variant="ghost"
-                    className="text-sm"
-                    onClick={() => navigate("/")}
-                  >
-                    ← Back to Home
-                  </Button>
                 </div>
               </div>
             </div>
           </div>
-        </div>
 
-        {/* User Type Selection Dialog */}
-        <UserTypeSelectionDialog
-          open={showUserTypeDialog}
-          onOpenChange={setShowUserTypeDialog}
-          onUserTypeSelect={handleUserTypeSelection}
-        />
-
-        {/* Sports Professional Welcome Dialog */}
-        <SportsProfessionalWelcome
-          open={showWelcomeDialog}
-          onOpenChange={setShowWelcomeDialog}
-          onStartProfile={() => {
-            setShowWelcomeDialog(false);
-            setIsRegisterDialogOpen(true);
-          }}
-          onSkip={() => {
-            setShowWelcomeDialog(false);
-            navigate(-1);
-          }}
-          userName={registeredUser?.name || ""}
-        />
-
-        {/* Professional Registration Dialog */}
-        {isRegisterDialogOpen && registeredUser && (
-          <RegisterProfessionalDialog
-            open={isRegisterDialogOpen}
-            onOpenChange={(open) => {
-              setIsRegisterDialogOpen(open);
-              if (!open) {
-                navigate(-1);
-              }
-            }}
-            isUpdate={true}
+          {/* User Type Selection Dialog */}
+          <UserTypeSelectionDialog
+            open={showUserTypeDialog}
+            onOpenChange={setShowUserTypeDialog}
+            onUserTypeSelect={handleUserTypeSelection}
           />
-        )}
+
+          {/* Sports Professional Welcome Dialog */}
+          <SportsProfessionalWelcome
+            open={showWelcomeDialog}
+            onOpenChange={setShowWelcomeDialog}
+            onStartProfile={() => {
+              setShowWelcomeDialog(false);
+              setIsRegisterDialogOpen(true);
+            }}
+            onSkip={() => {
+              setShowWelcomeDialog(false);
+              navigate(-1);
+            }}
+            userName={registeredUser?.name || ""}
+          />
+
+          {/* Professional Registration Dialog */}
+          {isRegisterDialogOpen && registeredUser && (
+            <RegisterProfessionalDialog
+              open={isRegisterDialogOpen}
+              onOpenChange={(open) => {
+                setIsRegisterDialogOpen(open);
+                if (!open) {
+                  navigate(-1);
+                }
+              }}
+              isUpdate={true}
+            />
+          )}
+        </div>
       </div>
-    </div>
+    </MainLayout>
   );
 };
 
