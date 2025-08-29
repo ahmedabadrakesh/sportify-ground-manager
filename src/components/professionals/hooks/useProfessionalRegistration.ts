@@ -214,7 +214,8 @@ export const useProfessionalRegistration = (onSuccess: () => void, isUpdate: boo
         about_me: values.about_me || null,
         success_stories: values.success_stories || [],
         age: values.age || 0,
-        sex: values.sex || null
+        sex: values.sex || null,
+        number_of_clients_served: Number(values.number_of_clients_served) || 0
       };
       
       console.log('Professional data to save:', professionalData);
