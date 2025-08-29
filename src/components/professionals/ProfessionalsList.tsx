@@ -44,7 +44,7 @@ const ProfessionalsList = ({ sportFilter }: ProfessionalsListProps) => {
           national_level_tournaments, international_level_tournaments,
           specialties, education, one_on_one_price, group_session_price,
           online_price, free_demo_call, about_me, success_stories,
-          training_locations_detailed, is_certified, game_ids, deleted_at,sex
+          training_locations_detailed, is_certified, game_ids, deleted_at,sex,number_of_clients_served
         `
         )
         .order("created_at", { ascending: false });

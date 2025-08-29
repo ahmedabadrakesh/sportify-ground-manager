@@ -140,20 +140,24 @@ const ProfessionalCard = ({
         <div className="md:h-40">
           {/* Stats Row */}
           <div className="flex items-center gap-2">
-            {professional.years_of_experience && (
-              <Badge
-                variant="secondary"
-                className="text-xs bg-gray-100 text-gray-700 border-0"
-              >
-                {`${professional.years_of_experience} Years`}
-              </Badge>
-            )}
-            <Badge
-              variant="secondary"
-              className="text-xs bg-gray-100 text-gray-700 border-0"
-            >
-              {getClientCount()}
-            </Badge>
+            {professional.years_of_experience !== null &&
+              professional.years_of_experience !== 0 && (
+                <Badge
+                  variant="secondary"
+                  className="text-xs bg-gray-100 text-gray-700 border-0"
+                >
+                  {`${professional.years_of_experience} Years`}
+                </Badge>
+              )}
+            {professional.number_of_clients_served !== null &&
+              professional.number_of_clients_served !== 0 && (
+                <Badge
+                  variant="secondary"
+                  className="text-xs bg-gray-100 text-gray-700 border-0"
+                >
+                  {`${professional.number_of_clients_served} Clients Served`}
+                </Badge>
+              )}
             {professional.is_certified && (
               <Badge
                 variant="secondary"

@@ -475,23 +475,25 @@ const ProfessionalProfile = () => {
                     })}
                 </>
 
-                <div className="block md:hidden grid grid-cols-2 md:grid-cols-5 gap-4 text-centers mb-6">
+                {/* <div className="block md:hidden grid grid-cols-2 md:grid-cols-5 gap-4 text-centers mb-6">
                   <div className="bg-muted rounded-lg p-4">
                     <div className="text-2xl font-bold text-primary">
                       {professional.years_of_experience}+
                     </div>
                     <div className="text-xs text-muted-foreground">
-                      Years Experience
+                      Years Experience1
                     </div>
                   </div>
-                   <div className="bg-muted rounded-lg p-4">
-                     <div className="text-2xl font-bold text-primary">
-                       {professional.number_of_clients_served || 0}+
-                     </div>
-                     <div className="text-xs text-muted-foreground">
-                       Clients Served
-                     </div>
-                   </div>
+                  {professional.number_of_clients_served !== 0 && (
+                    <div className="bg-muted rounded-lg p-4">
+                      <div className="text-2xl font-bold text-primary">
+                        {professional.number_of_clients_served || 0}
+                      </div>
+                      <div className="text-xs text-muted-foreground">
+                        Clients Served
+                      </div>
+                    </div>
+                  )}
                   {howManyMatchPlayed() !== 0 && (
                     <div className="bg-muted rounded-lg p-4">
                       <div className="text-2xl font-bold text-primary">
@@ -514,26 +516,30 @@ const ProfessionalProfile = () => {
                       {professional.city || "India"}
                     </div>
                   </div>
-                </div>
+                </div> */}
 
                 {/* Achievement Badges */}
                 <div className="hidden md:flex flex-wrap justify-center lg:justify-start gap-4 mb-6">
-                  {professional.years_of_experience && (
+                  {professional.years_of_experience !== null &&
+                    professional.years_of_experience !== 0 && (
+                      <Badge
+                        key="experience"
+                        variant="secondary"
+                        className="bg-primary-foreground/20 text-primary-foreground border-primary-foreground/30"
+                      >
+                        {professional.years_of_experience}+ Years Experience
+                      </Badge>
+                    )}
+                  {professional.number_of_clients_served !== 0 && (
                     <Badge
-                      key="experience"
+                      key="clients"
                       variant="secondary"
                       className="bg-primary-foreground/20 text-primary-foreground border-primary-foreground/30"
                     >
-                      {professional.years_of_experience}+ Years Experience
+                      {professional.number_of_clients_served || 0} Clients
+                      Served
                     </Badge>
                   )}
-                  <Badge
-                    key="clients"
-                    variant="secondary"
-                    className="bg-primary-foreground/20 text-primary-foreground border-primary-foreground/30"
-                  >
-                    {professional.number_of_clients_served || 0}+ Clients Served
-                  </Badge>
 
                   {howManyMatchPlayed() !== 0 && (
                     <Badge
