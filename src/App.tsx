@@ -38,9 +38,12 @@ import PrivacyPolicy from "./pages/PrivacyPolicy";
 import ResetPassword from "./pages/ResetPassword";
 import ForgotPassword from "./pages/ForgotPassword";
 import PendingCartPopup from "./components/cart/PendingCartPopup";
+import { usePageTracking } from "./hooks/useAnalytics";
 import "./App.css";
 
 function App() {
+  usePageTracking();
+  
   return (
     <Router>
       <PendingCartPopup />
