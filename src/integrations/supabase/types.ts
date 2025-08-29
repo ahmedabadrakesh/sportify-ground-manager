@@ -641,6 +641,7 @@ export type Database = {
           linkedin_link: string | null
           name: string
           national_level_tournaments: number | null
+          number_of_clients_served: number | null
           one_on_one_price: number | null
           online_price: number | null
           photo: string | null
@@ -693,6 +694,7 @@ export type Database = {
           linkedin_link?: string | null
           name: string
           national_level_tournaments?: number | null
+          number_of_clients_served?: number | null
           one_on_one_price?: number | null
           online_price?: number | null
           photo?: string | null
@@ -745,6 +747,7 @@ export type Database = {
           linkedin_link?: string | null
           name?: string
           national_level_tournaments?: number | null
+          number_of_clients_served?: number | null
           one_on_one_price?: number | null
           online_price?: number | null
           photo?: string | null

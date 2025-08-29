@@ -95,7 +95,7 @@ const ProfessionalProfile = () => {
            specialties, education, one_on_one_price, group_session_price,
            online_price, free_demo_call, about_me, success_stories,
            training_locations_detailed, is_certified, game_ids, deleted_at,
-           age, sex
+           age, sex, number_of_clients_served
          `
         )
         .eq("id", id)
@@ -484,14 +484,14 @@ const ProfessionalProfile = () => {
                       Years Experience
                     </div>
                   </div>
-                  <div className="bg-muted rounded-lg p-4">
-                    <div className="text-2xl font-bold text-primary">
-                      {100}+
-                    </div>
-                    <div className="text-xs text-muted-foreground">
-                      Clients Trained
-                    </div>
-                  </div>
+                   <div className="bg-muted rounded-lg p-4">
+                     <div className="text-2xl font-bold text-primary">
+                       {professional.number_of_clients_served || 0}+
+                     </div>
+                     <div className="text-xs text-muted-foreground">
+                       Clients Served
+                     </div>
+                   </div>
                   {howManyMatchPlayed() !== 0 && (
                     <div className="bg-muted rounded-lg p-4">
                       <div className="text-2xl font-bold text-primary">
@@ -532,7 +532,7 @@ const ProfessionalProfile = () => {
                     variant="secondary"
                     className="bg-primary-foreground/20 text-primary-foreground border-primary-foreground/30"
                   >
-                    {100}+ Clients Trained
+                    {professional.number_of_clients_served || 0}+ Clients Served
                   </Badge>
 
                   {howManyMatchPlayed() !== 0 && (

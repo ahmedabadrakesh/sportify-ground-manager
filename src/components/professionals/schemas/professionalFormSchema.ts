@@ -17,6 +17,7 @@ export const professionalFormSchema = z.object({
   years_of_experience: z.union([z.string(), z.number()]).transform((val) => Number(val) || 0).optional(),
   games_played: z.array(z.string()).min(1, "At least one game is required"),
   is_certified: z.boolean().optional(),
+  number_of_clients_served: z.union([z.string(), z.number()]).transform((val) => Number(val) || 0).optional(),
   
   // Contact & Social Details
   contact_number: z.string().min(1, "Contact number is required"),
