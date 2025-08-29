@@ -12,7 +12,7 @@ import { useGames } from "@/hooks/useGames";
 import { ProfessionalFormValues } from "../schemas/professionalFormSchema";
 import { ArrayFieldInput } from "./ArrayFieldInput";
 import { MultiSelect } from "@/components/ui/multi-select";
-import { Gamepad2, Trophy, Target, Award, GraduationCap } from "lucide-react";
+import { Gamepad2, Trophy, Target, Award, GraduationCap, Users } from "lucide-react";
 
 interface StepThreeProps {
   form: UseFormReturn<ProfessionalFormValues>;
@@ -125,6 +125,36 @@ export const StepThree = ({ form }: StepThreeProps) => {
               )}
             />
           </div>
+        </div>
+
+        {/* Number of Clients Served */}
+        <div className="mb-6">
+          <FormField
+            name="number_of_clients_served"
+            control={form.control}
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="flex items-center gap-2">
+                  <Users className="w-4 h-4" />
+                  Number of Clients Served
+                </FormLabel>
+                <FormControl>
+                  <Input
+                    type="number"
+                    {...field}
+                    value={field.value || ""}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      field.onChange(value === "" ? undefined : Number(value));
+                    }}
+                    placeholder="Enter number of clients served"
+                    min="0"
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
         </div>
 
         {/* Specialties and Achievements */}

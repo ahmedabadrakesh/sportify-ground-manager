@@ -19,7 +19,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { ProfessionalFormValues } from "../schemas/professionalFormSchema";
 import { PhotoUpload } from "./PhotoUpload";
 import { Database } from "@/integrations/supabase/types";
-import { Award, Users } from "lucide-react";
+import { Award } from "lucide-react";
 import TextSuggestionCarousel from "./TextSuggestionCarousel";
 import { useGames } from "@/hooks/useGames";
 import { Switch } from "@/components/ui/switch";
@@ -264,36 +264,6 @@ export const StepOne = ({ form }: StepOneProps) => {
                     field.onChange(value === "" ? undefined : Number(value));
                   }}
                   placeholder="Enter years of experience"
-                  min="0"
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-      </div>
-
-      {/* Number of Clients Served - Full Width Row */}
-      <div className="pt-4">
-        <FormField
-          name="number_of_clients_served"
-          control={form.control}
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel className="flex items-center gap-2">
-                <Users className="w-4 h-4" />
-                Number of Clients Served
-              </FormLabel>
-              <FormControl>
-                <Input
-                  type="number"
-                  {...field}
-                  value={field.value || ""}
-                  onChange={(e) => {
-                    const value = e.target.value;
-                    field.onChange(value === "" ? undefined : Number(value));
-                  }}
-                  placeholder="Enter number of clients served"
                   min="0"
                 />
               </FormControl>
