@@ -3,9 +3,9 @@ import { useLocation } from 'react-router-dom';
 import { trackPageView } from '@/utils/analytics';
 
 export const usePageTracking = () => {
-  const location = useLocation();
+  // const location = useLocation();
 
-  useEffect(() => {
-    trackPageView(location.pathname + location.search);
-  }, [location]);
+  // useEffect(() => {
+  //   trackPageView(location.pathname + location.search);
+  // }, [location]);
 };

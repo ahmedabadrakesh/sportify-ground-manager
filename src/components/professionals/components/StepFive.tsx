@@ -22,6 +22,8 @@ import {
   Trash2,
   Sparkles,
 } from "lucide-react";
+import OpenAI from "openai";
+import { TournamentParticipationSection } from "./form-sections/TournamentParticipationSection";
 
 interface StepFiveProps {
   form: UseFormReturn<ProfessionalFormValues>;
@@ -30,22 +32,51 @@ interface StepFiveProps {
 export const StepFive = ({ form }: StepFiveProps) => {
   const successStories = form.watch("success_stories") || [];
 
+  const openai = new OpenAI({
+    apiKey:
+      "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",
+    dangerouslyAllowBrowser: true,
+  });
+
   // Auto-generate About Me content based on form data
   const generateAboutMe = () => {
     const formData = form.getValues();
-    const gamesPlayed = formData.games_played?.join(", ") || "various sports";
-    const experience = formData.years_of_experience || "several years";
-    const professionType = formData.profession_type || "professional";
+    const gamesPlayed = formData.games_played?.join(", ");
+    const experience = formData.years_of_experience;
+    const professionType = formData.profession_type;
     const specialties =
       formData.specialties?.slice(0, 3).join(", ") || "coaching and training";
+    const numberOfClientServed = formData.number_of_clients_served;
+    const districtLevelTournaments = formData.district_level_tournaments;
+    const stateLevelTournaments = formData.state_level_tournaments;
+    const nationalLevelTournaments = formData.national_level_tournaments;
+    const internationalLevelTournaments =
+      formData.international_level_tournaments;
 
-    const aboutMeText = `I am a passionate ${professionType.toLowerCase()} with ${experience} years of experience in ${gamesPlayed}. My expertise lies in ${specialties}, and I am dedicated to helping athletes reach their full potential through personalized training programs and professional guidance.
+    const aboutMeText = `I am a passionate ${professionType.toLowerCase()} with ${experience} years of experience in ${gamesPlayed}. My expertise lies in ${specialties}, till now i served ${numberOfClientServed} clients.
 
-I have participated in numerous tournaments and competitions, bringing real-world experience to my coaching methodology. My approach focuses on not just improving technical skills but also building mental strength and strategic thinking.
+I have participated in numerous tournaments and competitions, which includes District Level - ${districtLevelTournaments}, State Level - ${stateLevelTournaments}, National Level - ${nationalLevelTournaments} and International Level - ${internationalLevelTournaments} bringing real-world experience to my coaching methodology. My approach focuses on not just improving technical skills but also building mental strength and strategic thinking.`;
 
-Whether you're a beginner looking to start your sports journey or an experienced athlete aiming to enhance your performance, I provide tailored training sessions that meet your specific needs and goals.`;
-
-    form.setValue("about_me", aboutMeText);
+    const aboutMeTextFromChatGPT = openai.responses.create({
+      model: "gpt-4o-mini",
+      input: [
+        {
+          role: "developer",
+          content:
+            "Just re-write about me with given input for my trainer profile. Dont include heading just direct text",
+        },
+        {
+          role: "user",
+          content: aboutMeText,
+        },
+      ],
+      store: false,
+      //reasoning: { effort: "low" },
+    });
+    aboutMeTextFromChatGPT.then((result) => {
+      console.log(result.output_text);
+      form.setValue("about_me", result.output_text);
+    });
   };
 
   const addSuccessStory = () => {
