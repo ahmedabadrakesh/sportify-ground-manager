@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -12,7 +11,12 @@ interface ArrayFieldInputProps {
   label: string;
 }
 
-export const ArrayFieldInput = ({ value = [], onChange, placeholder, label }: ArrayFieldInputProps) => {
+export const ArrayFieldInput = ({
+  value = [],
+  onChange,
+  placeholder,
+  label,
+}: ArrayFieldInputProps) => {
   const [inputValue, setInputValue] = useState("");
 
   const addItem = () => {
@@ -42,13 +46,17 @@ export const ArrayFieldInput = ({ value = [], onChange, placeholder, label }: Ar
           placeholder={placeholder}
           onKeyPress={handleKeyPress}
         />
-        <Button type="button" onClick={addItem} size="sm">
+        <Button type="button" variant="secondary" onClick={addItem} size="sm">
           <Plus className="h-4 w-4" />
         </Button>
       </div>
       <div className="flex flex-wrap gap-2">
         {value.map((item, index) => (
-          <Badge key={index} variant="secondary" className="flex items-center gap-1">
+          <Badge
+            key={index}
+            variant="secondary"
+            className="flex items-center gap-1"
+          >
             {item}
             <X
               className="h-3 w-3 cursor-pointer"

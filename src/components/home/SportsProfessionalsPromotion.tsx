@@ -68,7 +68,7 @@ const SportsProfessionalsPromotion = () => {
                 </p>
                 <Button
                   onClick={() => navigate("/sports-professionals")}
-                  variant="secondary"
+                  variant="default"
                   className="bg-white text-secondary-700 hover:bg-white/90"
                 >
                   <UserPlus className="mr-2 h-4 w-4" />

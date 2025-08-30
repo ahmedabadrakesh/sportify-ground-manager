@@ -249,9 +249,9 @@ const ProfessionalCard = ({
             }/${professional.id}`}
           >
             <Button
-              variant="default"
+              variant="secondary"
               size="sm"
-              className="bg-secondary-900 text-white hover:bg-gray-700 px-4 py-2 text-sm"
+              className=" px-4 py-2 text-sm"
             >
               View Profile
             </Button>

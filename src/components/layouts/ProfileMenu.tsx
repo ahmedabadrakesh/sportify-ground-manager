@@ -21,7 +21,12 @@ interface ProfileMenuProps {
   userEmail?: string;
 }
 
-const ProfileMenu: React.FC<ProfileMenuProps> = ({ userName, userRole, isSuperAdmin, userEmail }) => {
+const ProfileMenu: React.FC<ProfileMenuProps> = ({
+  userName,
+  userRole,
+  isSuperAdmin,
+  userEmail,
+}) => {
   const navigate = useNavigate();
   const [showResetDialog, setShowResetDialog] = useState(false);
 
@@ -45,23 +50,27 @@ const ProfileMenu: React.FC<ProfileMenuProps> = ({ userName, userRole, isSuperAd
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" className="relative h-8 w-8 rounded-full">
           <Avatar className="h-8 w-8">
-            <AvatarFallback className="bg-primary text-primary-foreground">
+            <AvatarFallback className="bg-secondary text-primary-foreground">
               {userName.charAt(0).toUpperCase()}
             </AvatarFallback>
           </Avatar>
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="w-56 bg-background border shadow-lg z-50" align="end" forceMount>
+      <DropdownMenuContent
+        className="w-56 bg-background border shadow-lg z-50"
+        align="end"
+        forceMount
+      >
         <div className="flex items-center justify-start gap-2 p-2">
           <Avatar className="h-8 w-8">
-            <AvatarFallback className="bg-primary text-primary-foreground">
+            <AvatarFallback className="bg-secondary text-primary-foreground">
               {userName.charAt(0).toUpperCase()}
             </AvatarFallback>
           </Avatar>
           <div className="flex flex-col space-y-1 leading-none">
             <p className="font-medium text-sm">{userName}</p>
             <p className="text-xs text-muted-foreground capitalize">
-              {userRole.replace('_', ' ')}
+              {userRole.replace("_", " ")}
             </p>
           </div>
         </div>
@@ -80,7 +89,10 @@ const ProfileMenu: React.FC<ProfileMenuProps> = ({ userName, userRole, isSuperAd
             </Link>
           </DropdownMenuItem>
         )}
-        <DropdownMenuItem onClick={handleResetPassword} className="cursor-pointer">
+        <DropdownMenuItem
+          onClick={handleResetPassword}
+          className="cursor-pointer"
+        >
           <Key className="mr-2 h-4 w-4" />
           <span>Reset Password</span>
         </DropdownMenuItem>
@@ -90,7 +102,7 @@ const ProfileMenu: React.FC<ProfileMenuProps> = ({ userName, userRole, isSuperAd
           <span>Logout</span>
         </DropdownMenuItem>
       </DropdownMenuContent>
-      
+
       <ResetPasswordDialog
         open={showResetDialog}
         onOpenChange={setShowResetDialog}

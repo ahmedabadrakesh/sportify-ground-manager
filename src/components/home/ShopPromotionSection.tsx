@@ -21,7 +21,7 @@ const ShopPromotionSection = () => {
             balls to bats, we've got everything you need for your game.
           </p>
           <Button
-            variant="secondary"
+            variant="default"
             size="lg"
             className="bg-white text-indigo-700 hover:bg-gray-100"
             onClick={() => navigate("/shop")}

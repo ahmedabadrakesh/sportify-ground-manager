@@ -30,7 +30,7 @@ const CartIcon: React.FC<CartIconProps> = ({ className = "h-5 w-5" }) => {
     <div className="relative">
       <ShoppingCart className={className} />
       {cartCount > 0 && (
-        <span className="absolute -top-2 -right-2 bg-primary text-primary-foreground text-xs rounded-full h-5 w-5 flex items-center justify-center font-medium">
+        <span className="absolute -top-2 -right-2 bg-secondary text-primary-foreground text-xs rounded-full h-5 w-5 flex items-center justify-center font-medium">
           {cartCount > 99 ? "99+" : cartCount}
         </span>
       )}

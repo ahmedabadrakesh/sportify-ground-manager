@@ -1,11 +1,10 @@
-
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import MainLayout from "@/components/layouts/MainLayout";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { 
+import {
   Select,
   SelectContent,
   SelectItem,
@@ -35,22 +34,28 @@ const Shop: React.FC = () => {
         setLoading(true);
         const allProducts = await getAllProducts();
         setProducts(allProducts);
-        
+
         // Extract unique categories
         const uniqueCategories = new Set<string>();
-        allProducts.forEach(product => uniqueCategories.add(product.category));
+        allProducts.forEach((product) =>
+          uniqueCategories.add(product.category)
+        );
         setCategories(["all", ...Array.from(uniqueCategories)]);
-        
+
         // Apply initial filtering
         applyFilters(allProducts, searchTerm, category, sortBy);
       } catch (error) {
         console.error("Error loading products:", error);
-        toast({ title: "Error", description: "Failed to load products", variant: "destructive" });
+        toast({
+          title: "Error",
+          description: "Failed to load products",
+          variant: "destructive",
+        });
       } finally {
         setLoading(false);
       }
     };
-    
+
     loadProducts();
   }, []);
 
@@ -63,19 +68,21 @@ const Shop: React.FC = () => {
   ) => {
     // Filter products
     let filtered = [...productsList];
-    
+
     if (search) {
-      filtered = filtered.filter(product => 
-        product.name.toLowerCase().includes(search.toLowerCase()) ||
-        (product.description && product.description.toLowerCase().includes(search.toLowerCase())) ||
-        product.category.toLowerCase().includes(search.toLowerCase())
+      filtered = filtered.filter(
+        (product) =>
+          product.name.toLowerCase().includes(search.toLowerCase()) ||
+          (product.description &&
+            product.description.toLowerCase().includes(search.toLowerCase())) ||
+          product.category.toLowerCase().includes(search.toLowerCase())
       );
     }
-    
+
     if (cat !== "all") {
-      filtered = filtered.filter(product => product.category === cat);
+      filtered = filtered.filter((product) => product.category === cat);
     }
-    
+
     // Sort products
     filtered.sort((a, b) => {
       if (sort === "featured") {
@@ -87,7 +94,7 @@ const Shop: React.FC = () => {
       }
       return 0;
     });
-    
+
     setFilteredProducts(filtered);
   };
 
@@ -122,7 +129,7 @@ const Shop: React.FC = () => {
     <MainLayout>
       <div className="mb-8">
         <h1 className="text-3xl font-bold mb-6">Sports Equipment Shop</h1>
-        
+
         {/* Search and Filters */}
         <div className="flex flex-col md:flex-row gap-4 mb-8">
           <div className="relative flex-1">
@@ -134,21 +141,21 @@ const Shop: React.FC = () => {
               onChange={handleSearchChange}
             />
           </div>
-          
+
           <div className="flex gap-2">
             <Select value={category} onValueChange={handleCategoryChange}>
               <SelectTrigger className="w-[180px]">
                 <SelectValue placeholder="Category" />
               </SelectTrigger>
               <SelectContent>
-                {categories.map(cat => (
+                {categories.map((cat) => (
                   <SelectItem key={cat} value={cat}>
                     {cat === "all" ? "All Categories" : cat}
                   </SelectItem>
                 ))}
               </SelectContent>
             </Select>
-            
+
             <Select value={sortBy} onValueChange={handleSortChange}>
               <SelectTrigger className="w-[180px]">
                 <SelectValue placeholder="Sort by" />
@@ -161,72 +168,117 @@ const Shop: React.FC = () => {
             </Select>
           </div>
         </div>
-        
+
         {loading ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {[1, 2, 3, 4, 5, 6, 8].map(i => (
-              <div key={i} className="bg-gray-100 rounded-md h-80 animate-pulse"></div>
+            {[1, 2, 3, 4, 5, 6, 8].map((i) => (
+              <div
+                key={i}
+                className="bg-gray-100 rounded-md h-80 animate-pulse"
+              ></div>
             ))}
           </div>
         ) : (
           <>
             {/* Products Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {filteredProducts.map(product => (
-                 <Card key={product.id} className="overflow-hidden">
-                   <div className="aspect-square relative bg-gray-100 cursor-pointer" onClick={() => navigate(`/product/${product.name ? product.name.toLowerCase().replace(/\s+/g, '-') : 'product'}/${product.id}`)}>
-                     <img 
-                       src={product.images?.[0] || "/placeholder.svg"} 
-                       alt={product.name}
-                       className="object-cover w-full h-full hover:scale-105 transition-transform duration-300"
-                     />
-                     {product.featured && (
-                       <div className="absolute top-2 right-2 bg-primary text-white text-xs font-bold px-2 py-1 rounded">
-                         Featured
-                       </div>
-                     )}
-                   </div>
-                  
-                   <CardContent className="p-4">
-                      <h2 
-                        className="font-semibold text-lg mb-1 cursor-pointer hover:text-primary transition-colors" 
-                        onClick={() => navigate(`/product/${product.name ? product.name.toLowerCase().replace(/\s+/g, '-') : 'product'}/${product.id}`)}
+              {filteredProducts.map((product) => (
+                <Card key={product.id} className="overflow-hidden">
+                  <div
+                    className="aspect-square relative bg-gray-100 cursor-pointer"
+                    onClick={() =>
+                      navigate(
+                        `/product/${
+                          product.name
+                            ? product.name.toLowerCase().replace(/\s+/g, "-")
+                            : "product"
+                        }/${product.id}`
+                      )
+                    }
+                  >
+                    <img
+                      src={product.images?.[0] || "/placeholder.svg"}
+                      alt={product.name}
+                      className="object-cover w-full h-full hover:scale-105 transition-transform duration-300"
+                    />
+                    {product.featured && (
+                      <div className="absolute top-2 right-2 bg-primary text-white text-xs font-bold px-2 py-1 rounded">
+                        Featured
+                      </div>
+                    )}
+                  </div>
+
+                  <CardContent className="p-4">
+                    <h2
+                      className="font-semibold text-lg mb-1 cursor-pointer hover:text-primary transition-colors"
+                      onClick={() =>
+                        navigate(
+                          `/product/${
+                            product.name
+                              ? product.name.toLowerCase().replace(/\s+/g, "-")
+                              : "product"
+                          }/${product.id}`
+                        )
+                      }
+                    >
+                      {product.name}
+                    </h2>
+                    <p className="text-gray-500 text-sm mb-2 line-clamp-2">
+                      {product.description}
+                    </p>
+                    <div className="flex items-center justify-between">
+                      <span className="font-bold text-lg">
+                        ₹{product.price}
+                      </span>
+                      <span
+                        className={`text-sm ${
+                          product.stock > 0 ? "text-green-600" : "text-red-600"
+                        }`}
                       >
-                       {product.name}
-                     </h2>
-                     <p className="text-gray-500 text-sm mb-2 line-clamp-2">{product.description}</p>
-                     <div className="flex items-center justify-between">
-                       <span className="font-bold text-lg">₹{product.price}</span>
-                       <span className={`text-sm ${product.stock > 0 ? 'text-green-600' : 'text-red-600'}`}>
-                         {product.stock > 0 ? `In Stock (${product.stock})` : 'Out of Stock'}
-                       </span>
-                     </div>
-                   </CardContent>
-                   
-                   <CardFooter className="p-4 pt-0">
-                     <div className="flex gap-2">
-                       <Button 
-                         className="flex-1" 
-                         onClick={() => handleAddToCart(product)}
-                         disabled={product.stock === 0}
-                       >
-                         <ShoppingCart className="mr-2 h-4 w-4" /> Add to Cart
-                       </Button>
-                       <Button 
-                         variant="outline" 
-                         onClick={() => navigate(`/product/${product.name ? product.name.toLowerCase().replace(/\s+/g, '-') : 'product'}/${product.id}`)}
-                       >
-                         View
-                       </Button>
-                     </div>
-                   </CardFooter>
+                        {product.stock > 0
+                          ? `In Stock (${product.stock})`
+                          : "Out of Stock"}
+                      </span>
+                    </div>
+                  </CardContent>
+
+                  <CardFooter className="p-4 pt-0">
+                    <div className="flex gap-2">
+                      <Button
+                        className="flex-1"
+                        variant="secondary"
+                        onClick={() => handleAddToCart(product)}
+                        disabled={product.stock === 0}
+                      >
+                        <ShoppingCart className="mr-2 h-4 w-4" /> Add to Cart
+                      </Button>
+                      <Button
+                        variant="outline"
+                        onClick={() =>
+                          navigate(
+                            `/product/${
+                              product.name
+                                ? product.name
+                                    .toLowerCase()
+                                    .replace(/\s+/g, "-")
+                                : "product"
+                            }/${product.id}`
+                          )
+                        }
+                      >
+                        View
+                      </Button>
+                    </div>
+                  </CardFooter>
                 </Card>
               ))}
             </div>
-            
+
             {filteredProducts.length === 0 && (
               <div className="text-center py-12">
-                <p className="text-gray-500 mb-4">No products found matching your criteria.</p>
+                <p className="text-gray-500 mb-4">
+                  No products found matching your criteria.
+                </p>
                 <Button
                   variant="outline"
                   onClick={() => {

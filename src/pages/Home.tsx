@@ -118,6 +118,7 @@ const Home: React.FC = () => {
               <div className="flex flex-row gap-2">
                 <Button
                   onClick={handleAddEvent}
+                  variant="secondary"
                   className="mt-4 md:mt-0 flex items-center gap-2"
                 >
                   Add Event
@@ -125,6 +126,7 @@ const Home: React.FC = () => {
                 </Button>
                 <Button
                   className="mt-4 md:mt-0 flex items-center gap-2"
+                  variant="secondary"
                   onClick={() => navigate("/events")}
                 >
                   View All Events <ArrowRight className="h-4 w-4" />

@@ -33,8 +33,7 @@ export const StepFive = ({ form }: StepFiveProps) => {
   const successStories = form.watch("success_stories") || [];
 
   const openai = new OpenAI({
-    apiKey:
-      "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",
+    apiKey: import.meta.env.VITE_REACT_APP_OPEN_AI_KEY,
     dangerouslyAllowBrowser: true,
   });
 
@@ -177,7 +176,7 @@ I have participated in numerous tournaments and competitions, which includes Dis
                 </FormLabel>
                 <Button
                   type="button"
-                  variant="outline"
+                  variant="secondary"
                   size="sm"
                   onClick={generateAboutMe}
                   className="flex items-center gap-2"

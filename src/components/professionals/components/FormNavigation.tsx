@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Button } from "@/components/ui/button";
 
@@ -12,23 +11,34 @@ interface FormNavigationProps {
   isUpdate?: boolean;
 }
 
-export const FormNavigation = ({ 
-  currentStep, 
-  totalSteps, 
-  onPrevious, 
-  onNext, 
+export const FormNavigation = ({
+  currentStep,
+  totalSteps,
+  onPrevious,
+  onNext,
   onSubmit,
   isSubmitting,
-  isUpdate = false
+  isUpdate = false,
 }: FormNavigationProps) => {
   const isLastStep = currentStep === totalSteps;
   const isFirstStep = currentStep === 1;
-  
-  const submitButtonText = isUpdate 
-    ? (isSubmitting ? "Updating Profile..." : "Update Profile")
-    : (isSubmitting ? "Registering..." : "Register as Professional");
 
-  console.log('FormNavigation render - currentStep:', currentStep, 'totalSteps:', totalSteps, 'isLastStep:', isLastStep);
+  const submitButtonText = isUpdate
+    ? isSubmitting
+      ? "Updating Profile..."
+      : "Update Profile"
+    : isSubmitting
+    ? "Registering..."
+    : "Register as Professional";
+
+  console.log(
+    "FormNavigation render - currentStep:",
+    currentStep,
+    "totalSteps:",
+    totalSteps,
+    "isLastStep:",
+    isLastStep
+  );
 
   return (
     <div className="flex justify-between pt-6">
@@ -40,25 +50,27 @@ export const FormNavigation = ({
       >
         Previous
       </Button>
-      
+
       {isLastStep ? (
-        <Button 
+        <Button
           type="button"
+          variant="secondary"
           disabled={isSubmitting}
           onClick={() => {
-            console.log('Submit button clicked on step:', currentStep);
+            console.log("Submit button clicked on step:", currentStep);
             onSubmit?.();
           }}
         >
           {submitButtonText}
         </Button>
       ) : (
-        <Button 
-          type="button" 
+        <Button
+          type="button"
+          variant="secondary"
           onClick={() => {
-            console.log('Next button clicked, moving from step:', currentStep);
+            console.log("Next button clicked, moving from step:", currentStep);
             onNext();
-          }} 
+          }}
           disabled={isSubmitting}
         >
           Next

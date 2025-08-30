@@ -119,9 +119,9 @@ const SportsProfessionals = () => {
           {shouldShowButton() && (
             <div className="md:col-span-2 justify-center text-right">
               <Button
+                variant="secondary"
                 onClick={handleRegisterClick}
                 disabled={checkingProfile}
-                className="bg-secondary-900 text-background hover:bg-foreground/90"
               >
                 {checkingProfile ? "Checking..." : getButtonText()}
               </Button>

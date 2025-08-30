@@ -102,7 +102,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ onSearch }) => {
           <>
             <Button
               onClick={() => navigate("/sports-professionals")}
-              variant="secondary"
+              variant="default"
               className="bg-white text-primary-700 hover:bg-white/90"
             >
               <Search className="mr-2 h-4 w-4" />
