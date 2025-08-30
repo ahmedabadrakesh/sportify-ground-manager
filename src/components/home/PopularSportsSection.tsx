@@ -89,13 +89,6 @@ const PopularSportsSection = () => {
       </p>
       <div className="relative px-4">
         <Carousel
-          plugins={[
-            Autoplay({
-              delay: 3000,
-              stopOnInteraction: true,
-              stopOnMouseEnter: true,
-            }),
-          ]}
           opts={{
             align: "start",
             loop: true,
