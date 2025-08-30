@@ -1,22 +1,27 @@
 import { useEffect, useCallback } from 'react';
 import { UseFormReturn } from 'react-hook-form';
 import { ProfessionalFormValues } from '../schemas/professionalFormSchema';
-import { supabase } from '@/integrations/supabase/client';
-import { useAuthStore } from '@/utils/auth';
-import { toast } from 'sonner';
+import { createClient } from '@supabase/supabase-js';
+import { getCurrentUser } from '@/utils/auth';
+
+// Create a simple client without complex type inference
+const simpleSupabase = createClient(
+  "https://qlrnxgyvplzrkzhhjhab.supabase.co",
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFscm54Z3l2cGx6cmt6aGhqaGFiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDQ2MjA1MjYsImV4cCI6MjA2MDE5NjUyNn0.LvgrB50gDT3KQz7DhJ7swPPFPmMDxi3IGVtlebUinTI"
+);
 
 export const useDraftSave = (
   form: UseFormReturn<ProfessionalFormValues>,
   currentStep: number,
   isUpdate: boolean = false
 ) => {
-  const { user } = useAuthStore();
-
   const saveDraft = useCallback(async (values: ProfessionalFormValues) => {
-    if (!user?.id || isUpdate) return; // Don't save drafts when updating existing profiles
+    if (isUpdate) return;
     
     try {
-      // Only save if there's meaningful data filled
+      const user = await getCurrentUser();
+      if (!user?.id) return;
+      
       const hasData = values.name || values.contact_number || values.address || values.city;
       if (!hasData) return;
 
@@ -35,14 +40,14 @@ export const useDraftSave = (
         youtube_link: values.youtube_link || '',
         age: values.age ? Number(values.age) : null,
         sex: values.sex || '',
-        profession_type: values.profession_type || 'coach',
+        profession_type: values.profession_type || 'Coach',
         fee: values.fee ? Number(values.fee) : 0,
-        fee_type: values.fee_type || 'hourly',
+        fee_type: values.fee_type || 'Per Hour',
         years_of_experience: values.years_of_experience ? Number(values.years_of_experience) : 0,
         number_of_clients_served: values.number_of_clients_served ? Number(values.number_of_clients_served) : 0,
         level: values.level || '',
         academy_name: values.academy_name || '',
-        game_ids: values.game_ids || [],
+        game_ids: values.games_played || [],
         specialties: values.specialties || [],
         certifications: values.certifications || [],
         education: values.education || [],
@@ -66,54 +71,57 @@ export const useDraftSave = (
         is_draft: true
       };
 
-      // Check if draft exists
-      const { data: existingDraft } = await supabase
+      const { data: existingDraft } = await simpleSupabase
         .from('sports_professionals')
         .select('id')
         .eq('user_id', user.id)
         .eq('is_draft', true)
-        .single();
+        .maybeSingle();
 
       if (existingDraft) {
-        // Update existing draft
-        await supabase
+        await simpleSupabase
           .from('sports_professionals')
           .update(draftData)
           .eq('id', existingDraft.id);
       } else {
-        // Create new draft
-        await supabase
+        await simpleSupabase
           .from('sports_professionals')
           .insert(draftData);
       }
+      
+      console.log('Draft saved successfully at step', currentStep);
     } catch (error) {
       console.error('Error saving draft:', error);
     }
-  }, [user?.id, isUpdate]);
+  }, [isUpdate, currentStep]);
 
   const loadDraft = useCallback(async () => {
-    if (!user?.id || isUpdate) return null;
+    if (isUpdate) return null;
     
     try {
-      const { data: draft } = await supabase
+      const user = await getCurrentUser();
+      if (!user?.id) return null;
+      
+      const { data: draft } = await simpleSupabase
         .from('sports_professionals')
         .select('*')
         .eq('user_id', user.id)
         .eq('is_draft', true)
-        .single();
+        .maybeSingle();
 
       return draft;
     } catch (error) {
       console.error('Error loading draft:', error);
       return null;
     }
-  }, [user?.id, isUpdate]);
+  }, [isUpdate]);
 
   const deleteDraft = useCallback(async () => {
-    if (!user?.id) return;
-    
     try {
-      await supabase
+      const user = await getCurrentUser();
+      if (!user?.id) return;
+      
+      await simpleSupabase
         .from('sports_professionals')
         .delete()
         .eq('user_id', user.id)
@@ -121,29 +129,19 @@ export const useDraftSave = (
     } catch (error) {
       console.error('Error deleting draft:', error);
     }
-  }, [user?.id]);
+  }, []);
 
   // Auto-save on step change
   useEffect(() => {
-    if (currentStep > 1) {
+    if (currentStep > 0) {
       const timeoutId = setTimeout(() => {
         const values = form.getValues();
         saveDraft(values);
-      }, 1000); // Save 1 second after step change
+      }, 1000);
 
       return () => clearTimeout(timeoutId);
     }
   }, [currentStep, form, saveDraft]);
-
-  // Auto-save every 30 seconds
-  useEffect(() => {
-    const intervalId = setInterval(() => {
-      const values = form.getValues();
-      saveDraft(values);
-    }, 30000);
-
-    return () => clearInterval(intervalId);
-  }, [form, saveDraft]);
 
   return {
     saveDraft,
