@@ -22,7 +22,12 @@ export const useDraftSave = (
       const user = await getCurrentUser();
       if (!user?.id) return;
       
-      const hasData = values.name || values.contact_number || values.address || values.city;
+      // Check if form has any meaningful data before saving
+      const hasData = values.name || values.contact_number || values.address || values.city || 
+                     values.about_me || values.profession_type || values.academy_name ||
+                     (values.games_played && values.games_played.length > 0) ||
+                     (values.specialties && values.specialties.length > 0);
+      
       if (!hasData) return;
 
       const draftData = {
@@ -38,6 +43,7 @@ export const useDraftSave = (
         linkedin_link: values.linkedin_link || '',
         website: values.website || '',
         youtube_link: values.youtube_link || '',
+        facebook_link: values.facebook_link || '',
         age: values.age ? Number(values.age) : null,
         sex: values.sex || '',
         profession_type: values.profession_type || 'Coach',
@@ -68,6 +74,8 @@ export const useDraftSave = (
         videos: values.videos || [],
         images: values.images || [],
         comments: values.comments || '',
+        photo: values.photo || '',
+        total_match_played: values.total_match_played ? Number(values.total_match_played) : 0,
         is_draft: true
       };
 
@@ -79,17 +87,28 @@ export const useDraftSave = (
         .maybeSingle();
 
       if (existingDraft) {
-        await simpleSupabase
+        const { error } = await simpleSupabase
           .from('sports_professionals')
           .update(draftData)
           .eq('id', existingDraft.id);
+        
+        if (error) {
+          console.error('Error updating draft:', error);
+        } else {
+          console.log('Draft updated successfully at step', currentStep);
+        }
       } else {
-        await simpleSupabase
+        const { error } = await simpleSupabase
           .from('sports_professionals')
           .insert(draftData);
+        
+        if (error) {
+          console.error('Error creating draft:', error);
+        } else {
+          console.log('Draft saved successfully at step', currentStep);
+        }
       }
       
-      console.log('Draft saved successfully at step', currentStep);
     } catch (error) {
       console.error('Error saving draft:', error);
     }

@@ -4,6 +4,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { professionalFormSchema, type ProfessionalFormValues } from "../schemas/professionalFormSchema";
 import { useStepNavigation } from "./useStepNavigation";
 import { useProfessionalRegistration } from "./useProfessionalRegistration";
+import { useDraftSave } from "./useDraftSave";
+import { useEffect } from "react";
 
 export const useRegisterProfessionalForm = (onSuccess: () => void, isUpdate: boolean = false) => {
   const form = useForm<ProfessionalFormValues>({
@@ -81,9 +83,90 @@ export const useRegisterProfessionalForm = (onSuccess: () => void, isUpdate: boo
 
   const { registerMutation } = useProfessionalRegistration(onSuccess, isUpdate);
 
+  // Initialize draft save functionality
+  const { saveDraft, loadDraft, deleteDraft } = useDraftSave(form, currentStep, isUpdate);
+
+  // Load draft data when form initializes (only for new registrations)
+  useEffect(() => {
+    if (!isUpdate) {
+      const loadDraftData = async () => {
+        const draft = await loadDraft();
+        if (draft) {
+          console.log('Loading draft data:', draft);
+          // Populate form with draft data
+          form.reset({
+            name: draft.name || "",
+            age: draft.age || 0,
+            sex: draft.sex || undefined,
+            profession_type: draft.profession_type || "Athlete",
+            photo: draft.photo || "",
+            academy_name: draft.academy_name || "",
+            years_of_experience: draft.years_of_experience || 0,
+            contact_number: draft.contact_number || "",
+            whatsapp: draft.whatsapp || "",
+            whatsapp_same_as_phone: draft.whatsapp_same_as_phone || true,
+            email: draft.email || "",
+            instagram_link: draft.instagram_link || "",
+            youtube_link: draft.youtube_link || "",
+            linkedin_link: draft.linkedin_link || "",
+            website: draft.website || "",
+            facebook_link: draft.facebook_link || "",
+            district_level_tournaments: draft.district_level_tournaments || 0,
+            state_level_tournaments: draft.state_level_tournaments || 0,
+            national_level_tournaments: draft.national_level_tournaments || 0,
+            international_level_tournaments: draft.international_level_tournaments || 0,
+            specialties: draft.specialties || [],
+            games_played: draft.game_ids || [],
+            certifications: draft.certifications || [],
+            education: draft.education || [],
+            accomplishments: draft.accomplishments || [],
+            training_locations_detailed: draft.training_locations_detailed || [],
+            images: draft.images || [],
+            videos: draft.videos || [],
+            one_on_one_price: draft.one_on_one_price || 0,
+            group_session_price: draft.group_session_price || 0,
+            online_price: draft.online_price || 0,
+            free_demo_call: draft.free_demo_call || false,
+            about_me: draft.about_me || "",
+            success_stories: draft.success_stories || [],
+            city: draft.city || "",
+            address: draft.address || "",
+            comments: draft.comments || "",
+            fee: draft.fee || 0,
+            fee_type: draft.fee_type || "Per Hour",
+            total_match_played: draft.total_match_played || 0,
+            awards: draft.awards || [],
+            training_locations: draft.training_locations || [],
+            punch_line: draft.punch_line || "",
+            level: draft.level || undefined,
+            coaching_availability: draft.coaching_availability || [],
+          });
+        }
+      };
+      loadDraftData();
+    }
+  }, [loadDraft, form, isUpdate]);
+
+  // Auto-save form data on every step change
+  useEffect(() => {
+    if (currentStep > 0 && !isUpdate) {
+      const timeoutId = setTimeout(() => {
+        const formValues = form.getValues();
+        saveDraft(formValues);
+        console.log('Auto-saving draft data at step:', currentStep);
+      }, 1000); // Save after 1 second delay
+
+      return () => clearTimeout(timeoutId);
+    }
+  }, [currentStep, form, saveDraft, isUpdate]);
+
   const resetForm = () => {
     resetNavigation();
     form.reset();
+    // Delete draft when form is reset
+    if (!isUpdate) {
+      deleteDraft();
+    }
   };
 
   const onSubmit = (values: ProfessionalFormValues) => {
@@ -117,6 +200,12 @@ export const useRegisterProfessionalForm = (onSuccess: () => void, isUpdate: boo
     };
     
     console.log('Processed values for submission:', processedValues);
+    
+    // Delete draft after successful submission
+    if (!isUpdate) {
+      deleteDraft();
+    }
+    
     registerMutation.mutate(processedValues);
   };
 
@@ -131,5 +220,8 @@ export const useRegisterProfessionalForm = (onSuccess: () => void, isUpdate: boo
     resetForm,
     onSubmit,
     stepDetails,
+    saveDraft,
+    loadDraft,
+    deleteDraft,
   };
 };
