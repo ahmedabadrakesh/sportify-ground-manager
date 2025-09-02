@@ -225,7 +225,6 @@ const createSportsProfessionalEntry = async (
       fee_type: 'Per Hour' as const,
       city: '',
       address: '',
-      comments: null,
       photo: null,
       awards: [],
       accomplishments: [],

@@ -84,7 +84,7 @@ const ProfessionalProfile = () => {
         .from("sports_professionals")
         .select(
           `
-           id, profession_type, name, fee, fee_type, address, city, comments,
+           id, profession_type, name, fee, fee_type, address, city,
            photo, user_id, created_at, updated_at, awards, accomplishments,
            certifications, training_locations, videos, images, punch_line,
            instagram_link, facebook_link, linkedin_link, website, level,
@@ -341,7 +341,7 @@ const ProfessionalProfile = () => {
         "@type": "Person",
         name: professional?.name || "Professional",
         jobTitle: professional.profession_type,
-        description: professional.about_me || professional.comments,
+        description: professional.about_me,
         url: typeof window !== "undefined" ? window.location.href : "",
         address: {
           "@type": "PostalAddress",
@@ -374,7 +374,6 @@ const ProfessionalProfile = () => {
                 professional.city
               }. ${
                 professional.about_me ||
-                professional.comments ||
                 "Book sports training sessions with certified professionals."
               }`.substring(0, 160)
             : "Find and book sessions with certified sports professionals on Jokova."

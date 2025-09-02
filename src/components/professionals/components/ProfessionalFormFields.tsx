@@ -1,4 +1,3 @@
-
 import React from "react";
 import { UseFormReturn } from "react-hook-form";
 import { ProfessionalFormValues } from "../schemas/professionalFormSchema";
@@ -8,7 +7,6 @@ import { ContactInformationSection } from "./form-sections/ContactInformationSec
 import { SocialMediaSection } from "./form-sections/SocialMediaSection";
 import { ProfessionalDetailsSection } from "./form-sections/ProfessionalDetailsSection";
 import { MediaSection } from "./form-sections/MediaSection";
-import { CommentsSection } from "./form-sections/CommentsSection";
 
 interface ProfessionalFormFieldsProps {
   form: UseFormReturn<ProfessionalFormValues>;
@@ -16,16 +14,23 @@ interface ProfessionalFormFieldsProps {
   isUpdate?: boolean;
 }
 
-export const ProfessionalFormFields = ({ form, userEmail, isUpdate = false }: ProfessionalFormFieldsProps) => {
+export const ProfessionalFormFields = ({
+  form,
+  userEmail,
+  isUpdate = false,
+}: ProfessionalFormFieldsProps) => {
   return (
     <div className="space-y-4">
       <BasicInformationSection form={form} />
       <FeeInformationSection form={form} />
-      <ContactInformationSection form={form} userEmail={userEmail} isUpdate={isUpdate} />
+      <ContactInformationSection
+        form={form}
+        userEmail={userEmail}
+        isUpdate={isUpdate}
+      />
       <SocialMediaSection form={form} />
       <ProfessionalDetailsSection form={form} />
       <MediaSection form={form} />
-      <CommentsSection form={form} />
     </div>
   );
 };

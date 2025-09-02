@@ -73,7 +73,6 @@ export const useDraftSave = (
         training_locations_detailed: values.training_locations_detailed || [],
         videos: values.videos || [],
         images: values.images || [],
-        comments: values.comments || '',
         photo: values.photo || '',
         total_match_played: values.total_match_played ? Number(values.total_match_played) : 0,
         is_draft: true

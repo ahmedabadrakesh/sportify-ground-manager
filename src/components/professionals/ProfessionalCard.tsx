@@ -43,25 +43,6 @@ const ProfessionalCard = ({
     },
   });
 
-  // Extract years of experience from comments or use a default
-  const getExperience = () => {
-    if (professional.comments) {
-      const match = professional.comments.match(/(\d+)\+?\s*years?/i);
-      if (match) return `${match[1]}+ Years`;
-    }
-    const yearsActive =
-      new Date().getFullYear() -
-      new Date(professional.created_at).getFullYear();
-    return `${Math.max(yearsActive, 1)}+ Years`;
-  };
-
-  // Mock client count based on experience
-  const getClientCount = () => {
-    const experience = parseInt(getExperience()) || 1;
-    const baseClients = Math.floor(experience * 50 + Math.random() * 200);
-    return `${baseClients}+ Clients`;
-  };
-
   const handleContactClick = (type: "phone" | "email") => {
     if (!isAuthenticated) {
       onLoginClick?.();

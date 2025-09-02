@@ -276,7 +276,6 @@ const RegisterProfessionalDialog = ({
             fee_type: "Per Hour",
             city: "",
             address: "",
-            comments: "",
             photo: "",
             years_of_experience: undefined,
             total_match_played: undefined,
@@ -352,7 +351,6 @@ const RegisterProfessionalDialog = ({
             // Legacy fields
             city: profileData.city || "",
             address: profileData.address || "",
-            comments: profileData.comments || "",
             fee: profileData.fee || 0,
             fee_type: profileData.fee_type || "Per Hour",
             total_match_played: profileData.total_match_played || 0,

@@ -20,12 +20,6 @@ const About = ({ professional }) => {
         </div>
 
         <div className="grid lg:grid-cols-3 gap-12">
-          <div className="space-y-6 col-span-2">
-            <p className="text-lg text-gray-700 leading-relaxed align-left text-justify">
-              {professional.comments}
-            </p>
-          </div>
-
           <div className="relative">
             <div className="grid grid-cols-1 gap-6">
               {stats.map((stat, index) => (

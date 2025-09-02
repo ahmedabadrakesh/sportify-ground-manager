@@ -176,7 +176,6 @@ export const useProfessionalRegistration = (onSuccess: () => void, isUpdate: boo
         fee_type: values.fee_type,
         city: values.city,
         address: values.address,
-        comments: values.comments || null,
         photo: values.photo || null,
         years_of_experience: values.years_of_experience ? Number(values.years_of_experience) : null,
         total_match_played: values.total_match_played ? Number(values.total_match_played) : null,

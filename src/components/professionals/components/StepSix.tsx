@@ -63,24 +63,6 @@ export const StepSix = ({ form }: StepSixProps) => {
         )}
       />
 
-      <FormField
-        name="comments"
-        control={form.control}
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel>About Me</FormLabel>
-            <FormControl>
-              <Textarea
-                {...field}
-                placeholder="Tell us more about yourself, your experience, and what makes you unique..."
-                className="min-h-[120px]"
-              />
-            </FormControl>
-            <FormMessage />
-          </FormItem>
-        )}
-      />
-
       <div className="p-4 bg-gradient-to-r from-primary/10 to-primary/5 rounded-lg border border-primary/20">
         <h3 className="text-sm font-semibold mb-2 flex items-center gap-2">
           <CheckCircle className="w-4 h-4" />

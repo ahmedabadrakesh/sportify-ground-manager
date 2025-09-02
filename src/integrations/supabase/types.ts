@@ -620,7 +620,6 @@ export type Database = {
           certifications: string[] | null
           city: string
           coaching_availability: string[] | null
-          comments: string | null
           contact_number: string
           created_at: string
           deleted_at: string | null
@@ -673,7 +672,6 @@ export type Database = {
           certifications?: string[] | null
           city: string
           coaching_availability?: string[] | null
-          comments?: string | null
           contact_number: string
           created_at?: string
           deleted_at?: string | null
@@ -726,7 +724,6 @@ export type Database = {
           certifications?: string[] | null
           city?: string
           coaching_availability?: string[] | null
-          comments?: string | null
           contact_number?: string
           created_at?: string
           deleted_at?: string | null
