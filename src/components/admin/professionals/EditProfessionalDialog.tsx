@@ -1,8 +1,12 @@
-
 import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Form } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -11,7 +15,10 @@ import { toast } from "sonner";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { PhotoUpload } from "../../professionals/components/PhotoUpload";
 import { ProfessionalFormFields } from "../../professionals/components/ProfessionalFormFields";
-import { professionalFormSchema, type ProfessionalFormValues } from "../../professionals/schemas/professionalFormSchema";
+import {
+  professionalFormSchema,
+  type ProfessionalFormValues,
+} from "../../professionals/schemas/professionalFormSchema";
 import { getCurrentUserSync, hasRoleSync } from "@/utils/auth";
 
 interface EditProfessionalDialogProps {
@@ -20,12 +27,16 @@ interface EditProfessionalDialogProps {
   professional: any;
 }
 
-const EditProfessionalDialog = ({ open, onOpenChange, professional }: EditProfessionalDialogProps) => {
+const EditProfessionalDialog = ({
+  open,
+  onOpenChange,
+  professional,
+}: EditProfessionalDialogProps) => {
   const queryClient = useQueryClient();
   const currentUser = getCurrentUserSync();
-  const isSuperAdmin = hasRoleSync('super_admin');
+  const isSuperAdmin = hasRoleSync("super_admin");
   const [userEmail, setUserEmail] = useState<string>("");
-  
+
   // Check if user can edit this profile
   const canEdit = isSuperAdmin || professional.user_id === currentUser?.id;
 
@@ -39,7 +50,6 @@ const EditProfessionalDialog = ({ open, onOpenChange, professional }: EditProfes
       fee_type: professional.fee_type,
       city: professional.city,
       address: professional.address,
-      comments: professional.comments || "",
       photo: professional.photo || "",
       awards: professional.awards || [],
       accomplishments: professional.accomplishments || [],
@@ -64,29 +74,36 @@ const EditProfessionalDialog = ({ open, onOpenChange, professional }: EditProfes
         try {
           // Fetch user email
           const { data: userData, error: userError } = await supabase
-            .from('users')
-            .select('email')
-            .eq('id', professional.user_id)
+            .from("users")
+            .select("email")
+            .eq("id", professional.user_id)
             .single();
-          
+
           if (userData && !userError) {
             setUserEmail(userData.email);
-            form.setValue('email', userData.email);
+            form.setValue("email", userData.email);
           }
 
           // Fetch game names from game IDs to populate games_played
-          if (professional.game_ids && Array.isArray(professional.game_ids) && professional.game_ids.length > 0) {
+          if (
+            professional.game_ids &&
+            Array.isArray(professional.game_ids) &&
+            professional.game_ids.length > 0
+          ) {
             const { data: gameData, error: gameError } = await supabase
-              .from('games')
-              .select('name')
-              .in('id', professional.game_ids);
-            
+              .from("games")
+              .select("name")
+              .in("id", professional.game_ids);
+
             if (gameData && !gameError) {
-              form.setValue('games_played', gameData.map(game => game.name));
+              form.setValue(
+                "games_played",
+                gameData.map((game) => game.name)
+              );
             }
           }
         } catch (error) {
-          console.error('Error fetching related data:', error);
+          console.error("Error fetching related data:", error);
         }
       }
     };
@@ -106,17 +123,17 @@ const EditProfessionalDialog = ({ open, onOpenChange, professional }: EditProfes
       let gameIds: string[] = [];
       if (values.games_played && values.games_played.length > 0) {
         const { data: gameData } = await supabase
-          .from('games')
-          .select('id, name')
-          .in('name', values.games_played);
-        
+          .from("games")
+          .select("id, name")
+          .in("name", values.games_played);
+
         if (gameData) {
-          gameIds = gameData.map(game => game.id);
+          gameIds = gameData.map((game) => game.id);
         }
       }
 
       const { error } = await supabase
-        .from('sports_professionals')
+        .from("sports_professionals")
         .update({
           name: values.name,
           profession_type: values.profession_type,
@@ -126,7 +143,6 @@ const EditProfessionalDialog = ({ open, onOpenChange, professional }: EditProfes
           fee_type: values.fee_type,
           city: values.city,
           address: values.address,
-          comments: values.comments || null,
           photo: values.photo || null,
           awards: values.awards || [],
           accomplishments: values.accomplishments || [],
@@ -142,19 +158,21 @@ const EditProfessionalDialog = ({ open, onOpenChange, professional }: EditProfes
           level: values.level || null,
           coaching_availability: values.coaching_availability || [],
         })
-        .eq('id', professional.id);
-      
+        .eq("id", professional.id);
+
       if (error) throw error;
     },
     onSuccess: () => {
       toast.success("Professional details updated successfully");
-      queryClient.invalidateQueries({ queryKey: ["admin-sports-professionals"] });
+      queryClient.invalidateQueries({
+        queryKey: ["admin-sports-professionals"],
+      });
       onOpenChange(false);
     },
     onError: (error) => {
       toast.error("Failed to update professional details");
       console.error("Update error:", error);
-    }
+    },
   });
 
   const onSubmit = (values: ProfessionalFormValues) => {
@@ -186,12 +204,14 @@ const EditProfessionalDialog = ({ open, onOpenChange, professional }: EditProfes
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
               <PhotoUpload form={form} />
               <ProfessionalFormFields form={form} userEmail={userEmail} />
-              <Button 
-                type="submit" 
+              <Button
+                type="submit"
                 className="w-full"
                 disabled={updateMutation.isPending}
               >
-                {updateMutation.isPending ? "Updating..." : "Update Professional"}
+                {updateMutation.isPending
+                  ? "Updating..."
+                  : "Update Professional"}
               </Button>
             </form>
           </Form>
