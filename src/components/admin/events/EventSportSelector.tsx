@@ -29,7 +29,7 @@ const EventSportSelector = ({ form }: EventSportSelectorProps) => {
                 <SelectValue placeholder="Select a sport" />
               </SelectTrigger>
             </FormControl>
-            <SelectContent>
+            <SelectContent className="max-h-60 overflow-y-auto">
               <SelectItem value="general">General</SelectItem>
               {games.map((game) => (
                 <SelectItem key={game.id} value={game.id}>

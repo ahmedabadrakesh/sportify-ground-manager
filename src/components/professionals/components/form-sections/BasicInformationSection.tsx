@@ -148,7 +148,7 @@ export const BasicInformationSection = ({ form }: BasicInformationSectionProps) 
                   <SelectValue placeholder="Select game" />
                 </SelectTrigger>
               </FormControl>
-              <SelectContent>
+              <SelectContent className="max-h-60 overflow-y-auto">
                 {games.map((game) => (
                   <SelectItem key={game.id} value={game.name}>
                     {game.name}

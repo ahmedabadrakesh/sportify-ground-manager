@@ -159,7 +159,7 @@ const ProfessionalsFilters = ({
                 <SelectTrigger>
                   <SelectValue placeholder="All Sports" />
                 </SelectTrigger>
-                <SelectContent>
+              <SelectContent className="max-h-60 overflow-y-auto">
                   <SelectItem value="all">All Sports</SelectItem>
                   {games?.map((game) => (
                     <SelectItem key={game.id} value={game.id}>
