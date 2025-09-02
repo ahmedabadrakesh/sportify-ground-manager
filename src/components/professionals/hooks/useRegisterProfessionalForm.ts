@@ -75,7 +75,7 @@ export const useRegisterProfessionalForm = (onSuccess: () => void, isUpdate: boo
     currentStep,
     totalSteps,
     stepTitles,
-    handleNext,
+    handleNext: originalHandleNext,
     handlePrevious,
     resetNavigation,
     stepDetails,
@@ -147,14 +147,24 @@ export const useRegisterProfessionalForm = (onSuccess: () => void, isUpdate: boo
     }
   }, [loadDraft, form, isUpdate]);
 
-  // Auto-save form data on every step change
+  // Custom handleNext that saves data before moving to next step
+  const handleNext = async () => {
+    if (!isUpdate) {
+      const formValues = form.getValues();
+      console.log('Saving draft data before moving to next step:', currentStep);
+      await saveDraft(formValues);
+    }
+    await originalHandleNext();
+  };
+
+  // Auto-save form data on every step change (backup)
   useEffect(() => {
-    if (currentStep > 0 && !isUpdate) {
+    if (currentStep > 1 && !isUpdate) {
       const timeoutId = setTimeout(() => {
         const formValues = form.getValues();
         saveDraft(formValues);
         console.log('Auto-saving draft data at step:', currentStep);
-      }, 1000); // Save after 1 second delay
+      }, 500);
 
       return () => clearTimeout(timeoutId);
     }
