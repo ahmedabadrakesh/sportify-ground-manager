@@ -125,6 +125,7 @@ I have participated in numerous tournaments and competitions, which includes Dis
                   onChange={field.onChange}
                   placeholder="Add training photo URL"
                   label="Training Photos"
+                  type="image"
                 />
               </FormControl>
               <p className="text-xs text-muted-foreground">

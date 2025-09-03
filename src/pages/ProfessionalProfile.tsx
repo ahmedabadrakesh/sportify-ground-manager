@@ -460,7 +460,8 @@ const ProfessionalProfile = () => {
 
                 <p className="text-sm lg:text-lg text-gray-300 ">
                   {professional.profession_type},{"Sports Professional"}
-                  {professional.academy_name && ` • Acadamy ${professional.academy_name}`}
+                  {professional.academy_name &&
+                    ` • Acadamy ${professional.academy_name}`}
                   {professional.age && ` • Age ${professional.age}`}
                   {professional.sex && ` • ${professional.sex}`}
                 </p>
@@ -597,7 +598,7 @@ const ProfessionalProfile = () => {
                     </div>
                   </div> */}
                 </div>
-                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -657,17 +658,12 @@ const ProfessionalProfile = () => {
                     </CardHeader>
                     <CardContent>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                        {professional.specialties.map(
-                          (specialty, index) => (
-                            <div
-                              key={index}
-                              className="flex items-center gap-2"
-                            >
-                              <CheckCircle className="w-4 h-4 text-success" />
-                              <span className="text-sm">{specialty}</span>
-                            </div>
-                          )
-                        )}
+                        {professional.specialties.map((specialty, index) => (
+                          <div key={index} className="flex items-center gap-2">
+                            <CheckCircle className="w-4 h-4 text-success" />
+                            <span className="text-sm">{specialty}</span>
+                          </div>
+                        ))}
                       </div>
                     </CardContent>
                   </Card>
@@ -714,6 +710,7 @@ const ProfessionalProfile = () => {
                   </CardHeader>
                   <CardContent>
                     {/* <ImageGallery images={professional.images} /> */}
+
                     <Carousel className="w-full">
                       <CarouselContent>
                         {professional.images.map((photo, index) => (
@@ -727,9 +724,9 @@ const ProfessionalProfile = () => {
                                 alt={photo}
                                 className="w-full h-48 object-cover"
                               />
-                              {/* <div className="p-3 bg-card">
+                              <div className="p-3 bg-card">
                                 <p className="text-sm font-medium">{photo}</p>
-                              </div> */}
+                              </div>
                             </div>
                           </CarouselItem>
                         ))}
@@ -993,9 +990,9 @@ const ProfessionalProfile = () => {
                 </CardContent>
               </Card>
               {/* Training Locations */}
-              {professional.address !== "" && (Array.isArray(professional.training_locations_detailed) &&
-                professional.training_locations_detailed.length > 0) 
-                 && (
+              {professional.address !== "" &&
+                Array.isArray(professional.training_locations_detailed) &&
+                professional.training_locations_detailed.length > 0 && (
                   <Card className="bg-white">
                     <CardHeader>
                       <CardTitle className="flex items-center gap-2 text-primary">
@@ -1004,22 +1001,22 @@ const ProfessionalProfile = () => {
                       </CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-4">
-                              <div
-                                key={professional.address}
-                                className="border rounded-lg p-3 bg-muted"
-                              >
-                                <div className="flex items-start gap-2 mb-2">
-                                  <MapPin className="w-4 h-4 text-primary mt-0.5" />
-                                  <div className="flex-1">
-                                    <p className="text-sm font-semibold text-left">
-                                      {"Primary Location"}
-                                    </p>
-                                    <p className="text-xs text-muted-foreground  text-left">
-                                      {professional.address}
-                                    </p>
-                                  </div>
-                                </div>
-                              </div>
+                      <div
+                        key={professional.address}
+                        className="border rounded-lg p-3 bg-muted"
+                      >
+                        <div className="flex items-start gap-2 mb-2">
+                          <MapPin className="w-4 h-4 text-primary mt-0.5" />
+                          <div className="flex-1">
+                            <p className="text-sm font-semibold text-left">
+                              {"Primary Location"}
+                            </p>
+                            <p className="text-xs text-muted-foreground  text-left">
+                              {professional.address}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
 
                       {(professional.training_locations_detailed as any[]).map(
                         (training_location, index) =>
@@ -1051,9 +1048,7 @@ const ProfessionalProfile = () => {
                             </>
                           )
                       )}
-
                     </CardContent>
-                    
                   </Card>
                 )}
               {/* Pricing */}

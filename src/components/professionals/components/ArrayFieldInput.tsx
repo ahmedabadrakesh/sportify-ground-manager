@@ -9,6 +9,7 @@ interface ArrayFieldInputProps {
   onChange: (value: string[]) => void;
   placeholder: string;
   label: string;
+  type?: string;
 }
 
 export const ArrayFieldInput = ({
@@ -16,6 +17,7 @@ export const ArrayFieldInput = ({
   onChange,
   placeholder,
   label,
+  type = "non known",
 }: ArrayFieldInputProps) => {
   const [inputValue, setInputValue] = useState("");
 
@@ -50,19 +52,33 @@ export const ArrayFieldInput = ({
           <Plus className="h-4 w-4" />
         </Button>
       </div>
-      <div className="flex flex-wrap gap-2">
+      <div className="flex flex-wrap gap-2 pt-2">
         {value.map((item, index) => (
-          <Badge
-            key={index}
-            variant="secondary"
-            className="flex items-center gap-1"
-          >
-            {item}
-            <X
-              className="h-3 w-3 cursor-pointer"
-              onClick={() => removeItem(index)}
-            />
-          </Badge>
+          <>
+            {type === "image" ? (
+              <>
+                <img src={item} className="w-12 h-12" />
+                <X
+                  className="h-3 w-3 cursor-pointer relative -top-2 right-1 "
+                  onClick={() => removeItem(index)}
+                />
+              </>
+            ) : (
+              <>
+                <Badge
+                  key={index}
+                  variant="secondary"
+                  className="flex items-center gap-1"
+                >
+                  {item}
+                  <X
+                    className="h-3 w-3 cursor-pointer "
+                    onClick={() => removeItem(index)}
+                  />
+                </Badge>
+              </>
+            )}
+          </>
         ))}
       </div>
     </div>
