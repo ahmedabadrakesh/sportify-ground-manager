@@ -71,7 +71,7 @@ export const EnhancedBasicInfoSection = ({
                   <SelectValue placeholder="Select profession type" />
                 </SelectTrigger>
               </FormControl>
-              <SelectContent className="max-h-60 overflow-y-auto">
+              <SelectContent>
                 {professionTypes.map((type) => (
                   <SelectItem key={type} value={type}>
                     {type}
@@ -127,7 +127,7 @@ export const EnhancedBasicInfoSection = ({
                   <SelectValue placeholder="Select a game/sport" />
                 </SelectTrigger>
               </FormControl>
-              <SelectContent className="max-h-60 overflow-y-auto">
+              <SelectContent>
                 {games?.map((game) => (
                   <SelectItem key={game.id} value={game.name}>
                     {game.name}

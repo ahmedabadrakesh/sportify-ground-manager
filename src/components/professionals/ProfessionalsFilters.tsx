@@ -113,7 +113,7 @@ const ProfessionalsFilters = ({
                 <SelectTrigger>
                   <SelectValue placeholder="All Cities" />
                 </SelectTrigger>
-                <SelectContent className="max-h-60 overflow-y-auto">
+              <SelectContent>
                   <SelectItem value="all">All Cities</SelectItem>
                   {availableCities.map((city) => (
                     <SelectItem key={city} value={city}>
@@ -136,7 +136,7 @@ const ProfessionalsFilters = ({
                 <SelectTrigger>
                   <SelectValue placeholder="All" />
                 </SelectTrigger>
-                <SelectContent className="max-h-60 overflow-y-auto">
+                <SelectContent>
                   <SelectItem value="all">All</SelectItem>
                   {genderValues.map((gender) => (
                     <SelectItem key={gender.value} value={gender.value}>
@@ -159,7 +159,7 @@ const ProfessionalsFilters = ({
                 <SelectTrigger>
                   <SelectValue placeholder="All Sports" />
                 </SelectTrigger>
-              <SelectContent className="max-h-60 overflow-y-auto">
+              <SelectContent>
                   <SelectItem value="all">All Sports</SelectItem>
                   {games?.map((game) => (
                     <SelectItem key={game.id} value={game.id}>
@@ -184,7 +184,7 @@ const ProfessionalsFilters = ({
                 <SelectTrigger>
                   <SelectValue placeholder="All Experience" />
                 </SelectTrigger>
-                <SelectContent className="max-h-60 overflow-y-auto">
+                <SelectContent>
                   <SelectItem value="all">All Experience</SelectItem>
                   {experienceRanges.map((range) => (
                     <SelectItem key={range.value} value={range.value}>

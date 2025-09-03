@@ -49,7 +49,7 @@ export const FeeInformationSection = ({ form }: FeeInformationSectionProps) => {
                     <SelectValue placeholder="Select fee type" />
                   </SelectTrigger>
                 </FormControl>
-                <SelectContent className="max-h-60 overflow-y-auto">
+                <SelectContent>
                   {feeTypes.map((type) => (
                     <SelectItem key={type} value={type}>
                       {type}
