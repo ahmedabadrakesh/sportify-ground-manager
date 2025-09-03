@@ -69,7 +69,7 @@ const PopularSportsSection = () => {
     { name: "Swimming", image: "/game-icons/swimming.svg" },
   ];
 
-  const sports = fallbackSports; // Use fallback sports for now
+  const sports = games; // Use fallback sports for now
 
   const handleSportClick = (sportName: string) => {
     navigate(
@@ -96,29 +96,32 @@ const PopularSportsSection = () => {
           className="w-full"
         >
           <CarouselContent className="-ml-2 md:-ml-4">
-            {sports.map((sport, index) => (
-              <CarouselItem
-                key={index}
-                className="pl-2 md:pl-4 basis-1/2 sm:basis-1/6 md:basis-1/3 lg:basis-1/6"
-              >
-                <motion.div
-                  className="cursor-pointer overflow-hidden rounded-2xl shadow-sm hover:shadow-md transition-all duration-300"
-                  whileHover={{ scale: 1.03 }}
-                  initial={{ opacity: 0, y: 30 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.5, delay: index * 0.1 }}
-                  onClick={() => handleSportClick(sport.name)}
-                >
-                  <div className={`relative bg-amber-100 overflow-hidden`}>
-                    <img
-                      src={sport.image}
-                      alt={sport.name}
-                      className="w-full h-auto object-cover object-center"
-                    />
-                  </div>
-                </motion.div>
-              </CarouselItem>
-            ))}
+            {sports.map(
+              (sport, index) =>
+                sport.popular_game && (
+                  <CarouselItem
+                    key={index}
+                    className="pl-2 md:pl-4 basis-1/2 sm:basis-1/6 md:basis-1/3 lg:basis-1/6"
+                  >
+                    <motion.div
+                      className="cursor-pointer overflow-hidden rounded-2xl shadow-sm hover:shadow-md transition-all duration-300"
+                      whileHover={{ scale: 1.03 }}
+                      initial={{ opacity: 0, y: 30 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.5, delay: index * 0.1 }}
+                      onClick={() => handleSportClick(sport.name)}
+                    >
+                      <div className={`relative bg-amber-100 overflow-hidden`}>
+                        <img
+                          src={sport.game_images}
+                          alt={sport.name}
+                          className="w-full h-auto object-cover object-center"
+                        />
+                      </div>
+                    </motion.div>
+                  </CarouselItem>
+                )
+            )}
           </CarouselContent>
           <div>
             <CarouselPrevious className="left-0" />

@@ -257,16 +257,19 @@ export type Database = {
           game_images: string | null
           id: string
           name: string
+          popular_game:boolean|false
         }
         Insert: {
           game_images?: string | null
           id?: string
           name: string
+          popular_game:boolean|false
         }
         Update: {
           game_images?: string | null
           id?: string
           name?: string
+          popular_game:boolean|false
         }
         Relationships: []
       }
