@@ -6,6 +6,8 @@ import { Button } from "@/components/ui/button";
 import { getCurrentUserSync, hasRoleSync } from "@/utils/auth";
 import { Toaster } from "@/components/ui/toaster";
 import jokovaLogoTextImage from "/public/green_text_only_logo.png";
+import jokovaLogoSymbolImageBlackTransparent from "/JOKOVA_text_only.png";
+
 import jokovaLogoSymbolImage from "/public/green_jokova_symbol.png";
 import MobileBottomNav from "./MobileBottomNav";
 import ProfileMenu from "./ProfileMenu";
@@ -143,10 +145,14 @@ const MainLayout = ({ children }: MainLayoutProps) => {
 
       <footer className="bg-gray-100 mt-auto">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
-          <div className="md:flex md:justify-between">
+          <div className="md:flex md:justify-between text-justify ">
             <div className="mb-6 md:mb-0">
               <Link to="/" className="text-xl font-bold text-primary">
-                SportsArena
+                <img
+                  src={jokovaLogoSymbolImageBlackTransparent}
+                  width="190"
+                  className="mr-2"
+                />
               </Link>
               <p className="mt-2 text-sm text-gray-600">
                 Book sports grounds, equipment, and find professionals.
@@ -236,21 +242,21 @@ const MainLayout = ({ children }: MainLayoutProps) => {
                       Privacy Policy
                     </Link>
                   </li>
-                  <li>
+                  {/* <li>
                     <Link
                       to="/api-documentation"
                       className="text-sm text-gray-600 hover:text-primary"
                     >
                       API Documentation
                     </Link>
-                  </li>
+                  </li> */}
                 </ul>
               </div>
             </div>
           </div>
           <div className="mt-8 border-t border-gray-200 pt-8 md:flex md:items-center md:justify-between">
             <p className="text-sm text-gray-500">
-              &copy; 2025 SportsArena. All rights reserved.
+              &copy; 2025 JOKOVA. All rights reserved.
             </p>
             <div className="flex space-x-6 md:mt-0">
               <a href="#" className="text-gray-500 hover:text-primary">

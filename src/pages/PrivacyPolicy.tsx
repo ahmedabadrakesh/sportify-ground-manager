@@ -7,7 +7,9 @@ const PrivacyPolicy = () => {
     <MainLayout>
       <div className="container mx-auto px-4 py-8 max-w-4xl">
         <div className="mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">Privacy Policy</h1>
+          <h1 className="text-4xl font-bold text-gray-900 mb-4">
+            Privacy Policy
+          </h1>
           <p className="text-gray-600">Last updated: January 19, 2025</p>
         </div>
 
@@ -18,7 +20,10 @@ const PrivacyPolicy = () => {
             </CardHeader>
             <CardContent>
               <div className="space-y-4 text-gray-700">
-                <p>We collect information you provide directly to us, such as when you:</p>
+                <p>
+                  We collect information you provide directly to us, such as
+                  when you:
+                </p>
                 <ul className="list-disc list-inside ml-4 space-y-2">
                   <li>Create an account or profile</li>
                   <li>Make a booking or purchase</li>
@@ -27,8 +32,9 @@ const PrivacyPolicy = () => {
                   <li>Participate in surveys or promotions</li>
                 </ul>
                 <p className="mt-4">
-                  This may include your name, email address, phone number, payment information, 
-                  and any other information you choose to provide.
+                  This may include your name, email address, phone number,
+                  payment information, and any other information you choose to
+                  provide.
                 </p>
               </div>
             </CardContent>
@@ -45,7 +51,9 @@ const PrivacyPolicy = () => {
                   <li>Provide, maintain, and improve our services</li>
                   <li>Process transactions and send related information</li>
                   <li>Send you technical notices and support messages</li>
-                  <li>Communicate with you about products, services, and events</li>
+                  <li>
+                    Communicate with you about products, services, and events
+                  </li>
                   <li>Monitor and analyze trends and usage</li>
                   <li>Detect and prevent fraudulent transactions</li>
                   <li>Comply with legal obligations</li>
@@ -60,17 +68,26 @@ const PrivacyPolicy = () => {
             </CardHeader>
             <CardContent>
               <div className="space-y-4 text-gray-700">
-                <p>We may share your information in the following situations:</p>
+                <p>
+                  We may share your information in the following situations:
+                </p>
                 <ul className="list-disc list-inside ml-4 space-y-2">
-                  <li>With sports facilities and professionals to fulfill your bookings</li>
-                  <li>With service providers who assist us in operating our platform</li>
+                  <li>
+                    With sports facilities and professionals to fulfill your
+                    bookings
+                  </li>
+                  <li>
+                    With service providers who assist us in operating our
+                    platform
+                  </li>
                   <li>When required by law or to protect our rights</li>
                   <li>In connection with a merger, sale, or acquisition</li>
                   <li>With your consent or at your direction</li>
                 </ul>
                 <p className="mt-4">
-                  We do not sell, trade, or rent your personal information to third parties 
-                  for marketing purposes without your explicit consent.
+                  We do not sell, trade, or rent your personal information to
+                  third parties for marketing purposes without your explicit
+                  consent.
                 </p>
               </div>
             </CardContent>
@@ -82,10 +99,12 @@ const PrivacyPolicy = () => {
             </CardHeader>
             <CardContent>
               <p className="text-gray-700">
-                We implement appropriate security measures to protect your personal information 
-                against unauthorized access, alteration, disclosure, or destruction. This includes 
-                encryption of sensitive data, secure servers, and regular security assessments. 
-                However, no method of transmission over the Internet is 100% secure.
+                We implement appropriate security measures to protect your
+                personal information against unauthorized access, alteration,
+                disclosure, or destruction. This includes encryption of
+                sensitive data, secure servers, and regular security
+                assessments. However, no method of transmission over the
+                Internet is 100% secure.
               </p>
             </CardContent>
           </Card>
@@ -97,10 +116,11 @@ const PrivacyPolicy = () => {
             <CardContent>
               <div className="space-y-4 text-gray-700">
                 <p>
-                  When you sign in with Google, we receive basic profile information including 
-                  your name and email address. We use this information to create and maintain 
-                  your account. We do not access any other Google services or data without 
-                  your explicit permission.
+                  When you sign in with Google, we receive basic profile
+                  information including your name and email address. We use this
+                  information to create and maintain your account. We do not
+                  access any other Google services or data without your explicit
+                  permission.
                 </p>
               </div>
             </CardContent>
@@ -113,9 +133,10 @@ const PrivacyPolicy = () => {
             <CardContent>
               <div className="space-y-4 text-gray-700">
                 <p>
-                  We use cookies and similar tracking technologies to enhance your experience, 
-                  analyze usage patterns, and provide personalized content. You can control 
-                  cookie preferences through your browser settings.
+                  We use cookies and similar tracking technologies to enhance
+                  your experience, analyze usage patterns, and provide
+                  personalized content. You can control cookie preferences
+                  through your browser settings.
                 </p>
               </div>
             </CardContent>
@@ -136,7 +157,8 @@ const PrivacyPolicy = () => {
                   <li>Object to certain uses of your information</li>
                 </ul>
                 <p className="mt-4">
-                  To exercise these rights, please contact us at privacy@sportsarena.com.
+                  To exercise these rights, please contact us at
+                  hello@jokova.com.
                 </p>
               </div>
             </CardContent>
@@ -148,10 +170,11 @@ const PrivacyPolicy = () => {
             </CardHeader>
             <CardContent>
               <p className="text-gray-700">
-                Our service is not intended for children under 13 years of age. We do not 
-                knowingly collect personal information from children under 13. If we discover 
-                that a child under 13 has provided us with personal information, we will 
-                delete such information immediately.
+                Our service is not intended for children under 13 years of age.
+                We do not knowingly collect personal information from children
+                under 13. If we discover that a child under 13 has provided us
+                with personal information, we will delete such information
+                immediately.
               </p>
             </CardContent>
           </Card>
@@ -162,9 +185,10 @@ const PrivacyPolicy = () => {
             </CardHeader>
             <CardContent>
               <p className="text-gray-700">
-                If you are accessing our service from outside the country where our servers 
-                are located, your information may be transferred to, stored, and processed 
-                in that country. By using our service, you consent to this transfer.
+                If you are accessing our service from outside the country where
+                our servers are located, your information may be transferred to,
+                stored, and processed in that country. By using our service, you
+                consent to this transfer.
               </p>
             </CardContent>
           </Card>
@@ -175,10 +199,10 @@ const PrivacyPolicy = () => {
             </CardHeader>
             <CardContent>
               <p className="text-gray-700">
-                We may update this Privacy Policy from time to time. We will notify you of 
-                any changes by posting the new Privacy Policy on this page and updating the 
-                "Last updated" date. You are advised to review this Privacy Policy 
-                periodically for any changes.
+                We may update this Privacy Policy from time to time. We will
+                notify you of any changes by posting the new Privacy Policy on
+                this page and updating the "Last updated" date. You are advised
+                to review this Privacy Policy periodically for any changes.
               </p>
             </CardContent>
           </Card>
@@ -189,9 +213,10 @@ const PrivacyPolicy = () => {
             </CardHeader>
             <CardContent>
               <p className="text-gray-700">
-                If you have any questions about this Privacy Policy, please contact us at:
+                If you have any questions about this Privacy Policy, please
+                contact us at:
                 <br />
-                Email: privacy@sportsarena.com
+                Email: hello@jokova.com
                 <br />
                 Or through our contact form on the website.
               </p>
