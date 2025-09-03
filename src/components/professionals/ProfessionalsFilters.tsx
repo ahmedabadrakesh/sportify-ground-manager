@@ -113,7 +113,7 @@ const ProfessionalsFilters = ({
                 <SelectTrigger>
                   <SelectValue placeholder="All Cities" />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="max-h-60 overflow-y-auto">
                   <SelectItem value="all">All Cities</SelectItem>
                   {availableCities.map((city) => (
                     <SelectItem key={city} value={city}>
@@ -136,7 +136,7 @@ const ProfessionalsFilters = ({
                 <SelectTrigger>
                   <SelectValue placeholder="All" />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="max-h-60 overflow-y-auto">
                   <SelectItem value="all">All</SelectItem>
                   {genderValues.map((gender) => (
                     <SelectItem key={gender.value} value={gender.value}>
@@ -184,7 +184,7 @@ const ProfessionalsFilters = ({
                 <SelectTrigger>
                   <SelectValue placeholder="All Experience" />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="max-h-60 overflow-y-auto">
                   <SelectItem value="all">All Experience</SelectItem>
                   {experienceRanges.map((range) => (
                     <SelectItem key={range.value} value={range.value}>
@@ -237,7 +237,7 @@ const ProfessionalsFilters = ({
                 <SelectTrigger>
                   <SelectValue placeholder="All" />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="max-h-60 overflow-y-auto">
                   <SelectItem value="all">All</SelectItem>
                   <SelectItem value="certified">Certified</SelectItem>
                   <SelectItem value="not-certified">Not Certified</SelectItem>

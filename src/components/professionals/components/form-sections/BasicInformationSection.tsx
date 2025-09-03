@@ -56,7 +56,7 @@ export const BasicInformationSection = ({ form }: BasicInformationSectionProps) 
                     <SelectValue placeholder="Select age" />
                   </SelectTrigger>
                 </FormControl>
-                <SelectContent>
+                <SelectContent className="max-h-60 overflow-y-auto">
                   {Array.from({ length: 41 }, (_, i) => i + 10).map((age) => (
                     <SelectItem key={age} value={age.toString()}>
                       {age}
@@ -123,7 +123,7 @@ export const BasicInformationSection = ({ form }: BasicInformationSectionProps) 
                   <SelectValue placeholder="Select profession type" />
                 </SelectTrigger>
               </FormControl>
-              <SelectContent>
+              <SelectContent className="max-h-60 overflow-y-auto">
                 {professionTypes.map((type) => (
                   <SelectItem key={type} value={type}>
                     {type}
@@ -173,7 +173,7 @@ export const BasicInformationSection = ({ form }: BasicInformationSectionProps) 
                   <SelectValue placeholder="Select level" />
                 </SelectTrigger>
               </FormControl>
-              <SelectContent>
+              <SelectContent className="max-h-60 overflow-y-auto">
                 {levelOptions.map((level) => (
                   <SelectItem key={level} value={level}>
                     {level}

@@ -116,7 +116,7 @@ export const StepOne = ({ form }: StepOneProps) => {
                         <SelectValue placeholder="Select age" />
                       </SelectTrigger>
                     </FormControl>
-                    <SelectContent>
+                    <SelectContent className="max-h-60 overflow-y-auto">
                       {Array.from({ length: 41 }, (_, i) => i + 10).map(
                         (age) => (
                           <SelectItem key={age} value={age.toString()}>
@@ -175,7 +175,7 @@ export const StepOne = ({ form }: StepOneProps) => {
                       <SelectValue placeholder="Select profession type" />
                     </SelectTrigger>
                   </FormControl>
-                  <SelectContent>
+                  <SelectContent className="max-h-60 overflow-y-auto">
                     {professionTypes.map((type) => (
                       <SelectItem key={type} value={type}>
                         {type}
