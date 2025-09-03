@@ -80,7 +80,7 @@ const PopularSportsSection = () => {
   };
 
   return (
-    <div className="mb-16">
+    <div className="container mb-16">
       <h2 className="text-3xl font-bold text-gray-900 mt-6 mb-6 md:mb-0">
         LOVE A SPORT?
       </h2>
@@ -101,7 +101,7 @@ const PopularSportsSection = () => {
                 sport.popular_game && (
                   <CarouselItem
                     key={index}
-                    className="pl-2 md:pl-4 basis-1/2 sm:basis-1/6 md:basis-1/3 lg:basis-1/6"
+                    className="pl-2 md:pl-4 basis-1/2 sm:basis-1/6 md:basis-1/3 lg:basis-1/5"
                   >
                     <motion.div
                       className="cursor-pointer overflow-hidden rounded-2xl shadow-sm hover:shadow-md transition-all duration-300"
@@ -124,8 +124,8 @@ const PopularSportsSection = () => {
             )}
           </CarouselContent>
           <div>
-            <CarouselPrevious className="left-0" />
-            <CarouselNext className="right-0" />
+            <CarouselPrevious className="-left-10" />
+            <CarouselNext className="-right-10" />
           </div>
         </Carousel>
       </div>
