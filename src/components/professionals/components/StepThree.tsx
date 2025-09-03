@@ -204,30 +204,8 @@ export const StepThree = ({ form }: StepThreeProps) => {
           />
         </div>
 
-        {/* Certifications & Education */}
-        <div className="grid md:grid-cols-2 gap-6 mb-6">
-          <FormField
-            name="certifications"
-            control={form.control}
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel className="flex items-center gap-2">
-                  <GraduationCap className="w-4 h-4" />
-                  Certifications
-                </FormLabel>
-                <FormControl>
-                  <ArrayFieldInput
-                    value={field.value || []}
-                    onChange={field.onChange}
-                    placeholder="Add certification"
-                    label="Certifications"
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
+        {/* Education */}
+        <div className="mb-6">
           <FormField
             name="education"
             control={form.control}

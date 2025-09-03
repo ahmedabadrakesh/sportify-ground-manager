@@ -23,6 +23,7 @@ import { Award } from "lucide-react";
 import TextSuggestionCarousel from "./TextSuggestionCarousel";
 import { useGames } from "@/hooks/useGames";
 import { Switch } from "@/components/ui/switch";
+import { ArrayFieldInput } from "./ArrayFieldInput";
 
 type ProfessionType = Database["public"]["Enums"]["sport_profession_type"];
 
@@ -295,6 +296,33 @@ export const StepOne = ({ form }: StepOneProps) => {
           )}
         />
       </div>
+
+      {/* Certifications - Conditional based on is_certified */}
+      {form.watch("is_certified") && (
+        <div className="pt-4">
+          <FormField
+            name="certifications"
+            control={form.control}
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="flex items-center gap-2">
+                  <Award className="w-4 h-4" />
+                  Certifications
+                </FormLabel>
+                <FormControl>
+                  <ArrayFieldInput
+                    value={field.value || []}
+                    onChange={field.onChange}
+                    placeholder="Add certification"
+                    label="Certifications"
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
+      )}
     </div>
   );
 };
