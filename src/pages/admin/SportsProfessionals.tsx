@@ -12,12 +12,17 @@ import { toast } from "sonner";
 
 const AdminSportsProfessionals = () => {
   const [isRegisterDialogOpen, setIsRegisterDialogOpen] = React.useState(false);
-  const [editingProfessional, setEditingProfessional] = React.useState<any>(null);
+  const [editingProfessional, setEditingProfessional] =
+    React.useState<any>(null);
 
   const currentUser = getCurrentUserSync();
   const isSuperAdmin = hasRoleSync("super_admin");
 
-  const { data: professionals, isLoading, refetch } = useQuery({
+  const {
+    data: professionals,
+    isLoading,
+    refetch,
+  } = useQuery({
     queryKey: ["admin-sports-professionals"],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -99,22 +104,20 @@ const AdminSportsProfessionals = () => {
       id: "fee",
       header: "Fee",
       cell: ({ row }) => (
-        <div>₹{row.original.fee} {row.original.fee_type}</div>
+        <div>
+          ₹{row.original.fee} {row.original.fee_type}
+        </div>
       ),
     },
     {
       accessorKey: "city",
       header: "City",
-      cell: ({ row }) => (
-        <div>{row.getValue("city")}</div>
-      ),
+      cell: ({ row }) => <div>{row.getValue("city")}</div>,
     },
     {
       accessorKey: "contact_number",
       header: "Contact",
-      cell: ({ row }) => (
-        <div>{row.getValue("contact_number")}</div>
-      ),
+      cell: ({ row }) => <div>{row.getValue("contact_number")}</div>,
     },
     {
       id: "actions",
@@ -161,27 +164,27 @@ const AdminSportsProfessionals = () => {
       <div className="flex justify-between items-center mb-6">
         <div>
           <h1 className="text-2xl font-bold">Sports Professionals</h1>
-          <p className="text-gray-600">Manage sports professionals and their profiles</p>
+          <p className="text-gray-600">
+            Manage sports professionals and their profiles
+          </p>
         </div>
         <Button onClick={() => setIsRegisterDialogOpen(true)}>
           <Plus className="w-4 h-4 mr-2" />
           Add Professional
         </Button>
       </div>
-
       <DataTable
         columns={columns}
         data={professionals || []}
         searchKey="name"
         searchPlaceholder="Search professionals..."
       />
-
       <RegisterProfessionalDialog
         open={isRegisterDialogOpen}
         onOpenChange={setIsRegisterDialogOpen}
         isUpdate={false}
       />
-
+      ̦
       {editingProfessional && (
         <RegisterProfessionalDialog
           open={!!editingProfessional}

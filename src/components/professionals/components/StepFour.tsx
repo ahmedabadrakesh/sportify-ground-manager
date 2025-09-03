@@ -100,7 +100,7 @@ export const StepFour = ({ form }: StepFourProps) => {
                 control={form.control}
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>One-on-One (₹)</FormLabel>
+                    <FormLabel>One-on-One (₹/Hour)</FormLabel>
                     <FormControl>
                       <Input type="number" {...field} placeholder="Amount" />
                     </FormControl>
@@ -114,7 +114,7 @@ export const StepFour = ({ form }: StepFourProps) => {
                 control={form.control}
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Group Sessions (₹)</FormLabel>
+                    <FormLabel>Group Sessions (₹/Hour)</FormLabel>
                     <FormControl>
                       <Input type="number" {...field} placeholder="Amount" />
                     </FormControl>
@@ -128,7 +128,7 @@ export const StepFour = ({ form }: StepFourProps) => {
                 control={form.control}
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Online (₹/session)</FormLabel>
+                    <FormLabel>Online (₹/session/Hour)</FormLabel>
                     <FormControl>
                       <Input type="number" {...field} placeholder="Amount" />
                     </FormControl>

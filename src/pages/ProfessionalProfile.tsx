@@ -432,6 +432,10 @@ const ProfessionalProfile = () => {
                       .toUpperCase() || "U"
                   )}
                 </div>
+                {/* Location and Social Links */}
+                <div className="flex flex-wrap justify-center lg:justify-start items-center gap-4 ml-8">
+                  {renderSocialLinks()}
+                </div>
               </div>
 
               {/* Profile Info */}
@@ -454,25 +458,26 @@ const ProfessionalProfile = () => {
                   )}
                 </h1>
 
-                <p className="text-sm lg:text-lg text-gray-300">
-                  {professional.profession_type},{" Sports Professional"}
+                <p className="text-sm lg:text-lg text-gray-300 ">
+                  {professional.profession_type},{"Sports Professional"}
+                  {professional.academy_name && ` • Acadamy ${professional.academy_name}`}
                   {professional.age && ` • Age ${professional.age}`}
                   {professional.sex && ` • ${professional.sex}`}
                 </p>
-                <>
+                <div className="mt-4">
                   {professional.game_ids &&
                     professional.game_ids.map((gameId, index) => {
                       return (
                         <Badge
                           key={`game-${gameId}-${index}`}
                           variant="secondary"
-                          className="text-sm bg-gray-100 text-gray-700 border-0 mt-2 mb-4 mr-2"
+                          className="text-sm bg-gray-100 text-gray-700 border-0 mr-2"
                         >
                           {findNameById(gameData, gameId)}
                         </Badge>
                       );
                     })}
-                </>
+                </div>
 
                 {/* <div className="block md:hidden grid grid-cols-2 md:grid-cols-5 gap-4 text-centers mb-6">
                   <div className="bg-muted rounded-lg p-4">
@@ -518,7 +523,7 @@ const ProfessionalProfile = () => {
                 </div> */}
 
                 {/* Achievement Badges */}
-                <div className="hidden md:flex flex-wrap justify-center lg:justify-start gap-4 mb-6">
+                <div className="hidden md:flex flex-wrap justify-center lg:justify-start gap-4 mt-4">
                   {professional.years_of_experience !== null &&
                     professional.years_of_experience !== 0 && (
                       <Badge
@@ -557,7 +562,7 @@ const ProfessionalProfile = () => {
                     <MapPin className="w-4 h-4 mr-2" />
                     {professional.city || "India"}
                   </Badge>
-                  {professional.age && (
+                  {/*{professional.age && (
                     <Badge
                       key="age"
                       variant="secondary"
@@ -574,7 +579,7 @@ const ProfessionalProfile = () => {
                     >
                       {professional.sex}
                     </Badge>
-                  )}
+                  )} */}
                   {/* {professional.total_match_played && (
                     <div className="bg-white/10 backdrop-blur-sm rounded-lg px-4 py-2 text-center">
                       <div className="text-2xl font-bold">
@@ -592,12 +597,7 @@ const ProfessionalProfile = () => {
                     </div>
                   </div> */}
                 </div>
-
-                {/* Location and Social Links */}
-                <div className="flex flex-wrap justify-center lg:justify-start items-center gap-4">
-                  {renderSocialLinks()}
                 </div>
-              </div>
             </div>
           </div>
         </div>
@@ -646,8 +646,8 @@ const ProfessionalProfile = () => {
               )}
 
               {/* Specialties */}
-              {professional.accomplishments &&
-                professional.accomplishments.length > 0 && (
+              {professional.specialties &&
+                professional.specialties.length > 0 && (
                   <Card className="bg-white ">
                     <CardHeader>
                       <CardTitle className="flex items-center gap-2 text-primary">
@@ -657,7 +657,7 @@ const ProfessionalProfile = () => {
                     </CardHeader>
                     <CardContent>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                        {professional.accomplishments.map(
+                        {professional.specialties.map(
                           (specialty, index) => (
                             <div
                               key={index}
@@ -992,10 +992,10 @@ const ProfessionalProfile = () => {
                   </div>
                 </CardContent>
               </Card>
-
               {/* Training Locations */}
-              {Array.isArray(professional.training_locations_detailed) &&
-                professional.training_locations_detailed.length > 0 && (
+              {professional.address !== "" && (Array.isArray(professional.training_locations_detailed) &&
+                professional.training_locations_detailed.length > 0) 
+                 && (
                   <Card className="bg-white">
                     <CardHeader>
                       <CardTitle className="flex items-center gap-2 text-primary">
@@ -1004,6 +1004,23 @@ const ProfessionalProfile = () => {
                       </CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-4">
+                              <div
+                                key={professional.address}
+                                className="border rounded-lg p-3 bg-muted"
+                              >
+                                <div className="flex items-start gap-2 mb-2">
+                                  <MapPin className="w-4 h-4 text-primary mt-0.5" />
+                                  <div className="flex-1">
+                                    <p className="text-sm font-semibold text-left">
+                                      {"Primary Location"}
+                                    </p>
+                                    <p className="text-xs text-muted-foreground  text-left">
+                                      {professional.address}
+                                    </p>
+                                  </div>
+                                </div>
+                              </div>
+
                       {(professional.training_locations_detailed as any[]).map(
                         (training_location, index) =>
                           (training_location.location ||
@@ -1024,15 +1041,19 @@ const ProfessionalProfile = () => {
                                     </p>
                                   </div>
                                 </div>
-                                <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                                  <Clock className="w-3 h-3" />
-                                  <span>{training_location.timings}</span>
-                                </div>
+                                {training_location.timings && (
+                                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                                    <Clock className="w-3 h-3" />
+                                    <span>{training_location.timings}</span>
+                                  </div>
+                                )}
                               </div>
                             </>
                           )
                       )}
+
                     </CardContent>
+                    
                   </Card>
                 )}
               {/* Pricing */}

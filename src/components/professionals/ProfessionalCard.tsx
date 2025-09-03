@@ -12,6 +12,7 @@ import {
   BadgeCheck,
   Volleyball,
   Award,
+  CheckCircle,
 } from "lucide-react";
 import { getCurrentUserSync } from "@/utils/auth";
 import ContactDetailsPopup from "./ContactDetailsPopup";
@@ -180,12 +181,23 @@ const ProfessionalCard = ({
                 Specialties
               </span>
             </div>
-            <p className="text-xs text-left text-gray-600">
+
+            {/* <p className="text-xs text-left text-gray-600">
               {professional.game_ids && professional.game_ids.length > 0
                 ? "Multi-Sport Training"
                 : "Sports Training"}
               , {professional.profession_type} +2 more
-            </p>
+            </p> */}
+            <div className="text-xs text-left text-gray-600 gap-4">
+              {professional.specialties.map((specialty, index) => (
+                <Badge
+                  variant="secondary"
+                  className="text-xs bg-gray-100 text-gray-700 border-0 mt-2"
+                >
+                  <span className="text-sm">{specialty}</span>
+                </Badge>
+              ))}
+            </div>
           </div>
         </div>
         {/* Bottom Row - Contact Icons and Button */}
