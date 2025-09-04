@@ -11,7 +11,7 @@ export const professionalFormSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
   age: z.union([z.string(), z.number()]).transform((val) => Number(val) || 0).optional(),
   sex: z.enum(["Male", "Female"] as const).optional(),
-  profession_type: z.enum(["Athlete", "Coach", "Trainer", "Sports Manager", "Support Staff", "Player", "Umpire"] as const),
+  profession_type: z.array(z.enum(["Athlete", "Coach", "Trainer", "Sports Manager", "Support Staff", "Player", "Umpire"] as const)).min(1, "At least one profession type is required"),
   photo: z.string().optional(),
   academy_name: z.string().optional(),
   years_of_experience: z.union([z.string(), z.number()]).transform((val) => Number(val) || 0).optional(),

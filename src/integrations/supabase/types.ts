@@ -257,19 +257,19 @@ export type Database = {
           game_images: string | null
           id: string
           name: string
-          popular_game:boolean|false
+          popular_game: boolean | null
         }
         Insert: {
           game_images?: string | null
           id?: string
           name: string
-          popular_game:boolean|false
+          popular_game?: boolean | null
         }
         Update: {
           game_images?: string | null
           id?: string
           name?: string
-          popular_game:boolean|false
+          popular_game?: boolean | null
         }
         Relationships: []
       }
@@ -623,6 +623,7 @@ export type Database = {
           certifications: string[] | null
           city: string
           coaching_availability: string[] | null
+          comments: string | null
           contact_number: string
           created_at: string
           deleted_at: string | null
@@ -647,7 +648,9 @@ export type Database = {
           one_on_one_price: number | null
           online_price: number | null
           photo: string | null
-          profession_type: Database["public"]["Enums"]["sport_profession_type"]
+          profession_type:
+            | Database["public"]["Enums"]["sport_profession_type"][]
+            | null
           punch_line: string | null
           sex: string | null
           specialties: string[] | null
@@ -675,6 +678,7 @@ export type Database = {
           certifications?: string[] | null
           city: string
           coaching_availability?: string[] | null
+          comments?: string | null
           contact_number: string
           created_at?: string
           deleted_at?: string | null
@@ -699,7 +703,9 @@ export type Database = {
           one_on_one_price?: number | null
           online_price?: number | null
           photo?: string | null
-          profession_type: Database["public"]["Enums"]["sport_profession_type"]
+          profession_type?:
+            | Database["public"]["Enums"]["sport_profession_type"][]
+            | null
           punch_line?: string | null
           sex?: string | null
           specialties?: string[] | null
@@ -727,6 +733,7 @@ export type Database = {
           certifications?: string[] | null
           city?: string
           coaching_availability?: string[] | null
+          comments?: string | null
           contact_number?: string
           created_at?: string
           deleted_at?: string | null
@@ -751,7 +758,9 @@ export type Database = {
           one_on_one_price?: number | null
           online_price?: number | null
           photo?: string | null
-          profession_type?: Database["public"]["Enums"]["sport_profession_type"]
+          profession_type?:
+            | Database["public"]["Enums"]["sport_profession_type"][]
+            | null
           punch_line?: string | null
           sex?: string | null
           specialties?: string[] | null

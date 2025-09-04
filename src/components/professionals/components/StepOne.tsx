@@ -8,6 +8,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { MultiSelect } from "@/components/ui/multi-select";
 import {
   Select,
   SelectContent,
@@ -170,20 +171,20 @@ export const StepOne = ({ form }: StepOneProps) => {
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Primary Role (Professional Type) *</FormLabel>
-                <Select onValueChange={field.onChange} value={field.value}>
-                  <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select profession type" />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    {professionTypes.map((type) => (
-                      <SelectItem key={type} value={type}>
-                        {type}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <FormControl>
+                  <MultiSelect
+                    options={professionTypes.map((type) => ({
+                      label: type,
+                      value: type,
+                    }))}
+                    onValueChange={field.onChange}
+                    defaultValue={field.value || []}
+                    placeholder="Select profession types"
+                    variant="default"
+                    animation={0.3}
+                    maxCount={3}
+                  />
+                </FormControl>
                 <FormMessage />
               </FormItem>
             )}

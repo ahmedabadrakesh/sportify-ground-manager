@@ -218,7 +218,7 @@ const createSportsProfessionalEntry = async (
     const defaultProfessionalData = {
       user_id: userId,
       name: name,
-      profession_type: 'Athlete' as const,
+      profession_type: ['Athlete'] as ("Athlete" | "Coach" | "Trainer" | "Sports Manager" | "Support Staff" | "Player" | "Umpire")[],
       game_ids: [games[0].id], // Fixed: changed from game_id to game_ids (array)
       contact_number: contactNumber,
       fee: 0,

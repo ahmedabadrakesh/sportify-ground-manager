@@ -3,7 +3,14 @@ import React from "react";
 import { UseFormReturn } from "react-hook-form";
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { MultiSelect } from "@/components/ui/multi-select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { ProfessionalFormValues } from "../../schemas/professionalFormSchema";
 import { useGames } from "@/hooks/useGames";
@@ -117,20 +124,18 @@ export const BasicInformationSection = ({ form }: BasicInformationSectionProps) 
         render={({ field }) => (
           <FormItem>
             <FormLabel>Profession Type</FormLabel>
-            <Select onValueChange={field.onChange} value={field.value}>
-              <FormControl>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select profession type" />
-                </SelectTrigger>
-              </FormControl>
-              <SelectContent>
-                {professionTypes.map((type) => (
-                  <SelectItem key={type} value={type}>
-                    {type}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <MultiSelect
+              options={professionTypes.map((type) => ({
+                label: type,
+                value: type,
+              }))}
+              onValueChange={field.onChange}
+              defaultValue={field.value || []}
+              placeholder="Select profession types"
+              variant="default"
+              animation={0.3}
+              maxCount={3}
+            />
             <FormMessage />
           </FormItem>
         )}

@@ -218,7 +218,7 @@ const Register: React.FC = () => {
             {
               user_id: newUser.id,
               name: userData.name,
-              profession_type: "Coach",
+              profession_type: ["Coach"],
               game_ids: [games.id],
               contact_number: googleUserData.phone || "",
               fee: 0,

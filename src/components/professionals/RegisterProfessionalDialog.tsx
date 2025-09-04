@@ -268,7 +268,7 @@ const RegisterProfessionalDialog = ({
           );
           form.reset({
             name: "",
-            profession_type: "Athlete",
+            profession_type: [],
             games_played: [],
             contact_number: "",
             email: "",
@@ -301,7 +301,7 @@ const RegisterProfessionalDialog = ({
           form.reset({
             // Basic Info
             name: profileData.name || "",
-            profession_type: profileData.profession_type || "Athlete",
+            profession_type: profileData.profession_type || [],
             photo: profileData.photo || "",
             academy_name: profileData.academy_name || "",
             years_of_experience: profileData.years_of_experience || 0,

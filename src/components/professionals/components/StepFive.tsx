@@ -52,7 +52,7 @@ export const StepFive = ({ form }: StepFiveProps) => {
     const internationalLevelTournaments =
       formData.international_level_tournaments;
 
-    const aboutMeText = `I am a passionate ${professionType.toLowerCase()} with ${experience} years of experience in ${gamesPlayed}. My expertise lies in ${specialties}, till now i served ${numberOfClientServed} clients.
+    const aboutMeText = `I am a passionate ${professionType.join(", ").toLowerCase()} with ${experience} years of experience in ${gamesPlayed}. My expertise lies in ${specialties}, till now i served ${numberOfClientServed} clients.
 
 I have participated in numerous tournaments and competitions, which includes District Level - ${districtLevelTournaments}, State Level - ${stateLevelTournaments}, National Level - ${nationalLevelTournaments} and International Level - ${internationalLevelTournaments} bringing real-world experience to my coaching methodology. My approach focuses on not just improving technical skills but also building mental strength and strategic thinking.`;
 
