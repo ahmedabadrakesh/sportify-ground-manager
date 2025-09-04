@@ -4,38 +4,38 @@ import { X, ChevronLeft, ChevronRight, Camera } from "lucide-react";
 const ImageGallery = ({ images }) => {
   const [selectedImage, setSelectedImage] = useState(null);
 
-  const images1 = [
-    {
-      src: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=400&h=300&fit=crop",
-      title: "Training Session",
-      category: "Coaching",
-    },
-    {
-      src: "https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=400&h=300&fit=crop",
-      title: "Tournament Victory",
-      category: "Competition",
-    },
-    {
-      src: "https://images.unsplash.com/photo-1500673922987-e212871fec22?w=400&h=300&fit=crop",
-      title: "Student Success",
-      category: "Achievement",
-    },
-    {
-      src: "https://images.unsplash.com/photo-1501854140801-50d01698950b?w=400&h=300&fit=crop",
-      title: "Group Training",
-      category: "Coaching",
-    },
-    {
-      src: "https://images.unsplash.com/photo-1721322800607-8c38375eef04?w=400&h=300&fit=crop",
-      title: "Facility Overview",
-      category: "Facility",
-    },
-    {
-      src: "https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?w=400&h=300&fit=crop",
-      title: "Technical Analysis",
-      category: "Training",
-    },
-  ];
+  // const images1 = [
+  //   {
+  //     src: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=400&h=300&fit=crop",
+  //     title: "Training Session",
+  //     category: "Coaching",
+  //   },
+  //   {
+  //     src: "https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=400&h=300&fit=crop",
+  //     title: "Tournament Victory",
+  //     category: "Competition",
+  //   },
+  //   {
+  //     src: "https://images.unsplash.com/photo-1500673922987-e212871fec22?w=400&h=300&fit=crop",
+  //     title: "Student Success",
+  //     category: "Achievement",
+  //   },
+  //   {
+  //     src: "https://images.unsplash.com/photo-1501854140801-50d01698950b?w=400&h=300&fit=crop",
+  //     title: "Group Training",
+  //     category: "Coaching",
+  //   },
+  //   {
+  //     src: "https://images.unsplash.com/photo-1721322800607-8c38375eef04?w=400&h=300&fit=crop",
+  //     title: "Facility Overview",
+  //     category: "Facility",
+  //   },
+  //   {
+  //     src: "https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?w=400&h=300&fit=crop",
+  //     title: "Technical Analysis",
+  //     category: "Training",
+  //   },
+  // ];
 
   const categories = [
     "All",
@@ -83,7 +83,7 @@ const ImageGallery = ({ images }) => {
             <img
               src={image}
               alt={image}
-              className="w-full h-auto object-cover transition-transform duration-300 group-hover:scale-110"
+              className="w-full h-48 object-cover transition-transform duration-300 group-hover:scale-110"
             />
             <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-all duration-300"></div>
             <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300">

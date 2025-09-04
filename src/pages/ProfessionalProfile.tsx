@@ -710,9 +710,9 @@ const ProfessionalProfile = () => {
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
-                    {/* <ImageGallery images={professional.images} /> */}
+                    <ImageGallery images={professional.images} />
 
-                    <Carousel className="w-full">
+                    {/* <Carousel className="w-full">
                       <CarouselContent>
                         {professional.images.map((photo, index) => (
                           <CarouselItem
@@ -732,7 +732,7 @@ const ProfessionalProfile = () => {
                           </CarouselItem>
                         ))}
                       </CarouselContent>
-                    </Carousel>
+                    </Carousel> */}
                   </CardContent>
                 </Card>
               )}
