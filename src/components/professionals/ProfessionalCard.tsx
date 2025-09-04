@@ -105,7 +105,7 @@ const ProfessionalCard = ({
               </>
             </h3>
             <p className="flex items-center gap-2 mb-2 text-sm text-gray-600">
-              {professional.profession_type}
+              {professional.profession_type.join(" • ")}
               {/* Location */}
               {professional.city && (
                 <>

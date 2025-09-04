@@ -459,7 +459,8 @@ const ProfessionalProfile = () => {
                 </h1>
 
                 <p className="text-sm lg:text-lg text-gray-300 ">
-                  {professional.profession_type},{"Sports Professional"}
+                  {professional.profession_type.join(" • ")},
+                  {" • Sports Professional"}
                   {professional.academy_name &&
                     ` • Acadamy ${professional.academy_name}`}
                   {professional.age && ` • Age ${professional.age}`}
