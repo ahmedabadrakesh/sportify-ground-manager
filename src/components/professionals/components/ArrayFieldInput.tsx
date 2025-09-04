@@ -23,8 +23,11 @@ export const ArrayFieldInput = ({
 }: ArrayFieldInputProps) => {
   const [inputValue, setInputValue] = useState("");
   const [uploading, setUploading] = useState(false);
+  const [showImageAlert, setShowImageAlert] = useState(false);
 
-  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileUpload = async (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
     try {
       if (!event.target.files || event.target.files.length === 0) {
         return;
@@ -32,39 +35,50 @@ export const ArrayFieldInput = ({
       setUploading(true);
 
       const file = event.target.files[0];
-      
+
       // Validate file type
-      const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/svg+xml', 'image/webp', 'image/bmp', 'image/tiff'];
+      const validTypes = [
+        "image/jpeg",
+        "image/jpg",
+        "image/png",
+        "image/gif",
+        "image/svg+xml",
+        "image/webp",
+        "image/bmp",
+        "image/tiff",
+      ];
       if (!validTypes.includes(file.type)) {
-        toast.error('Please select a valid image file (jpg, png, gif, svg, webp, bmp, tiff)');
+        toast.error(
+          "Please select a valid image file (jpg, png, gif, svg, webp, bmp, tiff)"
+        );
         return;
       }
 
-      const fileExt = file.name.split('.').pop();
+      const fileExt = file.name.split(".").pop();
       const fileName = `${Math.random()}.${fileExt}`;
       const filePath = `${fileName}`;
 
       const { error: uploadError } = await supabase.storage
-        .from('professionals')
+        .from("professionals")
         .upload(filePath, file);
 
       if (uploadError) {
         throw uploadError;
       }
 
-      const { data: { publicUrl } } = supabase.storage
-        .from('professionals')
-        .getPublicUrl(filePath);
+      const {
+        data: { publicUrl },
+      } = supabase.storage.from("professionals").getPublicUrl(filePath);
 
       // Add the uploaded image URL to the array
       onChange([...value, publicUrl]);
-      toast.success('Image uploaded successfully');
-      
+      toast.success("Image uploaded successfully");
+
       // Reset file input
-      event.target.value = '';
+      event.target.value = "";
     } catch (error) {
-      toast.error('Error uploading image');
-      console.error('Error uploading image:', error);
+      toast.error("Error uploading image");
+      console.error("Error uploading image:", error);
     } finally {
       setUploading(false);
     }
@@ -72,20 +86,33 @@ export const ArrayFieldInput = ({
 
   const addItem = () => {
     const trimmedValue = inputValue.trim();
-    
+
     if (!trimmedValue || value.includes(trimmedValue)) {
       return;
     }
 
     // Validate image URLs when type is "image"
     if (type === "image") {
-      const imageExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.svg', '.webp', '.bmp', '.tiff'];
-      const hasValidExtension = imageExtensions.some(ext => 
+      const imageExtensions = [
+        ".jpg",
+        ".jpeg",
+        ".png",
+        ".gif",
+        ".svg",
+        ".webp",
+        ".bmp",
+        ".tiff",
+      ];
+      const hasValidExtension = imageExtensions.some((ext) =>
         trimmedValue.toLowerCase().endsWith(ext)
       );
-      
+
       if (!hasValidExtension) {
-        alert("Please enter a valid image URL ending with: " + imageExtensions.join(', '));
+        // alert(
+        //   "Please enter a valid image URL ending with: " +
+        //     imageExtensions.join(", ")
+        // );
+        setShowImageAlert(true);
         return;
       }
     }
@@ -107,10 +134,22 @@ export const ArrayFieldInput = ({
 
   return (
     <div className="space-y-2">
+      {showImageAlert && (
+        <div
+          className="p-4 mb-4 text-sm text-red-800 rounded-lg bg-red-50 dark:bg-gray-800 dark:text-red-400"
+          role="alert"
+        >
+          <span className="font-medium">Not an Image</span>Please enter URL of
+          Image
+        </div>
+      )}
       <div className="flex gap-2">
         <Input
           value={inputValue}
-          onChange={(e) => setInputValue(e.target.value)}
+          onChange={(e) => {
+            setShowImageAlert(false);
+            setInputValue(e.target.value);
+          }}
           placeholder={placeholder}
           onKeyPress={handleKeyPress}
         />
@@ -118,7 +157,7 @@ export const ArrayFieldInput = ({
           <Plus className="h-4 w-4" />
         </Button>
       </div>
-      
+
       {type === "image" && (
         <div className="flex gap-2 items-center">
           <div className="text-sm text-muted-foreground">Or upload image:</div>
@@ -135,7 +174,9 @@ export const ArrayFieldInput = ({
               type="button"
               variant="outline"
               size="sm"
-              onClick={() => document.getElementById(`file-upload-${label}`)?.click()}
+              onClick={() =>
+                document.getElementById(`file-upload-${label}`)?.click()
+              }
               disabled={uploading}
             >
               <Upload className="h-4 w-4 mr-1" />
@@ -144,18 +185,19 @@ export const ArrayFieldInput = ({
           </div>
         </div>
       )}
-      
+
       <div className="flex flex-wrap gap-2 pt-2">
         {value.map((item, index) => (
           <div key={index} className="relative">
             {type === "image" ? (
               <>
-                <img 
-                  src={item} 
+                <img
+                  src={item}
                   alt={`Image ${index + 1}`}
                   className="w-12 h-12 object-cover rounded border"
                   onError={(e) => {
-                    (e.target as HTMLImageElement).src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect width='18' height='18' x='3' y='3' rx='2' ry='2'/%3E%3Ccircle cx='9' cy='9' r='2'/%3E%3Cpath d='m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21'/%3E%3C/svg%3E";
+                    (e.target as HTMLImageElement).src =
+                      "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect width='18' height='18' x='3' y='3' rx='2' ry='2'/%3E%3Ccircle cx='9' cy='9' r='2'/%3E%3Cpath d='m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21'/%3E%3C/svg%3E";
                   }}
                 />
                 <Button
@@ -169,10 +211,7 @@ export const ArrayFieldInput = ({
                 </Button>
               </>
             ) : (
-              <Badge
-                variant="secondary"
-                className="flex items-center gap-1"
-              >
+              <Badge variant="secondary" className="flex items-center gap-1">
                 {item}
                 <X
                   className="h-3 w-3 cursor-pointer"
