@@ -22,10 +22,27 @@ export const ArrayFieldInput = ({
   const [inputValue, setInputValue] = useState("");
 
   const addItem = () => {
-    if (inputValue.trim() && !value.includes(inputValue.trim())) {
-      onChange([...value, inputValue.trim()]);
-      setInputValue("");
+    const trimmedValue = inputValue.trim();
+    
+    if (!trimmedValue || value.includes(trimmedValue)) {
+      return;
     }
+
+    // Validate image URLs when type is "image"
+    if (type === "image") {
+      const imageExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.svg', '.webp', '.bmp', '.tiff'];
+      const hasValidExtension = imageExtensions.some(ext => 
+        trimmedValue.toLowerCase().endsWith(ext)
+      );
+      
+      if (!hasValidExtension) {
+        alert("Please enter a valid image URL ending with: " + imageExtensions.join(', '));
+        return;
+      }
+    }
+
+    onChange([...value, trimmedValue]);
+    setInputValue("");
   };
 
   const removeItem = (index: number) => {
