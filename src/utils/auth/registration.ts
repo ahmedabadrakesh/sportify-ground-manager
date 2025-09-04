@@ -215,11 +215,11 @@ const createSportsProfessionalEntry = async (
       throw new Error("No games available. Please contact administrator.");
     }
     
-    const defaultProfessionalData = {
+const defaultProfessionalData = {
       user_id: userId,
       name: name,
       profession_type: ['Athlete'] as ("Athlete" | "Coach" | "Trainer" | "Sports Manager" | "Support Staff" | "Player" | "Umpire")[],
-      game_ids: [games[0].id], // Fixed: changed from game_id to game_ids (array)
+      game_ids: [games[0].id],
       contact_number: contactNumber,
       fee: 0,
       fee_type: 'Per Hour' as const,
@@ -232,13 +232,37 @@ const createSportsProfessionalEntry = async (
       training_locations: [],
       videos: [],
       images: [],
-      punch_line: null,
+      punch_line: '',
       instagram_link: null,
       facebook_link: null,
       linkedin_link: null,
       website: null,
       level: null,
       coaching_availability: [],
+      years_of_experience: 0,
+      total_match_played: null,
+      whatsapp_same_as_phone: false,
+      district_level_tournaments: 0,
+      state_level_tournaments: 0,
+      national_level_tournaments: 0,
+      international_level_tournaments: 0,
+      one_on_one_price: 0,
+      group_session_price: 0,
+      online_price: 0,
+      free_demo_call: false,
+      success_stories: [],
+      training_locations_detailed: [],
+      is_certified: false,
+      age: null,
+      sex: null,
+      number_of_clients_served: 0,
+      academy_name: '',
+      whatsapp: contactNumber,
+      specialties: [],
+      about_me: `I am a passionate ${(['Athlete'] as any)[0].toLowerCase()} with a commitment to excellence. I am just starting my professional journey and look forward to sharing my knowledge and skills.`,
+      education: [],
+      youtube_link: null,
+      comments: null
     };
     
     console.log("Inserting sports professional data:", defaultProfessionalData);
