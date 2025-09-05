@@ -7,7 +7,7 @@ import { useProfessionalRegistration } from "./useProfessionalRegistration";
 import { useDraftSave } from "./useDraftSave";
 import { useEffect } from "react";
 
-export const useRegisterProfessionalForm = (onSuccess: () => void, isUpdate: boolean = false) => {
+export const useRegisterProfessionalForm = (onSuccess: () => void, isUpdate: boolean = false, existingUserId?: string) => {
   const form = useForm<ProfessionalFormValues>({
     resolver: zodResolver(professionalFormSchema),
     defaultValues: {
@@ -80,7 +80,7 @@ export const useRegisterProfessionalForm = (onSuccess: () => void, isUpdate: boo
     stepDetails,
   } = useStepNavigation(form);
 
-  const { registerMutation } = useProfessionalRegistration(onSuccess, isUpdate);
+  const { registerMutation } = useProfessionalRegistration(onSuccess, isUpdate, existingUserId);
 
   // Initialize draft save functionality
   const { saveDraft, loadDraft, deleteDraft } = useDraftSave(form, currentStep, isUpdate);

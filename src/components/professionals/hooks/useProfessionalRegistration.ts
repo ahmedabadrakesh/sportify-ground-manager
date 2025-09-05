@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import { getCurrentUser, hasRoleSync } from "@/utils/auth";
 import { ProfessionalFormValues } from "../schemas/professionalFormSchema";
 
-export const useProfessionalRegistration = (onSuccess: () => void, isUpdate: boolean = false) => {
+export const useProfessionalRegistration = (onSuccess: () => void, isUpdate: boolean = false, existingUserId?: string) => {
   const queryClient = useQueryClient();
   const isSuperAdmin = hasRoleSync('super_admin');
 
@@ -22,7 +22,11 @@ export const useProfessionalRegistration = (onSuccess: () => void, isUpdate: boo
 
       let userId: string;
 
-      if (isSuperAdmin && !isUpdate) {
+      // If we're updating an existing professional and have their user_id, use that
+      if (isUpdate && existingUserId) {
+        userId = existingUserId;
+        console.log('Using existing user ID for update:', userId);
+      } else if (isSuperAdmin && !isUpdate) {
         console.log('Super admin registering professional with email:', values.email);
         
         const { data: authData, error: authError } = await supabase.auth.signUp({

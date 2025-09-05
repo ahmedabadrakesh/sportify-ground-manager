@@ -229,7 +229,7 @@ const RegisterProfessionalDialog = ({
   } = useRegisterProfessionalForm(() => {
     onOpenChange(false);
     resetForm();
-  }, isUpdate);
+  }, isUpdate, professional?.user_id);
 
   const handleFormSubmit = (e: React.FormEvent) => {
     e.preventDefault();
