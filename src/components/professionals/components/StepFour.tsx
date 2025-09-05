@@ -13,7 +13,14 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ProfessionalFormValues } from "../schemas/professionalFormSchema";
 import { MultiSelect } from "@/components/ui/multi-select";
-import { MapPin, DollarSign, Clock, Plus, Trash2 } from "lucide-react";
+import {
+  MapPin,
+  DollarSign,
+  Clock,
+  Plus,
+  Trash2,
+  BadgeIndianRupee,
+} from "lucide-react";
 
 interface StepFourProps {
   form: UseFormReturn<ProfessionalFormValues>;
@@ -90,7 +97,7 @@ export const StepFour = ({ form }: StepFourProps) => {
         {/* Pricing Section */}
         <Card className="mb-6">
           <h3 className="text-lg font-semibold flex items-center gap-2 p-4">
-            <DollarSign className="w-5 h-5" />
+            <BadgeIndianRupee className="w-5 h-5" />
             Fee / Pricing
           </h3>
           <CardContent className="space-y-4">
