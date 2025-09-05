@@ -159,16 +159,26 @@ const ProfessionalCard = ({
                 </span>
               </div>
               <div className="flex items-center gap-2 mb-2 mt-2">
-                {professional.game_ids.map((gameId) => {
+                {professional.game_ids.slice(0, 2).map((gameId, index) => {
                   return (
-                    <Badge
-                      variant="secondary"
-                      className="text-xs   bg-gray-100 text-gray-700 border-0"
-                    >
-                      {findNameById(gameData, gameId)}
-                    </Badge>
+                    <>
+                      <Badge
+                        variant="secondary"
+                        className="text-xs bg-gray-100 text-gray-700 border-0"
+                      >
+                        {findNameById(gameData, gameId)}
+                      </Badge>
+                    </>
                   );
                 })}
+                {professional.game_ids.length > 2 && (
+                  <Badge
+                    variant="secondary"
+                    className="text-xs bg-gray-100 text-gray-700 border-0"
+                  >
+                    +
+                  </Badge>
+                )}
               </div>
             </div>
           )}
@@ -189,7 +199,7 @@ const ProfessionalCard = ({
               , {professional.profession_type} +2 more
             </p> */}
             <div className="text-xs text-left text-gray-600 gap-4">
-              {professional.specialties.map((specialty, index) => (
+              {professional.specialties.slice(0, 2).map((specialty, index) => (
                 <Badge
                   variant="secondary"
                   className="text-xs bg-gray-100 text-gray-700 border-0 mt-2"
@@ -197,6 +207,14 @@ const ProfessionalCard = ({
                   <span className="text-sm">{specialty}</span>
                 </Badge>
               ))}
+              {professional.specialties.length > 2 && (
+                <Badge
+                  variant="secondary"
+                  className="text-xs   bg-gray-100 text-gray-700 border-0"
+                >
+                  +
+                </Badge>
+              )}
             </div>
           </div>
         </div>

@@ -630,8 +630,6 @@ export type Database = {
           district_level_tournaments: number | null
           education: string[] | null
           facebook_link: string | null
-          fee: number
-          fee_type: Database["public"]["Enums"]["fee_type"]
           free_demo_call: boolean | null
           game_ids: string[] | null
           group_session_price: number | null
@@ -686,8 +684,6 @@ export type Database = {
           district_level_tournaments?: number | null
           education?: string[] | null
           facebook_link?: string | null
-          fee: number
-          fee_type: Database["public"]["Enums"]["fee_type"]
           free_demo_call?: boolean | null
           game_ids?: string[] | null
           group_session_price?: number | null
@@ -742,8 +738,6 @@ export type Database = {
           district_level_tournaments?: number | null
           education?: string[] | null
           facebook_link?: string | null
-          fee?: number
-          fee_type?: Database["public"]["Enums"]["fee_type"]
           free_demo_call?: boolean | null
           game_ids?: string[] | null
           group_session_price?: number | null
@@ -926,7 +920,6 @@ export type Database = {
       }
     }
     Enums: {
-      fee_type: "Per Hour" | "Per Day" | "Per Match"
       sport_profession_type:
         | "Athlete"
         | "Coach"
@@ -1068,7 +1061,6 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      fee_type: ["Per Hour", "Per Day", "Per Match"],
       sport_profession_type: [
         "Athlete",
         "Coach",

@@ -84,7 +84,7 @@ const ProfessionalProfile = () => {
         .from("sports_professionals")
         .select(
           `
-           id, profession_type, name, fee, fee_type, address, city,
+           id, profession_type, name, address, city,
            photo, user_id, created_at, updated_at, awards, accomplishments,
            certifications, training_locations, videos, images, punch_line,
            instagram_link, facebook_link, linkedin_link, website, level,
