@@ -96,7 +96,7 @@ const RegisterProfessionalDialog = ({
 
   useEffect(() => {
     const fetchExistingProfile = async () => {
-      if (isUpdate && currentUser && open && !isSuperAdmin && !professional) {
+      if (isUpdate && currentUser && open && !professional) {
         setIsLoadingProfile(true);
         try {
           console.log("Fetching existing profile for user:", currentUser);
@@ -210,7 +210,7 @@ const RegisterProfessionalDialog = ({
     };
 
     fetchExistingProfile();
-  }, [isUpdate, currentUser, open, userEmail, isSuperAdmin]);
+  }, [isUpdate, currentUser, open, userEmail, isSuperAdmin, professional]);
 
   const {
     form,

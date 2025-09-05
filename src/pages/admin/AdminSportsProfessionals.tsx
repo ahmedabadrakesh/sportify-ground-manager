@@ -203,7 +203,7 @@ const AdminSportsProfessionals = () => {
         </div>
         <Button onClick={handleAddProfessional}>
           <Plus className="w-4 h-4 mr-2" />
-          {isSportsProfessional && !isSuperAdmin ? "Create My Profile" : "Add Professional"}
+          {(isSportsProfessional && !isSuperAdmin) ? "Create My Profile" : "Add New Professional"}
         </Button>
       </div>
 

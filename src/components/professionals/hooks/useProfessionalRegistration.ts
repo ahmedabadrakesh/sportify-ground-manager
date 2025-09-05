@@ -149,6 +149,13 @@ export const useProfessionalRegistration = (onSuccess: () => void, isUpdate: boo
         throw new Error("You already have a professional profile. Use the update option instead.");
       }
 
+      // For super admins creating profiles for other users, they should never be in update mode
+      // unless explicitly passed existing profile data
+      if (isUpdate && isSuperAdmin && !hasExistingProfile) {
+        console.log("Super admin in update mode but no existing profile found, treating as new creation");
+        isUpdate = false;
+      }
+
       if (isUpdate && !hasExistingProfile) {
         throw new Error("No existing profile found to update. Please create a new profile instead.");
       }
