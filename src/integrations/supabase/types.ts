@@ -640,6 +640,7 @@ export type Database = {
           instagram_link: string | null
           international_level_tournaments: number | null
           is_certified: boolean | null
+          is_draft: boolean | null
           level: string | null
           linkedin_link: string | null
           name: string
@@ -695,6 +696,7 @@ export type Database = {
           instagram_link?: string | null
           international_level_tournaments?: number | null
           is_certified?: boolean | null
+          is_draft?: boolean | null
           level?: string | null
           linkedin_link?: string | null
           name: string
@@ -750,6 +752,7 @@ export type Database = {
           instagram_link?: string | null
           international_level_tournaments?: number | null
           is_certified?: boolean | null
+          is_draft?: boolean | null
           level?: string | null
           linkedin_link?: string | null
           name?: string
