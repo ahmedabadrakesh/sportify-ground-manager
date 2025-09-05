@@ -22,8 +22,9 @@ import {
   Trash2,
   Sparkles,
 } from "lucide-react";
-import OpenAI from "openai";
 import { TournamentParticipationSection } from "./form-sections/TournamentParticipationSection";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/components/ui/use-toast";
 
 interface StepFiveProps {
   form: UseFormReturn<ProfessionalFormValues>;
@@ -31,51 +32,59 @@ interface StepFiveProps {
 
 export const StepFive = ({ form }: StepFiveProps) => {
   const successStories = form.watch("success_stories") || [];
-
-  const openai = new OpenAI({
-    apiKey: import.meta.env.VITE_REACT_APP_OPEN_AI_KEY,
-    dangerouslyAllowBrowser: true,
-  });
+  const { toast } = useToast();
 
   // Auto-generate About Me content based on form data
-  const generateAboutMe = () => {
-    const formData = form.getValues();
-    const gamesPlayed = formData.games_played?.join(", ");
-    const experience = formData.years_of_experience;
-    const professionType = formData.profession_type;
-    const specialties =
-      formData.specialties?.slice(0, 3).join(", ") || "coaching and training";
-    const numberOfClientServed = formData.number_of_clients_served;
-    const districtLevelTournaments = formData.district_level_tournaments;
-    const stateLevelTournaments = formData.state_level_tournaments;
-    const nationalLevelTournaments = formData.national_level_tournaments;
-    const internationalLevelTournaments =
-      formData.international_level_tournaments;
+  const generateAboutMe = async () => {
+    try {
+      const formData = form.getValues();
+      const gamesPlayed = formData.games_played?.join(", ");
+      const experience = formData.years_of_experience;
+      const professionType = formData.profession_type;
+      const specialties =
+        formData.specialties?.slice(0, 3).join(", ") || "coaching and training";
+      const numberOfClientServed = formData.number_of_clients_served;
+      const districtLevelTournaments = formData.district_level_tournaments;
+      const stateLevelTournaments = formData.state_level_tournaments;
+      const nationalLevelTournaments = formData.national_level_tournaments;
+      const internationalLevelTournaments =
+        formData.international_level_tournaments;
 
-    const aboutMeText = `I am a passionate ${professionType.join(", ").toLowerCase()} with ${experience} years of experience in ${gamesPlayed}. My expertise lies in ${specialties}, till now i served ${numberOfClientServed} clients.
+      const aboutMeText = `I am a passionate ${professionType.join(", ").toLowerCase()} with ${experience} years of experience in ${gamesPlayed}. My expertise lies in ${specialties}, till now i served ${numberOfClientServed} clients.
 
 I have participated in numerous tournaments and competitions, which includes District Level - ${districtLevelTournaments}, State Level - ${stateLevelTournaments}, National Level - ${nationalLevelTournaments} and International Level - ${internationalLevelTournaments} bringing real-world experience to my coaching methodology. My approach focuses on not just improving technical skills but also building mental strength and strategic thinking.`;
 
-    const aboutMeTextFromChatGPT = openai.responses.create({
-      model: "gpt-4o-mini",
-      input: [
-        {
-          role: "developer",
-          content:
-            "Just re-write about me with given input for my trainer profile. Dont include heading just direct text",
-        },
-        {
-          role: "user",
-          content: aboutMeText,
-        },
-      ],
-      store: false,
-      //reasoning: { effort: "low" },
-    });
-    aboutMeTextFromChatGPT.then((result) => {
-      console.log(result.output_text);
-      form.setValue("about_me", result.output_text);
-    });
+      toast({
+        title: "Generating...",
+        description: "Creating your About Me section using AI",
+      });
+
+      const { data, error } = await supabase.functions.invoke('generate-about-me', {
+        body: { aboutMeText }
+      });
+
+      if (error) {
+        throw error;
+      }
+
+      if (data?.generatedText) {
+        form.setValue("about_me", data.generatedText);
+        toast({
+          title: "Success!",
+          description: "Your About Me section has been generated",
+        });
+      } else {
+        throw new Error('No generated text received');
+      }
+
+    } catch (error) {
+      console.error('Error generating about me:', error);
+      toast({
+        title: "Error",
+        description: "Failed to generate About Me content. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
 
   const addSuccessStory = () => {
