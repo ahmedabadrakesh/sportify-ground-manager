@@ -29,6 +29,7 @@ const AdminSportsProfessionals = () => {
         .from("sports_professionals")
         .select("*")
         .is("deleted_at", null)
+        .is("created_by", null)
         .order("created_at", { ascending: false });
 
       if (error) throw error;
