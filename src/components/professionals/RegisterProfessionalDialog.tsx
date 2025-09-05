@@ -69,12 +69,14 @@ const RegisterProfessionalDialog = ({
 
           if (userData && !error) {
             setUserEmail(userData.email);
+            console.log("Fetched professional's email:", userData.email);
           }
         } catch (error) {
           console.error("Error fetching professional's email:", error);
         }
-      } else if (currentUser && !isSuperAdmin && !professional) {
+      } else if (currentUser && !professional) {
         // Fetch email for current user when creating new profile
+        // Only do this if we're not editing an existing professional
         try {
           const { data: userData, error } = await supabase
             .from("users")
@@ -84,6 +86,7 @@ const RegisterProfessionalDialog = ({
 
           if (userData && !error) {
             setUserEmail(userData.email);
+            console.log("Fetched current user's email:", userData.email);
           }
         } catch (error) {
           console.error("Error fetching user email:", error);
