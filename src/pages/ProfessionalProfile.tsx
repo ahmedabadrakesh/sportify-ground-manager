@@ -320,7 +320,7 @@ const ProfessionalProfile = () => {
   };
 
   const getFiftyWords = (str, count) => {
-    if (str.length > count) {
+    if (str.split(" ").length > count) {
       return str.split(" ").slice(0, count).join(" ") + " ... ";
     } else {
       return str + " ";
@@ -631,7 +631,7 @@ const ProfessionalProfile = () => {
                         {isAboutReadMoreOpened
                           ? professional.about_me
                           : getFiftyWords(professional.about_me, 50)}
-                        {professional.about_me.length >= 50 && (
+                        {professional.about_me.split(" ").length >= 50 && (
                           <button
                             onClick={() =>
                               setisAboutReadMoreOpened(!isAboutReadMoreOpened)
