@@ -25,6 +25,7 @@ import { getCart, getCartTotal, processCheckout } from "@/utils/cart";
 import { CartItem, Product } from "@/types/models";
 import { getProductById } from "@/utils/ecommerce";
 import { getCurrentUserSync } from "@/utils/auth";
+import AuthRequiredDialog from "@/components/auth/AuthRequiredDialog";
 
 const checkoutFormSchema = z.object({
   name: z.string().min(2, { message: "Name must be at least 2 characters" }),
@@ -44,6 +45,7 @@ const Checkout: React.FC = () => {
   const [products, setProducts] = useState<Record<string, Product>>({});
   const [loading, setLoading] = useState(true);
   const [processingOrder, setProcessingOrder] = useState(false);
+  const [showAuthDialog, setShowAuthDialog] = useState(false);
   const currentUser = getCurrentUserSync();
 
   const form = useForm<CheckoutFormValues>({
@@ -58,6 +60,15 @@ const Checkout: React.FC = () => {
   });
 
   useEffect(() => {
+    // Check authentication first
+    if (!currentUser) {
+      // Store the intended destination
+      localStorage.setItem('redirectAfterLogin', '/checkout');
+      setShowAuthDialog(true);
+      setLoading(false);
+      return;
+    }
+
     const loadCartData = async () => {
       try {
         const cartItems = getCart();
@@ -92,7 +103,7 @@ const Checkout: React.FC = () => {
     };
     
     loadCartData();
-  }, [navigate]);
+  }, [navigate, currentUser]);
 
   const cartItems = cart.map(item => {
     const product = products[item.productId];
@@ -146,6 +157,29 @@ const Checkout: React.FC = () => {
         <div className="flex justify-center items-center h-[400px]">
           <p>Loading checkout...</p>
         </div>
+      </MainLayout>
+    );
+  }
+
+  // Show auth dialog if user is not authenticated
+  if (!currentUser) {
+    return (
+      <MainLayout>
+        <div className="flex justify-center items-center h-[400px]">
+          <div className="text-center">
+            <h2 className="text-2xl font-bold mb-4">Authentication Required</h2>
+            <p className="text-muted-foreground mb-6">Please log in to continue with checkout</p>
+            <Button onClick={() => setShowAuthDialog(true)}>
+              Login or Register
+            </Button>
+          </div>
+        </div>
+        <AuthRequiredDialog 
+          open={showAuthDialog} 
+          onOpenChange={setShowAuthDialog}
+          title="Login Required for Checkout"
+          description="You need to be logged in to proceed with checkout. Please login or create an account to continue."
+        />
       </MainLayout>
     );
   }

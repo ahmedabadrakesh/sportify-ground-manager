@@ -5,16 +5,13 @@ import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/comp
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ProfessionalFormValues } from "../../schemas/professionalFormSchema";
-import { Database } from "@/integrations/supabase/types";
-
-type FeeType = Database["public"]["Enums"]["fee_type"];
 
 interface FeeInformationSectionProps {
   form: UseFormReturn<ProfessionalFormValues>;
 }
 
 export const FeeInformationSection = ({ form }: FeeInformationSectionProps) => {
-  const feeTypes: FeeType[] = [
+  const feeTypes = [
     "Per Hour", "Per Day", "Per Match"
   ];
 

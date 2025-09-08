@@ -155,7 +155,13 @@ const Register: React.FC = () => {
             toast.success(
               `Welcome back, ${existingUser.name}! Redirecting to home...`
             );
-            navigate("/");
+            const redirectUrl = localStorage.getItem('redirectAfterLogin');
+            if (redirectUrl) {
+              localStorage.removeItem('redirectAfterLogin');
+              navigate(redirectUrl);
+            } else {
+              navigate("/");
+            }
           } else {
             // New user, show user type selection
             setGoogleUserData(session.user);
@@ -238,7 +244,13 @@ const Register: React.FC = () => {
         setShowWelcomeDialog(true);
       } else {
         toast.success(`Welcome to SportifyGround, ${newUser.name}!`);
-        navigate("/");
+        const redirectUrl = localStorage.getItem('redirectAfterLogin');
+        if (redirectUrl) {
+          localStorage.removeItem('redirectAfterLogin');
+          navigate(redirectUrl);
+        } else {
+          navigate("/");
+        }
       }
     } catch (error) {
       console.error("Error creating user profile:", error);
@@ -474,7 +486,13 @@ const Register: React.FC = () => {
             }}
             onSkip={() => {
               setShowWelcomeDialog(false);
-              navigate(-1);
+              const redirectUrl = localStorage.getItem('redirectAfterLogin');
+              if (redirectUrl) {
+                localStorage.removeItem('redirectAfterLogin');
+                navigate(redirectUrl);
+              } else {
+                navigate("/");
+              }
             }}
             userName={registeredUser?.name || ""}
           />
@@ -486,7 +504,13 @@ const Register: React.FC = () => {
               onOpenChange={(open) => {
                 setIsRegisterDialogOpen(open);
                 if (!open) {
-                  navigate(-1);
+                  const redirectUrl = localStorage.getItem('redirectAfterLogin');
+                  if (redirectUrl) {
+                    localStorage.removeItem('redirectAfterLogin');
+                    navigate(redirectUrl);
+                  } else {
+                    navigate("/");
+                  }
                 }
               }}
               isUpdate={true}

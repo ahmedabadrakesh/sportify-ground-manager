@@ -62,7 +62,11 @@ const Login: React.FC = () => {
         }
 
         // Redirect based on user role
-        if (user.role === "admin" || user.role === "super_admin") {
+        const redirectUrl = localStorage.getItem('redirectAfterLogin');
+        if (redirectUrl) {
+          localStorage.removeItem('redirectAfterLogin');
+          navigate(redirectUrl);
+        } else if (user.role === "admin" || user.role === "super_admin") {
           navigate("/admin");
         } else if (user.role === "ground_owner") {
           navigate("/admin/grounds"); // Ground owners go to grounds page
@@ -136,11 +140,29 @@ const Login: React.FC = () => {
               existingUser.role === "admin" ||
               existingUser.role === "super_admin"
             ) {
-              navigate("/admin");
+              const redirectUrl = localStorage.getItem('redirectAfterLogin');
+              if (redirectUrl) {
+                localStorage.removeItem('redirectAfterLogin');
+                navigate(redirectUrl);
+              } else {
+                navigate("/admin");
+              }
             } else if (existingUser.role === "ground_owner") {
-              navigate("/admin/grounds");
+              const redirectUrl = localStorage.getItem('redirectAfterLogin');
+              if (redirectUrl) {
+                localStorage.removeItem('redirectAfterLogin');
+                navigate(redirectUrl);
+              } else {
+                navigate("/admin/grounds");
+              }
             } else {
-              navigate("/");
+              const redirectUrl = localStorage.getItem('redirectAfterLogin');
+              if (redirectUrl) {
+                localStorage.removeItem('redirectAfterLogin');
+                navigate(redirectUrl);
+              } else {
+                navigate("/");
+              }
             }
           } else {
             // New user, show user type selection
@@ -421,8 +443,13 @@ const Login: React.FC = () => {
             }}
             onSkip={() => {
               setShowWelcomeDialog(false);
-              //navigate(referringPage.current);
-              navigate(-1);
+              const redirectUrl = localStorage.getItem('redirectAfterLogin');
+              if (redirectUrl) {
+                localStorage.removeItem('redirectAfterLogin');
+                navigate(redirectUrl);
+              } else {
+                navigate("/");
+              }
             }}
             userName={registeredUser?.name || ""}
           />
@@ -435,7 +462,13 @@ const Login: React.FC = () => {
               onOpenChange={(open) => {
                 setIsRegisterDialogOpen(open);
                 if (!open) {
-                  navigate(-1);
+                  const redirectUrl = localStorage.getItem('redirectAfterLogin');
+                  if (redirectUrl) {
+                    localStorage.removeItem('redirectAfterLogin');
+                    navigate(redirectUrl);
+                  } else {
+                    navigate("/");
+                  }
                 }
               }}
             />

@@ -1,10 +1,5 @@
 
 import * as z from "zod";
-import { Database } from "@/integrations/supabase/types";
-
-// Get the enum types from the database types
-type ProfessionType = Database["public"]["Enums"]["sport_profession_type"];
-type FeeType = Database["public"]["Enums"]["fee_type"];
 
 export const professionalFormSchema = z.object({
   // Basic Info
