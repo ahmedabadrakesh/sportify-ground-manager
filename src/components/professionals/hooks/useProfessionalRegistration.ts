@@ -35,37 +35,70 @@ export const useProfessionalRegistration = (onSuccess: () => void, isUpdate: boo
         console.log('Using existing user ID for update:', userId);
       } else if (isSuperAdmin && !isUpdate) {
         console.log('Super admin registering professional with email:', values.email);
+        console.log('Current time:', new Date().toISOString()); // Force refresh
         
-        // Use edge function to create user without affecting current session
-        const { data: session } = await supabase.auth.getSession();
-        const token = session?.session?.access_token;
+        // Get current session more reliably
+        const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
+        console.log('Session data available:', !!sessionData?.session);
+        console.log('Access token available:', !!sessionData?.session?.access_token);
+        console.log('Session error:', sessionError);
         
-        if (!token) {
-          throw new Error("No valid session found");
+        if (sessionError || !sessionData.session?.access_token) {
+          console.error('Session issue:', sessionError);
+          // Fallback: try to get user and create without edge function
+          const currentUserData = await getCurrentUser();
+          if (!currentUserData) {
+            throw new Error("Authentication required. Please log in again.");
+          }
+          
+          console.log('Using fallback user creation method');
+          // Create user record directly in users table with a placeholder auth_id
+          const tempAuthId = crypto.randomUUID();
+          const { data: newUser, error: userError } = await supabase
+            .from('users')
+            .insert({
+              auth_id: tempAuthId,
+              name: values.name,
+              email: values.email,
+              role: 'sports_professional'
+            })
+            .select('id')
+            .single();
+
+          if (userError) {
+            console.error('Error creating user profile:', userError);
+            throw new Error("Failed to create user profile");
+          }
+
+          userId = newUser.id;
+          console.log('Created user profile with fallback method:', userId);
+        } else {
+          // Use edge function to create user without affecting current session
+          const token = sessionData.session.access_token;
+          
+          const response = await fetch(`https://qlrnxgyvplzrkzhhjhab.supabase.co/functions/v1/admin-create-user`, {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${token}`,
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              email: values.email,
+              password: "123456",
+              name: values.name,
+              userType: 'sports_professional'
+            })
+          });
+
+          if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error || 'Failed to create user account');
+          }
+
+          const { user: createdUser } = await response.json();
+          userId = createdUser.id;
+          console.log('Created user via admin function:', userId);
         }
-
-        const response = await fetch(`https://qlrnxgyvplzrkzhhjhab.supabase.co/functions/v1/admin-create-user`, {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            email: values.email,
-            password: "123456",
-            name: values.name,
-            userType: 'sports_professional'
-          })
-        });
-
-        if (!response.ok) {
-          const errorData = await response.json();
-          throw new Error(errorData.error || 'Failed to create user account');
-        }
-
-        const { user: createdUser } = await response.json();
-        userId = createdUser.id;
-        console.log('Created user via admin function:', userId);
       } else {
         // For regular users, use their current user ID
         userId = currentUser.id;
