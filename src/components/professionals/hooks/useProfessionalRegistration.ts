@@ -34,46 +34,31 @@ export const useProfessionalRegistration = (onSuccess: () => void, isUpdate: boo
         userId = existingUserId;
         console.log('Using existing user ID for update:', userId);
       } else if (isSuperAdmin && !isUpdate) {
-        console.log('Super admin registering professional with email:', values.email);
-        // Get current session and use edge function to create user
-        const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
-        console.log('Session data available:', !!sessionData?.session);
-        console.log('Access token available:', !!sessionData?.session?.access_token);
+      console.log('Super admin registering professional with email:', values.email);
         
-        if (sessionError || !sessionData.session?.access_token) {
-          console.error('Session issue:', sessionError);
-          console.log('Admin session lost, clearing localStorage and redirecting to login');
-          localStorage.removeItem('currentUser');
-          localStorage.removeItem('adminBackup');
-          window.location.href = '/login';
-          throw new Error("Session expired. Please log in again.");
-        }
-
-        // Use edge function to create user without affecting current session
-        const token = sessionData.session.access_token;
+        // For predefined admins, create user directly in database
+        // since they don't have real Supabase sessions
+        const tempUserId = crypto.randomUUID();
         
-        const response = await fetch(`https://qlrnxgyvplzrkzhhjhab.supabase.co/functions/v1/admin-create-user`, {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            email: values.email,
-            password: "123456",
+        // Create user directly in users table
+        const { data: newUser, error: createUserError } = await supabase
+          .from('users')
+          .insert([{
+            id: tempUserId,
             name: values.name,
-            userType: 'sports_professional'
-          })
-        });
-
-        if (!response.ok) {
-          const errorData = await response.json();
-          throw new Error(errorData.error || 'Failed to create user account');
+            email: values.email,
+            role: 'sports_professional'
+          }])
+          .select()
+          .single();
+          
+        if (createUserError) {
+          console.error('Failed to create user:', createUserError);
+          throw new Error('Failed to create user account');
         }
-
-        const { user: createdUser } = await response.json();
-        userId = createdUser.id;
-        console.log('Created user via admin function:', userId);
+        
+        userId = newUser.id;
+        console.log('Created user directly in database:', userId);
       } else {
         // For regular users, use their current user ID
         userId = currentUser.id;

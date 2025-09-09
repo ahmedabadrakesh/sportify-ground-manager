@@ -19,19 +19,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        // Check both localStorage and Supabase session
         const storedUser = localStorage.getItem('currentUser');
-        const { data: { session } } = await supabase.auth.getSession();
-        
-        console.log('AdminLayout: Stored user exists:', !!storedUser);
-        console.log('AdminLayout: Supabase session exists:', !!session);
-        
-        if (storedUser && !session) {
-          console.log('AdminLayout: User in localStorage but no Supabase session - redirecting to login');
-          localStorage.removeItem('currentUser');
-          navigate('/login');
-          return;
-        }
         
         if (!storedUser) {
           console.log('AdminLayout: No stored user - redirecting to login');
@@ -48,6 +36,8 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
           return;
         }
         
+        // For predefined admins, we don't need Supabase session validation
+        // They are handled through localStorage only
         setIsValidated(true);
         setIsLoading(false);
       } catch (error) {
