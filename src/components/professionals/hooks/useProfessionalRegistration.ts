@@ -233,10 +233,11 @@ export const useProfessionalRegistration = (onSuccess: () => void, isUpdate: boo
             console.log("Updated user role to sports_professional");
           }
 
-          // Update localStorage for current user
+          // Update localStorage for current user only when they register themselves
           const updatedUser = { ...currentUser, role: 'sports_professional' as const };
           localStorage.setItem('currentUser', JSON.stringify(updatedUser));
           
+          // Only dispatch auth state change for self-registration, not admin creating others
           window.dispatchEvent(new CustomEvent('authStateChanged', { 
             detail: { user: updatedUser, session: null } 
           }));
