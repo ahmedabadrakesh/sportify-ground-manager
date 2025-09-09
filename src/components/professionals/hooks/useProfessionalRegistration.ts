@@ -219,7 +219,9 @@ export const useProfessionalRegistration = (onSuccess: () => void, isUpdate: boo
         
         console.log('Insert successful:', data);
 
-        if (!isSuperAdmin) {
+        // Only update current user's role and auth state if they are registering themselves
+        // If admin is registering someone else, skip the login/auth update
+        if (!isSuperAdmin && currentUser.id === userId) {
           const { error: userUpdateError } = await supabase
             .from('users')
             .update({ role: 'sports_professional' })
