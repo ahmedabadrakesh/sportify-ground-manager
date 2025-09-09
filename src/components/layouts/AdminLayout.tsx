@@ -1,6 +1,7 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { getCurrentUserSync, hasRoleSync } from "@/utils/auth";
+import { supabase } from "@/integrations/supabase/client";
 import Sidebar from "./admin/Sidebar";
 import MobileHeader from "./admin/MobileHeader";
 import MobileBreadcrumb from "./admin/MobileBreadcrumb";
@@ -12,15 +13,65 @@ interface AdminLayoutProps {
 const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
   const location = useLocation();
   const navigate = useNavigate();
+  const [isLoading, setIsLoading] = useState(true);
+  const [isValidated, setIsValidated] = useState(false);
+  
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        // Check both localStorage and Supabase session
+        const storedUser = localStorage.getItem('currentUser');
+        const { data: { session } } = await supabase.auth.getSession();
+        
+        console.log('AdminLayout: Stored user exists:', !!storedUser);
+        console.log('AdminLayout: Supabase session exists:', !!session);
+        
+        if (storedUser && !session) {
+          console.log('AdminLayout: User in localStorage but no Supabase session - redirecting to login');
+          localStorage.removeItem('currentUser');
+          navigate('/login');
+          return;
+        }
+        
+        if (!storedUser) {
+          console.log('AdminLayout: No stored user - redirecting to login');
+          navigate('/login');
+          return;
+        }
+        
+        const user = JSON.parse(storedUser);
+        console.log('AdminLayout: User role:', user.role);
+        
+        if (!['admin', 'super_admin'].includes(user.role)) {
+          console.log('AdminLayout: User not admin - redirecting to home');
+          navigate('/');
+          return;
+        }
+        
+        setIsValidated(true);
+        setIsLoading(false);
+      } catch (error) {
+        console.error('AdminLayout: Auth check error:', error);
+        localStorage.removeItem('currentUser');
+        navigate('/login');
+      }
+    };
+
+    checkAuth();
+  }, [navigate]);
+
+  if (isLoading || !isValidated) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-lg">Loading...</div>
+      </div>
+    );
+  }
+
   const currentUser = getCurrentUserSync();
   const isSuperAdmin = hasRoleSync('super_admin');
   
-  console.log('AdminLayout - currentUser:', currentUser);
-  console.log('AdminLayout - user role:', currentUser?.role);
-  
-  if (!currentUser || (currentUser.role !== 'admin' && currentUser.role !== 'super_admin')) {
-    console.log('AdminLayout - redirecting to login, currentUser:', currentUser);
-    navigate("/login");
+  if (!currentUser) {
     return null;
   }
 

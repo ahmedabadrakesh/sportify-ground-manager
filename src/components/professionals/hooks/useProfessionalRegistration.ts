@@ -42,7 +42,11 @@ export const useProfessionalRegistration = (onSuccess: () => void, isUpdate: boo
         
         if (sessionError || !sessionData.session?.access_token) {
           console.error('Session issue:', sessionError);
-          throw new Error("Authentication required. Please refresh the page and try again.");
+          console.log('Admin session lost, clearing localStorage and redirecting to login');
+          localStorage.removeItem('currentUser');
+          localStorage.removeItem('adminBackup');
+          window.location.href = '/login';
+          throw new Error("Session expired. Please log in again.");
         }
 
         // Use edge function to create user without affecting current session
