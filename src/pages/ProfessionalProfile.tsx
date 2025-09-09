@@ -700,43 +700,6 @@ const ProfessionalProfile = () => {
                   </Card>
                 )}
 
-              {/* Training Gallery */}
-              {professional.images && professional.images.length > 0 && (
-                <Card className="bg-white">
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <Camera className="h-5 w-5 text-primary" />
-                      Training Gallery
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <ImageGallery images={professional.images} />
-
-                    {/* <Carousel className="w-full">
-                      <CarouselContent>
-                        {professional.images.map((photo, index) => (
-                          <CarouselItem
-                            key={index}
-                            className="md:basis-1/2 lg:basis-1/3"
-                          >
-                            <div className="rounded-lg overflow-hidden shadow-md">
-                              <img
-                                src={photo || trainingPhoto1}
-                                alt={photo}
-                                className="w-full h-48 object-cover"
-                              />
-                              <div className="p-3 bg-card">
-                                <p className="text-sm font-medium">{photo}</p>
-                              </div>
-                            </div>
-                          </CarouselItem>
-                        ))}
-                      </CarouselContent>
-                    </Carousel> */}
-                  </CardContent>
-                </Card>
-              )}
-
               {/* Certifications & Education */}
               {professional.certifications &&
                 professional.certifications.length > 0 && (
@@ -831,21 +794,6 @@ const ProfessionalProfile = () => {
                 </Card>
               )}
 
-              {/* Featured Videos */}
-              {professional.videos && professional.videos.length > 0 && (
-                <Card className="bg-white">
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <Youtube className="h-5 w-5 text-primary" />
-                      Training Videos & Reels
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <VideoGallery videos={professional.videos} />
-                  </CardContent>
-                </Card>
-              )}
-
               {/* Achievements */}
               {professional.accomplishments &&
                 professional.accomplishments.length > 0 && (
@@ -873,6 +821,58 @@ const ProfessionalProfile = () => {
                     </CardContent>
                   </Card>
                 )}
+
+              {/* Training Gallery */}
+              {professional.images && professional.images.length > 0 && (
+                <Card className="bg-white">
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <Camera className="h-5 w-5 text-primary" />
+                      Training Gallery
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <ImageGallery images={professional.images} />
+
+                    {/* <Carousel className="w-full">
+                      <CarouselContent>
+                        {professional.images.map((photo, index) => (
+                          <CarouselItem
+                            key={index}
+                            className="md:basis-1/2 lg:basis-1/3"
+                          >
+                            <div className="rounded-lg overflow-hidden shadow-md">
+                              <img
+                                src={photo || trainingPhoto1}
+                                alt={photo}
+                                className="w-full h-48 object-cover"
+                              />
+                              <div className="p-3 bg-card">
+                                <p className="text-sm font-medium">{photo}</p>
+                              </div>
+                            </div>
+                          </CarouselItem>
+                        ))}
+                      </CarouselContent>
+                    </Carousel> */}
+                  </CardContent>
+                </Card>
+              )}
+
+              {/* Featured Videos */}
+              {professional.videos && professional.videos.length > 0 && (
+                <Card className="bg-white">
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <Youtube className="h-5 w-5 text-primary" />
+                      Training Videos & Reels
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <VideoGallery videos={professional.videos} />
+                  </CardContent>
+                </Card>
+              )}
             </div>
 
             {/* Right Column - Contact & Details */}

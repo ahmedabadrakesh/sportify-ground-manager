@@ -8,6 +8,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { InstagramEmbed } from "react-social-media-embed";
 
 interface VideoGalleryProps {
   videos: string[] | null;
@@ -122,15 +123,19 @@ const VideoGallery = ({ videos }: VideoGalleryProps) => {
     } else if (videoType === "instagram") {
       return (
         <>
-          <div className="w-full h-full bg-gradient-to-br from-purple-400 via-pink-500 to-red-500 flex items-center justify-center">
-            <Instagram className="h-12 w-12 text-white" />
-          </div>
-          <div className="absolute inset-0 bg-black bg-opacity-30 flex items-center justify-center group-hover:bg-opacity-50 transition-all duration-300">
-            <div className="bg-gradient-to-r from-purple-500 to-pink-500 rounded-full p-3 group-hover:scale-110 transition-transform duration-300">
-              <Play className="h-6 w-6 text-white ml-1" fill="white" />
-            </div>
-          </div>
+          <InstagramEmbed url={videoUrl} />
         </>
+        // <>
+        //   {/* <div className="w-full h-full bg-gradient-to-br from-purple-400 via-pink-500 to-red-500 flex items-center justify-center">
+        //     <Instagram className="h-12 w-12 text-white" />
+        //   </div> */}
+        //   <div className="absolute inset-0 bg-black bg-opacity-30 flex items-center justify-center group-hover:bg-opacity-50 transition-all duration-300">
+        //     {/* <div className="bg-gradient-to-r from-purple-500 to-pink-500 rounded-full p-3 group-hover:scale-110 transition-transform duration-300">
+        //       <Play className="h-6 w-6 text-white ml-1" fill="white" />
+        //     </div> */}
+
+        //   </div>
+        // </>
       );
     } else {
       return (
@@ -164,7 +169,7 @@ const VideoGallery = ({ videos }: VideoGalleryProps) => {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4">
             {videos.map((videoUrl, index) => {
               const videoType = getVideoType(videoUrl);
               return (
@@ -175,25 +180,27 @@ const VideoGallery = ({ videos }: VideoGalleryProps) => {
                 >
                   <div className="aspect-video bg-gray-100 flex items-center justify-center relative">
                     {renderVideoThumbnail(videoUrl, index)}
+                    {/* //https://www.instagram.com/p/BmyApv9H2Yy/?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw==
+                    {videoUrl} */}
                   </div>
                   <div className="p-3 bg-white">
-                    <p className="text-sm text-gray-600 truncate">
+                    {/* <p className="text-sm text-gray-600 truncate">
                       {getVideoLabel(videoUrl, index)}
-                    </p>
-                    {videoType === "external" && (
+                    </p> */}
+                    {/* {videoType === "external" && (
                       <div className="flex items-center gap-1 mt-1">
                         <ExternalLink className="h-3 w-3 text-gray-400" />
                         <span className="text-xs text-gray-400">
                           Opens externally
                         </span>
                       </div>
-                    )}
-                    {videoType === "instagram" && (
+                    )} */}
+                    {/* {videoType === "instagram" && (
                       <div className="flex items-center gap-1 mt-1">
                         <Instagram className="h-3 w-3 text-pink-500" />
                         <span className="text-xs text-pink-500">Instagram</span>
                       </div>
-                    )}
+                    )} */}
                     {videoType === "youtube" && (
                       <div className="flex items-center gap-1 mt-1">
                         <Play className="h-3 w-3 text-red-500" />
