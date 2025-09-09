@@ -59,8 +59,6 @@ export const professionalFormSchema = z.object({
   // Legacy fields for backward compatibility
   city: z.string().min(1, "City is required"),
   address: z.string().min(1, "Address is required"),
-  fee: z.union([z.string(), z.number()]).transform((val) => Number(val) || 0),
-  fee_type: z.enum(["Per Hour", "Per Day", "Per Match"] as const),
   total_match_played: z.union([z.string(), z.number()]).transform((val) => Number(val) || 0).optional(),
   awards: z.array(z.string()).optional(),
   training_locations: z.array(z.string()).optional(),

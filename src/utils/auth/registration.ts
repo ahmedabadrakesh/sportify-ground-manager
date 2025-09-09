@@ -221,8 +221,6 @@ const defaultProfessionalData = {
       profession_type: ['Athlete'] as ("Athlete" | "Coach" | "Trainer" | "Sports Manager" | "Support Staff" | "Player" | "Umpire")[],
       game_ids: [games[0].id],
       contact_number: contactNumber,
-      fee: 0,
-      fee_type: 'Per Hour' as const,
       city: '',
       address: '',
       photo: null,

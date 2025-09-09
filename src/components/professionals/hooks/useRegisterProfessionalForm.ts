@@ -59,8 +59,6 @@ export const useRegisterProfessionalForm = (onSuccess: () => void, isUpdate: boo
       // Legacy fields
       city: "",
       address: "",
-      fee: 0,
-      fee_type: "Per Hour",
       total_match_played: 0,
       awards: [],
       training_locations: [],
@@ -130,8 +128,6 @@ export const useRegisterProfessionalForm = (onSuccess: () => void, isUpdate: boo
             success_stories: draft.success_stories || [],
             city: draft.city || "",
             address: draft.address || "",
-            fee: draft.fee || 0,
-            fee_type: draft.fee_type || "Per Hour",
             total_match_played: draft.total_match_played || 0,
             awards: draft.awards || [],
             training_locations: draft.training_locations || [],
@@ -195,7 +191,6 @@ export const useRegisterProfessionalForm = (onSuccess: () => void, isUpdate: boo
     const processedValues = {
       ...values,
       age: Number(values.age) || 0,
-      fee: Number(values.fee) || 0,
       years_of_experience: Number(values.years_of_experience) || 0,
       total_match_played: Number(values.total_match_played) || 0,
       district_level_tournaments: Number(values.district_level_tournaments) || 0,

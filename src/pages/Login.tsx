@@ -229,8 +229,6 @@ const Login: React.FC = () => {
               profession_type: ["Coach"],
               game_ids: [games.id],
               contact_number: googleUserData.phone || "",
-              fee: 0,
-              fee_type: "Per Hour",
               address: "",
               city: "",
             },

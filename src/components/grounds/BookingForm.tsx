@@ -105,7 +105,7 @@ const BookingForm: React.FC<BookingFormProps> = ({ ground }) => {
     // Allow booking only if name and phone are provided, even if authenticated
     const currentUser = getCurrentUserSync();
     const effectiveName = name || currentUser?.name || "";
-    const effectivePhone = phone || currentUser?.phone || "";
+    const effectivePhone = phone || "";
 
     if (!effectiveName || !effectivePhone) {
       toast.error("Please enter your name and phone number");

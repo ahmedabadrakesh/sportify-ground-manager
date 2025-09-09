@@ -28,7 +28,7 @@ export const getAvailableGrounds = async (
         images,
         rating,
         review_count,
-        users(name, phone, whatsapp)
+        users(name)
       `);
     
     // Filter by game
@@ -78,8 +78,8 @@ export const getAvailableGrounds = async (
         location: locationObj,
         ownerId: ground.owner_id,
         ownerName: ground.users ? ground.users.name : 'Unknown Owner',
-        ownerContact: ground.users ? ground.users.phone || '' : '',
-        ownerWhatsapp: ground.users ? ground.users.whatsapp || '' : '',
+        ownerContact: '',
+        ownerWhatsapp: '',
         games: ground.games || [],
         facilities: ground.facilities || [],
         images: ground.images || [],
@@ -245,7 +245,7 @@ export const createBooking = async (
       id: bookingData.id,
       userId: user?.id || 'guest',
       userName: user?.name || userName,
-      userPhone: user?.phone || userPhone,
+      userPhone: "",
       groundId,
       groundName: groundData.name,
       date,
@@ -364,7 +364,7 @@ export const getGroundBookings = async (groundId: string): Promise<Booking[]> =>
         booking_status,
         payment_status,
         created_at,
-        users(name, phone)
+        users(name)
       `)
       .eq('ground_id', groundId);
     
@@ -415,7 +415,7 @@ export const getGroundBookings = async (groundId: string): Promise<Booking[]> =>
         id: booking.id,
         userId: booking.user_id,
         userName: booking.users?.name || 'Unknown User',
-        userPhone: booking.users?.phone || '',
+        userPhone: '',
         groundId: booking.ground_id,
         date: booking.date,
         totalAmount: booking.total_amount,

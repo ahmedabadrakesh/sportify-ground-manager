@@ -106,7 +106,7 @@ const AdminSportsProfessionals = () => {
       header: "Fee",
       cell: ({ row }) => (
         <div>
-          ₹{row.original.fee} {row.original.fee_type}
+          ₹{row.original.one_on_one_price || 0}
         </div>
       ),
     },

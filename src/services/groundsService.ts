@@ -22,7 +22,7 @@ export const fetchGrounds = async ({ isSuperAdmin, currentUserId }: FetchGrounds
       images,
       rating,
       review_count,
-      users(name, phone, whatsapp)
+      users(name)
     `);
 
     // If not super admin and currentUserId exists, filter by owner_id
@@ -62,7 +62,7 @@ export const fetchGroundById = async (groundId: string) => {
         images,
         rating,
         review_count,
-        users(name, phone, whatsapp)
+        users(name)
       `)
       .eq('id', groundId)
       .single();
@@ -95,8 +95,8 @@ const formatGroundData = (ground: any): Ground => {
     location: ground.location || { lat: 0, lng: 0 },
     ownerId: ground.owner_id,
     ownerName: ground.users ? ground.users.name : 'Unknown Owner',
-    ownerContact: ground.users ? ground.users.phone || '' : '',
-    ownerWhatsapp: ground.users ? ground.users.whatsapp || '' : '',
+    ownerContact: '',
+    ownerWhatsapp: '',
     games: ground.games || [],
     facilities: ground.facilities || [],
     images: ground.images || [],

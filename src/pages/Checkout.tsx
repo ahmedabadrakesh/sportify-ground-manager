@@ -53,7 +53,7 @@ const Checkout: React.FC = () => {
     defaultValues: {
       name: currentUser?.name || "",
       email: currentUser?.email || "",
-      phone: currentUser?.phone || "",
+      phone: "",
       address: "",
       paymentMethod: "card",
     },

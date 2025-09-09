@@ -275,8 +275,6 @@ const RegisterProfessionalDialog = ({
             games_played: [],
             contact_number: "",
             email: "",
-            fee: 0,
-            fee_type: "Per Hour",
             city: "",
             address: "",
             photo: "",
@@ -354,8 +352,6 @@ const RegisterProfessionalDialog = ({
             // Legacy fields
             city: profileData.city || "",
             address: profileData.address || "",
-            fee: profileData.fee || 0,
-            fee_type: profileData.fee_type || "Per Hour",
             total_match_played: profileData.total_match_played || 0,
             awards: profileData.awards || [],
             training_locations: profileData.training_locations || [],

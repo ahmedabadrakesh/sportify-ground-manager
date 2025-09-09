@@ -78,8 +78,6 @@ export const swaggerDefinition = {
           name: { type: "string" },
           profession_type: { type: "string" },
           game_id: { type: "string" },
-          fee: { type: "number" },
-          fee_type: { type: "string" },
           city: { type: "string" },
           contact_number: { type: "string" },
           created_at: { type: "string", format: "date-time" }
