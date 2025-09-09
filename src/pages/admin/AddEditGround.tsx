@@ -132,7 +132,7 @@ const AddEditGround: React.FC = () => {
           images: [], // Would be handled by file upload in real app
           ownerId: currentUser?.id || '',
           ownerName: currentUser?.name || '',
-          ownerContact: currentUser?.phone || '',
+          ownerContact: currentUser?.email || '',
           ownerWhatsapp: values.ownerWhatsapp,
         };
         

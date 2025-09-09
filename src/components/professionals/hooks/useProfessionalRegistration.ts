@@ -1,4 +1,3 @@
-
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -76,7 +75,6 @@ export const useProfessionalRegistration = (onSuccess: () => void, isUpdate: boo
               auth_id: authData.user.id,
               name: values.name,
               email: values.email,
-              phone: values.contact_number || null,
               role: 'sports_professional'
             })
             .select('id')
@@ -91,47 +89,9 @@ export const useProfessionalRegistration = (onSuccess: () => void, isUpdate: boo
           console.log('Created user profile:', userId);
         }
       } else {
-        if ('phone' in currentUser && currentUser.phone) {
-          console.log('Phone user detected, finding user record...');
-          const { data: existingUser, error: userLookupError } = await supabase
-            .from('users')
-            .select('id')
-            .eq('phone', currentUser.phone)
-            .maybeSingle();
-
-          if (userLookupError) {
-            console.error('Error looking up user by phone:', userLookupError);
-            throw new Error("Failed to find user profile");
-          }
-
-          if (existingUser) {
-            userId = existingUser.id;
-            console.log('Found existing user record with ID:', userId);
-          } else {
-            console.log('Creating new user record for phone user...');
-            const { data: newUser, error: userError } = await supabase
-              .from('users')
-              .insert({
-                name: currentUser.name,
-                email: values.contact_number.includes('@') ? values.contact_number : `${currentUser.phone}@phone.user`,
-                phone: currentUser.phone,
-                role: 'sports_professional'
-              })
-              .select('id')
-              .single();
-
-            if (userError) {
-              console.error('Error creating user record:', userError);
-              throw new Error("Failed to create user profile");
-            }
-
-            userId = newUser.id;
-            console.log('Created new user record with ID:', userId);
-          }
-        } else {
-          userId = currentUser.id;
-          console.log('Using direct user ID:', userId);
-        }
+        // For regular users, use their current user ID
+        userId = currentUser.id;
+        console.log('Using current user ID:', userId);
       }
 
       console.log('Checking for existing professional profile...');
@@ -182,8 +142,8 @@ export const useProfessionalRegistration = (onSuccess: () => void, isUpdate: boo
         name: values.name,
         profession_type: values.profession_type,
         game_ids: gameIds,
-          contact_number: values.contact_number,
-          city: values.city,
+        contact_number: values.contact_number,
+        city: values.city,
         address: values.address,
         photo: values.photo || null,
         years_of_experience: values.years_of_experience ? Number(values.years_of_experience) : null,
@@ -212,7 +172,6 @@ export const useProfessionalRegistration = (onSuccess: () => void, isUpdate: boo
         national_level_tournaments: Number(values.national_level_tournaments) || 0,
         international_level_tournaments: Number(values.international_level_tournaments) || 0,
         specialties: values.specialties || [],
-        
         education: values.education || [],
         training_locations_detailed: values.training_locations_detailed || [],
         one_on_one_price: Number(values.one_on_one_price) || 0,
@@ -272,14 +231,13 @@ export const useProfessionalRegistration = (onSuccess: () => void, isUpdate: boo
             console.log("Updated user role to sports_professional");
           }
 
-          if ('phone' in currentUser && currentUser.phone) {
-            const updatedUser = { ...currentUser, role: 'sports_professional' as const };
-            localStorage.setItem('currentUser', JSON.stringify(updatedUser));
-            
-            window.dispatchEvent(new CustomEvent('authStateChanged', { 
-              detail: { user: updatedUser, session: null } 
-            }));
-          }
+          // Update localStorage for current user
+          const updatedUser = { ...currentUser, role: 'sports_professional' as const };
+          localStorage.setItem('currentUser', JSON.stringify(updatedUser));
+          
+          window.dispatchEvent(new CustomEvent('authStateChanged', { 
+            detail: { user: updatedUser, session: null } 
+          }));
         }
 
         return data;

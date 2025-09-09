@@ -31,14 +31,12 @@ export const createGroundOwner = async (name: string, email: string, phone: stri
         
         if (data.user && !error) {
           registrationSuccess = true;
-          newGroundOwner = {
+          const newGroundOwner: User = {
             id: data.user.id,
             name,
             email,
-            phone: formattedPhone || '',
             role: 'ground_owner' as User['role'],
-            authId: data.user.id,
-            whatsapp: formattedPhone || ''
+            authId: data.user.id
           };
           
           const { error: insertError } = await supabase
@@ -71,10 +69,8 @@ export const createGroundOwner = async (name: string, email: string, phone: stri
             id: data.user.id,
             name,
             email: '',
-            phone: formattedPhone,
             role: 'ground_owner' as User['role'],
-            authId: data.user.id,
-            whatsapp: formattedPhone
+            authId: data.user.id
           };
           
           const { error: insertError } = await supabase
@@ -101,9 +97,7 @@ export const createGroundOwner = async (name: string, email: string, phone: stri
         id: mockOwnerId,
         name,
         email: email || '',
-        phone: formattedPhone || '',
-        role: 'ground_owner' as User['role'],
-        whatsapp: formattedPhone || ''
+        role: 'ground_owner' as User['role']
       };
       
       // Store mock ground owner in localStorage for demo persistence
