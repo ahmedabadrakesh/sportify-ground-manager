@@ -15,7 +15,11 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
   const currentUser = getCurrentUserSync();
   const isSuperAdmin = hasRoleSync('super_admin');
   
+  console.log('AdminLayout - currentUser:', currentUser);
+  console.log('AdminLayout - user role:', currentUser?.role);
+  
   if (!currentUser || (currentUser.role !== 'admin' && currentUser.role !== 'super_admin')) {
+    console.log('AdminLayout - redirecting to login, currentUser:', currentUser);
     navigate("/login");
     return null;
   }

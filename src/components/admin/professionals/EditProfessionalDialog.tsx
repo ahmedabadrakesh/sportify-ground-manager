@@ -37,8 +37,13 @@ const EditProfessionalDialog = ({
   const isSuperAdmin = hasRoleSync("super_admin");
   const [userEmail, setUserEmail] = useState<string>("");
 
+  console.log('EditProfessionalDialog - currentUser:', currentUser);
+  console.log('EditProfessionalDialog - isSuperAdmin:', isSuperAdmin);
+  console.log('EditProfessionalDialog - professional.user_id:', professional.user_id);
+
   // Check if user can edit this profile
   const canEdit = isSuperAdmin || professional.user_id === currentUser?.id;
+  console.log('EditProfessionalDialog - canEdit:', canEdit);
 
   const form = useForm<ProfessionalFormValues>({
     resolver: zodResolver(professionalFormSchema),

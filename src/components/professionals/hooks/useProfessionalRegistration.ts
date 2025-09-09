@@ -19,6 +19,14 @@ export const useProfessionalRegistration = (onSuccess: () => void, isUpdate: boo
         throw new Error("You must be logged in to register as a sports professional");
       }
 
+      // Store admin's current state to prevent losing session
+      const adminBackup = isSuperAdmin ? localStorage.getItem('currentUser') : null;
+      console.log('Admin backup stored:', adminBackup ? 'yes' : 'no');
+      
+      if (adminBackup) {
+        localStorage.setItem('adminBackup', adminBackup);
+      }
+
       let userId: string;
 
       // If we're updating an existing professional and have their user_id, use that
@@ -28,66 +36,36 @@ export const useProfessionalRegistration = (onSuccess: () => void, isUpdate: boo
       } else if (isSuperAdmin && !isUpdate) {
         console.log('Super admin registering professional with email:', values.email);
         
-        const { data: authData, error: authError } = await supabase.auth.signUp({
-          email: values.email,
-          password: "123456",
-          options: {
-            data: {
-              name: values.name,
-              user_type: 'sports_professional'
-            },
-            emailRedirectTo: `${window.location.origin}/`
-          }
+        // Use edge function to create user without affecting current session
+        const { data: session } = await supabase.auth.getSession();
+        const token = session?.session?.access_token;
+        
+        if (!token) {
+          throw new Error("No valid session found");
+        }
+
+        const response = await fetch(`https://qlrnxgyvplzrkzhhjhab.supabase.co/functions/v1/admin-create-user`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            email: values.email,
+            password: "123456",
+            name: values.name,
+            userType: 'sports_professional'
+          })
         });
 
-        if (authError) {
-          console.error('Auth registration error:', authError);
-          throw new Error(`Failed to create user account: ${authError.message}`);
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.error || 'Failed to create user account');
         }
 
-        if (!authData.user) {
-          throw new Error("Failed to create user account");
-        }
-
-        console.log('Auth user created:', authData.user.id);
-
-        await new Promise(resolve => setTimeout(resolve, 2000));
-
-        const { data: existingUser, error: userCheckError } = await supabase
-          .from('users')
-          .select('id')
-          .eq('auth_id', authData.user.id)
-          .maybeSingle();
-
-        if (userCheckError && userCheckError.code !== 'PGRST116') {
-          console.error('Error checking user profile:', userCheckError);
-          throw new Error("Failed to verify user profile creation");
-        }
-
-        if (existingUser) {
-          userId = existingUser.id;
-          console.log('Found existing user profile:', userId);
-        } else {
-          console.log('Creating user profile manually...');
-          const { data: newUser, error: userError } = await supabase
-            .from('users')
-            .insert({
-              auth_id: authData.user.id,
-              name: values.name,
-              email: values.email,
-              role: 'sports_professional'
-            })
-            .select('id')
-            .single();
-
-          if (userError) {
-            console.error('Error creating user profile:', userError);
-            throw new Error("Failed to create user profile");
-          }
-
-          userId = newUser.id;
-          console.log('Created user profile:', userId);
-        }
+        const { user: createdUser } = await response.json();
+        userId = createdUser.id;
+        console.log('Created user via admin function:', userId);
       } else {
         // For regular users, use their current user ID
         userId = currentUser.id;
@@ -253,6 +231,15 @@ export const useProfessionalRegistration = (onSuccess: () => void, isUpdate: boo
           ? "Successfully updated your professional profile" 
           : "Successfully registered as a sports professional";
       toast.success(successMessage);
+      
+      // Restore admin session if it was backed up
+      const adminBackup = localStorage.getItem('adminBackup');
+      if (isSuperAdmin && adminBackup) {
+        console.log('Restoring admin session from backup');
+        localStorage.setItem('currentUser', adminBackup);
+        localStorage.removeItem('adminBackup');
+      }
+      
       queryClient.invalidateQueries({ queryKey: ["sports-professionals"] });
       queryClient.invalidateQueries({ queryKey: ["admin-sports-professionals"] });
       queryClient.invalidateQueries({ queryKey: ["professional"] });
@@ -264,6 +251,14 @@ export const useProfessionalRegistration = (onSuccess: () => void, isUpdate: boo
         : "Failed to register. Please try again.";
       toast.error(errorMessage);
       console.error("Registration/Update error:", error);
+      
+      // Restore admin session even on error
+      const adminBackup = localStorage.getItem('adminBackup');
+      if (isSuperAdmin && adminBackup) {
+        console.log('Restoring admin session from backup after error');
+        localStorage.setItem('currentUser', adminBackup);
+        localStorage.removeItem('adminBackup');
+      }
     }
   });
 
