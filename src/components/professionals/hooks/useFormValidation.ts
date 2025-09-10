@@ -11,10 +11,10 @@ export const useFormValidation = (form: UseFormReturn<ProfessionalFormValues>) =
 
     switch (step) {
       case 1:
-        fieldsToValidate = ["name"];
+        fieldsToValidate = ["name", "profession_type"];
         break;
       case 2:
-        fieldsToValidate = ["profession_type", "email", "contact_number", "city", "address"];
+        fieldsToValidate = ["email", "contact_number", "city", "address"];
         break;
       case 3:
         // Step 3 is Professional Details - games_played is required
