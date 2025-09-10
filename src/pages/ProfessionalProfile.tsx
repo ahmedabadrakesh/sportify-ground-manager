@@ -368,6 +368,7 @@ const ProfessionalProfile = () => {
             ? `${professional.name} - ${professional.profession_type} | Jokova`
             : "Professional Profile | Jokova"
         }
+        ogImage={professional?.photo}
         description={
           professional?.name
             ? `${professional.name} is a ${professional.profession_type} in ${
