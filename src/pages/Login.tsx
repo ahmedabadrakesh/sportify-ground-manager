@@ -81,8 +81,30 @@ const Login: React.FC = () => {
       }
     } catch (error: any) {
       console.error("Login error:", error);
-      setLoginError("Authentication error. Please try again.");
-      toast.error("Authentication error. Please try again.");
+      
+      // Handle different types of login errors
+      let errorMessage = "Authentication error. Please try again.";
+      
+      if (error.message) {
+        if (error.message.includes("Invalid login credentials") || 
+            error.message.includes("invalid credentials") ||
+            error.message.includes("wrong password")) {
+          errorMessage = "Invalid credentials. Please check your email and password.";
+        } else if (error.message.includes("Email not confirmed")) {
+          errorMessage = "Please check your email and confirm your account before logging in.";
+        } else if (error.message.includes("rate limit") || 
+                   error.message.includes("too many requests")) {
+          errorMessage = "Too many login attempts. Please wait before trying again.";
+        } else if (error.message.includes("user not found") ||
+                   error.message.includes("account not found")) {
+          errorMessage = "Account not found. Please check your email or register a new account.";
+        } else {
+          errorMessage = error.message;
+        }
+      }
+      
+      setLoginError(errorMessage);
+      toast.error(errorMessage);
     } finally {
       setIsLoading(false);
     }

@@ -95,15 +95,27 @@ const Register: React.FC = () => {
     } catch (error: any) {
       console.error("Registration error:", error);
 
-      if (error.message?.includes("User already registered")) {
-        toast.error("This email is already registered. Please try logging in.");
-      } else if (error.message?.includes("rate limit")) {
-        toast.error(
-          "Too many registration attempts. Please wait before trying again."
-        );
-      } else {
-        toast.error(error.message || "Registration failed. Please try again.");
+      // Handle different types of Supabase auth errors
+      let errorMessage = "Registration failed. Please try again.";
+      
+      if (error.message) {
+        if (error.message.includes("User already registered") || 
+            error.message.includes("already registered") ||
+            error.message.includes("email address not available")) {
+          errorMessage = "This email is already registered. Please try logging in.";
+        } else if (error.message.includes("rate limit") || 
+                   error.message.includes("too many requests")) {
+          errorMessage = "Too many registration attempts. Please wait before trying again.";
+        } else if (error.message.includes("Invalid email")) {
+          errorMessage = "Please enter a valid email address.";
+        } else if (error.message.includes("Password")) {
+          errorMessage = "Password must be at least 6 characters long.";
+        } else {
+          errorMessage = error.message;
+        }
       }
+      
+      toast.error(errorMessage);
     } finally {
       setIsLoading(false);
       isSubmittingRef.current = false;
