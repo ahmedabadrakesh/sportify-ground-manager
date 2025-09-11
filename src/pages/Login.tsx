@@ -218,7 +218,6 @@ const Login: React.FC = () => {
           googleUserData.email?.split("@")[0] ||
           "User",
         email: googleUserData.email,
-        phone: googleUserData.phone || null,
         role: userType,
       };
 

@@ -139,7 +139,6 @@ const performRegistration = async (
           auth_id: data.user.id,
           name,
           email: email || `${formattedPhone}@phone.user`,
-          phone: formattedPhone || null,
           role: userRole as 'user' | 'sports_professional' | 'admin' | 'super_admin' | 'ground_owner'
         };
         console.log("Creating manual user profile:", manualUserData);
