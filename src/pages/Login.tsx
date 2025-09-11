@@ -221,16 +221,29 @@ const Login: React.FC = () => {
         role: userType,
       };
 
-      const { data: newUser, error } = await supabase
+      // Check if user already exists
+      const { data: existingUser } = await supabase
         .from("users")
-        .insert([userData])
         .select()
+        .eq("auth_id", googleUserData.id)
         .single();
 
-      if (error) {
-        console.error("Error creating user:", error);
-        toast.error("Failed to create user profile. Please try again.");
-        return;
+      let user = existingUser;
+
+      if (!existingUser) {
+        // Create new user only if they don't exist
+        const { data: newUser, error } = await supabase
+          .from("users")
+          .insert([userData])
+          .select()
+          .single();
+
+        if (error) {
+          console.error("Error creating user:", error);
+          toast.error("Failed to create user profile. Please try again.");
+          return;
+        }
+        user = newUser;
       }
 
       // Create sports professional entry if needed
@@ -245,7 +258,7 @@ const Login: React.FC = () => {
         if (games) {
           await supabase.from("sports_professionals").insert([
             {
-              user_id: newUser.id,
+              user_id: user.id,
               name: userData.name,
               profession_type: ["Coach"],
               game_ids: [games.id],
@@ -257,14 +270,14 @@ const Login: React.FC = () => {
         }
       }
 
-      localStorage.setItem("currentUser", JSON.stringify(newUser));
-      setRegisteredUser(newUser);
+      localStorage.setItem("currentUser", JSON.stringify(user));
+      setRegisteredUser(user);
       setShowUserTypeDialog(false);
 
       if (userType === "sports_professional") {
         setShowWelcomeDialog(true);
       } else {
-        toast.success(`Welcome to SportifyGround, ${newUser.name}!`);
+        toast.success(`Welcome to SportifyGround, ${user.name}!`);
         navigate("/");
       }
     } catch (error) {
