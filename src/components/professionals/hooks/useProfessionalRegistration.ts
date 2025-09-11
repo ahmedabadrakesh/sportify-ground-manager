@@ -40,23 +40,24 @@ export const useProfessionalRegistration = (onSuccess: () => void, isUpdate: boo
         const supabaseSession = await supabase.auth.getSession();
         
         // Use the admin-create-user edge function to create proper auth user
-        // For predefined admins, pass their ID as authorization header
-        const headers: Record<string, string> = {};
+        // For predefined admins, pass their ID in the request body instead of headers
+        const requestBody: any = {
+          email: values.email,
+          password: 'TempPassword123!', // Temporary password that user can reset
+          name: values.name,
+          userType: 'sports_professional'
+        };
+        
+        // Add admin ID for predefined admins
         if (currentUser && ['00000000-0000-0000-0000-000000000001', 
                            '00000000-0000-0000-0000-000000000002',
                            '00000000-0000-0000-0000-000000000003',
                            '00000000-0000-0000-0000-000000000004'].includes(currentUser.id)) {
-          headers['Authorization'] = `Bearer ${currentUser.id}`;
+          requestBody.adminId = currentUser.id;
         }
         
         const { data: createUserResponse, error: createUserError } = await supabase.functions.invoke('admin-create-user', {
-          body: {
-            email: values.email,
-            password: 'TempPassword123!', // Temporary password that user can reset
-            name: values.name,
-            userType: 'sports_professional'
-          },
-          headers
+          body: requestBody
         });
         
         if (createUserError || !createUserResponse?.success) {

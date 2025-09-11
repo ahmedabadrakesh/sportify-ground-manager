@@ -82,10 +82,10 @@ export const fetchBookings = async (options?: { groundId?: string, userId?: stri
           }
         }
         
-        // Get user details (name and phone)
+        // Get user details (name only)
         const { data: userData } = await supabase
           .from('users')
-          .select('name, phone')
+          .select('name')
           .eq('id', bookingData.user_id)
           .single();
         
@@ -93,7 +93,7 @@ export const fetchBookings = async (options?: { groundId?: string, userId?: stri
           id: bookingData.id,
           userId: bookingData.user_id,
           userName: userData?.name || 'Unknown User',
-          userPhone: userData?.phone || 'No phone',
+          userPhone: 'No phone available',
           groundId: bookingData.ground_id,
           groundName: groundData?.name || 'Unknown Ground',
           date: bookingData.date,

@@ -108,27 +108,8 @@ const RegisterProfessionalDialog = ({
 
           let userId = currentUser.id;
 
-          if ("phone" in currentUser && currentUser.phone) {
-            console.log(
-              "Phone user detected, looking up user record by phone:",
-              currentUser.phone
-            );
-            const { data: existingUser, error: userError } = await supabase
-              .from("users")
-              .select("id")
-              .eq("phone", currentUser.phone)
-              .single();
-
-            if (userError) {
-              console.error("Error finding user by phone:", userError);
-              if (userError.code !== "PGRST116") {
-                throw userError;
-              }
-            } else if (existingUser) {
-              userId = existingUser.id;
-              console.log("Found user record with ID:", userId);
-            }
-          }
+          // Skip phone-based lookup since phone column doesn't exist
+          console.log("Skipping phone-based user lookup");
 
           console.log(
             "Searching for professional profile with user_id:",
@@ -161,15 +142,8 @@ const RegisterProfessionalDialog = ({
               );
             }
 
-            if (currentUser.phone) {
-              contactQueries.push(
-                supabase
-                  .from("sports_professionals")
-                  .select("*")
-                  .eq("contact_number", currentUser.phone)
-                  .maybeSingle()
-              );
-            }
+            // Skip phone-based contact lookup since phone column doesn't exist
+            console.log("Skipping phone-based contact lookup");
 
             for (const query of contactQueries) {
               const { data: contactProfile, error: contactError } = await query;
@@ -398,9 +372,8 @@ const RegisterProfessionalDialog = ({
           form.setValue("name", currentUser.name || "");
           form.setValue("email", userEmail);
 
-          if (currentUser.phone) {
-            form.setValue("contact_number", currentUser.phone);
-          }
+          // Skip setting contact number from phone since phone column doesn't exist
+          console.log("Skipping phone-based contact number setting");
         }
       }
     };
