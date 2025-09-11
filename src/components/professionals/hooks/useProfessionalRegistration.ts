@@ -54,6 +54,12 @@ export const useProfessionalRegistration = (onSuccess: () => void, isUpdate: boo
           
         if (createUserError) {
           console.error('Failed to create user:', createUserError);
+          // Transform database errors into user-friendly messages
+          if (createUserError.code === '23505' && createUserError.message.includes('email')) {
+            throw new Error('This email address is already registered. Please use a different email address.');
+          } else if (createUserError.code === '23505') {
+            throw new Error('A user with this information already exists. Please check your details.');
+          }
           throw new Error('Failed to create user account');
         }
         
@@ -170,6 +176,14 @@ export const useProfessionalRegistration = (onSuccess: () => void, isUpdate: boo
         
         if (error) {
           console.error('Update error:', error);
+          // Transform database errors into user-friendly messages
+          if (error.code === '23505' && error.message.includes('email')) {
+            throw new Error('This email address is already registered. Please use a different email address.');
+          } else if (error.code === '23505' && error.message.includes('contact_number')) {
+            throw new Error('This phone number is already registered. Please use a different phone number.');
+          } else if (error.code === '23505') {
+            throw new Error('A professional with this information already exists. Please check your details.');
+          }
           throw error;
         }
         
@@ -185,6 +199,14 @@ export const useProfessionalRegistration = (onSuccess: () => void, isUpdate: boo
         
         if (error) {
           console.error('Insert error:', error);
+          // Transform database errors into user-friendly messages
+          if (error.code === '23505' && error.message.includes('email')) {
+            throw new Error('This email address is already registered. Please use a different email address.');
+          } else if (error.code === '23505' && error.message.includes('contact_number')) {
+            throw new Error('This phone number is already registered. Please use a different phone number.');
+          } else if (error.code === '23505') {
+            throw new Error('A professional with this information already exists. Please check your details.');
+          }
           throw error;
         }
         
@@ -239,9 +261,13 @@ export const useProfessionalRegistration = (onSuccess: () => void, isUpdate: boo
       onSuccess();
     },
     onError: (error) => {
-      const errorMessage = isUpdate 
-        ? "Failed to update profile. Please try again." 
-        : "Failed to register. Please try again.";
+      // Show specific error message if available, otherwise use generic message
+      const errorMessage = error instanceof Error && error.message 
+        ? error.message 
+        : isUpdate 
+          ? "Failed to update profile. Please try again." 
+          : "Failed to register. Please try again.";
+      
       toast.error(errorMessage);
       console.error("Registration/Update error:", error);
       
