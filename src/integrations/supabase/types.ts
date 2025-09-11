@@ -626,6 +626,7 @@ export type Database = {
           comments: string | null
           contact_number: string
           created_at: string
+          created_by: string | null
           deleted_at: string | null
           district_level_tournaments: number | null
           education: string[] | null
@@ -680,6 +681,7 @@ export type Database = {
           comments?: string | null
           contact_number: string
           created_at?: string
+          created_by?: string | null
           deleted_at?: string | null
           district_level_tournaments?: number | null
           education?: string[] | null
@@ -734,6 +736,7 @@ export type Database = {
           comments?: string | null
           contact_number?: string
           created_at?: string
+          created_by?: string | null
           deleted_at?: string | null
           district_level_tournaments?: number | null
           education?: string[] | null
@@ -836,35 +839,32 @@ export type Database = {
         Row: {
           auth_id: string | null
           created_at: string
+          created_by: string | null
           email: string
           id: string
           name: string
-          phone: string | null
           role: Database["public"]["Enums"]["user_role"]
           updated_at: string
-          whatsapp: string | null
         }
         Insert: {
           auth_id?: string | null
           created_at?: string
+          created_by?: string | null
           email: string
           id?: string
           name: string
-          phone?: string | null
           role?: Database["public"]["Enums"]["user_role"]
           updated_at?: string
-          whatsapp?: string | null
         }
         Update: {
           auth_id?: string | null
           created_at?: string
+          created_by?: string | null
           email?: string
           id?: string
           name?: string
-          phone?: string | null
           role?: Database["public"]["Enums"]["user_role"]
           updated_at?: string
-          whatsapp?: string | null
         }
         Relationships: []
       }
@@ -883,13 +883,12 @@ export type Database = {
         Returns: {
           auth_id: string | null
           created_at: string
+          created_by: string | null
           email: string
           id: string
           name: string
-          phone: string | null
           role: Database["public"]["Enums"]["user_role"]
           updated_at: string
-          whatsapp: string | null
         }
       }
       delete_admin_user: {
@@ -901,13 +900,12 @@ export type Database = {
         Returns: {
           auth_id: string | null
           created_at: string
+          created_by: string | null
           email: string
           id: string
           name: string
-          phone: string | null
           role: Database["public"]["Enums"]["user_role"]
           updated_at: string
-          whatsapp: string | null
         }[]
       }
       get_auth_user_role: {
@@ -920,6 +918,7 @@ export type Database = {
       }
     }
     Enums: {
+      fee_type: "Per Hour" | "Per Day" | "Per Match"
       sport_profession_type:
         | "Athlete"
         | "Coach"
@@ -1061,6 +1060,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      fee_type: ["Per Hour", "Per Day", "Per Match"],
       sport_profession_type: [
         "Athlete",
         "Coach",
