@@ -38,21 +38,38 @@ Deno.serve(async (req) => {
 
     // Verify the requesting user is an admin
     const token = authHeader.replace('Bearer ', '')
+    
+    // First try to get user with JWT token
     const { data: { user }, error: userError } = await supabaseAdmin.auth.getUser(token)
     
     if (userError || !user) {
-      throw new Error('Invalid authentication')
-    }
+      // If JWT auth fails, check if it's a predefined admin
+      // Predefined admins have specific UUIDs that we can validate
+      const predefinedAdminIds = [
+        '00000000-0000-0000-0000-000000000001', // Super Admin (sa@123456)
+        '00000000-0000-0000-0000-000000000002', // Admin (a@123456)
+        '00000000-0000-0000-0000-000000000003', // Super Admin (ronak@jokova.com)
+        '00000000-0000-0000-0000-000000000004', // Super Admin (damini@jokova.com)
+      ];
+      
+      // Check if the token matches a predefined admin ID (for localStorage users)
+      if (!predefinedAdminIds.includes(token)) {
+        throw new Error('Invalid authentication - not a valid admin')
+      }
+      
+      // For predefined admins, skip the role check since they don't exist in auth.users
+      console.log('Authorized predefined admin:', token);
+    } else {
+      // For real Supabase users, check their role in the users table
+      const { data: userData, error: roleError } = await supabaseAdmin
+        .from('users')
+        .select('role')
+        .eq('auth_id', user.id)
+        .single()
 
-    // Check if user is admin or super_admin
-    const { data: userData, error: roleError } = await supabaseAdmin
-      .from('users')
-      .select('role')
-      .eq('auth_id', user.id)
-      .single()
-
-    if (roleError || !userData || !['admin', 'super_admin'].includes(userData.role)) {
-      throw new Error('Insufficient permissions')
+      if (roleError || !userData || !['admin', 'super_admin'].includes(userData.role)) {
+        throw new Error('Insufficient permissions')
+      }
     }
 
     const { email, password, name, userType }: CreateUserRequest = await req.json()

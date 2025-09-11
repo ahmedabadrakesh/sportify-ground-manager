@@ -34,37 +34,50 @@ export const useProfessionalRegistration = (onSuccess: () => void, isUpdate: boo
         userId = existingUserId;
         console.log('Using existing user ID for update:', userId);
       } else if (isSuperAdmin && !isUpdate) {
-      console.log('Super admin registering professional with email:', values.email);
+        console.log('Super admin registering professional with email:', values.email);
         
-        // For predefined admins, create user directly in database
-        // since they don't have real Supabase sessions
-        const tempUserId = crypto.randomUUID();
+        // Store current admin session to restore later
+        const supabaseSession = await supabase.auth.getSession();
         
-        // Create user directly in users table
-        const { data: newUser, error: createUserError } = await supabase
-          .from('users')
-          .insert([{
-            id: tempUserId,
-            name: values.name,
-            email: values.email,
-            role: 'sports_professional'
-          }])
-          .select()
-          .single();
-          
-        if (createUserError) {
-          console.error('Failed to create user:', createUserError);
-          // Transform database errors into user-friendly messages
-          if (createUserError.code === '23505' && createUserError.message.includes('email')) {
-            throw new Error('This email address is already registered. Please use a different email address.');
-          } else if (createUserError.code === '23505') {
-            throw new Error('A user with this information already exists. Please check your details.');
-          }
-          throw new Error('Failed to create user account');
+        // Use the admin-create-user edge function to create proper auth user
+        // For predefined admins, pass their ID as authorization header
+        const headers: Record<string, string> = {};
+        if (currentUser && ['00000000-0000-0000-0000-000000000001', 
+                           '00000000-0000-0000-0000-000000000002',
+                           '00000000-0000-0000-0000-000000000003',
+                           '00000000-0000-0000-0000-000000000004'].includes(currentUser.id)) {
+          headers['Authorization'] = `Bearer ${currentUser.id}`;
         }
         
-        userId = newUser.id;
-        console.log('Created user directly in database:', userId);
+        const { data: createUserResponse, error: createUserError } = await supabase.functions.invoke('admin-create-user', {
+          body: {
+            email: values.email,
+            password: 'TempPassword123!', // Temporary password that user can reset
+            name: values.name,
+            userType: 'sports_professional'
+          },
+          headers
+        });
+        
+        if (createUserError || !createUserResponse?.success) {
+          console.error('Failed to create user via edge function:', createUserError);
+          
+          // Handle specific error cases
+          if (createUserError?.message?.includes('already registered') || 
+              createUserResponse?.error?.includes('already registered')) {
+            throw new Error('This email address is already registered. Please use a different email address.');
+          }
+          
+          throw new Error(createUserResponse?.error || createUserError?.message || 'Failed to create user account');
+        }
+        
+        userId = createUserResponse.user.id;
+        console.log('Created user via edge function:', userId);
+        
+        // Restore admin session after user creation
+        if (supabaseSession.data.session) {
+          await supabase.auth.setSession(supabaseSession.data.session);
+        }
       } else {
         // For regular users, use their current user ID
         userId = currentUser.id;

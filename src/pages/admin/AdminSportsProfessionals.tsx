@@ -217,6 +217,11 @@ const AdminSportsProfessionals = () => {
       <RegisterProfessionalDialog
         open={isRegisterDialogOpen}
         onOpenChange={setIsRegisterDialogOpen}
+        onSuccess={() => {
+          setIsRegisterDialogOpen(false);
+          refetch(); // Refresh the professionals list
+          toast.success("Professional registered successfully!");
+        }}
       />
 
       {editingProfessional && (

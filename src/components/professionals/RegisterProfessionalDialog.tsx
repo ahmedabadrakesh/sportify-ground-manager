@@ -22,12 +22,14 @@ interface RegisterProfessionalProps {
   hasExistingProfile?: boolean;
   isUpdate?: boolean;
   professional?: any;
+  onSuccess?: () => void;
 }
 
 const RegisterProfessionalDialog = ({
   open,
   onOpenChange,
   hasExistingProfile = false,
+  onSuccess,
   isUpdate = false,
   professional,
 }: RegisterProfessionalProps) => {
@@ -229,6 +231,9 @@ const RegisterProfessionalDialog = ({
   } = useRegisterProfessionalForm(() => {
     onOpenChange(false);
     resetForm();
+    if (onSuccess) {
+      onSuccess();
+    }
   }, isUpdate, professional?.user_id);
 
   const handleFormSubmit = (e: React.FormEvent) => {
