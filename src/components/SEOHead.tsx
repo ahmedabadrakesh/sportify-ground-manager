@@ -23,17 +23,17 @@ const SEOHead = ({
   const fullTitle = title.includes("Jokova") ? title : `${title} | Jokova`;
 
   return (
-    <Helmet>
+    <Helmet prioritizeSeoTags>
       {/* Basic Meta Tags */}
       <title>{fullTitle}</title>
       <meta name="description" content={description} />
       <meta name="keywords" content={keywords} />
       <meta name="robots" content="index, follow" />
       <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-      
+
       {/* Canonical URL */}
       {canonicalUrl && <link rel="canonical" href={canonicalUrl} />}
-      
+
       {/* Open Graph Meta Tags */}
       <meta property="og:title" content={fullTitle} />
       <meta property="og:description" content={description} />
@@ -41,17 +41,17 @@ const SEOHead = ({
       <meta property="og:url" content={currentUrl} />
       <meta property="og:type" content={ogType} />
       <meta property="og:site_name" content="Jokova" />
-      
+
       {/* Twitter Card Meta Tags */}
       <meta name="twitter:card" content="summary_large_image" />
       <meta name="twitter:title" content={fullTitle} />
       <meta name="twitter:description" content={description} />
       <meta name="twitter:image" content={ogImage} />
-      
+
       {/* Additional SEO Meta Tags */}
       <meta name="author" content="Jokova" />
       <meta name="theme-color" content="#1f2937" />
-      
+
       {/* Structured Data */}
       {structuredData && (
         <script type="application/ld+json">
