@@ -37,7 +37,7 @@ export const generateSitemapXML = async (): Promise<string> => {
 
     if (professionals) {
       professionals.forEach(professional => {
-        const professionalUrl = `/professional/${professional.name.toLowerCase().replace(/\s+/g, '-')}/${professional.id}`;
+        const professionalUrl = `/professional/${professional.id}/${professional.name.toLowerCase().replace(/\s+/g, '-')}`;
         const lastmod = professional.updated_at ? new Date(professional.updated_at).toISOString().split('T')[0] : currentDate;
         
         sitemapXML += `

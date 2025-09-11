@@ -43,7 +43,7 @@ import "./App.css";
 
 function App() {
   usePageTracking();
-  
+
   return (
     <Router>
       <PendingCartPopup />
@@ -64,7 +64,10 @@ function App() {
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="/sports-professionals" element={<SportsProfessionals />} />
-        <Route path="/professional/:name/:id" element={<ProfessionalProfile />} />
+        <Route
+          path="/professional/:id/:name"
+          element={<ProfessionalProfile />}
+        />
         <Route path="/api-documentation" element={<APIDoc />} />
         <Route path="/generate-sitemap" element={<SitemapGenerator />} />
         <Route path="/terms-of-service" element={<TermsOfService />} />

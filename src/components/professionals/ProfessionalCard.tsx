@@ -55,11 +55,11 @@ const ProfessionalCard = ({
   return (
     <Card className="p-4 hover:shadow-md transition-shadow bg-white border border-gray-200">
       <Link
-        to={`/professional/${
+        to={`/professional/${professional.id}/${
           professional.name
             ? professional.name.toLowerCase().replace(/\s+/g, "-")
             : "unknown"
-        }/${professional.id}`}
+        }`}
       >
         <div className="flex items-start gap-4 mb-2">
           {/* Profile Image */}
@@ -253,11 +253,11 @@ const ProfessionalCard = ({
           </div>
 
           <Link
-            to={`/professional/${
+            to={`/professional/${professional.id}/${
               professional.name
                 ? professional.name.toLowerCase().replace(/\s+/g, "-")
                 : "unknown"
-            }/${professional.id}`}
+            }`}
           >
             <Button
               variant="secondary"
