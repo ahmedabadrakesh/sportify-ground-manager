@@ -441,33 +441,36 @@ const ProfessionalProfile = () => {
 
               {/* Profile Info */}
               <div className="flex-1 text-center lg:text-left">
-                <h1 className="flex text-4xl lg:text-5xl font-bold mb-1 capitalize">
-                  {toTitleCase(professional?.name || "Professional")}
-                  {professional.is_certified && (
-                    <div className="relative group">
-                      <Award
-                        size={20}
-                        color="white"
-                        className="ml-2"
-                        fill="#1f2ce0"
-                        type="button"
-                      />
-                      <div className="absolute left-1/2 transform -translate-x-1/2 bottom-full mb-2 hidden group-hover:block bg-white text-black text-xs rounded py-1 px-2 z-10">
-                        {"Certified"}
+                <div className="flex items-end mb-1">
+                  <h1 className="flex text-4xl lg:text-5xl font-bold mb-1 capitalize text-white">
+                    {toTitleCase(professional?.name || "Professional")}
+                    {professional.is_certified && (
+                      <div className="relative group">
+                        <Award
+                          size={20}
+                          color="white"
+                          className="ml-2"
+                          fill="#1f2ce0"
+                          type="button"
+                        />
+                        <div className="absolute left-1/2 transform -translate-x-1/2 bottom-full mb-2 hidden group-hover:block bg-white text-black text-xs rounded py-1 px-2 z-10">
+                          {"Certified"}
+                        </div>
                       </div>
-                    </div>
-                  )}
-                </h1>
-
-                <p className="text-sm lg:text-lg text-gray-300 ">
+                    )}
+                  </h1>
+                  <span className="text-sm lg:text-lg text-white pb-1">
+                    {professional.academy_name &&
+                      ` • ${professional.academy_name} • `}
+                  </span>
+                </div>
+                <p className="text-sm lg:text-lg text-white ">
                   {professional.profession_type.join(" • ")},
                   {" • Sports Professional"}
-                  {professional.academy_name &&
-                    ` • Acadamy ${professional.academy_name}`}
                   {professional.age && ` • Age ${professional.age}`}
                   {professional.sex && ` • ${professional.sex}`}
                 </p>
-                <div className="mt-4">
+                <div className="mt-3">
                   {professional.game_ids &&
                     professional.game_ids.map((gameId, index) => {
                       return (
@@ -543,7 +546,7 @@ const ProfessionalProfile = () => {
                       variant="secondary"
                       className="bg-primary-foreground/20 text-primary-foreground border-primary-foreground/30"
                     >
-                      {professional.number_of_clients_served || 0} Clients
+                      {professional.number_of_clients_served || 0}+ Clients
                       Served
                     </Badge>
                   )}
