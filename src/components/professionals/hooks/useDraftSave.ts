@@ -49,7 +49,7 @@ export const useDraftSave = (
         profession_type: values.profession_type || ['Coach'],
         years_of_experience: values.years_of_experience ? Number(values.years_of_experience) : 0,
         number_of_clients_served: values.number_of_clients_served ? Number(values.number_of_clients_served) : 0,
-        level: values.level || '',
+        level: values.level || null,
         academy_name: values.academy_name || '',
         game_ids: values.games_played || [],
         specialties: values.specialties || [],
