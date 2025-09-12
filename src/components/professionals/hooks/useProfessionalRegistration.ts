@@ -267,7 +267,7 @@ export const useProfessionalRegistration = (onSuccess: () => void, isUpdate: boo
     },
     onSuccess: () => {
       const successMessage = isSuperAdmin && !isUpdate
-        ? "Successfully registered sports professional. Welcome email sent to the user."
+        ? "Successfully registered sports professional with user account"
         : isUpdate 
           ? "Successfully updated your professional profile" 
           : "Successfully registered as a sports professional";

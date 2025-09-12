@@ -117,33 +117,8 @@ Deno.serve(async (req) => {
         throw new Error(`Failed to create user profile: ${insertError.message}`)
       }
 
-      const userData = userProfile || newProfile;
-      console.log('User created successfully:', userData);
-
-      // Send welcome email using Supabase's password reset as welcome email
-      try {
-        console.log('Sending welcome email via password reset to:', email);
-        
-        const { data: resetData, error: resetError } = await supabaseAdmin.auth.admin.generateLink({
-          type: 'recovery',
-          email: email,
-          options: {
-            redirectTo: 'https://jokova.com/login?welcome=true'
-          }
-        });
-
-        if (resetError) {
-          console.error('Failed to send welcome email:', resetError);
-        } else {
-          console.log('Welcome email sent successfully via password reset');
-        }
-      } catch (emailError) {
-        console.error('Error sending welcome email:', emailError);
-        // Don't fail user creation if email fails
-      }
-
       return new Response(
-        JSON.stringify({ success: true, user: userData, welcomeEmailSent: true }),
+        JSON.stringify({ success: true, user: newProfile }),
         { 
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
           status: 200 
@@ -151,39 +126,13 @@ Deno.serve(async (req) => {
       )
     }
 
-    const userData = userProfile;
-    console.log('User created successfully:', userData);
-
-    // Send welcome email using Supabase's password reset as welcome email
-    try {
-      console.log('Sending welcome email via password reset to:', email);
-      
-      const { data: resetData, error: resetError } = await supabaseAdmin.auth.admin.generateLink({
-        type: 'recovery',
-        email: email,
-        options: {
-          redirectTo: 'https://jokova.com/login?welcome=true'
-        }
-      });
-
-      if (resetError) {
-        console.error('Failed to send welcome email:', resetError);
-      } else {
-        console.log('Welcome email sent successfully via password reset');
-      }
-    } catch (emailError) {
-      console.error('Error sending welcome email:', emailError);
-      // Don't fail user creation if email fails
-    }
-
     return new Response(
-      JSON.stringify({ success: true, user: userData, welcomeEmailSent: true }),
+      JSON.stringify({ success: true, user: userProfile }),
       { 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 200 
       }
     )
-
 
   } catch (error) {
     console.error('Admin create user error:', error)
