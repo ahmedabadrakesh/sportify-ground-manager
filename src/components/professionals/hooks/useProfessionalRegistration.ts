@@ -87,6 +87,31 @@ export const useProfessionalRegistration = (onSuccess: () => void, isUpdate: boo
         userId = createUserResponse.user.id;
         console.log('Created user via edge function:', userId);
         
+        // Send welcome email to the new user
+        try {
+          const welcomeEmailResponse = await fetch(`https://qlrnxgyvplzrkzhhjhab.supabase.co/functions/v1/send-welcome-email`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${(await supabase.auth.getSession()).data.session?.access_token || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFscm54Z3l2cGx6cmt6aGhqaGFiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDQ2MjA1MjYsImV4cCI6MjA2MDE5NjUyNn0.LvgrB50gDT3KQz7DhJ7swPPFPmMDxi3IGVtlebUinTI'}`,
+              'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFscm54Z3l2cGx6cmt6aGhqaGFiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDQ2MjA1MjYsImV4cCI6MjA2MDE5NjUyNn0.LvgrB50gDT3KQz7DhJ7swPPFPmMDxi3IGVtlebUinTI'
+            },
+            body: JSON.stringify({
+              name: values.name,
+              email: values.email
+            })
+          });
+          
+          if (welcomeEmailResponse.ok) {
+            console.log('Welcome email sent successfully');
+          } else {
+            console.error('Failed to send welcome email:', await welcomeEmailResponse.text());
+          }
+        } catch (emailError) {
+          console.error('Error sending welcome email:', emailError);
+          // Don't throw the error since user creation was successful
+        }
+        
         // Restore admin session after user creation
         if (supabaseSession.data.session) {
           await supabase.auth.setSession(supabaseSession.data.session);
@@ -267,7 +292,7 @@ export const useProfessionalRegistration = (onSuccess: () => void, isUpdate: boo
     },
     onSuccess: () => {
       const successMessage = isSuperAdmin && !isUpdate
-        ? "Successfully registered sports professional with user account"
+        ? "Successfully registered sports professional with user account. Welcome email sent to the user."
         : isUpdate 
           ? "Successfully updated your professional profile" 
           : "Successfully registered as a sports professional";
