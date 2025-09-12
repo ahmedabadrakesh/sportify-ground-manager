@@ -128,7 +128,20 @@ export const StepTwo = ({ form, userEmail, isUpdate }: StepTwoProps) => {
               <FormItem>
                 <FormLabel>WhatsApp Number</FormLabel>
                 <FormControl>
-                  <Input {...field} placeholder="WhatsApp number" />
+                  <Input 
+                    {...field} 
+                    placeholder="WhatsApp number"
+                    onBlur={(e) => {
+                      const trimmedValue = e.target.value.trim();
+                      if (trimmedValue === "" && e.target.value !== "") {
+                        field.onChange("");
+                        form.setError("whatsapp", { message: "Invalid value" });
+                      } else {
+                        field.onChange(trimmedValue);
+                        form.clearErrors("whatsapp");
+                      }
+                    }}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -165,7 +178,20 @@ export const StepTwo = ({ form, userEmail, isUpdate }: StepTwoProps) => {
               <FormItem>
                 <FormLabel>Instagram</FormLabel>
                 <FormControl>
-                  <Input {...field} placeholder="Instagram profile URL" />
+                  <Input 
+                    {...field} 
+                    placeholder="Instagram profile URL"
+                    onBlur={(e) => {
+                      const trimmedValue = e.target.value.trim();
+                      if (trimmedValue === "" && e.target.value !== "") {
+                        field.onChange("");
+                        form.setError("instagram_link", { message: "Invalid value" });
+                      } else {
+                        field.onChange(trimmedValue);
+                        form.clearErrors("instagram_link");
+                      }
+                    }}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -179,7 +205,20 @@ export const StepTwo = ({ form, userEmail, isUpdate }: StepTwoProps) => {
               <FormItem>
                 <FormLabel>YouTube</FormLabel>
                 <FormControl>
-                  <Input {...field} placeholder="YouTube channel URL" />
+                  <Input 
+                    {...field} 
+                    placeholder="YouTube channel URL"
+                    onBlur={(e) => {
+                      const trimmedValue = e.target.value.trim();
+                      if (trimmedValue === "" && e.target.value !== "") {
+                        field.onChange("");
+                        form.setError("youtube_link", { message: "Invalid value" });
+                      } else {
+                        field.onChange(trimmedValue);
+                        form.clearErrors("youtube_link");
+                      }
+                    }}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -195,7 +234,20 @@ export const StepTwo = ({ form, userEmail, isUpdate }: StepTwoProps) => {
               <FormItem>
                 <FormLabel>LinkedIn</FormLabel>
                 <FormControl>
-                  <Input {...field} placeholder="LinkedIn profile URL" />
+                  <Input 
+                    {...field} 
+                    placeholder="LinkedIn profile URL"
+                    onBlur={(e) => {
+                      const trimmedValue = e.target.value.trim();
+                      if (trimmedValue === "" && e.target.value !== "") {
+                        field.onChange("");
+                        form.setError("linkedin_link", { message: "Invalid value" });
+                      } else {
+                        field.onChange(trimmedValue);
+                        form.clearErrors("linkedin_link");
+                      }
+                    }}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -209,7 +261,20 @@ export const StepTwo = ({ form, userEmail, isUpdate }: StepTwoProps) => {
               <FormItem>
                 <FormLabel>Website</FormLabel>
                 <FormControl>
-                  <Input {...field} placeholder="Personal website URL" />
+                  <Input 
+                    {...field} 
+                    placeholder="Personal website URL"
+                    onBlur={(e) => {
+                      const trimmedValue = e.target.value.trim();
+                      if (trimmedValue === "" && e.target.value !== "") {
+                        field.onChange("");
+                        form.setError("website", { message: "Invalid value" });
+                      } else {
+                        field.onChange(trimmedValue);
+                        form.clearErrors("website");
+                      }
+                    }}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>

@@ -211,6 +211,19 @@ export const StepOne = ({ form }: StepOneProps) => {
                       setSuggestedPunchLine(e.target.value);
                       field.onChange(e.target.value);
                     }}
+                    onBlur={(e) => {
+                      const trimmedValue = e.target.value.trim();
+                      if (trimmedValue === "" && e.target.value !== "") {
+                        // Clear field if it contains only spaces
+                        setSuggestedPunchLine("");
+                        field.onChange("");
+                        form.setError("punch_line", { message: "Invalid value" });
+                      } else {
+                        setSuggestedPunchLine(trimmedValue);
+                        field.onChange(trimmedValue);
+                        form.clearErrors("punch_line");
+                      }
+                    }}
                     placeholder="A catchy phrase about yourself"
                   />
                 </FormControl>
@@ -239,7 +252,30 @@ export const StepOne = ({ form }: StepOneProps) => {
             <FormItem>
               <FormLabel>Academy Name</FormLabel>
               <FormControl>
-                <Input {...field} placeholder="Academy or organization name" />
+                <Input 
+                  {...field} 
+                  placeholder="Academy or organization name"
+                  onChange={(e) => {
+                    const trimmedValue = e.target.value.trim();
+                    if (e.target.value !== "" && trimmedValue === "") {
+                      // If user entered only spaces, clear the field
+                      field.onChange("");
+                    } else {
+                      field.onChange(e.target.value);
+                    }
+                  }}
+                  onBlur={(e) => {
+                    const trimmedValue = e.target.value.trim();
+                    if (trimmedValue === "" && e.target.value !== "") {
+                      // Clear field if it contains only spaces
+                      field.onChange("");
+                      form.setError("academy_name", { message: "Invalid value" });
+                    } else {
+                      field.onChange(trimmedValue);
+                      form.clearErrors("academy_name");
+                    }
+                  }}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
