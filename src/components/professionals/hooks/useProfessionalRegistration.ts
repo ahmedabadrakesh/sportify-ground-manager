@@ -56,9 +56,21 @@ export const useProfessionalRegistration = (onSuccess: () => void, isUpdate: boo
           requestBody.adminId = currentUser.id;
         }
         
-        const { data: createUserResponse, error: createUserError } = await supabase.functions.invoke('admin-create-user', {
-          body: requestBody
+        // Use direct fetch to ensure consistency across domains
+        const functionUrl = `https://qlrnxgyvplzrkzhhjhab.supabase.co/functions/v1/admin-create-user`;
+        
+        const response = await fetch(functionUrl, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${(await supabase.auth.getSession()).data.session?.access_token || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFscm54Z3l2cGx6cmt6aGhqaGFiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDQ2MjA1MjYsImV4cCI6MjA2MDE5NjUyNn0.LvgrB50gDT3KQz7DhJ7swPPFPmMDxi3IGVtlebUinTI'}`,
+            'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFscm54Z3l2cGx6cmt6aGhqaGFiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDQ2MjA1MjYsImV4cCI6MjA2MDE5NjUyNn0.LvgrB50gDT3KQz7DhJ7swPPFPmMDxi3IGVtlebUinTI'
+          },
+          body: JSON.stringify(requestBody)
         });
+
+        const createUserResponse = await response.json();
+        const createUserError = response.ok ? null : { message: createUserResponse.error || 'Failed to create user' };
         
         if (createUserError || !createUserResponse?.success) {
           console.error('Failed to create user via edge function:', createUserError);
