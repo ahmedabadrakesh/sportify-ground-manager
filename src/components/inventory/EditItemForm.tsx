@@ -21,13 +21,13 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 
 // Define the form schema
 const inventoryItemSchema = z.object({
-  name: z.string().min(2, { message: "Name must be at least 2 characters" }),
-  category: z.string().min(2, { message: "Category is required" }),
+  name: z.string().trim().min(1, "Invalid value").refine(val => val.length >= 2, "Name must be at least 2 characters"),
+  category: z.string().trim().min(1, "Invalid value").refine(val => val.length >= 2, "Category is required"),
   purchasePrice: z.coerce.number().min(0, { message: "Purchase price must be a positive number" }),
   sellPrice: z.coerce.number().min(0, { message: "Sell price must be a positive number" }),
   purchaseQuantity: z.coerce.number().min(0, { message: "Quantity must be a positive number" }),
-  description: z.string().optional(),
-  image: z.string().optional(),
+  description: z.string().trim().optional().refine(val => !val || val.length > 0, "Invalid value"),
+  image: z.string().trim().optional().refine(val => !val || val.length > 0, "Invalid value"),
 });
 
 type InventoryItemFormValues = z.infer<typeof inventoryItemSchema>;

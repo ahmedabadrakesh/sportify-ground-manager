@@ -1,6 +1,7 @@
 
 import React, { useState, useEffect, useMemo } from "react";
 import { format } from "date-fns";
+import { toast } from "sonner";
 import {
   Dialog,
   DialogContent,
@@ -111,7 +112,19 @@ const AddBookingDialog: React.FC<AddBookingDialogProps> = ({
   };
 
   const handleAddBooking = async () => {
-    if (!selectedGround || !selectedDate || !customerName || !customerPhone || selectedSlots.length === 0 || selectedGames.length === 0) {
+    // Validate customer name and phone - trim and check for non-empty values
+    const trimmedName = customerName.trim();
+    const trimmedPhone = customerPhone.trim();
+    
+    if (!selectedGround || !selectedDate || !trimmedName || !trimmedPhone || selectedSlots.length === 0 || selectedGames.length === 0) {
+      if (!trimmedName) {
+        toast.error("Invalid value - Customer name cannot be empty or just spaces");
+        return;
+      }
+      if (!trimmedPhone) {
+        toast.error("Invalid value - Customer phone cannot be empty or just spaces");
+        return;
+      }
       return;
     }
     
@@ -122,8 +135,8 @@ const AddBookingDialog: React.FC<AddBookingDialogProps> = ({
         selectedGround,
         formattedDate,
         selectedSlots,
-        customerName,
-        customerPhone,
+        trimmedName,
+        trimmedPhone,
         currentUserId,
         selectedGames
       );
@@ -212,8 +225,8 @@ const AddBookingDialog: React.FC<AddBookingDialogProps> = ({
             canCreate={
               !!selectedGround &&
               !!selectedDate &&
-              !!customerName &&
-              !!customerPhone &&
+              !!customerName.trim() &&
+              !!customerPhone.trim() &&
               selectedSlots.length > 0 &&
               selectedGames.length > 0
             }

@@ -28,10 +28,10 @@ import { getCurrentUserSync } from "@/utils/auth";
 import AuthRequiredDialog from "@/components/auth/AuthRequiredDialog";
 
 const checkoutFormSchema = z.object({
-  name: z.string().min(2, { message: "Name must be at least 2 characters" }),
-  email: z.string().email({ message: "Please enter a valid email address" }),
-  phone: z.string().min(10, { message: "Please enter a valid phone number" }),
-  address: z.string().min(10, { message: "Please enter your complete address" }),
+  name: z.string().trim().min(1, "Invalid value").refine(val => val.length >= 2, "Name must be at least 2 characters"),
+  email: z.string().trim().min(1, "Invalid value").email("Please enter a valid email address"),
+  phone: z.string().trim().min(1, "Invalid value").refine(val => val.length >= 10, "Please enter a valid phone number"),
+  address: z.string().trim().min(1, "Invalid value").refine(val => val.length >= 10, "Please enter your complete address"),
   paymentMethod: z.enum(["card", "cod"], { 
     required_error: "Please select a payment method" 
   }),

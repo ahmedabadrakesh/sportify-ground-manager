@@ -24,15 +24,9 @@ import { grounds } from "@/data/mockData";
 import { getCurrentUserSync } from "@/utils/auth";
 
 const groundFormSchema = z.object({
-  name: z.string().min(2, {
-    message: "Ground name must be at least 2 characters.",
-  }),
-  description: z.string().min(10, {
-    message: "Description must be at least 10 characters.",
-  }),
-  address: z.string().min(5, {
-    message: "Address must be at least 5 characters.",
-  }),
+  name: z.string().trim().min(1, "Invalid value").refine(val => val.length >= 2, "Ground name must be at least 2 characters"),
+  description: z.string().trim().min(1, "Invalid value").refine(val => val.length >= 10, "Description must be at least 10 characters"),
+  address: z.string().trim().min(1, "Invalid value").refine(val => val.length >= 5, "Address must be at least 5 characters"),
   latitude: z.string().refine((value) => {
     const num = Number(value);
     return !isNaN(num) && num >= -90 && num <= 90;

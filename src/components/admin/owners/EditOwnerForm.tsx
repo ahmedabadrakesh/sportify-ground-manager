@@ -17,10 +17,10 @@ import {
 } from "@/components/ui/form";
 
 const ownerFormSchema = z.object({
-  name: z.string().min(2, "Name must be at least 2 characters"),
-  email: z.string().email("Invalid email address"),
-  phone: z.string().min(10, "Phone number must be at least 10 digits"),
-  whatsapp: z.string().optional(),
+  name: z.string().trim().min(1, "Invalid value").refine(val => val.length >= 2, "Name must be at least 2 characters"),
+  email: z.string().trim().min(1, "Invalid value").email("Invalid email address"),
+  phone: z.string().trim().min(1, "Invalid value").refine(val => val.length >= 10, "Phone number must be at least 10 digits"),
+  whatsapp: z.string().trim().optional().refine(val => !val || val.length > 0, "Invalid value"),
 });
 
 type OwnerFormValues = z.infer<typeof ownerFormSchema>;
