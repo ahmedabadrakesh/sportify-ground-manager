@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { getCurrentUser, hasRoleSync } from "@/utils/auth";
+import { getCurrentUser, getCurrentUserSync, hasRoleSync } from "@/utils/auth";
 import { ProfessionalFormValues } from "../schemas/professionalFormSchema";
 
 export const useProfessionalRegistration = (onSuccess: () => void, isUpdate: boolean = false, existingUserId?: string) => {
@@ -140,6 +140,10 @@ export const useProfessionalRegistration = (onSuccess: () => void, isUpdate: boo
         }
       }
 
+      // Get current user's email for tracking
+      const currentUserForTracking = getCurrentUserSync();
+      const currentUserEmail = currentUserForTracking?.email || 'unknown';
+
       const professionalData = {
         user_id: userId,
         name: values.name,
@@ -185,7 +189,10 @@ export const useProfessionalRegistration = (onSuccess: () => void, isUpdate: boo
         success_stories: values.success_stories || [],
         age: values.age || 0,
         sex: values.sex || null,
-        number_of_clients_served: Number(values.number_of_clients_served) || 0
+        number_of_clients_served: Number(values.number_of_clients_served) || 0,
+        // Track who created/updated this record
+        created_by: currentUserEmail,
+        updated_by: currentUserEmail
       };
       
       console.log('Professional data to save:', professionalData);

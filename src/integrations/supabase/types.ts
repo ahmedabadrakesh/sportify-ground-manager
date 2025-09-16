@@ -660,6 +660,7 @@ export type Database = {
           training_locations: string[] | null
           training_locations_detailed: Json | null
           updated_at: string
+          updated_by: string | null
           user_id: string | null
           videos: string[] | null
           website: string | null
@@ -715,6 +716,7 @@ export type Database = {
           training_locations?: string[] | null
           training_locations_detailed?: Json | null
           updated_at?: string
+          updated_by?: string | null
           user_id?: string | null
           videos?: string[] | null
           website?: string | null
@@ -770,6 +772,7 @@ export type Database = {
           training_locations?: string[] | null
           training_locations_detailed?: Json | null
           updated_at?: string
+          updated_by?: string | null
           user_id?: string | null
           videos?: string[] | null
           website?: string | null
