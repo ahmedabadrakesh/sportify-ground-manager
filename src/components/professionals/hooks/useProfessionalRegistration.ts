@@ -190,9 +190,10 @@ export const useProfessionalRegistration = (onSuccess: () => void, isUpdate: boo
         age: values.age || 0,
         sex: values.sex || null,
         number_of_clients_served: Number(values.number_of_clients_served) || 0,
-        // Track who created/updated this record
-        created_by: currentUserEmail,
-        updated_by: currentUserEmail
+        // Track who updated this record
+        updated_by: currentUserEmail,
+        // Only set created_by for new records
+        ...((!isUpdate || !hasExistingProfile) && { created_by: currentUserEmail })
       };
       
       console.log('Professional data to save:', professionalData);
