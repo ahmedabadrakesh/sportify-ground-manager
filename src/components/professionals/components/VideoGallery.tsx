@@ -161,33 +161,25 @@ const VideoGallery = ({ videos }: VideoGalleryProps) => {
 
   return (
     <>
-      <Card className="mt-4">
-        <CardHeader className="pb-3">
-          <CardTitle className="flex items-center gap-2 text-lg">
-            <Video className="h-5 w-5" />
-            Featured Videos
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4">
-            {videos.map((videoUrl, index) => {
-              const videoType = getVideoType(videoUrl);
-              return (
-                <div
-                  key={index}
-                  className="relative group cursor-pointer rounded-lg overflow-hidden border hover:shadow-lg transition-all duration-300"
-                  onClick={() => handleVideoClick(videoUrl)}
-                >
-                  <div className="aspect-video bg-gray-100 flex items-center justify-center relative">
-                    {renderVideoThumbnail(videoUrl, index)}
-                    {/* //https://www.instagram.com/p/BmyApv9H2Yy/?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw==
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4 pt-2">
+        {videos.map((videoUrl, index) => {
+          const videoType = getVideoType(videoUrl);
+          return (
+            <div
+              key={index}
+              className="relative group cursor-pointer rounded-lg overflow-hidden border hover:shadow-lg transition-all duration-300"
+              onClick={() => handleVideoClick(videoUrl)}
+            >
+              <div className="aspect-video bg-gray-100 flex items-center justify-center relative">
+                {renderVideoThumbnail(videoUrl, index)}
+                {/* //https://www.instagram.com/p/BmyApv9H2Yy/?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw==
                     {videoUrl} */}
-                  </div>
-                  <div className="p-3 bg-white">
-                    {/* <p className="text-sm text-gray-600 truncate">
+              </div>
+              <div className="p-3 bg-white">
+                {/* <p className="text-sm text-gray-600 truncate">
                       {getVideoLabel(videoUrl, index)}
                     </p> */}
-                    {/* {videoType === "external" && (
+                {/* {videoType === "external" && (
                       <div className="flex items-center gap-1 mt-1">
                         <ExternalLink className="h-3 w-3 text-gray-400" />
                         <span className="text-xs text-gray-400">
@@ -195,25 +187,23 @@ const VideoGallery = ({ videos }: VideoGalleryProps) => {
                         </span>
                       </div>
                     )} */}
-                    {/* {videoType === "instagram" && (
+                {/* {videoType === "instagram" && (
                       <div className="flex items-center gap-1 mt-1">
                         <Instagram className="h-3 w-3 text-pink-500" />
                         <span className="text-xs text-pink-500">Instagram</span>
                       </div>
                     )} */}
-                    {videoType === "youtube" && (
-                      <div className="flex items-center gap-1 mt-1">
-                        <Play className="h-3 w-3 text-red-500" />
-                        <span className="text-xs text-red-500">YouTube</span>
-                      </div>
-                    )}
+                {videoType === "youtube" && (
+                  <div className="flex items-center gap-1 mt-1">
+                    <Play className="h-3 w-3 text-red-500" />
+                    <span className="text-xs text-red-500">YouTube</span>
                   </div>
-                </div>
-              );
-            })}
-          </div>
-        </CardContent>
-      </Card>
+                )}
+              </div>
+            </div>
+          );
+        })}
+      </div>
 
       {/* Video Modal */}
       <Dialog

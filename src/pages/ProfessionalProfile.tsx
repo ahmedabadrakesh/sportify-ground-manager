@@ -43,6 +43,7 @@ import {
   BadgeCheck,
   AwardIcon,
   FileBadge,
+  Video,
 } from "lucide-react";
 import VideoGallery from "@/components/professionals/components/VideoGallery";
 import ImageGallery from "@/components/professionals/components/ImageGallery";
@@ -868,7 +869,7 @@ const ProfessionalProfile = () => {
                 <Card className="bg-white">
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
-                      <Youtube className="h-5 w-5 text-primary" />
+                      <Video className="h-5 w-5" />
                       Training Videos & Reels
                     </CardTitle>
                   </CardHeader>
