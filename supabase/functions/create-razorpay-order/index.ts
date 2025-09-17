@@ -13,27 +13,40 @@ serve(async (req) => {
 
   try {
     const { amount, currency = 'INR' } = await req.json()
+    
+    console.log('Received request:', { amount, currency })
 
     // Get Razorpay credentials from environment
     const keyId = Deno.env.get('RAZORPAY_KEY_ID')
     const keySecret = Deno.env.get('RAZORPAY_KEY_SECRET')
 
+    console.log('Razorpay credentials check:', { 
+      keyIdExists: !!keyId, 
+      keySecretExists: !!keySecret,
+      keyIdPrefix: keyId ? keyId.substring(0, 8) + '...' : 'missing'
+    })
+
     if (!keyId || !keySecret) {
+      console.error('Missing Razorpay credentials')
       throw new Error('Razorpay credentials not configured')
     }
 
     // Initialize Razorpay instance
+    console.log('Initializing Razorpay...')
     const razorpay = new Razorpay({
       key_id: keyId,
       key_secret: keySecret,
     })
 
     // Create Razorpay order
+    console.log('Creating Razorpay order with:', { amount, currency })
     const order = await razorpay.orders.create({
       amount: amount, // amount in paise
       currency: currency,
       receipt: `receipt_${Date.now()}`,
     })
+
+    console.log('Razorpay order created successfully:', order.id)
 
     return new Response(
       JSON.stringify({
@@ -49,8 +62,13 @@ serve(async (req) => {
     )
   } catch (error) {
     console.error('Error creating Razorpay order:', error)
+    console.error('Error details:', error.message, error.stack)
     return new Response(
-      JSON.stringify({ error: 'Failed to create order' }),
+      JSON.stringify({ 
+        error: 'Failed to create order',
+        details: error.message,
+        timestamp: new Date().toISOString()
+      }),
       {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 500,
