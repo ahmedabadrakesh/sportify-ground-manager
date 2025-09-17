@@ -243,6 +243,9 @@ export const processCheckout = async (checkoutData: {
   };
   paymentMethod: string;
   totalAmount: number;
+  razorpayPaymentId?: string;
+  razorpayOrderId?: string;
+  razorpaySignature?: string;
 }): Promise<{ success: boolean; message: string; orderId?: string }> => {
   try {
     // Get current user
@@ -253,6 +256,24 @@ export const processCheckout = async (checkoutData: {
         success: false,
         message: "Please log in to place an order."
       };
+    }
+
+    // Verify Razorpay payment if it's a card payment
+    if (checkoutData.paymentMethod === 'card' && checkoutData.razorpayPaymentId) {
+      const { data: verificationResult, error: verificationError } = await supabase.functions.invoke('verify-razorpay-payment', {
+        body: {
+          razorpayOrderId: checkoutData.razorpayOrderId,
+          razorpayPaymentId: checkoutData.razorpayPaymentId,
+          razorpaySignature: checkoutData.razorpaySignature,
+        }
+      });
+
+      if (verificationError || !verificationResult?.success) {
+        return {
+          success: false,
+          message: "Payment verification failed. Please try again."
+        };
+      }
     }
 
     const orderNumber = `ORD-${Date.now()}`;

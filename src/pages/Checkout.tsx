@@ -26,6 +26,7 @@ import { CartItem, Product } from "@/types/models";
 import { getProductById } from "@/utils/ecommerce";
 import { getCurrentUserSync } from "@/utils/auth";
 import AuthRequiredDialog from "@/components/auth/AuthRequiredDialog";
+import { createRazorpayOrder, initiateRazorpayPayment } from "@/services/razorpay";
 
 const checkoutFormSchema = z.object({
   name: z.string().trim().min(1, "Invalid value").refine(val => val.length >= 2, "Name must be at least 2 characters"),
@@ -116,37 +117,99 @@ const Checkout: React.FC = () => {
 
   const totalAmount = getCartTotal();
 
-  const onSubmit = async (data: CheckoutFormValues) => {
-    setProcessingOrder(true);
-    
+  const handlePaymentSuccess = async (paymentData: any, customerData: CheckoutFormValues) => {
     try {
       const result = await processCheckout({
         items: cart,
         customer: {
-          name: data.name,
-          email: data.email,
-          phone: data.phone,
-          address: data.address,
+          name: customerData.name,
+          email: customerData.email,
+          phone: customerData.phone,
+          address: customerData.address,
         },
-        paymentMethod: data.paymentMethod,
+        paymentMethod: customerData.paymentMethod,
         totalAmount: totalAmount,
+        razorpayPaymentId: paymentData.razorpay_payment_id,
+        razorpayOrderId: paymentData.razorpay_order_id,
+        razorpaySignature: paymentData.razorpay_signature,
       });
       
       if (result.success) {
-        toast({ title: "Success", description: result.message });
+        toast({ title: "Success", description: "Payment successful! Your order has been placed." });
         navigate("/order-confirmation", { 
           state: { 
             orderId: result.orderId,
             orderAmount: totalAmount,
-            paymentMethod: data.paymentMethod,
+            paymentMethod: customerData.paymentMethod,
           } 
         });
       } else {
         toast({ title: "Error", description: result.message, variant: "destructive" });
       }
     } catch (error) {
-      toast({ title: "Error", description: "An error occurred during checkout. Please try again.", variant: "destructive" });
+      toast({ title: "Error", description: "Payment verification failed. Please contact support.", variant: "destructive" });
     } finally {
+      setProcessingOrder(false);
+    }
+  };
+
+  const onSubmit = async (data: CheckoutFormValues) => {
+    setProcessingOrder(true);
+    
+    try {
+      if (data.paymentMethod === 'card') {
+        // Create Razorpay order
+        const razorpayOrder = await createRazorpayOrder(totalAmount * 100); // Convert to paise
+        
+        // Initialize Razorpay payment
+        await initiateRazorpayPayment({
+          amount: razorpayOrder.amount,
+          currency: razorpayOrder.currency,
+          name: 'Jokova Sports',
+          description: 'Sports equipment purchase',
+          order_id: razorpayOrder.id,
+          handler: (response: any) => {
+            handlePaymentSuccess(response, data);
+          },
+          prefill: {
+            name: data.name,
+            email: data.email,
+            contact: data.phone,
+          },
+          theme: {
+            color: '#10b981',
+          },
+        });
+      } else {
+        // Handle Cash on Delivery
+        const result = await processCheckout({
+          items: cart,
+          customer: {
+            name: data.name,
+            email: data.email,
+            phone: data.phone,
+            address: data.address,
+          },
+          paymentMethod: data.paymentMethod,
+          totalAmount: totalAmount,
+        });
+        
+        if (result.success) {
+          toast({ title: "Success", description: result.message });
+          navigate("/order-confirmation", { 
+            state: { 
+              orderId: result.orderId,
+              orderAmount: totalAmount,
+              paymentMethod: data.paymentMethod,
+            } 
+          });
+        } else {
+          toast({ title: "Error", description: result.message, variant: "destructive" });
+        }
+        setProcessingOrder(false);
+      }
+    } catch (error) {
+      toast({ title: "Error", description: "An error occurred during checkout. Please try again.", variant: "destructive" });
       setProcessingOrder(false);
     }
   };
