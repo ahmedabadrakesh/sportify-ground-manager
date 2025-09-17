@@ -29,7 +29,7 @@ const AdminSportsProfessionals = () => {
         .from("sports_professionals")
         .select("*")
         .is("deleted_at", null)
-        .is("created_by", null)
+        .neq("created_by", "AI")
         .order("created_at", { ascending: false });
 
       if (error) throw error;
@@ -104,11 +104,7 @@ const AdminSportsProfessionals = () => {
     {
       id: "fee",
       header: "Fee",
-      cell: ({ row }) => (
-        <div>
-          ₹{row.original.one_on_one_price || 0}
-        </div>
-      ),
+      cell: ({ row }) => <div>₹{row.original.one_on_one_price || 0}</div>,
     },
     {
       accessorKey: "city",
@@ -190,7 +186,7 @@ const AdminSportsProfessionals = () => {
           toast.success("Professional registered successfully!");
         }}
       />
-      ̦
+
       {editingProfessional && (
         <RegisterProfessionalDialog
           open={!!editingProfessional}
