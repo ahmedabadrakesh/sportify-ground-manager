@@ -158,28 +158,41 @@ const Checkout: React.FC = () => {
     
     try {
       if (data.paymentMethod === 'card') {
-        // Create Razorpay order
-        const razorpayOrder = await createRazorpayOrder(totalAmount * 100); // Convert to paise
-        
-        // Initialize Razorpay payment
-        await initiateRazorpayPayment({
-          amount: razorpayOrder.amount,
-          currency: razorpayOrder.currency,
-          name: 'Jokova Sports',
-          description: 'Sports equipment purchase',
-          order_id: razorpayOrder.id,
-          handler: (response: any) => {
-            handlePaymentSuccess(response, data);
-          },
-          prefill: {
-            name: data.name,
-            email: data.email,
-            contact: data.phone,
-          },
-          theme: {
-            color: '#10b981',
-          },
-        });
+        try {
+          console.log('Creating Razorpay order for amount:', totalAmount * 100);
+          // Create Razorpay order
+          const razorpayOrder = await createRazorpayOrder(totalAmount * 100); // Convert to paise
+          console.log('Razorpay order created:', razorpayOrder);
+          
+          // Initialize Razorpay payment
+          await initiateRazorpayPayment({
+            amount: razorpayOrder.amount,
+            currency: razorpayOrder.currency,
+            name: 'Jokova Sports',
+            description: 'Sports equipment purchase',
+            order_id: razorpayOrder.id,
+            handler: (response: any) => {
+              console.log('Razorpay payment response:', response);
+              handlePaymentSuccess(response, data);
+            },
+            prefill: {
+              name: data.name,
+              email: data.email,
+              contact: data.phone,
+            },
+            theme: {
+              color: '#10b981',
+            },
+          });
+        } catch (razorpayError) {
+          console.error('Razorpay error:', razorpayError);
+          toast({ 
+            title: "Payment Gateway Error", 
+            description: "Unable to initialize payment gateway. Please try Cash on Delivery or contact support.", 
+            variant: "destructive" 
+          });
+          setProcessingOrder(false);
+        }
       } else {
         // Handle Cash on Delivery
         const result = await processCheckout({
@@ -209,6 +222,7 @@ const Checkout: React.FC = () => {
         setProcessingOrder(false);
       }
     } catch (error) {
+      console.error('Checkout error:', error);
       toast({ title: "Error", description: "An error occurred during checkout. Please try again.", variant: "destructive" });
       setProcessingOrder(false);
     }

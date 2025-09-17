@@ -40,11 +40,23 @@ export const loadRazorpayScript = (): Promise<boolean> => {
 
 export const createRazorpayOrder = async (amount: number, currency: string = 'INR') => {
   try {
+    console.log('Invoking create-razorpay-order function with:', { amount, currency });
+    
     const { data, error } = await supabase.functions.invoke('create-razorpay-order', {
       body: { amount, currency }
     });
 
-    if (error) throw error;
+    console.log('Supabase function response:', { data, error });
+
+    if (error) {
+      console.error('Supabase function error:', error);
+      throw new Error(`Payment service error: ${error.message || 'Unknown error'}`);
+    }
+    
+    if (!data || !data.id) {
+      throw new Error('Invalid response from payment service');
+    }
+    
     return data;
   } catch (error) {
     console.error('Error creating Razorpay order:', error);
