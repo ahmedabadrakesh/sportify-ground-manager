@@ -22,7 +22,7 @@ import * as z from "zod";
 import { toast } from "@/hooks/use-toast";
 import { ShoppingBag, CreditCard, Truck, Check, ArrowLeft, Loader2 } from "lucide-react";
 import { getCart, getCartTotal, processCheckout } from "@/utils/cart";
-import { CartItem, Product } from "@/types/models";
+import { CartItem, Product, User } from "@/types/models";
 import { getProductById } from "@/utils/ecommerce";
 import { getCurrentUserSync } from "@/utils/auth";
 import AuthRequiredDialog from "@/components/auth/AuthRequiredDialog";
@@ -47,7 +47,26 @@ const Checkout: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [processingOrder, setProcessingOrder] = useState(false);
   const [showAuthDialog, setShowAuthDialog] = useState(false);
-  const currentUser = getCurrentUserSync();
+  const [currentUser, setCurrentUser] = useState<User | null>(null);
+
+  useEffect(() => {
+    const checkUser = () => {
+      const user = getCurrentUserSync();
+      setCurrentUser(user);
+    };
+
+    checkUser();
+
+    // Listen for auth changes
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === 'currentUser') {
+        checkUser();
+      }
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
+  }, []);
 
   const form = useForm<CheckoutFormValues>({
     resolver: zodResolver(checkoutFormSchema),

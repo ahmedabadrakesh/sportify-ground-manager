@@ -1,11 +1,29 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { User, Calendar, ShoppingBag, LogIn } from "lucide-react";
 import { getCurrentUserSync } from "@/utils/auth";
 
 const MobileBottomNav = () => {
   const location = useLocation();
-  const authenticated = !!getCurrentUserSync();
+  const [authenticated, setAuthenticated] = useState(false);
+  
+  useEffect(() => {
+    const checkAuth = () => {
+      setAuthenticated(!!getCurrentUserSync());
+    };
+    
+    checkAuth();
+    
+    // Listen for authentication changes
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === 'currentUser') {
+        checkAuth();
+      }
+    };
+    
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
+  }, []);
   
   const navItems = [
     {

@@ -38,13 +38,10 @@ export const getCurrentUser = async (): Promise<User | null> => {
 // Synchronous version for backward compatibility
 export const getCurrentUserSync = (): User | null => {
   const storedUser = localStorage.getItem('currentUser');
-  console.log('getCurrentUserSync called, storedUser:', storedUser ? 'exists' : 'null');
   if (storedUser) {
     const user = JSON.parse(storedUser);
-    console.log('getCurrentUserSync returning user:', user.id, user.role);
     return user;
   }
-  console.log('getCurrentUserSync returning null');
   return null;
 };
 
