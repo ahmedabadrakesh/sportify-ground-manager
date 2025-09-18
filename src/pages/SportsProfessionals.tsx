@@ -2,7 +2,7 @@ import React from "react";
 import MainLayout from "@/components/layouts/MainLayout";
 import SEOHead from "@/components/SEOHead";
 import { useState, useEffect } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import ProfessionalsList from "@/components/professionals/ProfessionalsList";
@@ -53,17 +53,18 @@ const SportsProfessionals = () => {
     checkExistingProfile();
   }, [currentUser]);
 
+  const navigate = useNavigate();
   const handleRegisterClick = () => {
     if (!currentUser) {
-      toast.error("Please login to register as a professional");
+      toast.error("Please register as a professional");
+      navigate("/register");
       return;
     }
-
     setIsDialogOpen(true);
   };
 
   const getButtonText = () => {
-    if (!currentUser) return "Login to Register";
+    if (!currentUser) return "Register Yourself";
     if (isSuperAdmin) return "Add Professional";
     if (hasExistingProfile) return "Update Your Profile";
     if (isSportsProfessional) return "Update Your Profile";
