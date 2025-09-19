@@ -40,37 +40,47 @@ export const loadRazorpayScript = (): Promise<boolean> => {
 
 export const createRazorpayOrder = async (amount: number, currency: string = 'INR') => {
   try {
-    console.log('Invoking create-razorpay-order function with:', { amount, currency });
+    console.log('🚀 Starting createRazorpayOrder with:', { amount, currency });
+    console.log('🔧 Supabase client:', !!supabase);
     
     const { data, error } = await supabase.functions.invoke('create-razorpay-order', {
       body: { amount, currency }
     });
 
-    console.log('Supabase function response:', { data, error });
+    console.log('📦 Supabase function response:', { data, error });
 
     if (error) {
-      console.error('Supabase function error:', error);
+      console.error('❌ Supabase function error:', error);
       throw new Error(`Payment service error: ${error.message || 'Unknown error'}`);
     }
     
     if (!data || !data.id) {
+      console.error('❌ Invalid response from payment service:', data);
       throw new Error('Invalid response from payment service');
     }
     
+    console.log('✅ Razorpay order created successfully:', data);
     return data;
   } catch (error) {
-    console.error('Error creating Razorpay order:', error);
+    console.error('💥 Error creating Razorpay order:', error);
+    console.error('💥 Error stack:', error.stack);
     throw error;
   }
 };
 
 export const initiateRazorpayPayment = async (options: RazorpayOptions): Promise<void> => {
+  console.log('🎯 Starting initiateRazorpayPayment with options:', options);
+  
   const scriptLoaded = await loadRazorpayScript();
+  console.log('📜 Razorpay script loaded:', scriptLoaded);
   
   if (!scriptLoaded) {
+    console.error('❌ Failed to load Razorpay SDK');
     throw new Error('Failed to load Razorpay SDK');
   }
 
+  console.log('🔧 Creating Razorpay instance...');
   const rzp = new window.Razorpay(options);
+  console.log('🚀 Opening Razorpay payment window...');
   rzp.open();
 };
