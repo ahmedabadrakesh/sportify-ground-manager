@@ -42,12 +42,17 @@ export const createRazorpayOrder = async (amount: number, currency: string = 'IN
   try {
     console.log('🚀 Starting createRazorpayOrder with:', { amount, currency });
     console.log('🔧 Supabase client:', !!supabase);
+    console.log('🔧 Supabase client functions:', !!supabase.functions);
+    
+    console.log('📞 About to invoke create-razorpay-order function...');
     
     const { data, error } = await supabase.functions.invoke('create-razorpay-order', {
       body: { amount, currency }
     });
 
     console.log('📦 Supabase function response:', { data, error });
+    console.log('📦 Full response data:', JSON.stringify(data, null, 2));
+    console.log('📦 Full error:', JSON.stringify(error, null, 2));
 
     if (error) {
       console.error('❌ Supabase function error:', error);
@@ -63,7 +68,9 @@ export const createRazorpayOrder = async (amount: number, currency: string = 'IN
     return data;
   } catch (error) {
     console.error('💥 Error creating Razorpay order:', error);
-    console.error('💥 Error stack:', error.stack);
+    console.error('💥 Error type:', typeof error);
+    console.error('💥 Error message:', error?.message);
+    console.error('💥 Error stack:', error?.stack);
     throw error;
   }
 };
