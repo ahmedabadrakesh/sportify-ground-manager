@@ -40,13 +40,26 @@ import ForgotPassword from "./pages/ForgotPassword";
 import PendingCartPopup from "./components/cart/PendingCartPopup";
 import { usePageTracking } from "./hooks/useAnalytics";
 import "./App.css";
+import { useEffect } from "react";
+import { useLocation } from "react-router-dom";
 
 function App() {
   usePageTracking();
 
+  function ScrollToTop() {
+    const { pathname } = useLocation();
+
+    useEffect(() => {
+      window.scrollTo(0, 0);
+    }, [pathname]); // Re-run effect when pathname changes
+
+    return null; // This component doesn't render anything
+  }
+
   return (
     <Router>
       <PendingCartPopup />
+      <ScrollToTop />
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/home" element={<Home />} />

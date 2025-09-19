@@ -64,7 +64,7 @@ const SportsProfessionals = () => {
   };
 
   const getButtonText = () => {
-    if (!currentUser) return "Register Yourself";
+    if (!currentUser) return "Register as Professional";
     if (isSuperAdmin) return "Add Professional";
     if (hasExistingProfile) return "Update Your Profile";
     if (isSportsProfessional) return "Update Your Profile";
@@ -107,7 +107,7 @@ const SportsProfessionals = () => {
       />
       {/* Hero Section */}
       <div className="container bg-background border-b">
-        <div className="grid md:grid-cols-8 mx-auto text-left py-4 mt-4">
+        <div className="grid md:grid-cols-8 mx-auto text-left py-4 mt-4 max-w-7xl">
           <div className="c mb-6 col-span-6">
             <h1 className="text-3xl font-bold text-foreground mb-2">
               Find Your Perfect Coach

@@ -46,8 +46,8 @@ const MainLayout = ({ children }: MainLayoutProps) => {
   }, []);
 
   return (
-    <div className="flex flex-col min-h-screen">
-      <header className="bg-white">
+    <div className="flex flex-col min-h-screen ">
+      <header className="bg-white sticky top-0 z-50">
         <div className="mx-auto max-w-7xl">
           <div className="flex h-16 justify-between items-center">
             <div className="flex-grow items-center">

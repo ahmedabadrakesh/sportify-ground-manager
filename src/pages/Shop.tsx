@@ -127,8 +127,10 @@ const Shop: React.FC = () => {
 
   return (
     <MainLayout>
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold mb-6">Sports Equipment Shop</h1>
+      <div className="container mb-8">
+        <h1 className="text-3xl font-bold mb-6 text-left mt-6 mb-6">
+          Sports Equipment Shop
+        </h1>
 
         {/* Search and Filters */}
         <div className="flex flex-col md:flex-row gap-4 mb-8">
@@ -181,7 +183,7 @@ const Shop: React.FC = () => {
         ) : (
           <>
             {/* Products Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2">
               {filteredProducts.map((product) => (
                 <Card key={product.id} className="overflow-hidden">
                   <div
@@ -242,33 +244,30 @@ const Shop: React.FC = () => {
                     </div>
                   </CardContent>
 
-                  <CardFooter className="p-4 pt-0">
-                    <div className="flex gap-2">
-                      <Button
-                        className="flex-1"
-                        variant="secondary"
-                        onClick={() => handleAddToCart(product)}
-                        disabled={product.stock === 0}
-                      >
-                        <ShoppingCart className="mr-2 h-4 w-4" /> Add to Cart
-                      </Button>
-                      <Button
-                        variant="outline"
-                        onClick={() =>
-                          navigate(
-                            `/product/${
-                              product.name
-                                ? product.name
-                                    .toLowerCase()
-                                    .replace(/\s+/g, "-")
-                                : "product"
-                            }/${product.id}`
-                          )
-                        }
-                      >
-                        View
-                      </Button>
-                    </div>
+                  <CardFooter className="p-4 pt-0 w-full">
+                    <Button
+                      className="flex w-1/2 p-4 mr-2"
+                      variant="secondary"
+                      onClick={() => handleAddToCart(product)}
+                      disabled={product.stock === 0}
+                    >
+                      <ShoppingCart className="mr-2 h-4 w-4" /> Add to Cart
+                    </Button>
+                    <Button
+                      className="flex w-1/2 p-4 ml-2"
+                      variant="outline"
+                      onClick={() =>
+                        navigate(
+                          `/product/${
+                            product.name
+                              ? product.name.toLowerCase().replace(/\s+/g, "-")
+                              : "product"
+                          }/${product.id}`
+                        )
+                      }
+                    >
+                      View
+                    </Button>
                   </CardFooter>
                 </Card>
               ))}
