@@ -93,8 +93,15 @@ export const initiateRazorpayPayment = async (options: RazorpayOptions): Promise
     throw new Error('Failed to load Razorpay SDK');
   }
 
-  console.log('🔧 Creating Razorpay instance...');
-  const rzp = new window.Razorpay(options);
+  // Add the public key_id to options
+  const razorpayOptions = {
+    ...options,
+    key: 'rzp_test_mlxzRE3eCC0FHE', // Razorpay test key ID (safe to expose in frontend)
+  };
+
+  console.log('🔧 Creating Razorpay instance with key_id...');
+  console.log('🔑 Using key:', razorpayOptions.key);
+  const rzp = new window.Razorpay(razorpayOptions);
   console.log('🚀 Opening Razorpay payment window...');
   rzp.open();
 };
