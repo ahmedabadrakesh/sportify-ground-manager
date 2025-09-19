@@ -46,9 +46,16 @@ export const createRazorpayOrder = async (amount: number, currency: string = 'IN
     
     console.log('📞 About to invoke create-razorpay-order function...');
     
-    const { data, error } = await supabase.functions.invoke('create-razorpay-order', {
+    // Add timeout to prevent hanging
+    const invokePromise = supabase.functions.invoke('create-razorpay-order', {
       body: { amount, currency }
     });
+    
+    const timeoutPromise = new Promise((_, reject) => 
+      setTimeout(() => reject(new Error('Function call timeout after 30 seconds')), 30000)
+    );
+    
+    const { data, error } = await Promise.race([invokePromise, timeoutPromise]) as any;
 
     console.log('📦 Supabase function response:', { data, error });
     console.log('📦 Full response data:', JSON.stringify(data, null, 2));

@@ -1,5 +1,4 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
-import Razorpay from "https://esm.sh/razorpay@2.9.2"
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -14,39 +13,56 @@ serve(async (req) => {
   try {
     const { amount, currency = 'INR' } = await req.json()
     
-    console.log('Received request:', { amount, currency })
+    console.log('🚀 Received request:', { amount, currency })
 
     // Get Razorpay credentials from environment
     const keyId = Deno.env.get('RAZORPAY_KEY_ID')
     const keySecret = Deno.env.get('RAZORPAY_KEY_SECRET')
 
-    console.log('Razorpay credentials check:', { 
+    console.log('🔑 Razorpay credentials check:', { 
       keyIdExists: !!keyId, 
       keySecretExists: !!keySecret,
       keyIdPrefix: keyId ? keyId.substring(0, 8) + '...' : 'missing'
     })
 
     if (!keyId || !keySecret) {
-      console.error('Missing Razorpay credentials')
+      console.error('❌ Missing Razorpay credentials')
       throw new Error('Razorpay credentials not configured')
     }
 
-    // Initialize Razorpay instance
-    console.log('Initializing Razorpay...')
-    const razorpay = new Razorpay({
-      key_id: keyId,
-      key_secret: keySecret,
-    })
-
-    // Create Razorpay order
-    console.log('Creating Razorpay order with:', { amount, currency })
-    const order = await razorpay.orders.create({
+    // Create order using direct API call instead of library
+    const orderData = {
       amount: amount, // amount in paise
       currency: currency,
       receipt: `receipt_${Date.now()}`,
+    }
+
+    console.log('📦 Creating order with data:', orderData)
+
+    // Create basic auth header
+    const auth = btoa(`${keyId}:${keySecret}`)
+    
+    console.log('🌐 Making API call to Razorpay...')
+    
+    const response = await fetch('https://api.razorpay.com/v1/orders', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Basic ${auth}`,
+      },
+      body: JSON.stringify(orderData),
     })
 
-    console.log('Razorpay order created successfully:', order.id)
+    console.log('📡 Razorpay API response status:', response.status)
+
+    if (!response.ok) {
+      const errorText = await response.text()
+      console.error('❌ Razorpay API error:', response.status, errorText)
+      throw new Error(`Razorpay API error: ${response.status} - ${errorText}`)
+    }
+
+    const order = await response.json()
+    console.log('✅ Razorpay order created successfully:', order.id)
 
     return new Response(
       JSON.stringify({
@@ -61,8 +77,8 @@ serve(async (req) => {
       },
     )
   } catch (error) {
-    console.error('Error creating Razorpay order:', error)
-    console.error('Error details:', error.message, error.stack)
+    console.error('💥 Error creating Razorpay order:', error)
+    console.error('💥 Error details:', error.message, error.stack)
     return new Response(
       JSON.stringify({ 
         error: 'Failed to create order',
