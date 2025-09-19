@@ -96,7 +96,7 @@ export const initiateRazorpayPayment = async (options: RazorpayOptions): Promise
   // Add the public key_id to options
   const razorpayOptions = {
     ...options,
-    key: 'rzp_test_mlxzRE3eCC0FHE', // Razorpay test key ID (safe to expose in frontend)
+    key: 'rzp_test_RIApdiBL0lHWGq', // Your Razorpay test key ID
   };
 
   console.log('🔧 Creating Razorpay instance with key_id...');
