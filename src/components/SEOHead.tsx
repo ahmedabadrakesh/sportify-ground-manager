@@ -11,9 +11,9 @@ interface SEOHeadProps {
 }
 
 const SEOHead = ({
-  title = "Jokova - Book Sports Grounds & Find Professional Coaches",
-  description = "Book sports grounds, find certified sports professionals, and join events. Jokova is your one-stop platform for all sports activities.",
-  keywords = "sports, ground booking, sports professionals, coaches, sports events, fitness",
+  title = "Jokova - Redefining Sports Together | Find Sports Coaches, Events & Buy Sports Gear Online",
+  description = "Jokova - Your all-in-one sports destination! Find and connect with certified coaches in Cricket, Football, Badminton, Tennis, Hockey, Kabaddi, and more. Shop 5000+ products across 50+ sports with top-quality gear for gym, fitness, cycling, hiking, trekking, and beyond. Stay updated with nearby events and join the action. With Jokova, you don’t just play sports – you live them.",
+  keywords = "sports, sports professionals, coaches, sports events, fitness, Sports coaches in India, Find sports coach online, Connect with certified sports trainers, Sports events near me, Buy sports equipment online India, Sports gear online shopping, Cricket coach near me, Badminton coach in India, Football training online, Kabaddi trainers India, Gym and fitness accessories online, Trekking and hiking gear India, Cycling equipment online, Best sports coaching platform in India, One-stop shop for sports gear and coaching, How to find certified sports coaches online, Sports events and activities near me, Shop sports shoes and activewear online India",
   canonicalUrl,
   ogImage = "/jokova_socialmedia_og.jpg",
   ogType = "website",

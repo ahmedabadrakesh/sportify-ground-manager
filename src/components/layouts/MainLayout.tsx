@@ -5,7 +5,7 @@ import CartIcon from "@/components/cart/CartIcon";
 import { Button } from "@/components/ui/button";
 import { getCurrentUserSync, hasRoleSync } from "@/utils/auth";
 import { Toaster } from "@/components/ui/toaster";
-import jokovaLogoTextImage from "/public/green_text_only_logo.png";
+import jokovaLogoTextImage from "/public/jokova_logo.png";
 import jokovaLogoSymbolImageBlackTransparent from "/JOKOVA_text_only.png";
 
 import jokovaLogoSymbolImage from "/public/green_jokova_symbol.png";
