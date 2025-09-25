@@ -10,6 +10,7 @@ import { getProductById } from "@/utils/ecommerce";
 import { addToCart } from "@/utils/cart";
 import { Product } from "@/types/models";
 import { toast } from "sonner";
+import RelatedProducts from "@/components/shop/RelatedProducts";
 
 const ProductDetail: React.FC = () => {
   const { id, name } = useParams<{ id: string; name: string }>();
@@ -102,7 +103,7 @@ const ProductDetail: React.FC = () => {
         <div className="max-w-7xl mx-auto px-4 py-8 text-center">
           <h1 className="text-2xl font-bold mb-4">Product Not Found</h1>
           <Button onClick={() => navigate("/shop")}>
-            <ArrowLeft className="mr-2 h-4 w-4" /> Back to Shop
+            <ArrowLeft className="mr-2 h-4 w-4 " /> Back to Shop
           </Button>
         </div>
       </MainLayout>
@@ -182,7 +183,7 @@ const ProductDetail: React.FC = () => {
         ogType="product"
         structuredData={structuredData}
       />
-      <div className="max-w-7xl mx-auto px-4 py-8">
+      <div className="max-w-7xl mx-auto px-4 py-8 text-left">
         {/* Back Button */}
         <Button
           variant="ghost"
@@ -273,23 +274,9 @@ const ProductDetail: React.FC = () => {
 
             <Card>
               <CardContent className="p-6">
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <span className="font-semibold">Availability:</span>
-                    <span
-                      className={`font-medium ${
-                        product.stock > 0 ? "text-green-600" : "text-red-600"
-                      }`}
-                    >
-                      {product.stock > 0
-                        ? `${product.stock} in stock`
-                        : "Out of stock"}
-                    </span>
-                  </div>
-
+                <div className="space-y-4 items-left">
                   {product.stock > 0 && (
-                    <div className="flex items-center gap-4">
-                      <span className="font-semibold">Quantity:</span>
+                    <div className="flex flex-col items-center gap-4 md:flex-row">
                       <div className="flex items-center border rounded-lg">
                         <Button
                           variant="ghost"
@@ -313,27 +300,25 @@ const ProductDetail: React.FC = () => {
                           <Plus className="h-4 w-4" />
                         </Button>
                       </div>
+                      <Button
+                        onClick={handleAddToCart}
+                        disabled={product.stock === 0}
+                        className="w-full md:flex-1"
+                        size="lg"
+                      >
+                        <ShoppingCart className="mr-2 h-5 w-5" />
+                        {product.stock === 0 ? "Out of Stock" : "Add to Cart"}
+                      </Button>
+                      <Button
+                        variant="outline"
+                        onClick={() => navigate("/cart")}
+                        size="lg"
+                        className="w-full md:flex-1"
+                      >
+                        View Cart
+                      </Button>
                     </div>
                   )}
-
-                  <div className="flex gap-4">
-                    <Button
-                      onClick={handleAddToCart}
-                      disabled={product.stock === 0}
-                      className="flex-1"
-                      size="lg"
-                    >
-                      <ShoppingCart className="mr-2 h-5 w-5" />
-                      {product.stock === 0 ? "Out of Stock" : "Add to Cart"}
-                    </Button>
-                    <Button
-                      variant="outline"
-                      onClick={() => navigate("/cart")}
-                      size="lg"
-                    >
-                      View Cart
-                    </Button>
-                  </div>
                 </div>
               </CardContent>
             </Card>
@@ -359,7 +344,7 @@ const ProductDetail: React.FC = () => {
         {/* Related Products Section - You can implement this later */}
         <div className="mt-16 text-left">
           <h2 className="text-2xl font-bold mb-6">You Might Also Like</h2>
-          <div className="text-gray-500">Related products coming soon...</div>
+          <RelatedProducts currrentCatagory={product.category} />
         </div>
       </div>
     </MainLayout>
