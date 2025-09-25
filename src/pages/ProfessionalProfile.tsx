@@ -77,7 +77,6 @@ const ProfessionalProfile = () => {
   const currentUser = getCurrentUserSync();
   const isSuperAdmin = hasRoleSync("super_admin");
   const isAuthenticated = !!currentUser;
-
   const { data: professional, isLoading } = useQuery({
     queryKey: ["professional", id],
     queryFn: async () => {
@@ -361,6 +360,15 @@ const ProfessionalProfile = () => {
       }
     : undefined;
 
+  const getAboutMeText = () => {
+    const aboutmeTextFromDB = professional.about_me;
+    const aboutMeText = isAboutReadMoreOpened
+      ? aboutmeTextFromDB
+      : getFiftyWords(aboutmeTextFromDB, 50);
+
+    return aboutMeText;
+  };
+
   return (
     <MainLayout>
       <SEOHead
@@ -632,20 +640,24 @@ const ProfessionalProfile = () => {
                       )}
                       <Quote className="absolute -bottom-2 -right-2 w-8 h-8 text-gray-500 " />
 
-                      <p className="text-foreground text-gray-700 text-left leading-relaxed">
-                        {isAboutReadMoreOpened
-                          ? professional.about_me
-                          : getFiftyWords(professional.about_me, 50)}
-                        {professional.about_me.split(" ").length >= 50 && (
-                          <button
-                            onClick={() =>
-                              setisAboutReadMoreOpened(!isAboutReadMoreOpened)
-                            }
-                            className="ml-2 text-primary hover:underline font-medium"
-                          >
-                            {isAboutReadMoreOpened ? "Read Less" : "Read More"}
-                          </button>
-                        )}
+                      <p className="text-foreground text-gray-700 text-justify leading-relaxed">
+                        <span
+                          dangerouslySetInnerHTML={{ __html: getAboutMeText() }}
+                        />
+                        <span>
+                          {professional.about_me.split(" ").length >= 50 && (
+                            <button
+                              className="text-primary hover:underline font-medium"
+                              onClick={() =>
+                                setisAboutReadMoreOpened(!isAboutReadMoreOpened)
+                              }
+                            >
+                              {isAboutReadMoreOpened
+                                ? "Read Less"
+                                : "Read More"}
+                            </button>
+                          )}
+                        </span>
                       </p>
                     </div>
                   </CardContent>
