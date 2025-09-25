@@ -18,17 +18,22 @@ export const RichTextEditor = ({
   className,
   disabled = false,
 }: RichTextEditorProps) => {
-  // Configure toolbar with only Bold, Italic, Underline, and Link
+  // Configure toolbar with comprehensive formatting options
   const modules = useMemo(() => ({
     toolbar: [
-      ['bold', 'italic', 'underline'],
+      ['bold', 'italic', 'underline', 'strike'],
+      [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+      [{ 'indent': '-1'}, { 'indent': '+1' }],
       ['link'],
+      [{ 'align': [] }],
       ['clean'] // Remove formatting button
     ],
   }), []);
 
   const formats = [
-    'bold', 'italic', 'underline', 'link'
+    'bold', 'italic', 'underline', 'strike',
+    'list', 'bullet', 'indent',
+    'link', 'align'
   ];
 
   return (
