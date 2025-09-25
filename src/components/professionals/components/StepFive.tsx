@@ -11,6 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { RichTextEditor } from "@/components/ui/rich-text-editor";
 import { ProfessionalFormValues } from "../schemas/professionalFormSchema";
 import { ArrayFieldInput } from "./ArrayFieldInput";
 import {
@@ -196,15 +197,16 @@ I have participated in numerous tournaments and competitions, which includes Dis
                 </Button>
               </div>
               <FormControl>
-                <Textarea
-                  {...field}
+                <RichTextEditor
+                  value={field.value || ''}
+                  onChange={field.onChange}
                   placeholder="Tell us about yourself, your experience, and what makes you unique as a professional..."
-                  className="min-h-[150px] resize-vertical"
+                  className="min-h-[150px]"
                 />
               </FormControl>
               <p className="text-xs text-muted-foreground">
                 Click "Auto Generate" to create content based on your form data,
-                then edit as needed.
+                then edit as needed. Use the toolbar for formatting.
               </p>
               <FormMessage />
             </FormItem>
