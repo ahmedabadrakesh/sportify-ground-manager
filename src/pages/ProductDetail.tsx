@@ -109,44 +109,74 @@ const ProductDetail: React.FC = () => {
     );
   }
 
-  const mainImage = product.images && product.images.length > 0 
-    ? product.images[selectedImageIndex] 
-    : "/placeholder.svg";
+  const mainImage =
+    product.images && product.images.length > 0
+      ? product.images[selectedImageIndex]
+      : "/placeholder.svg";
 
-  const structuredData = product ? {
-    "@context": "https://schema.org",
-    "@type": "Product",
-    "name": product.name,
-    "image": product.images || ["/placeholder.svg"],
-    "description": product.description || `High quality ${product.name} available at Jokova Sports Equipment Shop`,
-    "brand": {
-      "@type": "Brand",
-      "name": "Jokova"
-    },
-    "offers": {
-      "@type": "Offer",
-      "url": typeof window !== "undefined" ? window.location.href : "",
-      "priceCurrency": "INR",
-      "price": product.price,
-      "availability": product.stock > 0 ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
-      "seller": {
-        "@type": "Organization",
-        "name": "Jokova"
+  const structuredData = product
+    ? {
+        "@context": "https://schema.org",
+        "@type": "Product",
+        name: product.name,
+        image: product.images || ["/placeholder.svg"],
+        description:
+          product.description ||
+          `High quality ${product.name} available at Jokova Sports Equipment Shop`,
+        brand: {
+          "@type": "Brand",
+          name: "Jokova",
+        },
+        offers: {
+          "@type": "Offer",
+          url: typeof window !== "undefined" ? window.location.href : "",
+          priceCurrency: "INR",
+          price: product.price,
+          availability:
+            product.stock > 0
+              ? "https://schema.org/InStock"
+              : "https://schema.org/OutOfStock",
+          seller: {
+            "@type": "Organization",
+            name: "Jokova",
+          },
+        },
+        aggregateRating: {
+          "@type": "AggregateRating",
+          ratingValue: "4.0",
+          reviewCount: "23",
+        },
       }
-    },
-    "aggregateRating": {
-      "@type": "AggregateRating",
-      "ratingValue": "4.0",
-      "reviewCount": "23"
-    }
-  } : undefined;
+    : undefined;
 
   return (
     <MainLayout>
       <SEOHead
-        title={product ? `${product.name} | Buy Sports Equipment | Jokova` : "Product | Jokova"}
-        description={product ? `Buy ${product.name} for ₹${product.price}. ${product.description || 'High quality sports equipment with fast delivery.'} ${product.stock > 0 ? 'In Stock' : 'Out of Stock'}.`.substring(0, 160) : "Buy sports equipment and accessories from Jokova's online store."}
-        keywords={product ? `${product.name}, ${product.category}, sports equipment, buy online, sports gear, ${product.name.split(' ').join(', ')}` : "sports equipment, sports gear, buy online"}
+        title={
+          product
+            ? `${product.name} | Buy Sports Equipment | Jokova`
+            : "Product | Jokova"
+        }
+        description={
+          product
+            ? `Buy ${product.name} for ₹${product.price}. ${
+                product.description ||
+                "High quality sports equipment with fast delivery."
+              } ${product.stock > 0 ? "In Stock" : "Out of Stock"}.`.substring(
+                0,
+                160
+              )
+            : "Buy sports equipment and accessories from Jokova's online store."
+        }
+        keywords={
+          product
+            ? `${product.name}, ${
+                product.category
+              }, sports equipment, buy online, sports gear, ${product.name
+                .split(" ")
+                .join(", ")}`
+            : "sports equipment, sports gear, buy online"
+        }
         canonicalUrl={typeof window !== "undefined" ? window.location.href : ""}
         ogImage={product?.images?.[0] || "/placeholder.svg"}
         ogType="product"
@@ -172,7 +202,7 @@ const ProductDetail: React.FC = () => {
                 className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
               />
             </div>
-            
+
             {/* Thumbnail Images */}
             {product.images && product.images.length > 1 && (
               <div className="flex space-x-2 overflow-x-auto">
@@ -181,8 +211,8 @@ const ProductDetail: React.FC = () => {
                     key={index}
                     onClick={() => setSelectedImageIndex(index)}
                     className={`flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden border-2 transition-colors ${
-                      selectedImageIndex === index 
-                        ? "border-primary" 
+                      selectedImageIndex === index
+                        ? "border-primary"
                         : "border-gray-200 hover:border-gray-300"
                     }`}
                   >
@@ -198,13 +228,11 @@ const ProductDetail: React.FC = () => {
           </div>
 
           {/* Product Info */}
-          <div className="space-y-6">
+          <div className="space-y-6 text-left">
             <div>
               <div className="flex items-center gap-2 mb-2">
                 <Badge variant="secondary">{product.category}</Badge>
-                {product.featured && (
-                  <Badge variant="default">Featured</Badge>
-                )}
+                {product.featured && <Badge variant="default">Featured</Badge>}
               </div>
               <h1 className="text-3xl font-bold text-gray-900 mb-2">
                 {product.name}
@@ -220,7 +248,9 @@ const ProductDetail: React.FC = () => {
                     />
                   ))}
                 </div>
-                <span className="text-sm text-gray-600">(4.0) • 23 reviews</span>
+                <span className="text-sm text-gray-600">
+                  (4.0) • 23 reviews
+                </span>
               </div>
             </div>
 
@@ -230,10 +260,14 @@ const ProductDetail: React.FC = () => {
 
             {product.description && (
               <div>
-                <h3 className="text-lg font-semibold mb-2">Description</h3>
-                <p className="text-gray-600 leading-relaxed">
-                  {product.description}
-                </p>
+                <h3 className="text-lg font-semibold mb-2 text-left">
+                  Description
+                </h3>
+                <span
+                  className="text-gray-600 leading-relaxed text-left"
+                  dangerouslySetInnerHTML={{ __html: product.description }}
+                ></span>
+                {/* {product.description} */}
               </div>
             )}
 
@@ -242,10 +276,14 @@ const ProductDetail: React.FC = () => {
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
                     <span className="font-semibold">Availability:</span>
-                    <span className={`font-medium ${
-                      product.stock > 0 ? "text-green-600" : "text-red-600"
-                    }`}>
-                      {product.stock > 0 ? `${product.stock} in stock` : "Out of stock"}
+                    <span
+                      className={`font-medium ${
+                        product.stock > 0 ? "text-green-600" : "text-red-600"
+                      }`}
+                    >
+                      {product.stock > 0
+                        ? `${product.stock} in stock`
+                        : "Out of stock"}
                     </span>
                   </div>
 
@@ -279,7 +317,7 @@ const ProductDetail: React.FC = () => {
                   )}
 
                   <div className="flex gap-4">
-                    <Button 
+                    <Button
                       onClick={handleAddToCart}
                       disabled={product.stock === 0}
                       className="flex-1"
@@ -288,8 +326,8 @@ const ProductDetail: React.FC = () => {
                       <ShoppingCart className="mr-2 h-5 w-5" />
                       {product.stock === 0 ? "Out of Stock" : "Add to Cart"}
                     </Button>
-                    <Button 
-                      variant="outline" 
+                    <Button
+                      variant="outline"
                       onClick={() => navigate("/cart")}
                       size="lg"
                     >
@@ -319,11 +357,9 @@ const ProductDetail: React.FC = () => {
         </div>
 
         {/* Related Products Section - You can implement this later */}
-        <div className="mt-16">
+        <div className="mt-16 text-left">
           <h2 className="text-2xl font-bold mb-6">You Might Also Like</h2>
-          <div className="text-center text-gray-500">
-            Related products coming soon...
-          </div>
+          <div className="text-gray-500">Related products coming soon...</div>
         </div>
       </div>
     </MainLayout>
