@@ -7,8 +7,12 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { RichTextEditor } from "@/components/ui/rich-text-editor";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { MultiSelect } from "@/components/ui/multi-select";
 import { addInventoryItem } from "@/utils/inventory";
 import { toast } from "sonner";
+import { useBrands } from "@/hooks/useBrands";
+import { useGames } from "@/hooks/useGames";
 import {
   Form,
   FormControl,
@@ -28,6 +32,10 @@ const inventoryItemSchema = z.object({
   initialQuantity: z.coerce.number().min(0, { message: "Quantity must be a positive number" }),
   description: z.string().trim().optional().refine(val => !val || val.length > 0, "Invalid value"),
   image: z.string().trim().optional().refine(val => !val || val.length > 0, "Invalid value"),
+  brandId: z.string().optional(),
+  gameIds: z.array(z.string()).optional(),
+  size: z.string().trim().optional(),
+  color: z.string().trim().optional(),
 });
 
 type InventoryItemFormValues = z.infer<typeof inventoryItemSchema>;
@@ -43,6 +51,9 @@ const AddItemForm: React.FC<AddItemFormProps> = ({
   onOpenChange,
   onItemAdded 
 }) => {
+  const { brands, loading: brandsLoading } = useBrands();
+  const { games, loading: gamesLoading } = useGames();
+  
   const form = useForm<InventoryItemFormValues>({
     resolver: zodResolver(inventoryItemSchema),
     defaultValues: {
@@ -53,6 +64,10 @@ const AddItemForm: React.FC<AddItemFormProps> = ({
       initialQuantity: 0,
       description: "",
       image: "",
+      brandId: "",
+      gameIds: [],
+      size: "",
+      color: "",
     },
   });
   
@@ -68,7 +83,11 @@ const AddItemForm: React.FC<AddItemFormProps> = ({
         price: data.sellPrice,
         initialQuantity: data.initialQuantity,
         description: data.description || "",
-        image: data.image || ""
+        image: data.image || "",
+        brandId: data.brandId ? parseInt(data.brandId) : null,
+        gamesId: data.gameIds || [],
+        size: data.size || "",
+        color: data.color || ""
       };
       
       const result = await addInventoryItem(itemData);
@@ -183,6 +202,83 @@ const AddItemForm: React.FC<AddItemFormProps> = ({
                   </FormItem>
                 )}
               />
+              
+              <FormField
+                control={form.control}
+                name="brandId"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Brand (Optional)</FormLabel>
+                    <Select onValueChange={field.onChange} value={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select a brand" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {brands.map((brand) => (
+                          <SelectItem key={brand.id} value={brand.id.toString()}>
+                            {brand.brand_name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              
+              <FormField
+                control={form.control}
+                name="gameIds"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Games (Optional)</FormLabel>
+                    <FormControl>
+                      <MultiSelect
+                        options={games.map((game) => ({
+                          value: game.id,
+                          label: game.name,
+                        }))}
+                        defaultValue={field.value || []}
+                        onValueChange={field.onChange}
+                        placeholder="Select games"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              
+              <div className="grid grid-cols-2 gap-4">
+                <FormField
+                  control={form.control}
+                  name="size"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Size (Optional)</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Enter size (e.g., M, L, XL)" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                
+                <FormField
+                  control={form.control}
+                  name="color"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Color (Optional)</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Enter color" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
               
               <FormField
                 control={form.control}

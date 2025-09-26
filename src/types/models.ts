@@ -9,6 +9,10 @@ export interface InventoryItem {
   availableQuantity?: number;
   description?: string;
   image?: string;
+  brandId?: number;
+  gamesId?: string[];
+  size?: string;
+  color?: string;
 }
 
 export interface GroundInventory {
