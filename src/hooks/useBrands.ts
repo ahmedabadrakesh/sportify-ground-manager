@@ -11,23 +11,9 @@ export interface Brand {
 
 export function useBrands() {
   const [brands, setBrands] = useState<Brand[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    async function fetchBrands() {
-      setLoading(true);
-      try {
-        // For now, return empty array since brands table needs to be set up properly
-        setBrands([]);
-        setLoading(false);
-      } catch (error) {
-        console.error("Error fetching brands:", error);
-        setBrands([]);
-        setLoading(false);
-      }
-    }
-    fetchBrands();
-  }, []);
-
-  return { brands, loading };
+  // Temporarily returning empty brands array
+  // TODO: Enable when brands table is properly typed in Supabase schema
+  return { brands: [], loading: false };
 }

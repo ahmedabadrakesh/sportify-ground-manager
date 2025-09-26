@@ -101,6 +101,33 @@ export type Database = {
           },
         ]
       }
+      brands: {
+        Row: {
+          address: string | null
+          brand_name: string | null
+          city: string | null
+          created_at: string
+          id: number
+          logo: string | null
+        }
+        Insert: {
+          address?: string | null
+          brand_name?: string | null
+          city?: string | null
+          created_at?: string
+          id?: number
+          logo?: string | null
+        }
+        Update: {
+          address?: string | null
+          brand_name?: string | null
+          city?: string | null
+          created_at?: string
+          id?: number
+          logo?: string | null
+        }
+        Relationships: []
+      }
       direct_sales: {
         Row: {
           created_at: string | null
@@ -403,11 +430,14 @@ export type Database = {
       }
       inventory_items: {
         Row: {
+          brandId: number | null
           category: string
+          color: string | null
           created_at: string
           deleted_at: string | null
           description: string | null
           featured: boolean | null
+          gamesId: string[] | null
           id: string
           image: string | null
           name: string
@@ -415,14 +445,18 @@ export type Database = {
           purchase_price: number | null
           purchase_quantity: number | null
           quantity: number | null
+          size: string | null
           updated_at: string
         }
         Insert: {
+          brandId?: number | null
           category: string
+          color?: string | null
           created_at?: string
           deleted_at?: string | null
           description?: string | null
           featured?: boolean | null
+          gamesId?: string[] | null
           id?: string
           image?: string | null
           name: string
@@ -430,14 +464,18 @@ export type Database = {
           purchase_price?: number | null
           purchase_quantity?: number | null
           quantity?: number | null
+          size?: string | null
           updated_at?: string
         }
         Update: {
+          brandId?: number | null
           category?: string
+          color?: string | null
           created_at?: string
           deleted_at?: string | null
           description?: string | null
           featured?: boolean | null
+          gamesId?: string[] | null
           id?: string
           image?: string | null
           name?: string
@@ -445,9 +483,18 @@ export type Database = {
           purchase_price?: number | null
           purchase_quantity?: number | null
           quantity?: number | null
+          size?: string | null
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "inventory_items_brandId_fkey"
+            columns: ["brandId"]
+            isOneToOne: false
+            referencedRelation: "brands"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       order_items: {
         Row: {
