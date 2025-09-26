@@ -17,22 +17,14 @@ export function useBrands() {
     async function fetchBrands() {
       setLoading(true);
       try {
-        const { data, error } = await supabase
-          .from("brands" as any)
-          .select("*")
-          .order("brand_name", { ascending: true });
-        
-        if (error) {
-          console.error("Error fetching brands:", error);
-          setBrands([]);
-        } else {
-          setBrands(data || []);
-        }
+        // For now, return empty array since brands table needs to be set up properly
+        setBrands([]);
+        setLoading(false);
       } catch (error) {
         console.error("Error fetching brands:", error);
         setBrands([]);
+        setLoading(false);
       }
-      setLoading(false);
     }
     fetchBrands();
   }, []);
