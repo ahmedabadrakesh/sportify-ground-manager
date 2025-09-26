@@ -11,6 +11,7 @@ import { addToCart } from "@/utils/cart";
 import { Product } from "@/types/models";
 import { toast } from "sonner";
 import RelatedProducts from "@/components/shop/RelatedProducts";
+import { useBrands } from "@/hooks/useBrands";
 
 const ProductDetail: React.FC = () => {
   const { id, name } = useParams<{ id: string; name: string }>();
@@ -19,6 +20,7 @@ const ProductDetail: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [quantity, setQuantity] = useState(1);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
+  const { brands, loading: brandsLoading } = useBrands();
 
   useEffect(() => {
     const loadProduct = async () => {
@@ -150,6 +152,18 @@ const ProductDetail: React.FC = () => {
       }
     : undefined;
 
+  const getBrandName = () => {
+    let brandName = "";
+    brands.map((item) => {
+      {
+        if (item.brandId === product.brandId) {
+          brandName = `${item.brand_name} |`;
+        }
+      }
+    });
+    return brandName;
+  };
+
   return (
     <MainLayout>
       <SEOHead
@@ -236,8 +250,9 @@ const ProductDetail: React.FC = () => {
                 {product.featured && <Badge variant="default">Featured</Badge>}
               </div>
               <h1 className="text-3xl font-bold text-gray-900 mb-2">
-                {product.name}
+                {`${getBrandName()} ${product.name}`}
               </h1>
+
               <div className="flex items-center gap-2 mb-4">
                 <div className="flex items-center">
                   {[...Array(5)].map((_, i) => (
@@ -257,6 +272,22 @@ const ProductDetail: React.FC = () => {
 
             <div className="text-3xl font-bold text-primary">
               ₹{product.price}
+            </div>
+
+            <div className="space-y-4 items-left">
+              <div className="flex items-center gap-4">
+                <span className="flex flex-row border p-4 rounded-lg">
+                  <div className="text-sm font-semibold text-left">Color</div>
+                  <div
+                    className="w-12 h-7 ml-2"
+                    style={{ "background-color": `${product.color}` }}
+                  />
+                </span>
+                <span className="flex flex-row border p-4 rounded-lg">
+                  <div className="text-sm font-semibold text-left">Size</div>
+                  <div className="text-lg pl-4 -mt-1">{product.size}</div>
+                </span>
+              </div>
             </div>
 
             {product.description && (

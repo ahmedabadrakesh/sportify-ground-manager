@@ -430,7 +430,7 @@ export type Database = {
       }
       inventory_items: {
         Row: {
-          brandId: number | null
+          brandId?: string | null
           category: string
           color: string | null
           created_at: string
@@ -449,7 +449,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
-          brandId?: number | null
+          brandId?: string | null
           category: string
           color?: string | null
           created_at?: string
@@ -468,7 +468,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
-          brandId?: number | null
+          brandId?: string | null
           category?: string
           color?: string | null
           created_at?: string

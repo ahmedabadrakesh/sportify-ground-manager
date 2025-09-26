@@ -9,7 +9,7 @@ export interface InventoryItem {
   availableQuantity?: number;
   description?: string;
   image?: string;
-  brandId?: number;
+  brandId?: string;
   gamesId?: string[];
   size?: string;
   color?: string;
@@ -91,6 +91,10 @@ export interface Product {
   stock: number;
   images?: string[];
   featured?: boolean;
+  gamesId?: string[];
+  brandId: string;
+  color: string;
+  size: string;
 }
 
 export interface CartItem {

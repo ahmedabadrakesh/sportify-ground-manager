@@ -55,7 +55,11 @@ export const getAllInventoryItems = async (): Promise<InventoryItem[]> => {
         purchaseQuantity: item.purchase_quantity || 0,
         description: item.description || '',
         image: item.image || '',
-        availableQuantity: availableQuantity
+        availableQuantity: availableQuantity,
+        brandId: item.brandId || '',
+        gamesId: item.gamesId || [],
+        size: item.size || '',
+        color: item.color||'',
       });
     }
 
@@ -80,7 +84,11 @@ export const addInventoryItemToDB = async (item: Omit<InventoryItem, 'id'> & { i
         purchase_price: item.purchasePrice,
         purchase_quantity: item.initialQuantity || 0,
         description: item.description || null,
-        image: item.image || null
+        image: item.image || null,
+        brandId: item.brandId || null,
+        gamesId: item.gamesId || [],
+        size: item.size || "",
+        color: item.color || "",
       })
       .select()
       .single();
@@ -101,7 +109,12 @@ export const addInventoryItemToDB = async (item: Omit<InventoryItem, 'id'> & { i
       purchaseQuantity: data.purchase_quantity || 0,
       description: data.description || '',
       image: data.image || '',
-      availableQuantity: data.purchase_quantity || 0
+      availableQuantity: data.purchase_quantity || 0,
+      brandId: data.brandId || null,
+      gamesId: data.gamesId || [],
+      size: data.size || "",
+      color: data.color || ""
+      
     };
   } catch (error) {
     console.error('Unexpected error in addInventoryItemToDB:', error);
@@ -122,7 +135,11 @@ export const updateInventoryItemInDB = async (item: InventoryItem): Promise<Inve
         purchase_price: item.purchasePrice,
         purchase_quantity: item.purchaseQuantity,
         description: item.description || null,
-        image: item.image || null
+        image: item.image || null,
+        brandId: item.brandId || null,
+        gamesId: item.gamesId || [],
+        size: item.size || "",
+        color: item.color || "",
       })
       .eq('id', item.id)
       .select()
@@ -158,7 +175,11 @@ export const updateInventoryItemInDB = async (item: InventoryItem): Promise<Inve
       purchaseQuantity: data.purchase_quantity || 0,
       description: data.description || '',
       image: data.image || '',
-      availableQuantity: availableQuantity
+      availableQuantity: availableQuantity,
+      brandId: data.brandId || null,
+      gamesId: data.gamesId || [],
+      size: data.size || "",
+      color: data.color || ""
     };
   } catch (error) {
     console.error('Unexpected error in updateInventoryItemInDB:', error);

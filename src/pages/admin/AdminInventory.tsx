@@ -27,10 +27,10 @@ const AdminInventory: React.FC = () => {
   const [selectedItem, setSelectedItem] = useState<InventoryItem | null>(null);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [itemToDelete, setItemToDelete] = useState<string | null>(null);
-  
+
   const currentUser = getCurrentUserSync();
-  const isSuperAdmin = hasRoleSync('super_admin');
-  
+  const isSuperAdmin = hasRoleSync("super_admin");
+
   const fetchData = async () => {
     setLoading(true);
     try {
@@ -38,9 +38,9 @@ const AdminInventory: React.FC = () => {
       setInventoryItems(items);
 
       const { data: groundsData, error: groundsError } = await supabase
-        .from('grounds')
-        .select('*');
-      
+        .from("grounds")
+        .select("*");
+
       if (groundsError) {
         console.error("Error fetching grounds:", groundsError);
         toast.error("Failed to load grounds data");
@@ -61,33 +61,39 @@ const AdminInventory: React.FC = () => {
         facilities: g.facilities || [],
         images: g.images || [],
         rating: g.rating,
-        reviewCount: g.review_count
+        reviewCount: g.review_count,
       }));
-      
+
       setGrounds(fetchedGrounds);
-      
+
       let allGroundInventory: GroundInventory[] = [];
-      
+
       if (isSuperAdmin && fetchedGrounds.length > 0) {
-        const groundInventoryPromises = fetchedGrounds.slice(0, 5).map(ground => 
-          getGroundInventory(ground.id)
+        const groundInventoryPromises = fetchedGrounds
+          .slice(0, 5)
+          .map((ground) => getGroundInventory(ground.id));
+
+        const groundInventoryResults = await Promise.all(
+          groundInventoryPromises
         );
-        
-        const groundInventoryResults = await Promise.all(groundInventoryPromises);
         allGroundInventory = groundInventoryResults.flat();
       } else if (currentUser && fetchedGrounds.length > 0) {
-        const userGrounds = fetchedGrounds.filter(g => g.ownerId === currentUser.id);
-        
+        const userGrounds = fetchedGrounds.filter(
+          (g) => g.ownerId === currentUser.id
+        );
+
         if (userGrounds.length > 0) {
-          const groundInventoryPromises = userGrounds.slice(0, 5).map(ground => 
-            getGroundInventory(ground.id)
+          const groundInventoryPromises = userGrounds
+            .slice(0, 5)
+            .map((ground) => getGroundInventory(ground.id));
+
+          const groundInventoryResults = await Promise.all(
+            groundInventoryPromises
           );
-          
-          const groundInventoryResults = await Promise.all(groundInventoryPromises);
           allGroundInventory = groundInventoryResults.flat();
         }
       }
-      
+
       setGroundInventory(allGroundInventory);
     } catch (error) {
       console.error("Error fetching inventory data:", error);
@@ -96,7 +102,7 @@ const AdminInventory: React.FC = () => {
       setLoading(false);
     }
   };
-  
+
   useEffect(() => {
     fetchData();
   }, []);
@@ -106,7 +112,7 @@ const AdminInventory: React.FC = () => {
   };
 
   const handleEditItem = (itemId: string) => {
-    const item = inventoryItems.find(item => item.id === itemId);
+    const item = inventoryItems.find((item) => item.id === itemId);
     if (item) {
       setSelectedItem(item);
       setIsEditItemOpen(true);
@@ -120,21 +126,21 @@ const AdminInventory: React.FC = () => {
 
   const confirmDeleteItem = async () => {
     if (!itemToDelete) return;
-    
+
     try {
       const { error } = await supabase
-        .from('inventory_items')
+        .from("inventory_items")
         .delete()
-        .eq('id', itemToDelete);
-      
+        .eq("id", itemToDelete);
+
       if (error) {
         throw error;
       }
-      
-      setInventoryItems(prevItems => 
-        prevItems.filter(item => item.id !== itemToDelete)
+
+      setInventoryItems((prevItems) =>
+        prevItems.filter((item) => item.id !== itemToDelete)
       );
-      
+
       toast.success("Item deleted successfully");
     } catch (error) {
       console.error("Error deleting item:", error);
@@ -156,9 +162,7 @@ const AdminInventory: React.FC = () => {
     {
       accessorKey: "category",
       header: "Category",
-      cell: ({ row }) => (
-        <div>{row.getValue("category")}</div>
-      ),
+      cell: ({ row }) => <div>{row.getValue("category")}</div>,
     },
     {
       accessorKey: "price",
@@ -232,7 +236,7 @@ const AdminInventory: React.FC = () => {
               Ground Allocation
             </TabsTrigger>
           </TabsList>
-          
+
           <TabsContent value="items">
             <DataTable
               columns={inventoryColumns}
@@ -241,9 +245,9 @@ const AdminInventory: React.FC = () => {
               searchPlaceholder="Search inventory items..."
             />
           </TabsContent>
-          
+
           <TabsContent value="allocation">
-            <GroundAllocationTab 
+            <GroundAllocationTab
               groundInventory={groundInventory}
               grounds={grounds}
               isSuperAdmin={isSuperAdmin}
@@ -252,20 +256,20 @@ const AdminInventory: React.FC = () => {
           </TabsContent>
         </Tabs>
       )}
-      
-      <AddItemForm 
-        open={isAddItemOpen} 
+
+      <AddItemForm
+        open={isAddItemOpen}
         onOpenChange={setIsAddItemOpen}
         onItemAdded={handleItemAdded}
       />
-      
+
       <EditItemForm
         open={isEditItemOpen}
         onOpenChange={setIsEditItemOpen}
         onItemUpdated={fetchData}
         item={selectedItem}
       />
-      
+
       <DeleteItemDialog
         isOpen={isDeleteDialogOpen}
         onOpenChange={setIsDeleteDialogOpen}

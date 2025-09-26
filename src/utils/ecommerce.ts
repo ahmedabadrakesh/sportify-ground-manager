@@ -56,7 +56,12 @@ export const getProductById = async (productId: string): Promise<Product | undef
       category: data.category,
       stock: data.quantity || 0,
       featured: false,
-      images: data.image ? [data.image] : ["/placeholder.svg"]
+      images: data.image ? [data.image] : ["/placeholder.svg"],
+      brandId:data.brandId || '',
+      gamesId: data.gamesId || [],
+      color: data.color || "",
+      size: data.size || "",
+
     };
   } catch (error) {
     console.error("Error in getProductById:", error);
