@@ -23,3 +23,19 @@ export const findNameById = (gameData, idToFind) => {
     }
     return "Name not found";
   };
+
+
+
+  export const shuffleArrayUtils = (arr) => {
+  // Create a shallow copy to avoid modifying the original array
+  const shuffledArr = [...arr]; 
+
+  for (let i = shuffledArr.length - 1; i > 0; i--) {
+    // Generate a random index 'j' between 0 and 'i' (inclusive)
+    const j = Math.floor(Math.random() * (i + 1));
+
+    // Swap elements at index 'i' and 'j'
+    [shuffledArr[i], shuffledArr[j]] = [shuffledArr[j], shuffledArr[i]];
+  }
+  return shuffledArr;
+}
