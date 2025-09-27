@@ -12,6 +12,7 @@ import { Product } from "@/types/models";
 import { toast } from "sonner";
 import RelatedProducts from "@/components/shop/RelatedProducts";
 import { useBrands } from "@/hooks/useBrands";
+import { addTailwindClassesToUl } from "@/lib/utils";
 
 const ProductDetail: React.FC = () => {
   const { id, name } = useParams<{ id: string; name: string }>();
@@ -280,16 +281,21 @@ const ProductDetail: React.FC = () => {
                   <h3 className="text-lg font-semibold mb-2 text-left">
                     Item Specifications
                   </h3>
-                  <div className="flex flex-row gap-4 mb-3 flex-wrap justify-between">
+                  <div className="flex flex-row gap-4 mb-3 flex-wrap">
                     <span className="flex flex-row border p-2 rounded-lg min-w-24">
                       <div className="text-sm font-bold text-left items-center">
                         Color
                       </div>
-                      <div className="text-sm pl-2 text-right w-full">
-                        <div
-                          className="w-5 h-5 rounded-full ml-2 border border-blue-900"
-                          style={{ backgroundColor: product.color }}
-                        />
+                      <div className="text-sm pl-2 text-right w-full flex flex-row">
+                        {product.color.split(",").map((colorCode) => {
+                          return (
+                            <div
+                              key={colorCode}
+                              className="w-5 h-5 rounded-full ml-2 border border-blue-900"
+                              style={{ backgroundColor: colorCode }}
+                            />
+                          );
+                        })}
                       </div>
                     </span>
                     <span className="flex flex-row border p-2 rounded-lg min-w-24">
@@ -338,9 +344,10 @@ const ProductDetail: React.FC = () => {
                 </h3>
                 <span
                   className="text-gray-600 leading-relaxed text-left"
-                  dangerouslySetInnerHTML={{ __html: product.description }}
+                  dangerouslySetInnerHTML={{
+                    __html: addTailwindClassesToUl(product.description),
+                  }}
                 ></span>
-                {/* {product.description} */}
               </div>
             )}
 

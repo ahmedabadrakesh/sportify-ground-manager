@@ -39,3 +39,10 @@ export const findNameById = (gameData, idToFind) => {
   }
   return shuffledArr;
 }
+
+export function addTailwindClassesToUl(htmlString) {
+  // The regular expression /<ul/g matches all occurrences of "<ul"
+  // The 'g' flag ensures a global search and replacement.
+  const modifiedString = htmlString.replace(/<ul/g, '<ul style="list-style-type: disc; list-style-position: inside;"');
+  return modifiedString;
+}
