@@ -281,7 +281,7 @@ const ProductDetail: React.FC = () => {
                   <h3 className="text-lg font-semibold mb-2 text-left">
                     Item Specifications
                   </h3>
-                  <div className="flex flex-row gap-4 mb-3 flex-wrap">
+                  <div className="flex flex-col md:flex-row gap-4 mb-3 flex-wrap">
                     <span className="flex flex-row border p-2 rounded-lg min-w-24">
                       <div className="text-sm font-bold text-left items-center">
                         Color
