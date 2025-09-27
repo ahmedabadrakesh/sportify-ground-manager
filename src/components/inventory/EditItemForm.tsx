@@ -69,6 +69,9 @@ const inventoryItemSchema = z.object({
   gameIds: z.array(z.string()).optional(),
   size: z.string().trim().optional(),
   color: z.string().trim().optional(),
+  weight: z.coerce.number().min(0, { message: "Weight must be a positive number" }).optional(),
+  material: z.string().trim().optional(),
+  ageRange: z.string().trim().optional(),
 });
 
 type InventoryItemFormValues = z.infer<typeof inventoryItemSchema>;
@@ -103,6 +106,9 @@ const EditItemForm: React.FC<EditItemFormProps> = ({
       gameIds: [],
       size: "",
       color: "",
+      weight: 0,
+      material: "",
+      ageRange: "",
     },
   });
 
@@ -121,6 +127,9 @@ const EditItemForm: React.FC<EditItemFormProps> = ({
         gameIds: item.gamesId || [],
         size: item.size || "",
         color: item.color || "",
+        weight: item.weight || 0,
+        material: item.material || "",
+        ageRange: item.ageRange || "",
       });
     }
   }, [item, form]);
@@ -148,6 +157,9 @@ const EditItemForm: React.FC<EditItemFormProps> = ({
         gamesId: data.gameIds || [],
         size: data.size || "",
         color: data.color || "",
+        weight: data.weight || 0,
+        material: data.material || "",
+        ageRange: data.ageRange || "",
         availableQuantity: 0, // This will be calculated in the service
       };
       const result = await updateInventoryItem(itemData);
@@ -304,7 +316,7 @@ const EditItemForm: React.FC<EditItemFormProps> = ({
                 />
               </div>
 
-              {/* Size, Color, and Image Row */}
+              {/* Size, Color, Weight, Material and Image Row */}
               <div className="grid grid-cols-3 gap-4">
                 <FormField
                   control={form.control}
@@ -331,6 +343,51 @@ const EditItemForm: React.FC<EditItemFormProps> = ({
                       <FormLabel>Color (Optional)</FormLabel>
                       <FormControl>
                         <Input placeholder="Enter color" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="weight"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Weight (kg)</FormLabel>
+                      <FormControl>
+                        <Input type="number" min="0" step="0.01" placeholder="0.0" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              {/* Material, Age Range, and Image Row */}
+              <div className="grid grid-cols-3 gap-4">
+                <FormField
+                  control={form.control}
+                  name="material"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Material (Optional)</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Enter material" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="ageRange"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Age Range (Optional)</FormLabel>
+                      <FormControl>
+                        <Input placeholder="e.g., 5-12 years" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>

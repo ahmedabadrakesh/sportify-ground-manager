@@ -3,7 +3,7 @@ import { InventoryItem, GroundInventory } from "@/types/models";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
-// Update the type to include purchase_quantity
+// Update the type to include all fields from database
 type InventoryItemDB = {
   id: string;
   name: string;
@@ -13,6 +13,13 @@ type InventoryItemDB = {
   purchase_quantity?: number;
   description?: string | null;
   image?: string | null;
+  brandId?: string | null;
+  gamesId?: string[] | null;
+  size?: string | null;
+  color?: string | null;
+  weight?: number | null;
+  material?: string | null;
+  'age Range'?: string | null;
   created_at: string;
   updated_at: string;
 };
@@ -33,7 +40,7 @@ export const getAllInventoryItems = async (): Promise<InventoryItem[]> => {
     // Process items and calculate available quantity
     const items: InventoryItem[] = [];
     
-    for (const item of data) {
+    for (const item of data as any[]) {
       const { data: allocatedData, error: allocatedError } = await supabase
         .from('ground_inventory')
         .select('quantity')
@@ -59,7 +66,10 @@ export const getAllInventoryItems = async (): Promise<InventoryItem[]> => {
         brandId: item.brandId || '',
         gamesId: item.gamesId || [],
         size: item.size || '',
-        color: item.color||'',
+        color: item.color || '',
+        weight: item.weight ?? 0,
+        material: item.material ?? '',
+        ageRange: item['age Range'] ?? '',
       });
     }
 
@@ -89,6 +99,9 @@ export const addInventoryItemToDB = async (item: Omit<InventoryItem, 'id'> & { i
         gamesId: item.gamesId || [],
         size: item.size || "",
         color: item.color || "",
+        weight: item.weight ?? 0,
+        material: item.material ?? "",
+        "age Range": item.ageRange ?? "",
       })
       .select()
       .single();
@@ -99,22 +112,25 @@ export const addInventoryItemToDB = async (item: Omit<InventoryItem, 'id'> & { i
       return null;
     }
 
-    toast.success(`Added new inventory item: ${data.name}`);
+    const responseData = data as any;
+    toast.success(`Added new inventory item: ${responseData.name}`);
     return {
-      id: data.id,
-      name: data.name,
-      category: data.category,
-      price: data.price,
-      purchasePrice: data.purchase_price || 0,
-      purchaseQuantity: data.purchase_quantity || 0,
-      description: data.description || '',
-      image: data.image || '',
-      availableQuantity: data.purchase_quantity || 0,
-      brandId: data.brandId || null,
-      gamesId: data.gamesId || [],
-      size: data.size || "",
-      color: data.color || ""
-      
+      id: responseData.id,
+      name: responseData.name,
+      category: responseData.category,
+      price: responseData.price,
+      purchasePrice: responseData.purchase_price || 0,
+      purchaseQuantity: responseData.purchase_quantity || 0,
+      description: responseData.description || '',
+      image: responseData.image || '',
+      availableQuantity: responseData.purchase_quantity || 0,
+      brandId: responseData.brandId || null,
+      gamesId: responseData.gamesId || [],
+      size: responseData.size || "",
+      color: responseData.color || "",
+      weight: responseData.weight ?? 0,
+      material: responseData.material ?? "",
+      ageRange: responseData['age Range'] ?? "",
     };
   } catch (error) {
     console.error('Unexpected error in addInventoryItemToDB:', error);
@@ -140,6 +156,9 @@ export const updateInventoryItemInDB = async (item: InventoryItem): Promise<Inve
         gamesId: item.gamesId || [],
         size: item.size || "",
         color: item.color || "",
+        weight: item.weight ?? 0,
+        material: item.material ?? "",
+        "age Range": item.ageRange ?? "",
       })
       .eq('id', item.id)
       .select()
@@ -151,7 +170,8 @@ export const updateInventoryItemInDB = async (item: InventoryItem): Promise<Inve
       return null;
     }
 
-    toast.success(`Updated inventory item: ${data.name}`);
+    const responseData = data as any;
+    toast.success(`Updated inventory item: ${responseData.name}`);
     
     // Calculate available quantity
     const { data: allocatedData } = await supabase
@@ -159,27 +179,30 @@ export const updateInventoryItemInDB = async (item: InventoryItem): Promise<Inve
       .select('quantity')
       .eq('item_id', item.id);
       
-    let availableQuantity = data.purchase_quantity || 0;
+    let availableQuantity = responseData.purchase_quantity || 0;
     
     if (allocatedData) {
       const totalAllocated = allocatedData.reduce((sum, record) => sum + (record.quantity || 0), 0);
-      availableQuantity = Math.max((data.purchase_quantity || 0) - totalAllocated, 0);
+      availableQuantity = Math.max((responseData.purchase_quantity || 0) - totalAllocated, 0);
     }
 
     return {
-      id: data.id,
-      name: data.name,
-      category: data.category,
-      price: data.price,
-      purchasePrice: data.purchase_price || 0,
-      purchaseQuantity: data.purchase_quantity || 0,
-      description: data.description || '',
-      image: data.image || '',
+      id: responseData.id,
+      name: responseData.name,
+      category: responseData.category,
+      price: responseData.price,
+      purchasePrice: responseData.purchase_price || 0,
+      purchaseQuantity: responseData.purchase_quantity || 0,
+      description: responseData.description || '',
+      image: responseData.image || '',
       availableQuantity: availableQuantity,
-      brandId: data.brandId || null,
-      gamesId: data.gamesId || [],
-      size: data.size || "",
-      color: data.color || ""
+      brandId: responseData.brandId || null,
+      gamesId: responseData.gamesId || [],
+      size: responseData.size || "",
+      color: responseData.color || "",
+      weight: responseData.weight ?? 0,
+      material: responseData.material ?? "",
+      ageRange: responseData['age Range'] ?? "",
     };
   } catch (error) {
     console.error('Unexpected error in updateInventoryItemInDB:', error);

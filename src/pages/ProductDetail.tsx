@@ -280,14 +280,36 @@ const ProductDetail: React.FC = () => {
                   <div className="text-sm font-semibold text-left">Color</div>
                   <div
                     className="w-12 h-7 ml-2"
-                    style={{ "background-color": `${product.color}` }}
+                    style={{ backgroundColor: product.color }}
                   />
                 </span>
                 <span className="flex flex-row border p-4 rounded-lg">
                   <div className="text-sm font-semibold text-left">Size</div>
                   <div className="text-lg pl-4 -mt-1">{product.size}</div>
                 </span>
+                {product.weight && product.weight > 0 && (
+                  <span className="flex flex-row border p-4 rounded-lg">
+                    <div className="text-sm font-semibold text-left">Weight</div>
+                    <div className="text-lg pl-4 -mt-1">{product.weight} kg</div>
+                  </span>
+                )}
               </div>
+              {(product.material || product.ageRange) && (
+                <div className="flex items-center gap-4">
+                  {product.material && (
+                    <span className="flex flex-row border p-4 rounded-lg">
+                      <div className="text-sm font-semibold text-left">Material</div>
+                      <div className="text-lg pl-4 -mt-1">{product.material}</div>
+                    </span>
+                  )}
+                  {product.ageRange && (
+                    <span className="flex flex-row border p-4 rounded-lg">
+                      <div className="text-sm font-semibold text-left">Age Range</div>
+                      <div className="text-lg pl-4 -mt-1">{product.ageRange}</div>
+                    </span>
+                  )}
+                </div>
+              )}
             </div>
 
             {product.description && (

@@ -36,6 +36,9 @@ const inventoryItemSchema = z.object({
   gameIds: z.array(z.string()).optional(),
   size: z.string().trim().optional(),
   color: z.string().trim().optional(),
+  weight: z.coerce.number().min(0, { message: "Weight must be a positive number" }).optional(),
+  material: z.string().trim().optional(),
+  ageRange: z.string().trim().optional(),
 });
 
 type InventoryItemFormValues = z.infer<typeof inventoryItemSchema>;
@@ -68,6 +71,9 @@ const AddItemForm: React.FC<AddItemFormProps> = ({
       gameIds: [],
       size: "",
       color: "",
+      weight: 0,
+      material: "",
+      ageRange: "",
     },
   });
   
@@ -84,10 +90,13 @@ const AddItemForm: React.FC<AddItemFormProps> = ({
         initialQuantity: data.initialQuantity,
         description: data.description || "",
         image: data.image || "",
-        brandId: data.brandId ? parseInt(data.brandId) : null,
+        brandId: data.brandId || null,
         gamesId: data.gameIds || [],
         size: data.size || "",
-        color: data.color || ""
+        color: data.color || "",
+        weight: data.weight || 0,
+        material: data.material || "",
+        ageRange: data.ageRange || "",
       };
       
       const result = await addInventoryItem(itemData);
@@ -439,7 +448,7 @@ const AddItemForm: React.FC<AddItemFormProps> = ({
                 )}
               />
               
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-3 gap-4">
                 <FormField
                   control={form.control}
                   name="size"
@@ -467,21 +476,66 @@ const AddItemForm: React.FC<AddItemFormProps> = ({
                     </FormItem>
                   )}
                 />
+
+                <FormField
+                  control={form.control}
+                  name="weight"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Weight (kg)</FormLabel>
+                      <FormControl>
+                        <Input type="number" min="0" step="0.01" placeholder="0.0" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
               </div>
-              
-              <FormField
-                control={form.control}
-                name="image"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Image URL (Optional)</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Enter image URL" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+
+              {/* Material, Age Range, and Image */}
+              <div className="grid grid-cols-3 gap-4">
+                <FormField
+                  control={form.control}
+                  name="material"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Material (Optional)</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Enter material" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="ageRange"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Age Range (Optional)</FormLabel>
+                      <FormControl>
+                        <Input placeholder="e.g., 5-12 years" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="image"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Image URL (Optional)</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Enter image URL" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
             </form>
           </Form>
         </div>

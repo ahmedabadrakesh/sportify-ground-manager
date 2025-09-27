@@ -13,6 +13,9 @@ export interface InventoryItem {
   gamesId?: string[];
   size?: string;
   color?: string;
+  weight?: number;
+  material?: string;
+  ageRange?: string;
 }
 
 export interface GroundInventory {
@@ -92,9 +95,12 @@ export interface Product {
   images?: string[];
   featured?: boolean;
   gamesId?: string[];
-  brandId: string;
-  color: string;
-  size: string;
+  brandId?: string;
+  color?: string;
+  size?: string;
+  weight?: number;
+  material?: string;
+  ageRange?: string;
 }
 
 export interface CartItem {
