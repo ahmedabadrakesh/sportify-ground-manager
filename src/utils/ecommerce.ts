@@ -24,7 +24,13 @@ export const getAllProducts = async (): Promise<Product[]> => {
       category: item.category,
       stock: item.quantity || 0,
       featured: false, // inventory_items doesn't have featured field
-      images: item.image ? [item.image] : ["/placeholder.svg"]
+      images: item.image ? [item.image] : ["/placeholder.svg"],
+      brandId:item.brandId || '',
+      gamesId: item.gamesId || [],
+      color: item.color || "",
+      weight: item.weight || 0,
+      ageRange: item.ageRange || "",
+      material: item.material || ""
     }));
   } catch (error) {
     console.error("Error in getAllProducts:", error);
@@ -61,6 +67,9 @@ export const getProductById = async (productId: string): Promise<Product | undef
       gamesId: data.gamesId || [],
       color: data.color || "",
       size: data.size || "",
+      weight: data.weight || 0,
+      ageRange: data.ageRange || "",
+      material: data.material || ""
 
     };
   } catch (error) {

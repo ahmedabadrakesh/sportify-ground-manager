@@ -447,6 +447,9 @@ export type Database = {
           quantity: number | null
           size: string | null
           updated_at: string
+          weight?: number;
+          material?: string;
+          ageRange?: string;
         }
         Insert: {
           brandId?: string | null
@@ -466,6 +469,9 @@ export type Database = {
           quantity?: number | null
           size?: string | null
           updated_at?: string
+          weight?: number;
+          material?: string;
+          ageRange?: string;
         }
         Update: {
           brandId?: string | null
@@ -485,6 +491,9 @@ export type Database = {
           quantity?: number | null
           size?: string | null
           updated_at?: string
+          weight?: number;
+          material?: string;
+          ageRange?: string;
         }
         Relationships: [
           {

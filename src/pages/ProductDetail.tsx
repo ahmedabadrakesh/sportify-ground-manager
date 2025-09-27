@@ -274,42 +274,61 @@ const ProductDetail: React.FC = () => {
               ₹{product.price}
             </div>
 
-            <div className="space-y-4 items-left">
-              <div className="flex items-center gap-4">
-                <span className="flex flex-row border p-4 rounded-lg">
-                  <div className="text-sm font-semibold text-left">Color</div>
-                  <div
-                    className="w-12 h-7 ml-2"
-                    style={{ backgroundColor: product.color }}
-                  />
+            <div className="space-y-4 items-center">
+              <div className="flex gap-4 items-center">
+                <span className="flex flex-col border p-2 rounded-lg w-full">
+                  <h3 className="text-lg font-semibold mb-2 text-left">
+                    Item Specifications
+                  </h3>
+                  <div className="flex flex-row gap-4 mb-3 flex-wrap justify-between">
+                    <span className="flex flex-row border p-2 rounded-lg min-w-24">
+                      <div className="text-sm font-bold text-left items-center">
+                        Color
+                      </div>
+                      <div className="text-sm pl-2 text-right w-full">
+                        <div
+                          className="w-5 h-5 rounded-full ml-2 border border-blue-900"
+                          style={{ backgroundColor: product.color }}
+                        />
+                      </div>
+                    </span>
+                    <span className="flex flex-row border p-2 rounded-lg min-w-24">
+                      <div className="text-sm font-bold text-left">Size</div>
+                      <div className="text-sm pl-2 text-right w-full">
+                        {product.size}
+                      </div>
+                    </span>
+                    {product.weight && product.weight > 0 && (
+                      <span className="flex flex-row border p-2 rounded-lg">
+                        <div className="text-sm font-bold text-left ">
+                          Weight
+                        </div>
+                        <div className="text-sm pl-2 ">
+                          {product.weight} Grams
+                        </div>
+                      </span>
+                    )}
+                    {product.material && (
+                      <span className="flex flex-row border p-2 rounded-lg min-w-24">
+                        <div className="text-sm font-bold text-left">
+                          Material
+                        </div>
+                        <div className="text-sm pl-2 ">{product.material}</div>
+                      </span>
+                    )}
+                    {product.ageRange && (
+                      <span className="flex flex-row border p-2 rounded-lg min-w-24">
+                        <div className="text-sm font-bold text-left">
+                          Age Range
+                        </div>
+                        <div className="text-sm pl-2 text-right">
+                          {product.ageRange}
+                        </div>
+                      </span>
+                    )}
+                  </div>
                 </span>
-                <span className="flex flex-row border p-4 rounded-lg">
-                  <div className="text-sm font-semibold text-left">Size</div>
-                  <div className="text-lg pl-4 -mt-1">{product.size}</div>
-                </span>
-                {product.weight && product.weight > 0 && (
-                  <span className="flex flex-row border p-4 rounded-lg">
-                    <div className="text-sm font-semibold text-left">Weight</div>
-                    <div className="text-lg pl-4 -mt-1">{product.weight} kg</div>
-                  </span>
-                )}
               </div>
-              {(product.material || product.ageRange) && (
-                <div className="flex items-center gap-4">
-                  {product.material && (
-                    <span className="flex flex-row border p-4 rounded-lg">
-                      <div className="text-sm font-semibold text-left">Material</div>
-                      <div className="text-lg pl-4 -mt-1">{product.material}</div>
-                    </span>
-                  )}
-                  {product.ageRange && (
-                    <span className="flex flex-row border p-4 rounded-lg">
-                      <div className="text-sm font-semibold text-left">Age Range</div>
-                      <div className="text-lg pl-4 -mt-1">{product.ageRange}</div>
-                    </span>
-                  )}
-                </div>
-              )}
             </div>
 
             {product.description && (
