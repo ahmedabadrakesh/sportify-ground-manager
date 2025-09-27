@@ -186,6 +186,11 @@ const Shop: React.FC = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2">
               {filteredProducts.map((product) => (
                 <Card key={product.id} className="overflow-hidden">
+                  <div className="relative z-10">
+                    <span className=" absolute right-0 top-4 bg-blue-500 text-blue-800 text-xm font-medium me-2 px-2.5 py-0.5 rounded-sm text-white border">
+                      ₹{product.price}
+                    </span>
+                  </div>
                   <div
                     className="aspect-square relative bg-gray-100 cursor-pointer"
                     onClick={() =>
@@ -223,25 +228,10 @@ const Shop: React.FC = () => {
                         )
                       }
                     >
-                      {product.name}
+                      {`${product.name.substring(0, 30)}${
+                        product.name.length > 30 ? "..." : ""
+                      }`}
                     </h2>
-                    <p className="text-gray-500 text-sm mb-2 line-clamp-2">
-                      {product.description}
-                    </p>
-                    <div className="flex items-center justify-between">
-                      <span className="font-bold text-lg">
-                        ₹{product.price}
-                      </span>
-                      <span
-                        className={`text-sm ${
-                          product.stock > 0 ? "text-green-600" : "text-red-600"
-                        }`}
-                      >
-                        {product.stock > 0
-                          ? `In Stock (${product.stock})`
-                          : "Out of Stock"}
-                      </span>
-                    </div>
                   </CardContent>
 
                   <CardFooter className="p-4 pt-0 w-full">
