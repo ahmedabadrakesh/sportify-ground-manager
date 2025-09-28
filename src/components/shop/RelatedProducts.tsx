@@ -15,6 +15,7 @@ import {
   CarouselPrevious,
 } from "@/components/ui/carousel";
 import { motion } from "framer-motion";
+import ProductItemCard from "./productItemCard";
 
 const RelatedProducts = ({ currrentCatagory }) => {
   const navigate = useNavigate();
@@ -149,7 +150,7 @@ const RelatedProducts = ({ currrentCatagory }) => {
               {filteredProducts.map((product, index) => (
                 <CarouselItem
                   key={index}
-                  className="pl-2 md:pl-4 basis-1/2 sm:basis-1/6 md:basis-1/3 lg:basis-1/5"
+                  className="pl-2 md:pl-4 basis-1/2 sm:basis-1/6 md:basis-1/3 lg:basis-1/4"
                 >
                   <motion.div
                     className="cursor-pointer overflow-hidden rounded-2xl shadow-sm hover:shadow-md transition-all duration-300"
@@ -158,80 +159,7 @@ const RelatedProducts = ({ currrentCatagory }) => {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.5, delay: index * 0.1 }}
                   ></motion.div>
-                  <Card key={product.id} className="overflow-hidden">
-                    <div
-                      className="aspect-square relative bg-gray-100 cursor-pointer"
-                      onClick={() =>
-                        navigate(
-                          `/product/${
-                            product.name
-                              ? product.name.toLowerCase().replace(/\s+/g, "-")
-                              : "product"
-                          }/${product.id}`
-                        )
-                      }
-                    >
-                      <img
-                        src={product.images?.[0] || "/placeholder.svg"}
-                        alt={product.name}
-                        className="object-cover w-full h-full hover:scale-105 transition-transform duration-300"
-                      />
-                      {product.featured && (
-                        <div className="absolute top-2 right-2 bg-primary text-white text-xs font-bold px-2 py-1 rounded">
-                          Featured
-                        </div>
-                      )}
-                    </div>
-
-                    <CardContent className="p-4">
-                      <h2
-                        className="font-semibold text-lg mb-1 cursor-pointer hover:text-primary transition-colors"
-                        onClick={() =>
-                          navigate(
-                            `/product/${
-                              product.name
-                                ? product.name
-                                    .toLowerCase()
-                                    .replace(/\s+/g, "-")
-                                : "product"
-                            }/${product.id}`
-                          )
-                        }
-                      >
-                        {product.name}
-                      </h2>
-                      {/* <p className="text-gray-500 text-sm mb-2 line-clamp-2">
-                        {product.description}
-                      </p> */}
-                      <div className="flex items-center justify-between">
-                        <span className="font-bold text-lg">
-                          ₹{product.price}
-                        </span>
-                        <span
-                          className={`text-sm ${
-                            product.stock > 0
-                              ? "text-green-600"
-                              : "text-red-600"
-                          }`}
-                        >
-                          {product.stock > 0
-                            ? `In Stock (${product.stock})`
-                            : "Out of Stock"}
-                        </span>
-                      </div>
-                    </CardContent>
-
-                    <CardFooter className="p-4 pt-0 w-full justify-center">
-                      <Button
-                        className="flex p-4 mr-2  w-full"
-                        variant="secondary"
-                        onClick={() => handleAddToCart(product)}
-                        disabled={product.stock === 0}
-                      >
-                        <ShoppingCart className="mr-2" /> Add to Cart
-                      </Button>
-                    </CardFooter>
-                  </Card>
+                  <ProductItemCard productItem={product} />
                 </CarouselItem>
               ))}
             </CarouselContent>

@@ -16,6 +16,7 @@ import { getAllProducts, searchProducts } from "@/utils/ecommerce";
 import { Product } from "@/types/models";
 import { addToCart } from "@/utils/cart";
 import { toast } from "@/hooks/use-toast";
+import ProductItemCard from "@/components/shop/productItemCard";
 
 const Shop: React.FC = () => {
   const navigate = useNavigate();
@@ -185,84 +186,9 @@ const Shop: React.FC = () => {
             {/* Products Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2">
               {filteredProducts.map((product) => (
-                <Card key={product.id} className="overflow-hidden">
-                  <div className="relative z-10">
-                    <span className=" absolute right-0 top-4 bg-blue-500 text-blue-800 text-xm font-medium me-2 px-2.5 py-0.5 rounded-sm text-white border">
-                      ₹{product.price}
-                    </span>
-                  </div>
-                  <div
-                    className="aspect-square relative bg-gray-100 cursor-pointer"
-                    onClick={() =>
-                      navigate(
-                        `/product/${
-                          product.name
-                            ? product.name.toLowerCase().replace(/\s+/g, "-")
-                            : "product"
-                        }/${product.id}`
-                      )
-                    }
-                  >
-                    <img
-                      src={product.images?.[0] || "/placeholder.svg"}
-                      alt={product.name}
-                      className="object-cover w-full h-full hover:scale-105 transition-transform duration-300"
-                    />
-                    {product.featured && (
-                      <div className="absolute top-2 right-2 bg-primary text-white text-xs font-bold px-2 py-1 rounded">
-                        Featured
-                      </div>
-                    )}
-                  </div>
-
-                  <CardContent className="p-4">
-                    <h2
-                      className="font-semibold text-lg mb-1 cursor-pointer hover:text-primary transition-colors"
-                      onClick={() =>
-                        navigate(
-                          `/product/${
-                            product.name
-                              ? product.name.toLowerCase().replace(/\s+/g, "-")
-                              : "product"
-                          }/${product.id}`
-                        )
-                      }
-                    >
-                      {`${product.name.substring(0, 30)}${
-                        product.name.length > 30 ? "..." : ""
-                      }`}
-                    </h2>
-                  </CardContent>
-
-                  <CardFooter className="p-4 pt-0 w-full">
-                    <Button
-                      className="flex w-1/2 p-4 mr-2"
-                      variant="secondary"
-                      onClick={() => handleAddToCart(product)}
-                      disabled={product.stock === 0}
-                    >
-                      <ShoppingCart className="mr-2 h-4 w-4" /> Add to Cart
-                    </Button>
-                    <Button
-                      className="flex w-1/2 p-4 ml-2"
-                      variant="outline"
-                      onClick={() =>
-                        navigate(
-                          `/product/${
-                            product.name
-                              ? product.name.toLowerCase().replace(/\s+/g, "-")
-                              : "product"
-                          }/${product.id}`
-                        )
-                      }
-                    >
-                      View
-                    </Button>
-                  </CardFooter>
-                </Card>
+                <ProductItemCard productItem={product} />
               ))}
             </div>
-
             {filteredProducts.length === 0 && (
               <div className="text-center py-12">
                 <p className="text-gray-500 mb-4">
