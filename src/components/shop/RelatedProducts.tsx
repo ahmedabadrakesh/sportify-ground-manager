@@ -148,10 +148,7 @@ const RelatedProducts = ({ currrentCatagory }) => {
           >
             <CarouselContent className="-ml-2 md:-ml-4">
               {filteredProducts.map((product, index) => (
-                <CarouselItem
-                  key={index}
-                  className="pl-2 md:pl-4 basis-1/2 sm:basis-1/6 md:basis-1/3 lg:basis-1/4"
-                >
+                <CarouselItem key={index} className="pl-2 md:pl-4 md:basis-1/4">
                   <motion.div
                     className="cursor-pointer overflow-hidden rounded-2xl shadow-sm hover:shadow-md transition-all duration-300"
                     whileHover={{ scale: 1.03 }}
