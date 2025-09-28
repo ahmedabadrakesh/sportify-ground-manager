@@ -404,7 +404,7 @@ const ProfessionalProfile = () => {
             <div className="mb-8 flex justify-between items-center">
               <Link to="/sports-professionals">
                 <Button className="flex bg-secondary-900 items-center gap-2 hover:bg-secondary-600">
-                  <ArrowLeft className="h-4 w-4 variant="secondary"" />
+                  <ArrowLeft className="h-4 w-4" />
                   Back to Professionals
                 </Button>
               </Link>

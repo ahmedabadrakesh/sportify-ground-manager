@@ -1,74 +1,133 @@
-
-import { Product, CartItem } from "@/types/models";
-import { toast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { CartItem, Product } from "@/types/models";
 
-// Helper to get cart from localStorage
-export const getCart = (): CartItem[] => {
-  const cartItems = localStorage.getItem("cart");
-  return cartItems ? JSON.parse(cartItems) : [];
+// Get cart from database for authenticated users, localStorage for guest users
+const getCart = async (): Promise<CartItem[]> => {
+  try {
+    const { data: { user } } = await supabase.auth.getUser();
+    
+    if (user) {
+      // Authenticated user - get from database
+      const { data, error } = await supabase
+        .from('cart')
+        .select('*')
+        .eq('user_id', user.id);
+      
+      if (error) throw error;
+      
+      return data.map((item: any) => ({
+        id: item.id,
+        productId: item.product_id,
+        name: item.product_name,
+        price: item.unit_price,
+        quantity: item.quantity,
+        color: item.product_color,
+        image: undefined // Will be populated when needed
+      }));
+    } else {
+      // Guest user - get from localStorage
+      const cart = localStorage.getItem("cart");
+      return cart ? JSON.parse(cart) : [];
+    }
+  } catch (error) {
+    console.error("Error getting cart:", error);
+    // Fallback to localStorage
+    const cart = localStorage.getItem("cart");
+    return cart ? JSON.parse(cart) : [];
+  }
 };
 
-// Create or update pending cart in database
-export const createPendingCart = async (items: CartItem[]): Promise<string | null> => {
+// Sync cart to database for authenticated users
+const syncCartToDatabase = async (items: CartItem[]): Promise<void> => {
+  try {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+
+    // Clear existing cart items for this user
+    await supabase
+      .from('cart')
+      .delete()
+      .eq('user_id', user.id);
+
+    // Insert new cart items
+    if (items.length > 0) {
+      const cartItems = items.map(item => ({
+        user_id: user.id,
+        product_id: item.productId,
+        product_name: item.name,
+        quantity: item.quantity,
+        unit_price: item.price,
+        product_color: item.color
+      }));
+
+      const { error } = await supabase
+        .from('cart')
+        .insert(cartItems);
+
+      if (error) {
+        console.error("Error syncing cart to database:", error);
+      }
+    }
+  } catch (error) {
+    console.error("Error syncing cart:", error);
+  }
+};
+
+// Create or update pending cart in database (legacy orders functionality)
+const createPendingCart = async (items: CartItem[]): Promise<string | null> => {
   try {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return null;
 
-    const orderNumber = `PENDING-${Date.now()}`;
-    const totalAmount = items.reduce((total, item) => total + (item.price * item.quantity), 0);
-
-    // Check for existing pending order
-    const { data: existingOrder } = await supabase
+    // Check if there's already a pending order
+    const { data: existingOrder, error: orderError } = await supabase
       .from('orders')
       .select('id')
       .eq('user_id', user.id)
       .eq('order_status', 'pending')
       .maybeSingle();
 
-    let orderId: string;
+    if (orderError && orderError.code !== 'PGRST116') {
+      console.error("Error checking existing order:", orderError);
+      return null;
+    }
 
-    if (existingOrder) {
-      // Update existing pending order
-      const { data: order, error: orderError } = await supabase
-        .from('orders')
-        .update({
-          total_amount: totalAmount,
-          updated_at: new Date().toISOString()
-        })
-        .eq('id', existingOrder.id)
-        .select()
-        .single();
+    let orderId = existingOrder?.id;
 
-      if (orderError) throw orderError;
-      orderId = order.id;
-
-      // Delete existing order items
-      await supabase.from('order_items').delete().eq('order_id', orderId);
-    } else {
+    if (!orderId) {
       // Create new pending order
-      const { data: order, error: orderError } = await supabase
+      const orderNumber = `ORD-${Date.now()}`;
+      const { data: newOrder, error: createOrderError } = await supabase
         .from('orders')
         .insert({
           user_id: user.id,
           order_number: orderNumber,
-          customer_name: '',
-          customer_email: '',
+          customer_name: user.email || '',
+          customer_email: user.email || '',
           customer_phone: '',
           shipping_address: '',
-          payment_method: '',
-          payment_status: 'pending',
+          payment_method: 'pending',
+          total_amount: 0,
           order_status: 'pending',
-          total_amount: totalAmount
+          payment_status: 'pending'
         })
-        .select()
+        .select('id')
         .single();
 
-      if (orderError) throw orderError;
-      orderId = order.id;
+      if (createOrderError) {
+        console.error("Error creating pending order:", createOrderError);
+        return null;
+      }
+      orderId = newOrder.id;
     }
 
-    // Create order items
+    // Clear existing order items
+    await supabase
+      .from('order_items')
+      .delete()
+      .eq('order_id', orderId);
+
+    // Add current cart items to order
     const orderItems = items.map(item => ({
       order_id: orderId,
       product_id: item.productId,
@@ -78,11 +137,23 @@ export const createPendingCart = async (items: CartItem[]): Promise<string | nul
       total_price: item.price * item.quantity
     }));
 
-    const { error: itemsError } = await supabase
-      .from('order_items')
-      .insert(orderItems);
+    if (orderItems.length > 0) {
+      const { error: itemsError } = await supabase
+        .from('order_items')
+        .insert(orderItems);
 
-    if (itemsError) throw itemsError;
+      if (itemsError) {
+        console.error("Error inserting order items:", itemsError);
+        return null;
+      }
+    }
+
+    // Update order total
+    const totalAmount = items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+    await supabase
+      .from('orders')
+      .update({ total_amount: totalAmount })
+      .eq('id', orderId);
 
     return orderId;
   } catch (error) {
@@ -91,73 +162,150 @@ export const createPendingCart = async (items: CartItem[]): Promise<string | nul
   }
 };
 
-// Add to cart
+// Add product to cart
 export const addToCart = async (product: Product, quantity: number = 1): Promise<CartItem | null> => {
   try {
-    const cart = getCart();
+    const { data: { user } } = await supabase.auth.getUser();
     
-    // Check if product already in cart
-    const existingItem = cart.find(item => item.productId === product.id);
-    
-    let newCart: CartItem[];
-    if (existingItem) {
-      // Update quantity
-      newCart = cart.map(item => 
-        item.productId === product.id 
-          ? { ...item, quantity: item.quantity + quantity } 
-          : item
-      );
-    } else {
-      // Add new item
-      const newItem: CartItem = {
-        id: `cart-${Date.now()}-${product.id}`,
+    if (user) {
+      // Authenticated user - work with database
+      const { data: existingItem, error: fetchError } = await supabase
+        .from('cart')
+        .select('*')
+        .eq('user_id', user.id)
+        .eq('product_id', product.id)
+        .eq('product_color', product.color || '')
+        .maybeSingle();
+
+      if (fetchError && fetchError.code !== 'PGRST116') {
+        console.error("Error fetching cart item:", fetchError);
+        return null;
+      }
+
+      if (existingItem) {
+        // Update existing item
+        const { error: updateError } = await supabase
+          .from('cart')
+          .update({ quantity: existingItem.quantity + quantity })
+          .eq('id', existingItem.id);
+
+        if (updateError) {
+          console.error("Error updating cart item:", updateError);
+          return null;
+        }
+      } else {
+        // Add new item
+        const { error: insertError } = await supabase
+          .from('cart')
+          .insert({
+            user_id: user.id,
+            product_id: product.id,
+            product_name: product.name,
+            quantity: quantity,
+            unit_price: product.price,
+            product_color: product.color
+          });
+
+        if (insertError) {
+          console.error("Error inserting cart item:", insertError);
+          return null;
+        }
+      }
+
+      window.dispatchEvent(new Event("cartUpdated"));
+      return {
+        id: existingItem?.id || `cart-${Date.now()}-${product.id}`,
         productId: product.id,
         name: product.name,
         price: product.price,
-        quantity,
-        image: product.images?.[0] || undefined
+        quantity: quantity,
+        image: product.images?.[0],
+        color: product.color
       };
+    } else {
+      // Guest user - use localStorage
+      const cart = await getCart();
+      const existingItem = cart.find(item => item.productId === product.id && item.color === product.color);
+
+      if (existingItem) {
+        existingItem.quantity += quantity;
+      } else {
+        const newItem: CartItem = {
+          id: `cart-${Date.now()}-${product.id}`,
+          productId: product.id,
+          name: product.name,
+          price: product.price,
+          quantity: quantity,
+          image: product.images?.[0],
+          color: product.color
+        };
+        cart.push(newItem);
+      }
+
+      localStorage.setItem("cart", JSON.stringify(cart));
+      window.dispatchEvent(new Event("cartUpdated"));
       
-      newCart = [...cart, newItem];
+      return existingItem || cart[cart.length - 1];
     }
-    
-    localStorage.setItem("cart", JSON.stringify(newCart));
-    
-    // Create/update pending cart in database
-    await createPendingCart(newCart);
-    
-    window.dispatchEvent(new Event("cartUpdated"));
-    return existingItem || newCart[newCart.length - 1];
   } catch (error) {
     console.error("Error adding to cart:", error);
-    toast({ title: "Error", description: "Failed to add item to cart", variant: "destructive" });
     return null;
   }
-};
-
-// Get cart items
-export const getCartItems = (): CartItem[] => {
-  return getCart();
 };
 
 // Update cart item quantity
 export const updateCartItemQuantity = async (productId: string, quantity: number): Promise<boolean> => {
   try {
-    const cart = getCart();
-    const itemIndex = cart.findIndex(item => item.productId === productId);
+    const { data: { user } } = await supabase.auth.getUser();
     
-    if (itemIndex === -1) return false;
-    
-    cart[itemIndex].quantity = quantity;
-    localStorage.setItem("cart", JSON.stringify(cart));
-    
-    // Update pending cart in database
-    await createPendingCart(cart);
-    
-    window.dispatchEvent(new Event("cartUpdated"));
-    return true;
+    if (user) {
+      // Authenticated user - update in database
+      if (quantity <= 0) {
+        const { error } = await supabase
+          .from('cart')
+          .delete()
+          .eq('user_id', user.id)
+          .eq('product_id', productId);
+
+        if (error) {
+          console.error("Error deleting cart item:", error);
+          return false;
+        }
+      } else {
+        const { error } = await supabase
+          .from('cart')
+          .update({ quantity })
+          .eq('user_id', user.id)
+          .eq('product_id', productId);
+
+        if (error) {
+          console.error("Error updating cart item:", error);
+          return false;
+        }
+      }
+
+      window.dispatchEvent(new Event("cartUpdated"));
+      return true;
+    } else {
+      // Guest user - update localStorage
+      const cart = await getCart();
+      const itemIndex = cart.findIndex(item => item.productId === productId);
+      
+      if (itemIndex !== -1) {
+        if (quantity <= 0) {
+          cart.splice(itemIndex, 1);
+        } else {
+          cart[itemIndex].quantity = quantity;
+        }
+        
+        localStorage.setItem("cart", JSON.stringify(cart));
+        window.dispatchEvent(new Event("cartUpdated"));
+        return true;
+      }
+      return false;
+    }
   } catch (error) {
-    console.error("Error updating cart item:", error);
+    console.error("Error updating cart item quantity:", error);
     return false;
   }
 };
@@ -165,70 +313,107 @@ export const updateCartItemQuantity = async (productId: string, quantity: number
 // Remove item from cart
 export const removeFromCart = async (productId: string): Promise<boolean> => {
   try {
-    const cart = getCart();
-    const newCart = cart.filter(item => item.productId !== productId);
+    const { data: { user } } = await supabase.auth.getUser();
     
-    localStorage.setItem("cart", JSON.stringify(newCart));
-    
-    // Update pending cart in database
-    if (newCart.length > 0) {
-      await createPendingCart(newCart);
+    if (user) {
+      // Authenticated user - delete from database
+      const { error } = await supabase
+        .from('cart')
+        .delete()
+        .eq('user_id', user.id)
+        .eq('product_id', productId);
+
+      if (error) {
+        console.error("Error removing cart item:", error);
+        return false;
+      }
+
+      window.dispatchEvent(new Event("cartUpdated"));
+      return true;
     } else {
-      // Clear pending cart if no items left
-      await clearPendingCart();
+      // Guest user - update localStorage
+      const cart = await getCart();
+      const filteredCart = cart.filter(item => item.productId !== productId);
+      
+      localStorage.setItem("cart", JSON.stringify(filteredCart));
+      window.dispatchEvent(new Event("cartUpdated"));
+      return true;
     }
-    
-    window.dispatchEvent(new Event("cartUpdated"));
-    return true;
   } catch (error) {
     console.error("Error removing from cart:", error);
     return false;
   }
 };
 
-// Clear pending cart from database
-export const clearPendingCart = async (): Promise<void> => {
-  try {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return;
-
-    await supabase
-      .from('orders')
-      .delete()
-      .eq('user_id', user.id)
-      .eq('order_status', 'pending');
-  } catch (error) {
-    console.error("Error clearing pending cart:", error);
-  }
+// Get cart items (async version)
+export const getCartItems = async (): Promise<CartItem[]> => {
+  return await getCart();
 };
 
 // Clear cart
 export const clearCart = async (): Promise<void> => {
-  localStorage.setItem("cart", JSON.stringify([]));
-  await clearPendingCart();
-  window.dispatchEvent(new Event("cartUpdated"));
+  try {
+    const { data: { user } } = await supabase.auth.getUser();
+    
+    if (user) {
+      // Authenticated user - clear database cart
+      await supabase
+        .from('cart')
+        .delete()
+        .eq('user_id', user.id);
+
+      // Also clear pending order for authenticated users
+      const { data: order } = await supabase
+        .from('orders')
+        .select('id')
+        .eq('user_id', user.id)
+        .eq('order_status', 'pending')
+        .maybeSingle();
+
+      if (order) {
+        // Delete order items first
+        await supabase
+          .from('order_items')
+          .delete()
+          .eq('order_id', order.id);
+
+        // Delete the order
+        await supabase
+          .from('orders')
+          .delete()
+          .eq('id', order.id);
+      }
+    } else {
+      // Guest user - clear localStorage
+      localStorage.removeItem("cart");
+    }
+    
+    window.dispatchEvent(new Event("cartUpdated"));
+  } catch (error) {
+    console.error("Error clearing cart:", error);
+  }
 };
 
-// Calculate cart total
-export const getCartTotal = (): number => {
-  const cart = getCart();
+// Get cart total
+export const getCartTotal = async (): Promise<number> => {
+  const cart = await getCart();
   return cart.reduce((total, item) => total + (item.price * item.quantity), 0);
 };
 
 // Get cart count
-export const getCartCount = (): number => {
-  const cart = getCart();
+export const getCartCount = async (): Promise<number> => {
+  const cart = await getCart();
   return cart.reduce((count, item) => count + item.quantity, 0);
 };
 
-// Get cart items count (alias for getCartCount for backward compatibility)
-export const getCartItemsCount = (): number => {
-  return getCartCount();
+// Get cart items count (alias)
+export const getCartItemsCount = async (): Promise<number> => {
+  return await getCartCount();
 };
 
 // Check if product is in cart
-export const isInCart = (productId: string): boolean => {
-  const cart = getCart();
+export const isInCart = async (productId: string): Promise<boolean> => {
+  const cart = await getCart();
   return cart.some(item => item.productId === productId);
 };
 
@@ -344,3 +529,6 @@ export const processCheckout = async (checkoutData: {
     };
   }
 };
+
+// Legacy function for backward compatibility
+export { getCart };

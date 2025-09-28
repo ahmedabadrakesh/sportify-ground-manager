@@ -21,7 +21,8 @@ const Cart: React.FC = () => {
     const loadCart = async () => {
       try {
         setLoading(true);
-        const cartItems = getCart();
+        const { getCartItems } = await import("@/utils/cart");
+        const cartItems = await getCartItems();
         setCart(cartItems);
 
         // Load product details for each cart item
@@ -46,6 +47,17 @@ const Cart: React.FC = () => {
     };
 
     loadCart();
+    
+    // Listen for cart updates
+    const handleCartUpdate = () => {
+      loadCart();
+    };
+    
+    window.addEventListener("cartUpdated", handleCartUpdate);
+    
+    return () => {
+      window.removeEventListener("cartUpdated", handleCartUpdate);
+    };
   }, []);
 
   // Get product details for cart items
@@ -67,8 +79,10 @@ const Cart: React.FC = () => {
     0
   );
 
-  const handleCartUpdate = () => {
-    setCart(getCart());
+  const handleCartUpdate = async () => {
+    const { getCartItems } = await import("@/utils/cart");
+    const cartItems = await getCartItems();
+    setCart(cartItems);
   };
 
   if (loading) {

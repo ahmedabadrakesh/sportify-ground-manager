@@ -72,6 +72,7 @@ const Checkout: React.FC = () => {
   const [products, setProducts] = useState<Record<string, Product>>({});
   const [loading, setLoading] = useState(true);
   const [processingOrder, setProcessingOrder] = useState(false);
+  const [totalAmount, setTotalAmount] = useState(0);
   const [showAuthDialog, setShowAuthDialog] = useState(false);
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [userPrefillData, setUserPrefillData] = useState<{
@@ -177,7 +178,8 @@ const Checkout: React.FC = () => {
 
     const loadCartData = async () => {
       try {
-        const cartItems = getCart();
+        const { getCartItems, getCartTotal } = await import("@/utils/cart");
+        const cartItems = await getCartItems();
         if (cartItems.length === 0) {
           toast({
             title: "Error",
@@ -230,7 +232,11 @@ const Checkout: React.FC = () => {
     })
     .filter((item) => item.product);
 
-  const totalAmount = getCartTotal();
+  // Calculate total amount when cart items change
+  useEffect(() => {
+    const total = cartItems.reduce((sum, item) => sum + item.subtotal, 0);
+    setTotalAmount(total);
+  }, [cartItems]);
 
   const handlePaymentSuccess = async (
     paymentData: any,

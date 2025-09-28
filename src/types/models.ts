@@ -110,6 +110,7 @@ export interface CartItem {
   price: number;
   quantity: number;
   image?: string;
+  color?: string;
 }
 
 export interface Event {

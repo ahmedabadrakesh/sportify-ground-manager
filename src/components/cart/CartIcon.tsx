@@ -11,11 +11,17 @@ const CartIcon: React.FC<CartIconProps> = ({ className = "h-5 w-5" }) => {
 
   useEffect(() => {
     // Update cart count on mount
-    setCartCount(getCartCount());
+    const updateCartCount = async () => {
+      const count = await getCartCount();
+      setCartCount(count);
+    };
+    
+    updateCartCount();
 
     // Listen for cart updates
-    const handleCartUpdate = () => {
-      setCartCount(getCartCount());
+    const handleCartUpdate = async () => {
+      const count = await getCartCount();
+      setCartCount(count);
     };
 
     // Add event listener for cart updates

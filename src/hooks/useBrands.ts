@@ -3,11 +3,12 @@ import { supabase } from "@/integrations/supabase/client";
 
 export interface Brand {
   [x: string]: any;
-  id: number;
+  brandId: string;
   brand_name: string;
   logo?: string;
   address?: string;
   city?: string;
+  created_at: string;
 }
 
 export function useBrands() {

@@ -105,26 +105,62 @@ export type Database = {
         Row: {
           address: string | null
           brand_name: string | null
+          brandId: string
           city: string | null
           created_at: string
-          id: number
           logo: string | null
         }
         Insert: {
           address?: string | null
           brand_name?: string | null
+          brandId?: string
           city?: string | null
           created_at?: string
-          id?: number
           logo?: string | null
         }
         Update: {
           address?: string | null
           brand_name?: string | null
+          brandId?: string
           city?: string | null
           created_at?: string
-          id?: number
           logo?: string | null
+        }
+        Relationships: []
+      }
+      cart: {
+        Row: {
+          created_at: string
+          id: string
+          product_color: string | null
+          product_id: string
+          product_name: string
+          quantity: number
+          unit_price: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          product_color?: string | null
+          product_id: string
+          product_name: string
+          quantity?: number
+          unit_price: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          product_color?: string | null
+          product_id?: string
+          product_name?: string
+          quantity?: number
+          unit_price?: number
+          updated_at?: string
+          user_id?: string
         }
         Relationships: []
       }
@@ -430,7 +466,8 @@ export type Database = {
       }
       inventory_items: {
         Row: {
-          brandId?: string | null
+          ageRange: string | null
+          brandId: string | null
           category: string
           color: string | null
           created_at: string
@@ -440,6 +477,7 @@ export type Database = {
           gamesId: string[] | null
           id: string
           image: string | null
+          material: string | null
           name: string
           price: number
           purchase_price: number | null
@@ -447,11 +485,10 @@ export type Database = {
           quantity: number | null
           size: string | null
           updated_at: string
-          weight?: number;
-          material?: string;
-          ageRange?: string;
+          weight: number | null
         }
         Insert: {
+          ageRange?: string | null
           brandId?: string | null
           category: string
           color?: string | null
@@ -462,6 +499,7 @@ export type Database = {
           gamesId?: string[] | null
           id?: string
           image?: string | null
+          material?: string | null
           name: string
           price: number
           purchase_price?: number | null
@@ -469,11 +507,10 @@ export type Database = {
           quantity?: number | null
           size?: string | null
           updated_at?: string
-          weight?: number;
-          material?: string;
-          ageRange?: string;
+          weight?: number | null
         }
         Update: {
+          ageRange?: string | null
           brandId?: string | null
           category?: string
           color?: string | null
@@ -484,6 +521,7 @@ export type Database = {
           gamesId?: string[] | null
           id?: string
           image?: string | null
+          material?: string | null
           name?: string
           price?: number
           purchase_price?: number | null
@@ -491,9 +529,7 @@ export type Database = {
           quantity?: number | null
           size?: string | null
           updated_at?: string
-          weight?: number;
-          material?: string;
-          ageRange?: string;
+          weight?: number | null
         }
         Relationships: [
           {
@@ -501,7 +537,7 @@ export type Database = {
             columns: ["brandId"]
             isOneToOne: false
             referencedRelation: "brands"
-            referencedColumns: ["id"]
+            referencedColumns: ["brandId"]
           },
         ]
       }

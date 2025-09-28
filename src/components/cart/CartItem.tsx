@@ -52,6 +52,9 @@ const CartItem: React.FC<CartItemProps> = ({
           }`}
         </h3>
         <p className="text-sm text-gray-500">{product.category}</p>
+        {product.color && (
+          <p className="text-sm text-gray-600">Color: {product.color}</p>
+        )}
         <p className="font-semibold">₹{product.price}</p>
       </div>
 
