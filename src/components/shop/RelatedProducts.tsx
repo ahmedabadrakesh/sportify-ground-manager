@@ -15,7 +15,7 @@ import {
   CarouselPrevious,
 } from "@/components/ui/carousel";
 import { motion } from "framer-motion";
-import ProductItemCard from "./productItemCard";
+import ProductItemCard from "./ProductItemCard";
 
 const RelatedProducts = ({ currrentCatagory }) => {
   const navigate = useNavigate();

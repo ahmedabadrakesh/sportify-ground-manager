@@ -16,7 +16,7 @@ import { getAllProducts, searchProducts } from "@/utils/ecommerce";
 import { Product } from "@/types/models";
 import { addToCart } from "@/utils/cart";
 import { toast } from "@/hooks/use-toast";
-import ProductItemCard from "@/components/shop/productItemCard";
+import ProductItemCard from "@/components/shop/ProductItemCard";
 
 const Shop: React.FC = () => {
   const navigate = useNavigate();
