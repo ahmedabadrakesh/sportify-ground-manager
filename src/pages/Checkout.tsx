@@ -36,6 +36,7 @@ import {
   createRazorpayOrder,
   initiateRazorpayPayment,
 } from "@/services/razorpay";
+import { supabase } from "@/integrations/supabase/client";
 
 const checkoutFormSchema = z.object({
   name: z
@@ -73,11 +74,51 @@ const Checkout: React.FC = () => {
   const [processingOrder, setProcessingOrder] = useState(false);
   const [showAuthDialog, setShowAuthDialog] = useState(false);
   const [currentUser, setCurrentUser] = useState<User | null>(null);
+  const [userPrefillData, setUserPrefillData] = useState<{
+    name: string;
+    email: string;
+    phone: string;
+    address: string;
+  }>({ name: "", email: "", phone: "", address: "" });
+
+  // Function to get user's latest order data for prefilling
+  const getUserPrefillData = async (user: User) => {
+    try {
+      // Get user's most recent order to prefill shipping info
+      const { data: latestOrder } = await supabase
+        .from('orders')
+        .select('customer_name, customer_email, customer_phone, shipping_address')
+        .eq('user_id', user.authId || user.id)
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+      return {
+        name: latestOrder?.customer_name || user.name || "",
+        email: latestOrder?.customer_email || user.email || "",
+        phone: latestOrder?.customer_phone || "",
+        address: latestOrder?.shipping_address || "",
+      };
+    } catch (error) {
+      console.error("Error fetching user prefill data:", error);
+      return {
+        name: user.name || "",
+        email: user.email || "",
+        phone: "",
+        address: "",
+      };
+    }
+  };
 
   useEffect(() => {
-    const checkUser = () => {
+    const checkUser = async () => {
       const user = getCurrentUserSync();
       setCurrentUser(user);
+      
+      if (user) {
+        const prefillData = await getUserPrefillData(user);
+        setUserPrefillData(prefillData);
+      }
     };
 
     checkUser();
@@ -96,13 +137,26 @@ const Checkout: React.FC = () => {
   const form = useForm<CheckoutFormValues>({
     resolver: zodResolver(checkoutFormSchema),
     defaultValues: {
-      name: currentUser?.name || "",
-      email: currentUser?.email || "",
+      name: "",
+      email: "",
       phone: "",
       address: "",
       paymentMethod: "card",
     },
   });
+
+  // Update form when user prefill data is loaded
+  useEffect(() => {
+    if (userPrefillData.name || userPrefillData.email || userPrefillData.phone || userPrefillData.address) {
+      form.reset({
+        name: userPrefillData.name,
+        email: userPrefillData.email,
+        phone: userPrefillData.phone,
+        address: userPrefillData.address,
+        paymentMethod: "card",
+      });
+    }
+  }, [userPrefillData, form]);
 
   useEffect(() => {
     // Check authentication first
