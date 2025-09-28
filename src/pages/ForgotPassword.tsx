@@ -4,7 +4,13 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { toast } from "sonner";
 import { Loader2, Mail, ArrowLeft } from "lucide-react";
 import MainLayout from "@/components/layouts/MainLayout";
@@ -17,7 +23,7 @@ const ForgotPassword = () => {
 
   const handleForgotPassword = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!email) {
       toast.error("Please enter your email address");
       return;
@@ -27,7 +33,7 @@ const ForgotPassword = () => {
 
     try {
       const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${window.location.origin}/reset-password`
+        redirectTo: `${window.location.origin}/reset-password`,
       });
 
       if (error) {
@@ -47,7 +53,7 @@ const ForgotPassword = () => {
 
   return (
     <>
-      <SEOHead 
+      <SEOHead
         title="Forgot Password - Reset Your Account Password"
         description="Reset your password to regain access to your sports booking account. Enter your email to receive password reset instructions."
       />
@@ -59,10 +65,9 @@ const ForgotPassword = () => {
                 {isSubmitted ? "Check Your Email" : "Forgot Password"}
               </CardTitle>
               <CardDescription className="text-center">
-                {isSubmitted 
+                {isSubmitted
                   ? "We've sent you a password reset link via email."
-                  : "Enter your email address and we'll send you a link to reset your password."
-                }
+                  : "Enter your email address and we'll send you a link to reset your password."}
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -80,18 +85,18 @@ const ForgotPassword = () => {
                     </p>
                   </div>
                   <div className="flex flex-col gap-2 w-full">
-                    <Button 
+                    <Button
                       onClick={() => {
                         setIsSubmitted(false);
                         setEmail("");
                       }}
-                      variant="outline" 
+                      variant="outline"
                       className="w-full"
                     >
                       Try Different Email
                     </Button>
                     <Link to="/login">
-                      <Button className="w-full">
+                      <Button className="w-full" variant="secondary">
                         <ArrowLeft className="mr-2 h-4 w-4" />
                         Back to Login
                       </Button>
@@ -113,9 +118,13 @@ const ForgotPassword = () => {
                       autoComplete="email"
                     />
                   </div>
-                  
+
                   <div className="flex flex-col gap-2">
-                    <Button type="submit" disabled={isLoading} className="w-full">
+                    <Button
+                      type="submit"
+                      disabled={isLoading}
+                      className="w-full"
+                    >
                       {isLoading ? (
                         <>
                           <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -125,9 +134,13 @@ const ForgotPassword = () => {
                         "Send Reset Link"
                       )}
                     </Button>
-                    
+
                     <Link to="/login">
-                      <Button type="button" variant="outline" className="w-full">
+                      <Button
+                        type="button"
+                        variant="secondary"
+                        className="w-full"
+                      >
                         <ArrowLeft className="mr-2 h-4 w-4" />
                         Back to Login
                       </Button>

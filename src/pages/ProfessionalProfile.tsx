@@ -196,7 +196,7 @@ const ProfessionalProfile = () => {
           <div className="text-center">
             <h1 className="text-2xl font-bold mb-4">Professional not found</h1>
             <Link to="/sports-professionals">
-              <Button className="bg-secondary-900">
+              <Button className="bg-secondary-900" variant="secondary">
                 Back to Professionals
               </Button>
             </Link>
@@ -404,7 +404,7 @@ const ProfessionalProfile = () => {
             <div className="mb-8 flex justify-between items-center">
               <Link to="/sports-professionals">
                 <Button className="flex bg-secondary-900 items-center gap-2 hover:bg-secondary-600">
-                  <ArrowLeft className="h-4 w-4" />
+                  <ArrowLeft className="h-4 w-4 variant="secondary"" />
                   Back to Professionals
                 </Button>
               </Link>

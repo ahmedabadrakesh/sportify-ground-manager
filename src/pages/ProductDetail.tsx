@@ -105,8 +105,8 @@ const ProductDetail: React.FC = () => {
       <MainLayout>
         <div className="max-w-7xl mx-auto px-4 py-8 text-center">
           <h1 className="text-2xl font-bold mb-4">Product Not Found</h1>
-          <Button onClick={() => navigate("/shop")}>
-            <ArrowLeft className="mr-2 h-4 w-4 " /> Back to Shop
+          <Button onClick={() => navigate("/shop")} variant="secondary">
+            <ArrowLeft className="mr-2 h-4 w-4" /> Back to Shop
           </Button>
         </div>
       </MainLayout>
@@ -201,7 +201,7 @@ const ProductDetail: React.FC = () => {
       <div className="max-w-7xl mx-auto px-4 py-8 text-left">
         {/* Back Button */}
         <Button
-          variant="ghost"
+          variant="secondary"
           onClick={() => navigate("/shop")}
           className="mb-6"
         >

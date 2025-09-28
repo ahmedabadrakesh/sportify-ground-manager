@@ -62,9 +62,9 @@ const Login: React.FC = () => {
         }
 
         // Redirect based on user role
-        const redirectUrl = localStorage.getItem('redirectAfterLogin');
+        const redirectUrl = localStorage.getItem("redirectAfterLogin");
         if (redirectUrl) {
-          localStorage.removeItem('redirectAfterLogin');
+          localStorage.removeItem("redirectAfterLogin");
           navigate(redirectUrl);
         } else if (user.role === "admin" || user.role === "super_admin") {
           navigate("/admin");
@@ -81,28 +81,38 @@ const Login: React.FC = () => {
       }
     } catch (error: any) {
       console.error("Login error:", error);
-      
+
       // Handle different types of login errors
       let errorMessage = "Authentication error. Please try again.";
-      
+
       if (error.message) {
-        if (error.message.includes("Invalid login credentials") || 
-            error.message.includes("invalid credentials") ||
-            error.message.includes("wrong password")) {
-          errorMessage = "Invalid credentials. Please check your email and password.";
+        if (
+          error.message.includes("Invalid login credentials") ||
+          error.message.includes("invalid credentials") ||
+          error.message.includes("wrong password")
+        ) {
+          errorMessage =
+            "Invalid credentials. Please check your email and password.";
         } else if (error.message.includes("Email not confirmed")) {
-          errorMessage = "Please check your email and confirm your account before logging in.";
-        } else if (error.message.includes("rate limit") || 
-                   error.message.includes("too many requests")) {
-          errorMessage = "Too many login attempts. Please wait before trying again.";
-        } else if (error.message.includes("user not found") ||
-                   error.message.includes("account not found")) {
-          errorMessage = "Account not found. Please check your email or register a new account.";
+          errorMessage =
+            "Please check your email and confirm your account before logging in.";
+        } else if (
+          error.message.includes("rate limit") ||
+          error.message.includes("too many requests")
+        ) {
+          errorMessage =
+            "Too many login attempts. Please wait before trying again.";
+        } else if (
+          error.message.includes("user not found") ||
+          error.message.includes("account not found")
+        ) {
+          errorMessage =
+            "Account not found. Please check your email or register a new account.";
         } else {
           errorMessage = error.message;
         }
       }
-      
+
       setLoginError(errorMessage);
       toast.error(errorMessage);
     } finally {
@@ -162,25 +172,25 @@ const Login: React.FC = () => {
               existingUser.role === "admin" ||
               existingUser.role === "super_admin"
             ) {
-              const redirectUrl = localStorage.getItem('redirectAfterLogin');
+              const redirectUrl = localStorage.getItem("redirectAfterLogin");
               if (redirectUrl) {
-                localStorage.removeItem('redirectAfterLogin');
+                localStorage.removeItem("redirectAfterLogin");
                 navigate(redirectUrl);
               } else {
                 navigate("/admin");
               }
             } else if (existingUser.role === "ground_owner") {
-              const redirectUrl = localStorage.getItem('redirectAfterLogin');
+              const redirectUrl = localStorage.getItem("redirectAfterLogin");
               if (redirectUrl) {
-                localStorage.removeItem('redirectAfterLogin');
+                localStorage.removeItem("redirectAfterLogin");
                 navigate(redirectUrl);
               } else {
                 navigate("/admin/grounds");
               }
             } else {
-              const redirectUrl = localStorage.getItem('redirectAfterLogin');
+              const redirectUrl = localStorage.getItem("redirectAfterLogin");
               if (redirectUrl) {
-                localStorage.removeItem('redirectAfterLogin');
+                localStorage.removeItem("redirectAfterLogin");
                 navigate(redirectUrl);
               } else {
                 navigate("/");
@@ -446,7 +456,7 @@ const Login: React.FC = () => {
                     </p>
 
                     <Button
-                      variant="ghost"
+                      variant="secondary"
                       className="text-sm"
                       onClick={() => navigate("/")}
                     >
@@ -475,9 +485,9 @@ const Login: React.FC = () => {
             }}
             onSkip={() => {
               setShowWelcomeDialog(false);
-              const redirectUrl = localStorage.getItem('redirectAfterLogin');
+              const redirectUrl = localStorage.getItem("redirectAfterLogin");
               if (redirectUrl) {
-                localStorage.removeItem('redirectAfterLogin');
+                localStorage.removeItem("redirectAfterLogin");
                 navigate(redirectUrl);
               } else {
                 navigate("/");
@@ -494,9 +504,10 @@ const Login: React.FC = () => {
               onOpenChange={(open) => {
                 setIsRegisterDialogOpen(open);
                 if (!open) {
-                  const redirectUrl = localStorage.getItem('redirectAfterLogin');
+                  const redirectUrl =
+                    localStorage.getItem("redirectAfterLogin");
                   if (redirectUrl) {
-                    localStorage.removeItem('redirectAfterLogin');
+                    localStorage.removeItem("redirectAfterLogin");
                     navigate(redirectUrl);
                   } else {
                     navigate("/");

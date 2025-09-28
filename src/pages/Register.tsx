@@ -97,15 +97,21 @@ const Register: React.FC = () => {
 
       // Handle different types of Supabase auth errors
       let errorMessage = "Registration failed. Please try again.";
-      
+
       if (error.message) {
-        if (error.message.includes("User already registered") || 
-            error.message.includes("already registered") ||
-            error.message.includes("email address not available")) {
-          errorMessage = "This email is already registered. Please try logging in.";
-        } else if (error.message.includes("rate limit") || 
-                   error.message.includes("too many requests")) {
-          errorMessage = "Too many registration attempts. Please wait before trying again.";
+        if (
+          error.message.includes("User already registered") ||
+          error.message.includes("already registered") ||
+          error.message.includes("email address not available")
+        ) {
+          errorMessage =
+            "This email is already registered. Please try logging in.";
+        } else if (
+          error.message.includes("rate limit") ||
+          error.message.includes("too many requests")
+        ) {
+          errorMessage =
+            "Too many registration attempts. Please wait before trying again.";
         } else if (error.message.includes("Invalid email")) {
           errorMessage = "Please enter a valid email address.";
         } else if (error.message.includes("Password")) {
@@ -114,7 +120,7 @@ const Register: React.FC = () => {
           errorMessage = error.message;
         }
       }
-      
+
       toast.error(errorMessage);
     } finally {
       setIsLoading(false);
@@ -167,9 +173,9 @@ const Register: React.FC = () => {
             toast.success(
               `Welcome back, ${existingUser.name}! Redirecting to home...`
             );
-            const redirectUrl = localStorage.getItem('redirectAfterLogin');
+            const redirectUrl = localStorage.getItem("redirectAfterLogin");
             if (redirectUrl) {
-              localStorage.removeItem('redirectAfterLogin');
+              localStorage.removeItem("redirectAfterLogin");
               navigate(redirectUrl);
             } else {
               navigate("/");
@@ -253,9 +259,9 @@ const Register: React.FC = () => {
         setShowWelcomeDialog(true);
       } else {
         toast.success(`Welcome to SportifyGround, ${newUser.name}!`);
-        const redirectUrl = localStorage.getItem('redirectAfterLogin');
+        const redirectUrl = localStorage.getItem("redirectAfterLogin");
         if (redirectUrl) {
-          localStorage.removeItem('redirectAfterLogin');
+          localStorage.removeItem("redirectAfterLogin");
           navigate(redirectUrl);
         } else {
           navigate("/");
@@ -466,7 +472,7 @@ const Register: React.FC = () => {
                     </p>
 
                     <Button
-                      variant="ghost"
+                      variant="secondary"
                       className="text-sm"
                       onClick={() => navigate("/")}
                     >
@@ -495,9 +501,9 @@ const Register: React.FC = () => {
             }}
             onSkip={() => {
               setShowWelcomeDialog(false);
-              const redirectUrl = localStorage.getItem('redirectAfterLogin');
+              const redirectUrl = localStorage.getItem("redirectAfterLogin");
               if (redirectUrl) {
-                localStorage.removeItem('redirectAfterLogin');
+                localStorage.removeItem("redirectAfterLogin");
                 navigate(redirectUrl);
               } else {
                 navigate("/");
@@ -513,9 +519,10 @@ const Register: React.FC = () => {
               onOpenChange={(open) => {
                 setIsRegisterDialogOpen(open);
                 if (!open) {
-                  const redirectUrl = localStorage.getItem('redirectAfterLogin');
+                  const redirectUrl =
+                    localStorage.getItem("redirectAfterLogin");
                   if (redirectUrl) {
-                    localStorage.removeItem('redirectAfterLogin');
+                    localStorage.removeItem("redirectAfterLogin");
                     navigate(redirectUrl);
                   } else {
                     navigate("/");

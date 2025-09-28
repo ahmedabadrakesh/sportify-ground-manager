@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Button } from "@/components/ui/button";
 import { Minus, Plus, X } from "lucide-react";
@@ -13,7 +12,12 @@ interface CartItemProps {
   onUpdate: () => void;
 }
 
-const CartItem: React.FC<CartItemProps> = ({ productId, quantity, product, onUpdate }) => {
+const CartItem: React.FC<CartItemProps> = ({
+  productId,
+  quantity,
+  product,
+  onUpdate,
+}) => {
   const subtotal = product.price * quantity;
 
   const handleQuantityChange = (newQuantity: number) => {
@@ -34,35 +38,39 @@ const CartItem: React.FC<CartItemProps> = ({ productId, quantity, product, onUpd
   return (
     <div className="flex items-center py-4 border-b last:border-0">
       <div className="h-20 w-20 bg-gray-100 rounded-md overflow-hidden mr-4">
-        <img 
-          src={product.images[0]} 
-          alt={product.name} 
+        <img
+          src={product.images[0]}
+          alt={product.name}
           className="h-full w-full object-cover"
         />
       </div>
-      
+
       <div className="flex-1">
-        <h3 className="font-medium">{product.name}</h3>
+        <h3 className="font-medium">
+          {`${product.name.substring(0, 30)}${
+            product.name.length > 30 ? "..." : ""
+          }`}
+        </h3>
         <p className="text-sm text-gray-500">{product.category}</p>
         <p className="font-semibold">₹{product.price}</p>
       </div>
-      
+
       <div className="flex items-center mr-4">
-        <Button 
-          variant="outline" 
-          size="icon" 
+        <Button
+          variant="outline"
+          size="icon"
           className="h-8 w-8 rounded-full"
           onClick={() => handleQuantityChange(quantity - 1)}
           disabled={quantity <= 1}
         >
           <Minus className="h-3 w-3" />
         </Button>
-        
+
         <span className="mx-2 w-8 text-center">{quantity}</span>
-        
-        <Button 
-          variant="outline" 
-          size="icon" 
+
+        <Button
+          variant="outline"
+          size="icon"
           className="h-8 w-8 rounded-full"
           onClick={() => handleQuantityChange(quantity + 1)}
           disabled={quantity >= product.stock}
@@ -70,13 +78,13 @@ const CartItem: React.FC<CartItemProps> = ({ productId, quantity, product, onUpd
           <Plus className="h-3 w-3" />
         </Button>
       </div>
-      
+
       <div className="text-right w-24 mr-2">
         <p className="font-semibold">₹{subtotal}</p>
       </div>
-      
-      <Button 
-        variant="ghost" 
+
+      <Button
+        variant="ghost"
         size="icon"
         className="text-gray-500"
         onClick={handleRemove}

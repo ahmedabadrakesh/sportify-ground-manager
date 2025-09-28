@@ -86,10 +86,12 @@ const Checkout: React.FC = () => {
     try {
       // Get user's most recent order to prefill shipping info
       const { data: latestOrder } = await supabase
-        .from('orders')
-        .select('customer_name, customer_email, customer_phone, shipping_address')
-        .eq('user_id', user.authId || user.id)
-        .order('created_at', { ascending: false })
+        .from("orders")
+        .select(
+          "customer_name, customer_email, customer_phone, shipping_address"
+        )
+        .eq("user_id", user.authId || user.id)
+        .order("created_at", { ascending: false })
         .limit(1)
         .maybeSingle();
 
@@ -114,7 +116,7 @@ const Checkout: React.FC = () => {
     const checkUser = async () => {
       const user = getCurrentUserSync();
       setCurrentUser(user);
-      
+
       if (user) {
         const prefillData = await getUserPrefillData(user);
         setUserPrefillData(prefillData);
@@ -147,7 +149,12 @@ const Checkout: React.FC = () => {
 
   // Update form when user prefill data is loaded
   useEffect(() => {
-    if (userPrefillData.name || userPrefillData.email || userPrefillData.phone || userPrefillData.address) {
+    if (
+      userPrefillData.name ||
+      userPrefillData.email ||
+      userPrefillData.phone ||
+      userPrefillData.address
+    ) {
       form.reset({
         name: userPrefillData.name,
         email: userPrefillData.email,
@@ -396,20 +403,21 @@ const Checkout: React.FC = () => {
 
   return (
     <MainLayout>
-      <div className="mb-8">
-        <Button
-          variant="ghost"
-          onClick={() => navigate("/cart")}
-          className="mb-4"
-        >
-          <ArrowLeft className="mr-2 h-4 w-4" /> Back to Cart
-        </Button>
-
+      <div className="container mb-8">
+        <div className="pt-8 pb-8 text-left">
+          <Button
+            variant="secondary"
+            onClick={() => navigate("/cart")}
+            className="mb-4"
+          >
+            <ArrowLeft className="mr-2 h-4 w-4" /> Back to Cart
+          </Button>
+        </div>
         <h1 className="text-3xl font-bold mb-6 flex items-center">
           <ShoppingBag className="mr-2 h-6 w-6" /> Checkout
         </h1>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 text-left">
           <div className="lg:col-span-2">
             <Card>
               <CardContent className="p-6">
@@ -589,7 +597,9 @@ const Checkout: React.FC = () => {
                     >
                       <div className="flex items-center">
                         <div className="font-medium">
-                          {item.product?.name}
+                          {`${item.name.substring(0, 30)}${
+                            item.name.length > 30 ? "..." : ""
+                          }`}
                           <span className="text-gray-500 ml-1">
                             × {item.quantity}
                           </span>
