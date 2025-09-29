@@ -21,6 +21,7 @@ const ProductDetail: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [quantity, setQuantity] = useState(1);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
+  const [selectedColor, setSelectedColor] = useState<string>("");
   const { brands, loading: brandsLoading } = useBrands();
 
   useEffect(() => {
@@ -34,6 +35,11 @@ const ProductDetail: React.FC = () => {
         const productData = await getProductById(id);
         if (productData) {
           setProduct(productData);
+          // Set first color as default selected color
+          if (productData.color) {
+            const colors = productData.color.split(",");
+            setSelectedColor(colors[0]);
+          }
         } else {
           toast.error("Product not found");
           navigate("/shop");
@@ -50,7 +56,7 @@ const ProductDetail: React.FC = () => {
     loadProduct();
   }, [id, navigate]);
 
-  const handleAddToCart = () => {
+  const handleAddToCart = async () => {
     if (!product) return;
 
     if (product.stock === 0) {
@@ -63,7 +69,15 @@ const ProductDetail: React.FC = () => {
       return;
     }
 
-    const cartItem = addToCart(product, quantity);
+    if (!selectedColor) {
+      toast.error("Please select a color");
+      return;
+    }
+
+    // Create product with selected color
+    const productWithColor = { ...product, color: selectedColor };
+    
+    const cartItem = await addToCart(productWithColor, quantity);
     if (cartItem) {
       toast.success(`Added ${quantity} ${product.name}(s) to cart`);
     } else {
@@ -289,10 +303,16 @@ const ProductDetail: React.FC = () => {
                       <div className="text-sm pl-2 text-right w-full flex flex-row">
                         {product.color.split(",").map((colorCode) => {
                           return (
-                            <div
+                            <button
                               key={colorCode}
-                              className="w-5 h-5 rounded-full ml-2 border border-blue-900"
+                              onClick={() => setSelectedColor(colorCode)}
+                              className={`w-5 h-5 rounded-full ml-2 border-2 hover:scale-110 transition-transform ${
+                                selectedColor === colorCode 
+                                  ? "border-primary border-3 ring-2 ring-primary/30" 
+                                  : "border-gray-400 hover:border-gray-600"
+                              }`}
                               style={{ backgroundColor: colorCode }}
+                              title={`Select ${colorCode} color`}
                             />
                           );
                         })}

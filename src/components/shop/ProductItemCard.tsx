@@ -83,7 +83,7 @@ const ProductItemCard = ({ productItem }) => {
         <Button
           className="flex w-1/2 p-4 mr-2"
           variant="secondary"
-          onClick={() => handleAddToCart(product)}
+          onClick={() => handleAddToCart(productItem)}
           disabled={productItem.stock === 0}
         >
           <ShoppingCart className="mr-2 h-4 w-4" /> Add to Cart
