@@ -9,6 +9,7 @@ interface CartItemProps {
   productId: string;
   quantity: number;
   product: Product;
+  selectedColor?: string;
   onUpdate: () => void;
 }
 
@@ -16,6 +17,7 @@ const CartItem: React.FC<CartItemProps> = ({
   productId,
   quantity,
   product,
+  selectedColor,
   onUpdate,
 }) => {
   const subtotal = product.price * quantity;
@@ -52,8 +54,8 @@ const CartItem: React.FC<CartItemProps> = ({
           }`}
         </h3>
         <p className="text-sm text-gray-500">{product.category}</p>
-        {product.color && (
-          <p className="text-sm text-gray-600">Color: {product.color}</p>
+        {selectedColor && (
+          <p className="text-sm text-gray-600">Color: {selectedColor}</p>
         )}
         <p className="font-semibold">₹{product.price}</p>
       </div>

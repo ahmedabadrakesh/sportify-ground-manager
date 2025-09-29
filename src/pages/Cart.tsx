@@ -122,15 +122,16 @@ const Cart: React.FC = () => {
                   <div className="space-y-4">
                     {cartItems.map(
                       (item) =>
-                        item && (
-                          <CartItem
-                            key={item.productId}
-                            productId={item.productId}
-                            quantity={item.quantity}
-                            product={item.product}
-                            onUpdate={handleCartUpdate}
-                          />
-                        )
+                         item && (
+                           <CartItem
+                             key={item.productId}
+                             productId={item.productId}
+                             quantity={item.quantity}
+                             product={item.product}
+                             selectedColor={item.color}
+                             onUpdate={handleCartUpdate}
+                           />
+                         )
                     )}
                   </div>
                 </CardContent>
