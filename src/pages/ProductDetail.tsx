@@ -74,14 +74,23 @@ const ProductDetail: React.FC = () => {
       return;
     }
 
+    console.log("🎯 Product Detail - Adding to cart:", {
+      productId: product.id,
+      productName: product.name,
+      selectedColor,
+      quantity
+    });
+
     // Create product with selected color
     const productWithColor = { ...product, color: selectedColor };
     
     const cartItem = await addToCart(productWithColor, quantity);
+    console.log("📦 Product Detail - Cart operation result:", cartItem);
+    
     if (cartItem) {
       toast.success(`Added ${quantity} ${product.name}(s) to cart`);
     } else {
-      toast.error("Failed to add item to cart");
+      toast.error("Failed to add item to cart. Please login to continue.");
     }
   };
 

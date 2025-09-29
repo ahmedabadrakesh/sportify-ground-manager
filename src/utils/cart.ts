@@ -165,9 +165,14 @@ const createPendingCart = async (items: CartItem[]): Promise<string | null> => {
 // Add product to cart
 export const addToCart = async (product: Product, quantity: number = 1): Promise<CartItem | null> => {
   try {
-    const { data: { user } } = await supabase.auth.getUser();
+    console.log("🛒 addToCart - Starting with product:", product.name, "quantity:", quantity, "color:", product.color);
+    
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    console.log("🔐 Auth check - User:", user?.id, "Auth error:", authError);
     
     if (user) {
+      console.log("✅ User authenticated, using database cart");
+      
       // Authenticated user - work with database
       const { data: existingItem, error: fetchError } = await supabase
         .from('cart')
@@ -177,12 +182,15 @@ export const addToCart = async (product: Product, quantity: number = 1): Promise
         .eq('product_color', product.color || '')
         .maybeSingle();
 
+      console.log("🔍 Fetch existing cart item result:", { existingItem, fetchError });
+
       if (fetchError && fetchError.code !== 'PGRST116') {
-        console.error("Error fetching cart item:", fetchError);
+        console.error("❌ Error fetching cart item:", fetchError);
         return null;
       }
 
       if (existingItem) {
+        console.log("📝 Updating existing cart item:", existingItem.id);
         // Update existing item
         const { error: updateError } = await supabase
           .from('cart')
@@ -190,12 +198,14 @@ export const addToCart = async (product: Product, quantity: number = 1): Promise
           .eq('id', existingItem.id);
 
         if (updateError) {
-          console.error("Error updating cart item:", updateError);
+          console.error("❌ Error updating cart item:", updateError);
           return null;
         }
+        console.log("✅ Cart item updated successfully");
       } else {
+        console.log("➕ Adding new cart item to database");
         // Add new item
-        const { error: insertError } = await supabase
+        const { data: insertData, error: insertError } = await supabase
           .from('cart')
           .insert({
             user_id: user.id,
@@ -203,13 +213,18 @@ export const addToCart = async (product: Product, quantity: number = 1): Promise
             product_name: product.name,
             quantity: quantity,
             unit_price: product.price,
-            product_color: product.color
-          });
+            product_color: product.color || null
+          })
+          .select()
+          .single();
+
+        console.log("💾 Insert result:", { insertData, insertError });
 
         if (insertError) {
-          console.error("Error inserting cart item:", insertError);
+          console.error("❌ Error inserting cart item:", insertError);
           return null;
         }
+        console.log("✅ Cart item inserted successfully:", insertData);
       }
 
       window.dispatchEvent(new Event("cartUpdated"));
