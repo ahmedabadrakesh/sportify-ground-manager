@@ -20,6 +20,7 @@ export function useGames() {
       if (error) {
         setGames([]);
       } else {
+        data.sort((a: any, b: any) => b.popular_game - a.popular_game);
         setGames(data || []);
       }
       setLoading(false);

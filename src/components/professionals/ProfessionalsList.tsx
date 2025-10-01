@@ -5,6 +5,7 @@ import ProfessionalCard from "./ProfessionalCard";
 import AuthRequiredDialog from "@/components/auth/AuthRequiredDialog";
 import ProfessionalsFilters from "./ProfessionalsFilters";
 import { useGames } from "@/hooks/useGames";
+import VerticalFiltersSection from "./VerticalFiltersSection";
 
 interface FilterOptions {
   city?: string;
@@ -219,14 +220,24 @@ const ProfessionalsList = ({ sportFilter }: ProfessionalsListProps) => {
           availableCities={availableCities}
         />
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {professionals?.map((professional) => (
-            <ProfessionalCard
-              key={professional.id}
-              professional={professional}
-              onLoginClick={handleLoginClick}
+        <div className="grid grid-cols-8 gap-6">
+          <div className="col-span-2">
+            <VerticalFiltersSection
+              filters={filters}
+              onFiltersChange={setFilters}
+              availableCities={availableCities}
             />
-          ))}
+          </div>
+
+          <div className="grid col-span-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {professionals?.map((professional) => (
+              <ProfessionalCard
+                key={professional.id}
+                professional={professional}
+                onLoginClick={handleLoginClick}
+              />
+            ))}
+          </div>
         </div>
       </div>
 
