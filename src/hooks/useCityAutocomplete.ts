@@ -13,8 +13,10 @@ interface UseCityAutocompleteReturn {
   searchCities: (query: string) => void;
 }
 
-// Using OpenStreetMap Nominatim API (free, no API key required)
-const NOMINATIM_API_BASE = 'https://nominatim.openstreetmap.org/search';
+// Using GeoNames Search API (free with registration, demo for development)
+// Register at https://www.geonames.org/login for production use
+const GEONAMES_API_BASE = 'http://api.geonames.org/searchJSON';
+const GEONAMES_USERNAME = 'demo'; // Replace with registered username for production
 
 export const useCityAutocomplete = (): UseCityAutocompleteReturn => {
   const [cities, setCities] = useState<City[]>([]);
@@ -49,21 +51,17 @@ export const useCityAutocomplete = (): UseCityAutocompleteReturn => {
       setError(null);
 
       try {
-        // Search for Indian cities using general query (q parameter)
-        // This allows partial matching unlike the city parameter
+        // Search for Indian cities using GeoNames API
+        // name_startsWith enables autocomplete functionality
+        // featureClass=P filters for populated places (cities, towns)
         const response = await fetch(
-          `${NOMINATIM_API_BASE}?` +
-          `q=${encodeURIComponent(query)}&` +
-          `countrycodes=in&` +
-          `format=json&` +
-          `addressdetails=1&` +
-          `limit=20`,
-          {
-            method: 'GET',
-            headers: {
-              'User-Agent': 'JokovaApp/1.0'
-            }
-          }
+          `${GEONAMES_API_BASE}?` +
+          `name_startsWith=${encodeURIComponent(query)}&` +
+          `country=IN&` +
+          `featureClass=P&` +
+          `maxRows=15&` +
+          `username=${GEONAMES_USERNAME}&` +
+          `style=SHORT`
         );
 
         if (!response.ok) {
@@ -72,36 +70,19 @@ export const useCityAutocomplete = (): UseCityAutocompleteReturn => {
 
         const data = await response.json();
         
-        if (data && data.length > 0) {
-          // Filter and format city results
-          const formattedCities = data
-            .map((place: any, index: number) => {
-              // Extract city name from various possible fields
-              const cityName = place.address?.city || 
-                              place.address?.town || 
-                              place.address?.village ||
-                              place.address?.municipality ||
-                              place.name ||
-                              place.display_name.split(',')[0].trim();
-              
-              return {
-                id: parseInt(place.place_id) || index,
-                name: cityName,
-                country: place.address?.country || 'India',
-                state: place.address?.state || ''
-              };
-            })
+        if (data.geonames && data.geonames.length > 0) {
+          // Format city results
+          const formattedCities = data.geonames
+            .map((place: any) => ({
+              id: place.geonameId,
+              name: place.name,
+              country: 'India',
+              state: place.adminName1 || ''
+            }))
             // Remove duplicates by city name
             .filter((city: any, index: number, self: any[]) => 
               index === self.findIndex((c) => c.name.toLowerCase() === city.name.toLowerCase())
             )
-            // Sort by relevance (shorter names first, then alphabetically)
-            .sort((a, b) => {
-              if (a.name.length !== b.name.length) {
-                return a.name.length - b.name.length;
-              }
-              return a.name.localeCompare(b.name);
-            })
             .slice(0, 10);
           
           setCities(formattedCities);
