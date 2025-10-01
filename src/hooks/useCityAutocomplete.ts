@@ -13,9 +13,8 @@ interface UseCityAutocompleteReturn {
   searchCities: (query: string) => void;
 }
 
-// Using GeoDB Cities API (free tier: 1000 requests/day, max 10 requests/second)
-const GEODB_API_BASE = 'https://wft-geo-db.p.rapidapi.com/v1/geo';
-const RAPIDAPI_KEY = 'demo'; // Using demo key for development
+// Using OpenStreetMap Nominatim API (free, no API key required)
+const NOMINATIM_API_BASE = 'https://nominatim.openstreetmap.org/search';
 
 export const useCityAutocomplete = (): UseCityAutocompleteReturn => {
   const [cities, setCities] = useState<City[]>([]);
@@ -50,13 +49,21 @@ export const useCityAutocomplete = (): UseCityAutocompleteReturn => {
       setError(null);
 
       try {
+        // Search for cities with focus on India (countrycodes=in)
+        // format=json returns JSON, addressdetails=1 gives us country info
+        // featuretype=city limits to cities only
         const response = await fetch(
-          `${GEODB_API_BASE}/cities?namePrefix=${encodeURIComponent(query)}&limit=10&sort=-population`,
+          `${NOMINATIM_API_BASE}?` +
+          `q=${encodeURIComponent(query)}&` +
+          `countrycodes=in&` +
+          `featuretype=city&` +
+          `format=json&` +
+          `addressdetails=1&` +
+          `limit=10`,
           {
             method: 'GET',
             headers: {
-              'X-RapidAPI-Key': RAPIDAPI_KEY,
-              'X-RapidAPI-Host': 'wft-geo-db.p.rapidapi.com'
+              'User-Agent': 'JokovaApp/1.0' // Nominatim requires a user agent
             }
           }
         );
@@ -67,12 +74,27 @@ export const useCityAutocomplete = (): UseCityAutocompleteReturn => {
 
         const data = await response.json();
         
-        if (data.data) {
-          const formattedCities = data.data.map((city: any) => ({
-            id: city.id,
-            name: city.name,
-            country: city.country
-          }));
+        if (data && data.length > 0) {
+          // Filter and format city results
+          const formattedCities = data
+            .filter((place: any) => {
+              // Filter to include only cities/towns/villages
+              const type = place.type || place.addresstype;
+              return ['city', 'town', 'village', 'municipality'].includes(type);
+            })
+            .map((place: any, index: number) => ({
+              id: parseInt(place.place_id) || index,
+              name: place.address?.city || 
+                    place.address?.town || 
+                    place.address?.village || 
+                    place.name || 
+                    place.display_name.split(',')[0],
+              country: place.address?.country || 'India'
+            }))
+            // Remove duplicates by city name
+            .filter((city: City, index: number, self: City[]) => 
+              index === self.findIndex((c) => c.name === city.name)
+            );
           setCities(formattedCities);
         } else {
           setCities([]);
