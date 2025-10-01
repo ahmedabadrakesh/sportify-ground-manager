@@ -1,5 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
-import { createHash, createHmac } from "https://deno.land/std@0.168.0/crypto/mod.ts"
+import { crypto } from "https://deno.land/std@0.168.0/crypto/mod.ts"
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -23,9 +23,22 @@ serve(async (req) => {
 
     // Verify the payment signature
     const body = razorpayOrderId + "|" + razorpayPaymentId;
-    const expectedSignature = createHmac("sha256", keySecret)
-      .update(body)
-      .toString("hex");
+    const encoder = new TextEncoder();
+    const keyData = encoder.encode(keySecret);
+    const bodyData = encoder.encode(body);
+    
+    const cryptoKey = await crypto.subtle.importKey(
+      "raw",
+      keyData,
+      { name: "HMAC", hash: "SHA-256" },
+      false,
+      ["sign"]
+    );
+    
+    const signature = await crypto.subtle.sign("HMAC", cryptoKey, bodyData);
+    const expectedSignature = Array.from(new Uint8Array(signature))
+      .map(b => b.toString(16).padStart(2, '0'))
+      .join('');
 
     if (expectedSignature === razorpaySignature) {
       return new Response(
