@@ -49,15 +49,15 @@ export const useCityAutocomplete = (): UseCityAutocompleteReturn => {
       setError(null);
 
       try {
-        // Search for Indian cities - removed featuretype to allow partial matches
-        // Using city=<query> parameter for better city search
+        // Search for Indian cities using general query (q parameter)
+        // This allows partial matching unlike the city parameter
         const response = await fetch(
           `${NOMINATIM_API_BASE}?` +
-          `city=${encodeURIComponent(query)}&` +
+          `q=${encodeURIComponent(query)}&` +
           `countrycodes=in&` +
           `format=json&` +
           `addressdetails=1&` +
-          `limit=15`,
+          `limit=20`,
           {
             method: 'GET',
             headers: {
