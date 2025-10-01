@@ -49,21 +49,19 @@ export const useCityAutocomplete = (): UseCityAutocompleteReturn => {
       setError(null);
 
       try {
-        // Search for cities with focus on India (countrycodes=in)
-        // format=json returns JSON, addressdetails=1 gives us country info
-        // featuretype=city limits to cities only
+        // Search for Indian cities - removed featuretype to allow partial matches
+        // Using city=<query> parameter for better city search
         const response = await fetch(
           `${NOMINATIM_API_BASE}?` +
-          `q=${encodeURIComponent(query)}&` +
+          `city=${encodeURIComponent(query)}&` +
           `countrycodes=in&` +
-          `featuretype=city&` +
           `format=json&` +
           `addressdetails=1&` +
-          `limit=10`,
+          `limit=15`,
           {
             method: 'GET',
             headers: {
-              'User-Agent': 'JokovaApp/1.0' // Nominatim requires a user agent
+              'User-Agent': 'JokovaApp/1.0'
             }
           }
         );
@@ -77,24 +75,35 @@ export const useCityAutocomplete = (): UseCityAutocompleteReturn => {
         if (data && data.length > 0) {
           // Filter and format city results
           const formattedCities = data
-            .filter((place: any) => {
-              // Filter to include only cities/towns/villages
-              const type = place.type || place.addresstype;
-              return ['city', 'town', 'village', 'municipality'].includes(type);
+            .map((place: any, index: number) => {
+              // Extract city name from various possible fields
+              const cityName = place.address?.city || 
+                              place.address?.town || 
+                              place.address?.village ||
+                              place.address?.municipality ||
+                              place.name ||
+                              place.display_name.split(',')[0].trim();
+              
+              return {
+                id: parseInt(place.place_id) || index,
+                name: cityName,
+                country: place.address?.country || 'India',
+                state: place.address?.state || ''
+              };
             })
-            .map((place: any, index: number) => ({
-              id: parseInt(place.place_id) || index,
-              name: place.address?.city || 
-                    place.address?.town || 
-                    place.address?.village || 
-                    place.name || 
-                    place.display_name.split(',')[0],
-              country: place.address?.country || 'India'
-            }))
             // Remove duplicates by city name
-            .filter((city: City, index: number, self: City[]) => 
-              index === self.findIndex((c) => c.name === city.name)
-            );
+            .filter((city: any, index: number, self: any[]) => 
+              index === self.findIndex((c) => c.name.toLowerCase() === city.name.toLowerCase())
+            )
+            // Sort by relevance (shorter names first, then alphabetically)
+            .sort((a, b) => {
+              if (a.name.length !== b.name.length) {
+                return a.name.length - b.name.length;
+              }
+              return a.name.localeCompare(b.name);
+            })
+            .slice(0, 10);
+          
           setCities(formattedCities);
         } else {
           setCities([]);
