@@ -10,7 +10,6 @@ import {
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { ProfessionalFormValues } from "../schemas/professionalFormSchema";
-import { CityAutocomplete } from "./CityAutocomplete";
 
 interface StepTwoProps {
   form: UseFormReturn<ProfessionalFormValues>;
@@ -50,7 +49,7 @@ export const StepTwo = ({ form, userEmail, isUpdate }: StepTwoProps) => {
           )}
         />
 
-        {/* Right: City with Autocomplete */}
+        {/* Right: City */}
         <FormField
           name="city"
           control={form.control}
@@ -58,11 +57,7 @@ export const StepTwo = ({ form, userEmail, isUpdate }: StepTwoProps) => {
             <FormItem>
               <FormLabel>City *</FormLabel>
               <FormControl>
-                <CityAutocomplete
-                  value={field.value || ""}
-                  onChange={field.onChange}
-                  placeholder="Search and select city"
-                />
+                <Input {...field} placeholder="Enter your city" />
               </FormControl>
               <FormMessage />
             </FormItem>
