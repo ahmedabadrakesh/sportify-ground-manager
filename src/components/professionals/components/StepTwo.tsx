@@ -10,6 +10,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { ProfessionalFormValues } from "../schemas/professionalFormSchema";
+import { GooglePlacesAutocomplete } from "@/components/ui/google-places-autocomplete";
 
 interface StepTwoProps {
   form: UseFormReturn<ProfessionalFormValues>;
@@ -42,7 +43,13 @@ export const StepTwo = ({ form, userEmail, isUpdate }: StepTwoProps) => {
             <FormItem>
               <FormLabel>Address *</FormLabel>
               <FormControl>
-                <Input {...field} placeholder="Enter your complete address" />
+                <GooglePlacesAutocomplete
+                  value={field.value || ""}
+                  onChange={field.onChange}
+                  onBlur={field.onBlur}
+                  placeholder="Enter your complete address"
+                  componentRestrictions={{ country: "in" }}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -57,7 +64,14 @@ export const StepTwo = ({ form, userEmail, isUpdate }: StepTwoProps) => {
             <FormItem>
               <FormLabel>City *</FormLabel>
               <FormControl>
-                <Input {...field} placeholder="Enter your city" />
+                <GooglePlacesAutocomplete
+                  value={field.value || ""}
+                  onChange={field.onChange}
+                  onBlur={field.onBlur}
+                  placeholder="Enter your city"
+                  types={["(cities)"]}
+                  componentRestrictions={{ country: "in" }}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>

@@ -21,6 +21,7 @@ import {
   Trash2,
   BadgeIndianRupee,
 } from "lucide-react";
+import { GooglePlacesAutocomplete } from "@/components/ui/google-places-autocomplete";
 
 interface StepFourProps {
   form: UseFormReturn<ProfessionalFormValues>;
@@ -189,12 +190,13 @@ export const StepFour = ({ form }: StepFourProps) => {
                 </div>
                 <div>
                   <FormLabel>Address</FormLabel>
-                  <Input
-                    placeholder="Full address"
+                  <GooglePlacesAutocomplete
                     value={location.address}
-                    onChange={(e) =>
-                      updateTrainingLocation(index, "address", e.target.value)
+                    onChange={(value) =>
+                      updateTrainingLocation(index, "address", value)
                     }
+                    placeholder="Full address"
+                    componentRestrictions={{ country: "in" }}
                   />
                 </div>
                 <div>

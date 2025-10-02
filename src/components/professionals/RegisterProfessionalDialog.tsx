@@ -15,6 +15,7 @@ import { getCurrentUser } from "@/utils/auth";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { hasRoleSync } from "@/utils/auth";
+import { GoogleMapsProvider } from "./components/GoogleMapsProvider";
 
 interface RegisterProfessionalProps {
   open: boolean;
@@ -420,70 +421,72 @@ const RegisterProfessionalDialog = ({
   return (
     <Dialog open={open} onOpenChange={handleDialogClose}>
       <DialogContent className="max-w-6xl md:max-h-[90vh] p--6 border-2 border-primary rounded-4xl">
-        <div className="grid md:grid-cols-8 gap-4 ">
-          <div className="hidden md:block col-span-2 bg-primary ">
-            <ScrollArea className="h-[calc(90vh-40px)] ">
-              <DialogTitle className="text-left text-white pl-4 pb-4 pt-8">
-                {dialogTitle}
-              </DialogTitle>
-              <hr />
-              <StepperForm
-                currentStep={currentStep}
-                totalSteps={totalSteps}
-                stepTitles={stepTitles}
-                stepDetails={stepDetails}
-              />
-            </ScrollArea>
-          </div>
-          <div className="md:col-span-6 p-6">
-            {isLoadingProfile ? (
-              <div className="flex items-center justify-center h-64">
-                <div className="text-center">
-                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-2"></div>
-                  <p className="text-sm text-muted-foreground">
-                    Loading profile...
-                  </p>
+        <GoogleMapsProvider>
+          <div className="grid md:grid-cols-8 gap-4 ">
+            <div className="hidden md:block col-span-2 bg-primary ">
+              <ScrollArea className="h-[calc(90vh-40px)] ">
+                <DialogTitle className="text-left text-white pl-4 pb-4 pt-8">
+                  {dialogTitle}
+                </DialogTitle>
+                <hr />
+                <StepperForm
+                  currentStep={currentStep}
+                  totalSteps={totalSteps}
+                  stepTitles={stepTitles}
+                  stepDetails={stepDetails}
+                />
+              </ScrollArea>
+            </div>
+            <div className="md:col-span-6 p-6">
+              {isLoadingProfile ? (
+                <div className="flex items-center justify-center h-64">
+                  <div className="text-center">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-2"></div>
+                    <p className="text-sm text-muted-foreground">
+                      Loading profile...
+                    </p>
+                  </div>
                 </div>
+              ) : (
+                <>
+                  <div className="md:hidden bg-black mb-4 mt-6">
+                    <StepperForm
+                      currentStep={currentStep}
+                      totalSteps={totalSteps}
+                      stepTitles={stepTitles}
+                      stepDetails={stepDetails}
+                    />
+                  </div>
+                  <ScrollArea className="h-[calc(90vh-120px)]">
+                    <Form {...form}>
+                      <form onSubmit={handleFormSubmit} className="space-y-6">
+                        <div className="min-h-9/10">
+                          <StepContentRenderer
+                            currentStep={currentStep}
+                            form={form}
+                            userEmail={userEmail}
+                            isUpdate={isUpdate}
+                          />
+                        </div>
+                      </form>
+                    </Form>
+                  </ScrollArea>
+                </>
+              )}
+              <div>
+                <FormNavigation
+                  currentStep={currentStep}
+                  totalSteps={totalSteps}
+                  onPrevious={handlePrevious}
+                  onNext={handleNext}
+                  onSubmit={handleSubmitButtonClick}
+                  isSubmitting={registerMutation.isPending}
+                  isUpdate={isUpdate}
+                />
               </div>
-            ) : (
-              <>
-                <div className="md:hidden bg-black mb-4 mt-6">
-                  <StepperForm
-                    currentStep={currentStep}
-                    totalSteps={totalSteps}
-                    stepTitles={stepTitles}
-                    stepDetails={stepDetails}
-                  />
-                </div>
-                <ScrollArea className="h-[calc(90vh-120px)]">
-                  <Form {...form}>
-                    <form onSubmit={handleFormSubmit} className="space-y-6">
-                      <div className="min-h-9/10">
-                        <StepContentRenderer
-                          currentStep={currentStep}
-                          form={form}
-                          userEmail={userEmail}
-                          isUpdate={isUpdate}
-                        />
-                      </div>
-                    </form>
-                  </Form>
-                </ScrollArea>
-              </>
-            )}
-            <div>
-              <FormNavigation
-                currentStep={currentStep}
-                totalSteps={totalSteps}
-                onPrevious={handlePrevious}
-                onNext={handleNext}
-                onSubmit={handleSubmitButtonClick}
-                isSubmitting={registerMutation.isPending}
-                isUpdate={isUpdate}
-              />
             </div>
           </div>
-        </div>
+        </GoogleMapsProvider>
       </DialogContent>
     </Dialog>
   );

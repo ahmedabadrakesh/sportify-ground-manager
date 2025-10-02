@@ -20,6 +20,7 @@ import {
   type ProfessionalFormValues,
 } from "../../professionals/schemas/professionalFormSchema";
 import { getCurrentUserSync, hasRoleSync } from "@/utils/auth";
+import { GoogleMapsProvider } from "../../professionals/components/GoogleMapsProvider";
 
 interface EditProfessionalDialogProps {
   open: boolean;
@@ -197,26 +198,28 @@ const EditProfessionalDialog = ({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-4xl max-h-[90vh]">
-        <DialogHeader>
-          <DialogTitle>Edit Professional Details</DialogTitle>
-        </DialogHeader>
-        <ScrollArea className="h-[calc(90vh-120px)] px-1">
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-              <PhotoUpload form={form} />
-              <ProfessionalFormFields form={form} userEmail={userEmail} />
-              <Button
-                type="submit"
-                className="w-full"
-                disabled={updateMutation.isPending}
-              >
-                {updateMutation.isPending
-                  ? "Updating..."
-                  : "Update Professional"}
-              </Button>
-            </form>
-          </Form>
-        </ScrollArea>
+        <GoogleMapsProvider>
+          <DialogHeader>
+            <DialogTitle>Edit Professional Details</DialogTitle>
+          </DialogHeader>
+          <ScrollArea className="h-[calc(90vh-120px)] px-1">
+            <Form {...form}>
+              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+                <PhotoUpload form={form} />
+                <ProfessionalFormFields form={form} userEmail={userEmail} />
+                <Button
+                  type="submit"
+                  className="w-full"
+                  disabled={updateMutation.isPending}
+                >
+                  {updateMutation.isPending
+                    ? "Updating..."
+                    : "Update Professional"}
+                </Button>
+              </form>
+            </Form>
+          </ScrollArea>
+        </GoogleMapsProvider>
       </DialogContent>
     </Dialog>
   );
