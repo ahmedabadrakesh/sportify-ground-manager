@@ -4,7 +4,7 @@ import { useMemo } from "react";
 const libraries: ("places")[] = ["places"];
 
 // Replace 'YOUR_GOOGLE_MAPS_API_KEY' with your actual Google Maps API key
-const GOOGLE_MAPS_API_KEY = "YOUR_GOOGLE_MAPS_API_KEY";
+const GOOGLE_MAPS_API_KEY = "AIzaSyBuahoaXexv5cAtVPqdkpJ8vMOOstvrFoo";
 
 export const useGoogleMaps = () => {
   const { isLoaded, loadError } = useLoadScript({
