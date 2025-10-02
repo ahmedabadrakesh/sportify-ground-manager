@@ -1,10 +1,17 @@
-import React, { useRef, useEffect, useState } from "react";
+import React, { useRef, useEffect, useState, useCallback } from "react";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 
+interface PlaceDetails {
+  formatted_address: string;
+  lat?: number;
+  lng?: number;
+  place_id?: string;
+}
+
 interface GooglePlacesAutocompleteProps {
   value: string;
-  onChange: (value: string) => void;
+  onChange: (value: string, details?: PlaceDetails) => void;
   onBlur?: () => void;
   placeholder?: string;
   disabled?: boolean;
@@ -56,14 +63,32 @@ export const GooglePlacesAutocomplete = React.forwardRef<
       return () => clearInterval(interval);
     }, []);
 
+    // Handle place selection
+    const handlePlaceChanged = useCallback(() => {
+      const place = autocompleteRef.current?.getPlace();
+      if (place) {
+        const details: PlaceDetails = {
+          formatted_address: place.formatted_address || "",
+          lat: place.geometry?.location?.lat(),
+          lng: place.geometry?.location?.lng(),
+          place_id: place.place_id,
+        };
+        
+        const newValue = place.formatted_address || "";
+        setLocalValue(newValue);
+        onChange(newValue, details);
+      }
+    }, [onChange]);
+
     // Initialize autocomplete
     useEffect(() => {
       if (!isApiLoaded || !inputRef.current || disabled) return;
 
       try {
         const options: google.maps.places.AutocompleteOptions = {
-          types,
+          types: types.length > 0 ? types : undefined,
           componentRestrictions: componentRestrictions || { country: "in" },
+          fields: ["formatted_address", "geometry", "place_id", "name"],
         };
 
         autocompleteRef.current = new google.maps.places.Autocomplete(
@@ -71,16 +96,10 @@ export const GooglePlacesAutocomplete = React.forwardRef<
           options
         );
 
+        // Attach place_changed listener
         const listener = autocompleteRef.current.addListener(
           "place_changed",
-          () => {
-            const place = autocompleteRef.current?.getPlace();
-            if (place && place.formatted_address) {
-              const newValue = place.formatted_address;
-              setLocalValue(newValue);
-              onChange(newValue);
-            }
-          }
+          handlePlaceChanged
         );
 
         return () => {
@@ -91,7 +110,7 @@ export const GooglePlacesAutocomplete = React.forwardRef<
       } catch (error) {
         console.error("Error initializing Google Places Autocomplete:", error);
       }
-    }, [isApiLoaded, disabled, types, componentRestrictions, onChange]);
+    }, [isApiLoaded, disabled, types, componentRestrictions, handlePlaceChanged]);
 
     // Sync local value with prop value
     useEffect(() => {
