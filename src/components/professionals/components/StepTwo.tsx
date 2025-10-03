@@ -10,7 +10,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { ProfessionalFormValues } from "../schemas/professionalFormSchema";
-import { GooglePlacesAutocomplete } from "@/components/ui/google-places-autocomplete";
+import { GooglePlacesAutocomplete, PlaceDetails } from "@/components/ui/google-places-autocomplete";
 
 interface StepTwoProps {
   form: UseFormReturn<ProfessionalFormValues>;
@@ -45,7 +45,14 @@ export const StepTwo = ({ form, userEmail, isUpdate }: StepTwoProps) => {
               <FormControl>
                 <GooglePlacesAutocomplete
                   value={field.value || ""}
-                  onChange={(value) => field.onChange(value)}
+                  onChange={(value, details?: PlaceDetails) => {
+                    field.onChange(value);
+                    if (details) {
+                      form.setValue("address_lat", details.lat);
+                      form.setValue("address_lng", details.lng);
+                      form.setValue("address_place_id", details.place_id);
+                    }
+                  }}
                   onBlur={field.onBlur}
                   placeholder="Enter your complete address"
                   componentRestrictions={{ country: "in" }}
@@ -66,7 +73,14 @@ export const StepTwo = ({ form, userEmail, isUpdate }: StepTwoProps) => {
               <FormControl>
                 <GooglePlacesAutocomplete
                   value={field.value || ""}
-                  onChange={(value) => field.onChange(value)}
+                  onChange={(value, details?: PlaceDetails) => {
+                    field.onChange(value);
+                    if (details) {
+                      form.setValue("city_lat", details.lat);
+                      form.setValue("city_lng", details.lng);
+                      form.setValue("city_place_id", details.place_id);
+                    }
+                  }}
                   onBlur={field.onBlur}
                   placeholder="Enter your city"
                   types={["(cities)"]}

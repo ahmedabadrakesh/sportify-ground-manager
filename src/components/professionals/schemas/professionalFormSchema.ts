@@ -25,6 +25,14 @@ export const professionalFormSchema = z.object({
   website: z.string().trim().optional().refine(val => !val || val.length > 0, "Invalid value"),
   facebook_link: z.string().trim().optional().refine(val => !val || val.length > 0, "Invalid value"),
   
+  // Location coordinates
+  address_lat: z.number().optional(),
+  address_lng: z.number().optional(),
+  address_place_id: z.string().optional(),
+  city_lat: z.number().optional(),
+  city_lng: z.number().optional(),
+  city_place_id: z.string().optional(),
+  
   // Professional Details
   district_level_tournaments: z.union([z.string(), z.number()]).transform((val) => Number(val) || 0).optional(),
   state_level_tournaments: z.union([z.string(), z.number()]).transform((val) => Number(val) || 0).optional(),
@@ -37,7 +45,10 @@ export const professionalFormSchema = z.object({
   training_locations_detailed: z.array(z.object({
     location: z.string().trim().min(1, "Invalid value"),
     address: z.string().trim().min(1, "Invalid value"),
-    timings: z.string().trim().min(1, "Invalid value")
+    timings: z.string().trim().min(1, "Invalid value"),
+    lat: z.number().optional(),
+    lng: z.number().optional(),
+    place_id: z.string().optional()
   })).optional(),
   
   // Media & Pricing

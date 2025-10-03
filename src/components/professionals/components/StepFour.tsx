@@ -21,7 +21,7 @@ import {
   Trash2,
   BadgeIndianRupee,
 } from "lucide-react";
-import { GooglePlacesAutocomplete } from "@/components/ui/google-places-autocomplete";
+import { GooglePlacesAutocomplete, PlaceDetails } from "@/components/ui/google-places-autocomplete";
 
 interface StepFourProps {
   form: UseFormReturn<ProfessionalFormValues>;
@@ -42,7 +42,7 @@ export const StepFour = ({ form }: StepFourProps) => {
       form.getValues("training_locations_detailed") || [];
     form.setValue("training_locations_detailed", [
       ...currentLocations,
-      { location: "", address: "", timings: "" },
+      { location: "", address: "", timings: "", lat: undefined, lng: undefined, place_id: undefined },
     ]);
   };
 
@@ -192,9 +192,20 @@ export const StepFour = ({ form }: StepFourProps) => {
                   <FormLabel>Address</FormLabel>
                   <GooglePlacesAutocomplete
                     value={location.address}
-                    onChange={(value) =>
-                      updateTrainingLocation(index, "address", value)
-                    }
+                    onChange={(value, details?: PlaceDetails) => {
+                      updateTrainingLocation(index, "address", value);
+                      if (details) {
+                        const currentLocations = form.getValues("training_locations_detailed") || [];
+                        const newLocations = [...currentLocations];
+                        newLocations[index] = {
+                          ...newLocations[index],
+                          lat: details.lat,
+                          lng: details.lng,
+                          place_id: details.place_id
+                        };
+                        form.setValue("training_locations_detailed", newLocations);
+                      }
+                    }}
                     placeholder="Full address"
                     componentRestrictions={{ country: "in" }}
                   />

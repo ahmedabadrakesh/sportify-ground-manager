@@ -1,8 +1,8 @@
-import React, { useRef, useEffect, useState, useCallback } from "react";
+import React, { useRef, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 
-interface PlaceDetails {
+export interface PlaceDetails {
   formatted_address: string;
   lat?: number;
   lng?: number;
@@ -39,119 +39,95 @@ export const GooglePlacesAutocomplete = React.forwardRef<
   ) => {
     const inputRef = useRef<HTMLInputElement>(null);
     const autocompleteRef = useRef<google.maps.places.Autocomplete | null>(null);
-    const listenerRef = useRef<google.maps.MapsEventListener | null>(null);
-    const [localValue, setLocalValue] = useState(value);
-    const [isApiLoaded, setIsApiLoaded] = useState(false);
+    const isSelectingRef = useRef(false);
 
-    // Check if Google Maps is loaded
+    // Initialize autocomplete when Google Maps is loaded
     useEffect(() => {
-      const checkGoogleMaps = () => {
-        if (window.google && window.google.maps && window.google.maps.places) {
-          setIsApiLoaded(true);
-        }
-      };
+      if (!inputRef.current || disabled) return;
 
-      checkGoogleMaps();
-      
-      // If not loaded initially, set up an interval to check
-      const interval = setInterval(() => {
-        if (window.google && window.google.maps && window.google.maps.places) {
-          setIsApiLoaded(true);
-          clearInterval(interval);
-        }
-      }, 100);
-
-      return () => clearInterval(interval);
-    }, []);
-
-
-    // Initialize autocomplete
-    useEffect(() => {
-      if (!isApiLoaded || !inputRef.current || disabled) return;
-
-      // Clean up previous autocomplete instance
-      if (listenerRef.current) {
-        google.maps.event.removeListener(listenerRef.current);
-        listenerRef.current = null;
-      }
-      if (autocompleteRef.current) {
-        google.maps.event.clearInstanceListeners(autocompleteRef.current);
-        autocompleteRef.current = null;
-      }
-
-      try {
-        const options: google.maps.places.AutocompleteOptions = {
-          componentRestrictions: componentRestrictions || { country: "in" },
-          fields: ["formatted_address", "geometry", "place_id", "name"],
-        };
-
-        // Only add types if it's a valid non-empty array
-        if (Array.isArray(types) && types.length > 0) {
-          options.types = types;
+      // Wait for Google Maps to load
+      const initAutocomplete = () => {
+        if (!window.google?.maps?.places) {
+          setTimeout(initAutocomplete, 100);
+          return;
         }
 
-        const autocomplete = new google.maps.places.Autocomplete(
-          inputRef.current,
-          options
-        );
-        
-        autocompleteRef.current = autocomplete;
+        // Clean up previous instance
+        if (autocompleteRef.current) {
+          google.maps.event.clearInstanceListeners(autocompleteRef.current);
+        }
 
-        // Attach place_changed listener
-        listenerRef.current = autocomplete.addListener(
-          "place_changed",
-          () => {
+        try {
+          const options: google.maps.places.AutocompleteOptions = {
+            componentRestrictions: componentRestrictions || { country: "in" },
+            fields: ["formatted_address", "geometry", "place_id", "name"],
+          };
+
+          // Only add types if provided and valid
+          if (types && types.length > 0) {
+            options.types = types;
+          }
+
+          const autocomplete = new google.maps.places.Autocomplete(
+            inputRef.current,
+            options
+          );
+
+          autocompleteRef.current = autocomplete;
+
+          // Listen for place selection
+          autocomplete.addListener("place_changed", () => {
             const place = autocomplete.getPlace();
-            
-            if (place && place.formatted_address) {
+
+            if (place?.formatted_address) {
+              isSelectingRef.current = true;
+
               const details: PlaceDetails = {
-                formatted_address: place.formatted_address || "",
+                formatted_address: place.formatted_address,
                 lat: place.geometry?.location?.lat(),
                 lng: place.geometry?.location?.lng(),
                 place_id: place.place_id,
               };
-              
-              const newValue = place.formatted_address || "";
-              setLocalValue(newValue);
-              onChange(newValue, details);
-              
-              // Force the input to show the selected value
-              if (inputRef.current) {
-                inputRef.current.value = newValue;
-              }
+
+              // Call onChange with the formatted address and details
+              onChange(place.formatted_address, details);
+
+              // Reset flag after a short delay
+              setTimeout(() => {
+                isSelectingRef.current = false;
+              }, 100);
             }
-          }
-        );
-      } catch (error) {
-        console.error("Error initializing Google Places Autocomplete:", error);
-      }
+          });
+        } catch (error) {
+          console.error("Error initializing Google Places Autocomplete:", error);
+        }
+      };
+
+      initAutocomplete();
 
       return () => {
-        if (listenerRef.current) {
-          google.maps.event.removeListener(listenerRef.current);
-        }
         if (autocompleteRef.current) {
           google.maps.event.clearInstanceListeners(autocompleteRef.current);
         }
       };
-    }, [isApiLoaded, disabled, componentRestrictions, types, onChange]);
+    }, [disabled, componentRestrictions, types, onChange]);
 
-    // Sync local value with prop value
+    // Sync input value with prop value
     useEffect(() => {
-      setLocalValue(value);
+      if (inputRef.current && !isSelectingRef.current) {
+        inputRef.current.value = value || "";
+      }
     }, [value]);
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-      const newValue = e.target.value;
-      setLocalValue(newValue);
-      // Only pass the value when manually typing (no details)
-      onChange(newValue, undefined);
+      if (!isSelectingRef.current) {
+        onChange(e.target.value, undefined);
+      }
     };
 
     return (
       <Input
         ref={(node) => {
-          // Set both refs
           if (node) {
             inputRef.current = node;
             if (typeof ref === "function") {
@@ -161,7 +137,7 @@ export const GooglePlacesAutocomplete = React.forwardRef<
             }
           }
         }}
-        value={localValue}
+        defaultValue={value}
         onChange={handleInputChange}
         onBlur={onBlur}
         placeholder={placeholder}
