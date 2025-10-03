@@ -64,22 +64,6 @@ export const GooglePlacesAutocomplete = React.forwardRef<
       return () => clearInterval(interval);
     }, []);
 
-    // Handle place selection
-    const handlePlaceChanged = useCallback(() => {
-      const place = autocompleteRef.current?.getPlace();
-      if (place && place.formatted_address) {
-        const details: PlaceDetails = {
-          formatted_address: place.formatted_address || "",
-          lat: place.geometry?.location?.lat(),
-          lng: place.geometry?.location?.lng(),
-          place_id: place.place_id,
-        };
-        
-        const newValue = place.formatted_address || "";
-        setLocalValue(newValue);
-        onChange(newValue, details);
-      }
-    }, [onChange]);
 
     // Initialize autocomplete
     useEffect(() => {
@@ -106,15 +90,37 @@ export const GooglePlacesAutocomplete = React.forwardRef<
           options.types = types;
         }
 
-        autocompleteRef.current = new google.maps.places.Autocomplete(
+        const autocomplete = new google.maps.places.Autocomplete(
           inputRef.current,
           options
         );
+        
+        autocompleteRef.current = autocomplete;
 
         // Attach place_changed listener
-        listenerRef.current = autocompleteRef.current.addListener(
+        listenerRef.current = autocomplete.addListener(
           "place_changed",
-          handlePlaceChanged
+          () => {
+            const place = autocomplete.getPlace();
+            
+            if (place && place.formatted_address) {
+              const details: PlaceDetails = {
+                formatted_address: place.formatted_address || "",
+                lat: place.geometry?.location?.lat(),
+                lng: place.geometry?.location?.lng(),
+                place_id: place.place_id,
+              };
+              
+              const newValue = place.formatted_address || "";
+              setLocalValue(newValue);
+              onChange(newValue, details);
+              
+              // Force the input to show the selected value
+              if (inputRef.current) {
+                inputRef.current.value = newValue;
+              }
+            }
+          }
         );
       } catch (error) {
         console.error("Error initializing Google Places Autocomplete:", error);
@@ -128,7 +134,7 @@ export const GooglePlacesAutocomplete = React.forwardRef<
           google.maps.event.clearInstanceListeners(autocompleteRef.current);
         }
       };
-    }, [isApiLoaded, disabled, componentRestrictions, handlePlaceChanged]);
+    }, [isApiLoaded, disabled, componentRestrictions, types, onChange]);
 
     // Sync local value with prop value
     useEffect(() => {
