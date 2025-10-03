@@ -32,13 +32,14 @@ export const GooglePlacesAutocomplete = React.forwardRef<
       placeholder,
       disabled,
       className,
-      types = [],
+      types,
       componentRestrictions,
     },
     ref
   ) => {
     const inputRef = useRef<HTMLInputElement>(null);
     const autocompleteRef = useRef<google.maps.places.Autocomplete | null>(null);
+    const listenerRef = useRef<google.maps.MapsEventListener | null>(null);
     const [localValue, setLocalValue] = useState(value);
     const [isApiLoaded, setIsApiLoaded] = useState(false);
 
@@ -66,7 +67,7 @@ export const GooglePlacesAutocomplete = React.forwardRef<
     // Handle place selection
     const handlePlaceChanged = useCallback(() => {
       const place = autocompleteRef.current?.getPlace();
-      if (place) {
+      if (place && place.formatted_address) {
         const details: PlaceDetails = {
           formatted_address: place.formatted_address || "",
           lat: place.geometry?.location?.lat(),
@@ -84,14 +85,24 @@ export const GooglePlacesAutocomplete = React.forwardRef<
     useEffect(() => {
       if (!isApiLoaded || !inputRef.current || disabled) return;
 
+      // Clean up previous autocomplete instance
+      if (listenerRef.current) {
+        google.maps.event.removeListener(listenerRef.current);
+        listenerRef.current = null;
+      }
+      if (autocompleteRef.current) {
+        google.maps.event.clearInstanceListeners(autocompleteRef.current);
+        autocompleteRef.current = null;
+      }
+
       try {
         const options: google.maps.places.AutocompleteOptions = {
           componentRestrictions: componentRestrictions || { country: "in" },
           fields: ["formatted_address", "geometry", "place_id", "name"],
         };
 
-        // Only add types if it's a non-empty array
-        if (types && Array.isArray(types) && types.length > 0) {
+        // Only add types if it's a valid non-empty array
+        if (Array.isArray(types) && types.length > 0) {
           options.types = types;
         }
 
@@ -101,20 +112,23 @@ export const GooglePlacesAutocomplete = React.forwardRef<
         );
 
         // Attach place_changed listener
-        const listener = autocompleteRef.current.addListener(
+        listenerRef.current = autocompleteRef.current.addListener(
           "place_changed",
           handlePlaceChanged
         );
-
-        return () => {
-          if (listener) {
-            google.maps.event.removeListener(listener);
-          }
-        };
       } catch (error) {
         console.error("Error initializing Google Places Autocomplete:", error);
       }
-    }, [isApiLoaded, disabled, types, componentRestrictions, handlePlaceChanged]);
+
+      return () => {
+        if (listenerRef.current) {
+          google.maps.event.removeListener(listenerRef.current);
+        }
+        if (autocompleteRef.current) {
+          google.maps.event.clearInstanceListeners(autocompleteRef.current);
+        }
+      };
+    }, [isApiLoaded, disabled, componentRestrictions, handlePlaceChanged]);
 
     // Sync local value with prop value
     useEffect(() => {
@@ -147,6 +161,7 @@ export const GooglePlacesAutocomplete = React.forwardRef<
         placeholder={placeholder}
         disabled={disabled}
         className={cn(className)}
+        autoComplete="off"
       />
     );
   }
