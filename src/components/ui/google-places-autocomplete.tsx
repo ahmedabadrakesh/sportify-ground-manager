@@ -86,10 +86,14 @@ export const GooglePlacesAutocomplete = React.forwardRef<
 
       try {
         const options: google.maps.places.AutocompleteOptions = {
-          types: types.length > 0 ? types : undefined,
           componentRestrictions: componentRestrictions || { country: "in" },
           fields: ["formatted_address", "geometry", "place_id", "name"],
         };
+
+        // Only add types if it's a non-empty array
+        if (types && Array.isArray(types) && types.length > 0) {
+          options.types = types;
+        }
 
         autocompleteRef.current = new google.maps.places.Autocomplete(
           inputRef.current,
@@ -120,7 +124,8 @@ export const GooglePlacesAutocomplete = React.forwardRef<
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
       const newValue = e.target.value;
       setLocalValue(newValue);
-      onChange(newValue);
+      // Only pass the value when manually typing (no details)
+      onChange(newValue, undefined);
     };
 
     return (

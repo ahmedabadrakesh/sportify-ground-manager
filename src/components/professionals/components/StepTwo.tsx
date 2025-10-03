@@ -45,7 +45,7 @@ export const StepTwo = ({ form, userEmail, isUpdate }: StepTwoProps) => {
               <FormControl>
                 <GooglePlacesAutocomplete
                   value={field.value || ""}
-                  onChange={field.onChange}
+                  onChange={(value) => field.onChange(value)}
                   onBlur={field.onBlur}
                   placeholder="Enter your complete address"
                   componentRestrictions={{ country: "in" }}
@@ -66,7 +66,7 @@ export const StepTwo = ({ form, userEmail, isUpdate }: StepTwoProps) => {
               <FormControl>
                 <GooglePlacesAutocomplete
                   value={field.value || ""}
-                  onChange={field.onChange}
+                  onChange={(value) => field.onChange(value)}
                   onBlur={field.onBlur}
                   placeholder="Enter your city"
                   types={["(cities)"]}
