@@ -2,6 +2,42 @@ import React, { useRef, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 
+// Add styles for Google Places Autocomplete dropdown
+const autocompleteStyles = `
+  .pac-container {
+    z-index: 9999 !important;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+    border: 1px solid hsl(var(--border));
+    background-color: hsl(var(--popover));
+    margin-top: 4px;
+  }
+  .pac-item {
+    padding: 8px 12px;
+    cursor: pointer;
+    color: hsl(var(--popover-foreground));
+    border-top: 1px solid hsl(var(--border));
+  }
+  .pac-item:first-child {
+    border-top: none;
+  }
+  .pac-item:hover {
+    background-color: hsl(var(--accent));
+    color: hsl(var(--accent-foreground));
+  }
+  .pac-item-selected {
+    background-color: hsl(var(--accent));
+    color: hsl(var(--accent-foreground));
+  }
+  .pac-icon {
+    display: none;
+  }
+  .pac-item-query {
+    color: hsl(var(--foreground));
+    font-weight: 500;
+  }
+`;
+
 export interface PlaceDetails {
   formatted_address: string;
   lat?: number;
@@ -40,6 +76,24 @@ export const GooglePlacesAutocomplete = React.forwardRef<
     const inputRef = useRef<HTMLInputElement>(null);
     const autocompleteRef = useRef<google.maps.places.Autocomplete | null>(null);
     const isSelectingRef = useRef(false);
+    const styleRef = useRef<HTMLStyleElement | null>(null);
+
+    // Inject styles for autocomplete dropdown
+    useEffect(() => {
+      if (!styleRef.current) {
+        const style = document.createElement('style');
+        style.textContent = autocompleteStyles;
+        document.head.appendChild(style);
+        styleRef.current = style;
+      }
+
+      return () => {
+        if (styleRef.current) {
+          document.head.removeChild(styleRef.current);
+          styleRef.current = null;
+        }
+      };
+    }, []);
 
     // Initialize autocomplete when Google Maps is loaded
     useEffect(() => {
