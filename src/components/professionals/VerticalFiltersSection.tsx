@@ -59,7 +59,17 @@ const VerticalFiltersSection = ({
     { value: "Male", label: "Male" },
     { value: "Female", label: "Female" },
   ];
+
+  const experienceRanges = [
+    { value: ">1", label: "Less than 1 year" },
+    { value: "1-2", label: "1-2 years" },
+    { value: "3-5", label: "3-5 years" },
+    { value: "6-10", label: "6-10 years" },
+    { value: "10+", label: "10+ years" },
+  ];
+
   const [selectedGender, setSelectedGender] = useState<string>("all");
+  const [selectedExperience, setSelectedExperience] = useState<string>("all");
 
   const handleFilterChange = (key: keyof FilterOptions, value: any) => {
     onFiltersChange({
@@ -83,6 +93,29 @@ const VerticalFiltersSection = ({
           Reset All
         </button>
       </div>
+
+      {/* Certification Filter */}
+      <div className="flex flex-row items-left">
+        <label className="text-sm font-bold text-foreground mb-2 block text-left">
+          Certified?
+        </label>
+        <div className="shrink items-left">
+          <Switch
+            checked={
+              filters.isCertified === undefined
+                ? false
+                : filters.isCertified
+                ? true
+                : false
+            }
+            onCheckedChange={(value) =>
+              handleFilterChange("isCertified", value)
+            }
+            className="ml-6"
+          />
+        </div>
+      </div>
+
       {/* Games */}
       <div className="mb-6">
         <h4 className="text-text-primary mb-3 font-bold text-left">Games</h4>
@@ -114,13 +147,6 @@ const VerticalFiltersSection = ({
         <h4 className="text-text-primary mb-3 font-bold text-left">Gender</h4>
         {genderValues.map((gender) => (
           <label className="flex items-center">
-            {/* <input
-                type="checkbox"
-                className="rounded border-secondary-300 text-accent focus:ring-accent/20"
-                onClick={() =>
-                  handleFilterChange("sex", checked ? gender.label : "All")
-                }
-              /> */}
             <RadioGroup
               onValueChange={(value) => {
                 setSelectedGender(value);
@@ -150,7 +176,44 @@ const VerticalFiltersSection = ({
           </label>
         ))}
       </div>
+
       <div className="mb-6">
+        <h4 className="text-text-primary mb-3 font-bold text-left">
+          Experience
+        </h4>
+        {experienceRanges.map((experience) => (
+          <label className="flex items-center">
+            <RadioGroup
+              onValueChange={(value) => {
+                setSelectedExperience(value);
+                handleFilterChange("experienceRange", value);
+              }}
+              value={selectedExperience}
+              className="flex flex-row space-x-4"
+            >
+              <div className="flex items-center space-x-2 mb-1">
+                <RadioGroupItem value={experience.value} id="gender" />
+                <label
+                  htmlFor={experience.label}
+                  className="text-sm font-medium ml-2 text-text-secondary"
+                >
+                  {experience.label}
+                </label>
+              </div>
+            </RadioGroup>
+
+            {/* <Checkbox
+                id={`facility-${`gender_${gender.label}`}`}
+                checked={selectedFacilities.includes(facility)}
+                onCheckedChange={() =>
+                  handleFilterChange("sex", checked ? gender.label : "All")
+                }
+              /> */}
+          </label>
+        ))}
+      </div>
+
+      {/* <div className="mb-6">
         <h4 className="text-text-primary mb-3 font-bold text-left">
           Price Range
         </h4>
@@ -184,9 +247,9 @@ const VerticalFiltersSection = ({
             <span className="ml-2 text-text-secondary">$200+/hour</span>
           </label>
         </div>
-      </div>
+      </div> */}
       {/* <!-- Experience Level --> */}
-      <div className="mb-6">
+      {/* <div className="mb-6">
         <h4 className="text-text-primary mb-3 font-bold text-left">
           Experience Level
         </h4>
@@ -226,9 +289,9 @@ const VerticalFiltersSection = ({
             <span className="ml-2 text-text-secondary">Expert (10+ years)</span>
           </label>
         </div>
-      </div>
+      </div> */}
       {/* <!-- Availability --> */}
-      <div className="mb-6">
+      {/* <div className="mb-6">
         <h4 className="text-text-primary mb-3 font-bold text-left">
           Availability
         </h4>
@@ -255,9 +318,9 @@ const VerticalFiltersSection = ({
             <span className="ml-2 text-text-secondary">Flexible Schedule</span>
           </label>
         </div>
-      </div>
+      </div> */}
       {/* <!-- Session Type --> */}
-      <div className="mb-6">
+      {/* <div className="mb-6">
         <h4 className="text-text-primary mb-3 font-bold text-left">
           Session Type
         </h4>
@@ -284,7 +347,7 @@ const VerticalFiltersSection = ({
             <span className="ml-2 text-text-secondary">Group Sessions</span>
           </label>
         </div>
-      </div>
+      </div> */}
     </section>
   );
 };

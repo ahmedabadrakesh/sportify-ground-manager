@@ -76,16 +76,16 @@ const ProfessionalsFilters = ({
     }
 
     toast.loading("Getting your location...");
-    
+
     navigator.geolocation.getCurrentPosition(
       async (position) => {
         const { latitude, longitude } = position.coords;
-        
+
         try {
           // Reverse geocode to get city name
           const geocoder = new google.maps.Geocoder();
           const result = await geocoder.geocode({
-            location: { lat: latitude, lng: longitude }
+            location: { lat: latitude, lng: longitude },
           });
 
           if (result.results[0]) {
@@ -97,7 +97,8 @@ const ProfessionalsFilters = ({
                 component.types.includes("administrative_area_level_2")
             );
 
-            const city = cityComponent?.long_name || result.results[0].formatted_address;
+            const city =
+              cityComponent?.long_name || result.results[0].formatted_address;
             handleFilterChange("city", city);
             toast.success(`Location set to ${city}`);
           } else {
@@ -110,7 +111,9 @@ const ProfessionalsFilters = ({
       },
       (error) => {
         console.error("Geolocation error:", error);
-        toast.error("Failed to get your location. Please enable location access.");
+        toast.error(
+          "Failed to get your location. Please enable location access."
+        );
       }
     );
   };
@@ -177,7 +180,7 @@ const ProfessionalsFilters = ({
             </div>
 
             {/* Gender Filter */}
-            <div className="flex-1">
+            {/* <div className="flex-1">
               <label className="text-sm font-medium text-foreground mb-2 block">
                 Gender
               </label>
@@ -197,10 +200,10 @@ const ProfessionalsFilters = ({
                   ))}
                 </SelectContent>
               </Select>
-            </div>
+            </div> */}
 
             {/* Game Filter */}
-            <div className="flex-1">
+            {/* <div className="flex-1">
               <label className="text-sm font-medium text-foreground mb-2 block">
                 Sport
               </label>
@@ -211,7 +214,7 @@ const ProfessionalsFilters = ({
                 <SelectTrigger>
                   <SelectValue placeholder="All Sports" />
                 </SelectTrigger>
-              <SelectContent>
+                <SelectContent>
                   <SelectItem value="all">All Sports</SelectItem>
                   {games?.map((game) => (
                     <SelectItem key={game.id} value={game.id}>
@@ -220,10 +223,10 @@ const ProfessionalsFilters = ({
                   ))}
                 </SelectContent>
               </Select>
-            </div>
+            </div> */}
 
             {/* Experience Filter */}
-            <div className="flex-1">
+            {/* <div className="flex-1">
               <label className="text-sm font-medium text-foreground mb-2 block">
                 Experience
               </label>
@@ -245,10 +248,10 @@ const ProfessionalsFilters = ({
                   ))}
                 </SelectContent>
               </Select>
-            </div>
+            </div> */}
 
             {/* Certification Filter */}
-            <div className="shrink items-center">
+            {/* <div className="shrink items-center">
               <label className="text-sm font-medium text-foreground mb-2 block">
                 Certified?
               </label>
@@ -266,36 +269,7 @@ const ProfessionalsFilters = ({
                   }
                 />
               </div>
-
-              {/* <Select
-                value={
-                  filters.isCertified === undefined
-                    ? "all"
-                    : filters.isCertified
-                    ? "certified"
-                    : "not-certified"
-                }
-                onValueChange={(value) =>
-                  handleFilterChange(
-                    "isCertified",
-                    value === "all"
-                      ? undefined
-                      : value === "certified"
-                      ? true
-                      : false
-                  )
-                }
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="All" />
-                </SelectTrigger>
-                <SelectContent className="max-h-60 overflow-y-auto">
-                  <SelectItem value="all">All</SelectItem>
-                  <SelectItem value="certified">Certified</SelectItem>
-                  <SelectItem value="not-certified">Not Certified</SelectItem>
-                </SelectContent>
-              </Select> */}
-            </div>
+            </div> */}
           </div>
 
           {/* Active Filters and Clear Button */}
