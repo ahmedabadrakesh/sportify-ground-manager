@@ -8,10 +8,12 @@ import {
 } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { X, Filter, ChevronUp } from "lucide-react";
+import { X, Filter, ChevronUp, MapPin } from "lucide-react";
 import { useGames } from "@/hooks/useGames";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Switch } from "@/components/ui/switch";
+import { GooglePlacesAutocomplete } from "@/components/ui/google-places-autocomplete";
+import { toast } from "sonner";
 
 interface FilterOptions {
   city?: string;
@@ -67,6 +69,52 @@ const ProfessionalsFilters = ({
   // On mobile, show filters based on showFilters state
   const shouldShowFilters = !isMobile || showFilters;
 
+  const handleUseMyLocation = () => {
+    if (!navigator.geolocation) {
+      toast.error("Geolocation is not supported by your browser");
+      return;
+    }
+
+    toast.loading("Getting your location...");
+    
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        const { latitude, longitude } = position.coords;
+        
+        try {
+          // Reverse geocode to get city name
+          const geocoder = new google.maps.Geocoder();
+          const result = await geocoder.geocode({
+            location: { lat: latitude, lng: longitude }
+          });
+
+          if (result.results[0]) {
+            // Extract city from address components
+            const addressComponents = result.results[0].address_components;
+            const cityComponent = addressComponents.find(
+              (component) =>
+                component.types.includes("locality") ||
+                component.types.includes("administrative_area_level_2")
+            );
+
+            const city = cityComponent?.long_name || result.results[0].formatted_address;
+            handleFilterChange("city", city);
+            toast.success(`Location set to ${city}`);
+          } else {
+            toast.error("Could not determine your city");
+          }
+        } catch (error) {
+          console.error("Geocoding error:", error);
+          toast.error("Failed to get your location");
+        }
+      },
+      (error) => {
+        console.error("Geolocation error:", error);
+        toast.error("Failed to get your location. Please enable location access.");
+      }
+    );
+  };
+
   return (
     <div className="mb-6">
       {/* Mobile Filter Toggle Button */}
@@ -101,27 +149,31 @@ const ProfessionalsFilters = ({
           )}
 
           <div className="flex flex-col lg:flex-row gap-4">
-            {/* City Filter */}
+            {/* City Filter with Google Autocomplete */}
             <div className="flex-1">
               <label className="text-sm font-medium text-foreground mb-2 block">
                 City
               </label>
-              <Select
-                value={filters.city || "all"}
-                onValueChange={(value) => handleFilterChange("city", value)}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="All Cities" />
-                </SelectTrigger>
-              <SelectContent>
-                  <SelectItem value="all">All Cities</SelectItem>
-                  {availableCities.map((city) => (
-                    <SelectItem key={city} value={city}>
-                      {city}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <div className="flex gap-2">
+                <div className="flex-1">
+                  <GooglePlacesAutocomplete
+                    value={filters.city || ""}
+                    onChange={(value) => handleFilterChange("city", value)}
+                    placeholder="Search city..."
+                    types={["(cities)"]}
+                    componentRestrictions={{ country: "in" }}
+                  />
+                </div>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="icon"
+                  onClick={handleUseMyLocation}
+                  title="Use my location"
+                >
+                  <MapPin className="h-4 w-4" />
+                </Button>
+              </div>
             </div>
 
             {/* Gender Filter */}

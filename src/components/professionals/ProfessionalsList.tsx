@@ -6,6 +6,7 @@ import AuthRequiredDialog from "@/components/auth/AuthRequiredDialog";
 import ProfessionalsFilters from "./ProfessionalsFilters";
 import { useGames } from "@/hooks/useGames";
 import VerticalFiltersSection from "./VerticalFiltersSection";
+import { GoogleMapsProvider } from "./components/GoogleMapsProvider";
 
 interface FilterOptions {
   city?: string;
@@ -198,11 +199,13 @@ const ProfessionalsList = ({ sportFilter }: ProfessionalsListProps) => {
 
     return (
       <div className="container text-center max-w-7xl">
-        <ProfessionalsFilters
-          filters={filters}
-          onFiltersChange={setFilters}
-          availableCities={availableCities}
-        />
+        <GoogleMapsProvider>
+          <ProfessionalsFilters
+            filters={filters}
+            onFiltersChange={setFilters}
+            availableCities={availableCities}
+          />
+        </GoogleMapsProvider>
         <p className="text-gray-600">{noDataMessage}</p>
         <p className="text-sm text-gray-500 mt-2">
           If you expect to see data here, there might be a permissions issue.
@@ -214,11 +217,13 @@ const ProfessionalsList = ({ sportFilter }: ProfessionalsListProps) => {
   return (
     <>
       <div className="max-w-7xl mx-auto">
-        <ProfessionalsFilters
-          filters={filters}
-          onFiltersChange={setFilters}
-          availableCities={availableCities}
-        />
+        <GoogleMapsProvider>
+          <ProfessionalsFilters
+            filters={filters}
+            onFiltersChange={setFilters}
+            availableCities={availableCities}
+          />
+        </GoogleMapsProvider>
 
         <div className="grid grid-cols-8 gap-6">
           <div className="col-span-2">
