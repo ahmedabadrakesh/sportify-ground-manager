@@ -420,7 +420,16 @@ const RegisterProfessionalDialog = ({
 
   return (
     <Dialog open={open} onOpenChange={handleDialogClose}>
-      <DialogContent className="max-w-6xl md:max-h-[90vh] p--6 border-2 border-primary rounded-4xl">
+      <DialogContent 
+        className="max-w-6xl md:max-h-[90vh] p--6 border-2 border-primary rounded-4xl"
+        onInteractOutside={(e) => {
+          // Prevent dialog from closing when clicking on Google Places autocomplete dropdown
+          const target = e.target as HTMLElement;
+          if (target.closest('.pac-container')) {
+            e.preventDefault();
+          }
+        }}
+      >
         <GoogleMapsProvider>
           <div className="grid md:grid-cols-8 gap-4 ">
             <div className="hidden md:block col-span-2 bg-primary ">

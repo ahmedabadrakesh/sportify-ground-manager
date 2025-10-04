@@ -40,16 +40,6 @@ const autocompleteStyles = `
   }
 `;
 
-// Prevent dropdown clicks from bubbling to parent dialogs
-const preventDialogClose = () => {
-  document.addEventListener('click', (e) => {
-    const target = e.target as HTMLElement;
-    if (target.closest('.pac-container')) {
-      e.stopPropagation();
-    }
-  }, true);
-};
-
 export interface PlaceDetails {
   formatted_address: string;
   lat?: number;
@@ -97,9 +87,6 @@ export const GooglePlacesAutocomplete = React.forwardRef<
         style.textContent = autocompleteStyles;
         document.head.appendChild(style);
         styleRef.current = style;
-        
-        // Prevent clicks on dropdown from closing parent dialogs
-        preventDialogClose();
       }
 
       return () => {
