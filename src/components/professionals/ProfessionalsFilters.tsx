@@ -37,6 +37,7 @@ const ProfessionalsFilters = ({
   const { games } = useGames();
   const isMobile = useIsMobile();
   const [showFilters, setShowFilters] = useState(false);
+  const [tempCityInput, setTempCityInput] = useState("");
 
   const genderValues = [
     { value: "Male", label: "Male" },
@@ -60,6 +61,25 @@ const ProfessionalsFilters = ({
 
   const clearAllFilters = () => {
     onFiltersChange({});
+    setTempCityInput("");
+  };
+
+  const handleCityChange = (value: string, details?: any) => {
+    // Update temp input for display
+    setTempCityInput(value);
+    
+    // Only update the filter if user selected from dropdown (details exist)
+    if (details?.formatted_address) {
+      handleFilterChange("city", details.formatted_address);
+    }
+  };
+
+  const handleCityBlur = () => {
+    // If no city is selected but there's input, clear it and show message
+    if (tempCityInput && !filters.city) {
+      setTempCityInput("");
+      toast.error("Please select a city from the dropdown");
+    }
   };
 
   const hasActiveFilters = Object.values(filters).some(
@@ -75,7 +95,7 @@ const ProfessionalsFilters = ({
       return;
     }
 
-    toast.loading("Getting your location...");
+    const loadingToast = toast.loading("Getting your location...");
 
     navigator.geolocation.getCurrentPosition(
       async (position) => {
@@ -99,18 +119,23 @@ const ProfessionalsFilters = ({
 
             const city =
               cityComponent?.long_name || result.results[0].formatted_address;
+            setTempCityInput(city);
             handleFilterChange("city", city);
+            toast.dismiss(loadingToast);
             toast.success(`Location set to ${city}`);
           } else {
+            toast.dismiss(loadingToast);
             toast.error("Could not determine your city");
           }
         } catch (error) {
           console.error("Geocoding error:", error);
+          toast.dismiss(loadingToast);
           toast.error("Failed to get your location");
         }
       },
       (error) => {
         console.error("Geolocation error:", error);
+        toast.dismiss(loadingToast);
         toast.error(
           "Failed to get your location. Please enable location access."
         );
@@ -160,8 +185,9 @@ const ProfessionalsFilters = ({
               <div className="flex gap-2">
                 <div className="flex-1">
                   <GooglePlacesAutocomplete
-                    value={filters.city || ""}
-                    onChange={(value) => handleFilterChange("city", value)}
+                    value={filters.city || tempCityInput}
+                    onChange={handleCityChange}
+                    onBlur={handleCityBlur}
                     placeholder="Search city..."
                     types={["(cities)"]}
                     componentRestrictions={{ country: "in" }}
@@ -279,12 +305,15 @@ const ProfessionalsFilters = ({
                 Active filters:
               </span>
 
-              {filters.city && (
+               {filters.city && (
                 <Badge variant="secondary" className="flex items-center gap-1">
                   City: {filters.city}
                   <X
                     className="h-3 w-3 cursor-pointer"
-                    onClick={() => handleFilterChange("city", undefined)}
+                    onClick={() => {
+                      handleFilterChange("city", undefined);
+                      setTempCityInput("");
+                    }}
                   />
                 </Badge>
               )}
