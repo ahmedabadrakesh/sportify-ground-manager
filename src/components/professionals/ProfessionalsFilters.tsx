@@ -37,6 +37,8 @@ const ProfessionalsFilters = ({
   const { games } = useGames();
   const isMobile = useIsMobile();
   const [showFilters, setShowFilters] = useState(false);
+  const [tempCity, setTempCity] = useState(filters.city || "");
+  const [isCitySelected, setIsCitySelected] = useState(false);
 
   const genderValues = [
     { value: "Male", label: "Male" },
@@ -59,7 +61,35 @@ const ProfessionalsFilters = ({
   };
 
   const clearAllFilters = () => {
+    setTempCity("");
+    setIsCitySelected(false);
     onFiltersChange({});
+  };
+
+  const handleCityChange = (value: string, details?: any) => {
+    setTempCity(value);
+    
+    if (details?.formatted_address) {
+      // Valid selection from autocomplete
+      setIsCitySelected(true);
+      handleFilterChange("city", value);
+    } else {
+      // Just typing, not a valid selection
+      setIsCitySelected(false);
+      if (value === "") {
+        // Cleared the field
+        handleFilterChange("city", undefined);
+      }
+    }
+  };
+
+  const handleCityBlur = () => {
+    if (tempCity && !isCitySelected) {
+      // User typed but didn't select - clear the field
+      setTempCity("");
+      handleFilterChange("city", undefined);
+      toast.error("Please select a city from the dropdown");
+    }
   };
 
   const hasActiveFilters = Object.values(filters).some(
@@ -99,6 +129,8 @@ const ProfessionalsFilters = ({
 
             const city =
               cityComponent?.long_name || result.results[0].formatted_address;
+            setTempCity(city);
+            setIsCitySelected(true);
             handleFilterChange("city", city);
             toast.success(`Location set to ${city}`);
           } else {
@@ -160,9 +192,10 @@ const ProfessionalsFilters = ({
               <div className="flex gap-2">
                 <div className="flex-1">
                   <GooglePlacesAutocomplete
-                    value={filters.city || ""}
-                    onChange={(value) => handleFilterChange("city", value)}
-                    placeholder="Search city..."
+                    value={tempCity}
+                    onChange={handleCityChange}
+                    onBlur={handleCityBlur}
+                    placeholder="Select city from list..."
                     types={["(cities)"]}
                     componentRestrictions={{ country: "in" }}
                   />
@@ -284,7 +317,11 @@ const ProfessionalsFilters = ({
                   City: {filters.city}
                   <X
                     className="h-3 w-3 cursor-pointer"
-                    onClick={() => handleFilterChange("city", undefined)}
+                    onClick={() => {
+                      setTempCity("");
+                      setIsCitySelected(false);
+                      handleFilterChange("city", undefined);
+                    }}
                   />
                 </Badge>
               )}
