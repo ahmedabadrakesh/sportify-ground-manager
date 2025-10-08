@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Select,
   SelectContent,
@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { X, Filter, ChevronUp } from "lucide-react";
+import { X, Filter, ChevronUp, ChevronDown } from "lucide-react";
 import { useGames } from "@/hooks/useGames";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Switch } from "@/components/ui/switch";
@@ -47,6 +47,8 @@ const VerticalFiltersSection = ({
   availableCities,
 }: ProfessionalsFiltersProps) => {
   const { games } = useGames();
+  const isMobile = useIsMobile();
+
   const gameOptions =
     games?.map((game) => ({
       label: game.name,
@@ -70,6 +72,9 @@ const VerticalFiltersSection = ({
 
   const [selectedGender, setSelectedGender] = useState<string>("all");
   const [selectedExperience, setSelectedExperience] = useState<string>("all");
+  const [filterShow, setFilterShow] = useState<boolean>(
+    isMobile ? false : true
+  );
 
   const handleFilterChange = (key: keyof FilterOptions, value: any) => {
     onFiltersChange({
@@ -82,272 +87,151 @@ const VerticalFiltersSection = ({
     onFiltersChange({});
   };
 
+  useEffect(() => {
+    if (isMobile) {
+      setFilterShow(false);
+    } else {
+      setFilterShow(true);
+    }
+  }, [isMobile]);
   return (
-    <section className="py-8 bg-secondary-50 bg-card border rounded-lg p-4">
-      <div className="flex items-center justify-between mb-4">
+    <section className="w-full bg-secondary-50 bg-card border rounded-lg p-4">
+      <div className="flex items-center justify-between">
         <h3 className="text-lg font-semibold text-text-primary">Filters</h3>
         <button
-          className="text-accent hover:text-accent-700 text-sm"
+          className="text-secondary hover:text-accent-700 text-sm"
           onClick={clearAllFilters}
         >
           Reset All
         </button>
+        <button
+          className="text-secondary hover:text-accent-700 text-sm"
+          hidden={!isMobile}
+          onClick={() => setFilterShow(!filterShow)}
+        >
+          {filterShow ? <ChevronDown /> : <ChevronUp />}
+        </button>
       </div>
-
-      {/* Certification Filter */}
-      <div className="flex flex-row items-left">
-        <label className="text-sm font-bold text-foreground mb-2 block text-left">
-          Certified?
-        </label>
-        <div className="shrink items-left">
-          <Switch
-            checked={
-              filters.isCertified === undefined
-                ? false
-                : filters.isCertified
-                ? true
-                : false
-            }
-            onCheckedChange={(value) =>
-              handleFilterChange("isCertified", value)
-            }
-            className="ml-6"
-          />
+      <div hidden={!filterShow} className="mt-4">
+        {/* Certification Filter */}
+        <div className="flex flex-row items-left">
+          <label className="text-sm font-bold text-foreground mb-2 block text-left">
+            Certified?
+          </label>
+          <div className="shrink items-left">
+            <Switch
+              checked={
+                filters.isCertified === undefined
+                  ? false
+                  : filters.isCertified
+                  ? true
+                  : false
+              }
+              onCheckedChange={(value) =>
+                handleFilterChange("isCertified", value)
+              }
+              className="ml-6"
+            />
+          </div>
         </div>
-      </div>
 
-      {/* Games */}
-      <div className="mb-6">
-        <h4 className="text-text-primary mb-3 font-bold text-left">Games</h4>
-        <div className="space-y-2">
-          <ScrollArea className="h-[calc(30vh)] px-1">
-            {games.map((option) => {
-              return (
-                <label
-                  className="flex items-top text-left"
-                  onClick={(value) => {
-                    handleFilterChange("gameId", option.id);
-                  }}
-                >
-                  <input
-                    type="checkbox"
-                    className="rounded border-secondary-300 text-accent focus:ring-accent/20"
-                  />
-                  <span className="ml-2 text-text-secondary">
-                    {option.name}
-                  </span>
-                </label>
-              );
-            })}
-          </ScrollArea>
+        {/* Games */}
+        <div className="mb-6">
+          <h4 className="text-text-primary mb-3 font-bold text-left">Games</h4>
+          <div className="space-y-2">
+            <ScrollArea className="h-[calc(30vh)] px-1">
+              {games.map((option) => {
+                return (
+                  <label
+                    className="flex items-top text-left"
+                    onClick={(value) => {
+                      handleFilterChange("gameId", option.id);
+                    }}
+                  >
+                    <input
+                      type="checkbox"
+                      className="rounded border-secondary-300 text-accent focus:ring-accent/20"
+                    />
+                    <span className="ml-2 text-text-secondary">
+                      {option.name}
+                    </span>
+                  </label>
+                );
+              })}
+            </ScrollArea>
+          </div>
         </div>
-      </div>
 
-      <div className="mb-6">
-        <h4 className="text-text-primary mb-3 font-bold text-left">Gender</h4>
-        {genderValues.map((gender) => (
-          <label className="flex items-center">
-            <RadioGroup
-              onValueChange={(value) => {
-                setSelectedGender(value);
-                handleFilterChange("sex", value);
-              }}
-              value={selectedGender}
-              className="flex flex-row space-x-4"
-            >
-              <div className="flex items-center space-x-2 mb-1">
-                <RadioGroupItem value={gender.value} id="gender" />
-                <label
-                  htmlFor={gender.label}
-                  className="text-sm font-medium ml-2 text-text-secondary"
-                >
-                  {gender.label}
-                </label>
-              </div>
-            </RadioGroup>
+        <div className="mb-6">
+          <h4 className="text-text-primary mb-3 font-bold text-left">Gender</h4>
+          {genderValues.map((gender) => (
+            <label className="flex items-center">
+              <RadioGroup
+                onValueChange={(value) => {
+                  setSelectedGender(value);
+                  handleFilterChange("sex", value);
+                }}
+                value={selectedGender}
+                className="flex flex-row space-x-4"
+              >
+                <div className="flex items-center space-x-2 mb-1">
+                  <RadioGroupItem value={gender.value} id="gender" />
+                  <label
+                    htmlFor={gender.label}
+                    className="text-sm font-medium ml-2 text-text-secondary"
+                  >
+                    {gender.label}
+                  </label>
+                </div>
+              </RadioGroup>
 
-            {/* <Checkbox
+              {/* <Checkbox
                 id={`facility-${`gender_${gender.label}`}`}
                 checked={selectedFacilities.includes(facility)}
                 onCheckedChange={() =>
                   handleFilterChange("sex", checked ? gender.label : "All")
                 }
               /> */}
-          </label>
-        ))}
-      </div>
+            </label>
+          ))}
+        </div>
 
-      <div className="mb-6">
-        <h4 className="text-text-primary mb-3 font-bold text-left">
-          Experience
-        </h4>
-        {experienceRanges.map((experience) => (
-          <label className="flex items-center">
-            <RadioGroup
-              onValueChange={(value) => {
-                setSelectedExperience(value);
-                handleFilterChange("experienceRange", value);
-              }}
-              value={selectedExperience}
-              className="flex flex-row space-x-4"
-            >
-              <div className="flex items-center space-x-2 mb-1">
-                <RadioGroupItem value={experience.value} id="gender" />
-                <label
-                  htmlFor={experience.label}
-                  className="text-sm font-medium ml-2 text-text-secondary"
-                >
-                  {experience.label}
-                </label>
-              </div>
-            </RadioGroup>
+        <div className="mb-6">
+          <h4 className="text-text-primary mb-3 font-bold text-left">
+            Experience
+          </h4>
+          {experienceRanges.map((experience) => (
+            <label className="flex items-center">
+              <RadioGroup
+                onValueChange={(value) => {
+                  setSelectedExperience(value);
+                  handleFilterChange("experienceRange", value);
+                }}
+                value={selectedExperience}
+                className="flex flex-row space-x-4"
+              >
+                <div className="flex items-center space-x-2 mb-1">
+                  <RadioGroupItem value={experience.value} id="gender" />
+                  <label
+                    htmlFor={experience.label}
+                    className="text-sm font-medium ml-2 text-text-secondary"
+                  >
+                    {experience.label}
+                  </label>
+                </div>
+              </RadioGroup>
 
-            {/* <Checkbox
+              {/* <Checkbox
                 id={`facility-${`gender_${gender.label}`}`}
                 checked={selectedFacilities.includes(facility)}
                 onCheckedChange={() =>
                   handleFilterChange("sex", checked ? gender.label : "All")
                 }
               /> */}
-          </label>
-        ))}
+            </label>
+          ))}
+        </div>
       </div>
-
-      {/* <div className="mb-6">
-        <h4 className="text-text-primary mb-3 font-bold text-left">
-          Price Range
-        </h4>
-        <div className="space-y-2">
-          <label className="flex items-center">
-            <input
-              type="checkbox"
-              className="rounded border-secondary-300 text-accent focus:ring-accent/20"
-            />
-            <span className="ml-2 text-text-secondary">$25 - $50/hour</span>
-          </label>
-          <label className="flex items-center">
-            <input
-              type="checkbox"
-              className="rounded border-secondary-300 text-accent focus:ring-accent/20"
-            />
-            <span className="ml-2 text-text-secondary">$50 - $100/hour</span>
-          </label>
-          <label className="flex items-center">
-            <input
-              type="checkbox"
-              className="rounded border-secondary-300 text-accent focus:ring-accent/20"
-            />
-            <span className="ml-2 text-text-secondary">$100 - $200/hour</span>
-          </label>
-          <label className="flex items-center">
-            <input
-              type="checkbox"
-              className="rounded border-secondary-300 text-accent focus:ring-accent/20"
-            />
-            <span className="ml-2 text-text-secondary">$200+/hour</span>
-          </label>
-        </div>
-      </div> */}
-      {/* <!-- Experience Level --> */}
-      {/* <div className="mb-6">
-        <h4 className="text-text-primary mb-3 font-bold text-left">
-          Experience Level
-        </h4>
-        <div className="space-y-2 text-left">
-          <label className="flex items-center">
-            <input
-              type="checkbox"
-              className="rounded border-secondary-300 text-accent focus:ring-accent/20"
-            />
-            <span className="ml-2 text-text-secondary">
-              Beginner (0-2 years)
-            </span>
-          </label>
-          <label className="flex items-center">
-            <input
-              type="checkbox"
-              className="rounded border-secondary-300 text-accent focus:ring-accent/20"
-            />
-            <span className="ml-2 text-text-secondary">
-              Intermediate (3-5 years)
-            </span>
-          </label>
-          <label className="flex items-center">
-            <input
-              type="checkbox"
-              className="rounded border-secondary-300 text-accent focus:ring-accent/20"
-            />
-            <span className="ml-2 text-text-secondary">
-              Advanced (6-10 years)
-            </span>
-          </label>
-          <label className="flex items-center">
-            <input
-              type="checkbox"
-              className="rounded border-secondary-300 text-accent focus:ring-accent/20"
-            />
-            <span className="ml-2 text-text-secondary">Expert (10+ years)</span>
-          </label>
-        </div>
-      </div> */}
-      {/* <!-- Availability --> */}
-      {/* <div className="mb-6">
-        <h4 className="text-text-primary mb-3 font-bold text-left">
-          Availability
-        </h4>
-        <div className="space-y-2">
-          <label className="flex items-center">
-            <input
-              type="checkbox"
-              className="rounded border-secondary-300 text-accent focus:ring-accent/20"
-            />
-            <span className="ml-2 text-text-secondary">Available Today</span>
-          </label>
-          <label className="flex items-center">
-            <input
-              type="checkbox"
-              className="rounded border-secondary-300 text-accent focus:ring-accent/20"
-            />
-            <span className="ml-2 text-text-secondary">This Week</span>
-          </label>
-          <label className="flex items-center">
-            <input
-              type="checkbox"
-              className="rounded border-secondary-300 text-accent focus:ring-accent/20"
-            />
-            <span className="ml-2 text-text-secondary">Flexible Schedule</span>
-          </label>
-        </div>
-      </div> */}
-      {/* <!-- Session Type --> */}
-      {/* <div className="mb-6">
-        <h4 className="text-text-primary mb-3 font-bold text-left">
-          Session Type
-        </h4>
-        <div className="space-y-2">
-          <label className="flex items-center">
-            <input
-              type="checkbox"
-              className="rounded border-secondary-300 text-accent focus:ring-accent/20"
-            />
-            <span className="ml-2 text-text-secondary">In-Person</span>
-          </label>
-          <label className="flex items-center">
-            <input
-              type="checkbox"
-              className="rounded border-secondary-300 text-accent focus:ring-accent/20"
-            />
-            <span className="ml-2 text-text-secondary">Online</span>
-          </label>
-          <label className="flex items-center">
-            <input
-              type="checkbox"
-              className="rounded border-secondary-300 text-accent focus:ring-accent/20"
-            />
-            <span className="ml-2 text-text-secondary">Group Sessions</span>
-          </label>
-        </div>
-      </div> */}
     </section>
   );
 };

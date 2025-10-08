@@ -216,7 +216,7 @@ const ProfessionalsList = ({ sportFilter }: ProfessionalsListProps) => {
 
   return (
     <>
-      <div className="max-w-7xl mx-auto">
+      <div className="max-w-7xl mx-auto p-8 md:p-0">
         <GoogleMapsProvider>
           <ProfessionalsFilters
             filters={filters}
@@ -225,8 +225,8 @@ const ProfessionalsList = ({ sportFilter }: ProfessionalsListProps) => {
           />
         </GoogleMapsProvider>
 
-        <div className="grid grid-cols-8 gap-6">
-          <div className="col-span-2">
+        <div className="md:grid md:grid-cols-8 gap-6">
+          <div className="w-full md:col-span-2 pb-4">
             <VerticalFiltersSection
               filters={filters}
               onFiltersChange={setFilters}

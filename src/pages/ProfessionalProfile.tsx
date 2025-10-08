@@ -420,7 +420,7 @@ const ProfessionalProfile = () => {
             </div>
 
             {/* Profile Header */}
-            <div className="bg-gradient-to-br from-secondary-600 to-secondary-900 p-12 flex flex-col lg:flex-row items-center lg:items-start gap-8">
+            <div className="bg-gradient-to-br from-secondary-600 to-secondary-900 p-8 md:p-12 flex flex-col lg:flex-row items-center lg:items-start">
               {/* Avatar and Initials */}
               <div className="relative flex flex-col items-center gap-4 w-full lg:w-auto">
                 <div className="w-32 h-32 lg:w-32 lg:h-32 rounded-full bg-gradient-to-br from-blue-400 to-purple-600 flex items-center justify-center text-white text-4xl lg:text-6xl font-bold mx-auto lg:mx-0">
@@ -450,7 +450,7 @@ const ProfessionalProfile = () => {
 
               {/* Profile Info */}
               <div className="flex-1 text-center lg:text-left">
-                <div className="flex items-end mb-1">
+                <div className="flex flex-col md:flex-row items-center md:items-end">
                   <h1 className="flex text-4xl lg:text-5xl font-bold mb-1 capitalize text-white">
                     {toTitleCase(professional?.name || "Professional")}
                     {professional.is_certified && (
@@ -479,14 +479,14 @@ const ProfessionalProfile = () => {
                   {professional.age && ` • Age ${professional.age}`}
                   {professional.sex && ` • ${professional.sex}`}
                 </p>
-                <div className="mt-3">
+                <div className="w-full mt-3">
                   {professional.game_ids &&
                     professional.game_ids.map((gameId, index) => {
                       return (
                         <Badge
                           key={`game-${gameId}-${index}`}
                           variant="secondary"
-                          className="text-sm bg-gray-100 text-gray-700 border-0 mr-2"
+                          className="text-sm bg-gray-100 text-gray-700 border-0 m-2"
                         >
                           {findNameById(gameData, gameId)}
                         </Badge>

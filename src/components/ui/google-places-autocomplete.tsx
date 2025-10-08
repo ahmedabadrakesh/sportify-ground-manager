@@ -76,14 +76,16 @@ export const GooglePlacesAutocomplete = React.forwardRef<
     ref
   ) => {
     const inputRef = useRef<HTMLInputElement>(null);
-    const autocompleteRef = useRef<google.maps.places.Autocomplete | null>(null);
+    const autocompleteRef = useRef<google.maps.places.Autocomplete | null>(
+      null
+    );
     const isSelectingRef = useRef(false);
     const styleRef = useRef<HTMLStyleElement | null>(null);
 
     // Inject styles for autocomplete dropdown
     useEffect(() => {
       if (!styleRef.current) {
-        const style = document.createElement('style');
+        const style = document.createElement("style");
         style.textContent = autocompleteStyles;
         document.head.appendChild(style);
         styleRef.current = style;
@@ -134,7 +136,6 @@ export const GooglePlacesAutocomplete = React.forwardRef<
           // Listen for place selection
           autocomplete.addListener("place_changed", () => {
             const place = autocomplete.getPlace();
-
             if (place?.formatted_address) {
               isSelectingRef.current = true;
 
@@ -144,7 +145,6 @@ export const GooglePlacesAutocomplete = React.forwardRef<
                 lng: place.geometry?.location?.lng(),
                 place_id: place.place_id,
               };
-
               // Call onChange with the formatted address and details
               onChange(place.formatted_address, details);
 
@@ -155,17 +155,20 @@ export const GooglePlacesAutocomplete = React.forwardRef<
             }
           });
         } catch (error) {
-          console.error("Error initializing Google Places Autocomplete:", error);
+          console.error(
+            "Error initializing Google Places Autocomplete:",
+            error
+          );
         }
       };
 
       initAutocomplete();
 
-      return () => {
-        if (autocompleteRef.current) {
-          google.maps.event.clearInstanceListeners(autocompleteRef.current);
-        }
-      };
+      // return () => {
+      //   if (autocompleteRef.current) {
+      //     google.maps.event.clearInstanceListeners(autocompleteRef.current);
+      //   }
+      // };
     }, [disabled, componentRestrictions, types, onChange]);
 
     // Sync input value with prop value
@@ -175,11 +178,11 @@ export const GooglePlacesAutocomplete = React.forwardRef<
       }
     }, [value]);
 
-    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-      if (!isSelectingRef.current) {
-        onChange(e.target.value, undefined);
-      }
-    };
+    // const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    //   if (!isSelectingRef.current) {
+    //     onChange(e.target.value, undefined);
+    //   }
+    // };
 
     return (
       <Input
@@ -194,12 +197,12 @@ export const GooglePlacesAutocomplete = React.forwardRef<
           }
         }}
         defaultValue={value}
-        onChange={handleInputChange}
+        //onChange={handleInputChange}
         onBlur={onBlur}
         placeholder={placeholder}
         disabled={disabled}
         className={cn(className)}
-        autoComplete="off"
+        autoComplete="on"
       />
     );
   }

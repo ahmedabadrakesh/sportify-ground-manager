@@ -47,14 +47,14 @@ const Cart: React.FC = () => {
     };
 
     loadCart();
-    
+
     // Listen for cart updates
     const handleCartUpdate = () => {
       loadCart();
     };
-    
+
     window.addEventListener("cartUpdated", handleCartUpdate);
-    
+
     return () => {
       window.removeEventListener("cartUpdated", handleCartUpdate);
     };
@@ -118,20 +118,20 @@ const Cart: React.FC = () => {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             <div className="lg:col-span-2">
               <Card>
-                <CardContent className="p-6">
+                <CardContent className="p-3">
                   <div className="space-y-4">
                     {cartItems.map(
                       (item) =>
-                         item && (
-                           <CartItem
-                             key={item.productId}
-                             productId={item.productId}
-                             quantity={item.quantity}
-                             product={item.product}
-                             selectedColor={item.color}
-                             onUpdate={handleCartUpdate}
-                           />
-                         )
+                        item && (
+                          <CartItem
+                            key={item.productId}
+                            productId={item.productId}
+                            quantity={item.quantity}
+                            product={item.product}
+                            selectedColor={item.color}
+                            onUpdate={handleCartUpdate}
+                          />
+                        )
                     )}
                   </div>
                 </CardContent>

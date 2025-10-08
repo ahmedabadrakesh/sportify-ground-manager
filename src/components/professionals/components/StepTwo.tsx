@@ -10,7 +10,10 @@ import {
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { ProfessionalFormValues } from "../schemas/professionalFormSchema";
-import { GooglePlacesAutocomplete, PlaceDetails } from "@/components/ui/google-places-autocomplete";
+import {
+  GooglePlacesAutocomplete,
+  PlaceDetails,
+} from "@/components/ui/google-places-autocomplete";
 
 interface StepTwoProps {
   form: UseFormReturn<ProfessionalFormValues>;
@@ -156,8 +159,8 @@ export const StepTwo = ({ form, userEmail, isUpdate }: StepTwoProps) => {
               <FormItem>
                 <FormLabel>WhatsApp Number</FormLabel>
                 <FormControl>
-                  <Input 
-                    {...field} 
+                  <Input
+                    {...field}
                     placeholder="WhatsApp number"
                     onBlur={(e) => {
                       const trimmedValue = e.target.value.trim();
@@ -206,14 +209,16 @@ export const StepTwo = ({ form, userEmail, isUpdate }: StepTwoProps) => {
               <FormItem>
                 <FormLabel>Instagram</FormLabel>
                 <FormControl>
-                  <Input 
-                    {...field} 
+                  <Input
+                    {...field}
                     placeholder="Instagram profile URL"
                     onBlur={(e) => {
                       const trimmedValue = e.target.value.trim();
                       if (trimmedValue === "" && e.target.value !== "") {
                         field.onChange("");
-                        form.setError("instagram_link", { message: "Invalid value" });
+                        form.setError("instagram_link", {
+                          message: "Invalid value",
+                        });
                       } else {
                         field.onChange(trimmedValue);
                         form.clearErrors("instagram_link");
@@ -233,14 +238,16 @@ export const StepTwo = ({ form, userEmail, isUpdate }: StepTwoProps) => {
               <FormItem>
                 <FormLabel>YouTube</FormLabel>
                 <FormControl>
-                  <Input 
-                    {...field} 
+                  <Input
+                    {...field}
                     placeholder="YouTube channel URL"
                     onBlur={(e) => {
                       const trimmedValue = e.target.value.trim();
                       if (trimmedValue === "" && e.target.value !== "") {
                         field.onChange("");
-                        form.setError("youtube_link", { message: "Invalid value" });
+                        form.setError("youtube_link", {
+                          message: "Invalid value",
+                        });
                       } else {
                         field.onChange(trimmedValue);
                         form.clearErrors("youtube_link");
@@ -262,14 +269,16 @@ export const StepTwo = ({ form, userEmail, isUpdate }: StepTwoProps) => {
               <FormItem>
                 <FormLabel>LinkedIn</FormLabel>
                 <FormControl>
-                  <Input 
-                    {...field} 
+                  <Input
+                    {...field}
                     placeholder="LinkedIn profile URL"
                     onBlur={(e) => {
                       const trimmedValue = e.target.value.trim();
                       if (trimmedValue === "" && e.target.value !== "") {
                         field.onChange("");
-                        form.setError("linkedin_link", { message: "Invalid value" });
+                        form.setError("linkedin_link", {
+                          message: "Invalid value",
+                        });
                       } else {
                         field.onChange(trimmedValue);
                         form.clearErrors("linkedin_link");
@@ -289,8 +298,8 @@ export const StepTwo = ({ form, userEmail, isUpdate }: StepTwoProps) => {
               <FormItem>
                 <FormLabel>Website</FormLabel>
                 <FormControl>
-                  <Input 
-                    {...field} 
+                  <Input
+                    {...field}
                     placeholder="Personal website URL"
                     onBlur={(e) => {
                       const trimmedValue = e.target.value.trim();

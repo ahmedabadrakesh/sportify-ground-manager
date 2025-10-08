@@ -1,6 +1,6 @@
 import React from "react";
 import { Button } from "@/components/ui/button";
-import { Minus, Plus, X } from "lucide-react";
+import { Delete, Minus, Plus, Recycle, Trash2, X } from "lucide-react";
 import { toast } from "sonner";
 import { updateCartItemQuantity, removeFromCart } from "@/utils/cart";
 import { Product } from "@/types/models";
@@ -37,29 +37,8 @@ const CartItem: React.FC<CartItemProps> = ({
     toast.success("Item removed from cart");
   };
 
-  return (
-    <div className="flex items-center py-4 border-b last:border-0">
-      <div className="h-20 w-20 bg-gray-100 rounded-md overflow-hidden mr-4">
-        <img
-          src={product.images[0]}
-          alt={product.name}
-          className="h-full w-full object-cover"
-        />
-      </div>
-
-      <div className="flex-1">
-        <h3 className="font-medium">
-          {`${product.name.substring(0, 30)}${
-            product.name.length > 30 ? "..." : ""
-          }`}
-        </h3>
-        <p className="text-sm text-gray-500">{product.category}</p>
-        {selectedColor && (
-          <p className="text-sm text-gray-600">Color: {selectedColor}</p>
-        )}
-        <p className="font-semibold">₹{product.price}</p>
-      </div>
-
+  const QuantitySection = () => {
+    return (
       <div className="flex items-center mr-4">
         <Button
           variant="outline"
@@ -83,19 +62,77 @@ const CartItem: React.FC<CartItemProps> = ({
           <Plus className="h-3 w-3" />
         </Button>
       </div>
+    );
+  };
 
-      <div className="text-right w-24 mr-2">
-        <p className="font-semibold">₹{subtotal}</p>
+  return (
+    <div className="flex items-center border-b last:border-0 w-full items-center">
+      <div className="h-20 w-20 md:h-32 md:w-32 bg-gray-100 rounded-md overflow-hidden mr-4">
+        <img
+          src={product.images[0]}
+          alt={product.name}
+          className="h-full w-full object-cover rounded-md"
+        />
       </div>
+      <div className="flex flex-col w-full">
+        <div className="flex flex-row items-center w-full">
+          <div className="flex flex-col items-left text-left w-[90%] md:w-[55%] gap-2">
+            <h3 className="font-medium">
+              {`${product.name.substring(0, 30)}${
+                product.name.length > 30 ? "..." : ""
+              }`}
+            </h3>
+            <div className="flex flex-row gap-4">
+              <p className="text-sm text-gray-500">{product.category}</p>
+              <div className="flex flex-row gap-2">
+                {selectedColor &&
+                  selectedColor.split(",").map((colorCode) => {
+                    return (
+                      <button
+                        key={colorCode}
+                        className={`w-5 h-5 rounded-full mr-2 border-2 hover:scale-110 transition-transform ${
+                          selectedColor === colorCode
+                            ? "border-primary border-3 ring-2 ring-primary/30"
+                            : "border-gray-400 hover:border-gray-600"
+                        }`}
+                        style={{ backgroundColor: colorCode }}
+                        title={`Select ${colorCode} color`}
+                      />
+                    );
+                  })}
+              </div>
+              <p className="font-semibold">₹{product.price}</p>
+            </div>
+          </div>
 
-      <Button
-        variant="ghost"
-        size="icon"
-        className="text-gray-500"
-        onClick={handleRemove}
-      >
-        <X className="h-4 w-4" />
-      </Button>
+          <div className="hidden md:block w-[20%]">
+            <QuantitySection />
+          </div>
+          <div className="hidden md:block  text-right mr-2 w-[20%]">
+            <p className="font-semibold">₹{subtotal}</p>
+          </div>
+
+          <div className="flex text-right w-[10%] md:w-[5%] aligh-top height-full -mt-8 md:mt-0">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="text-gray-500 aligh-top"
+              onClick={handleRemove}
+            >
+              <Trash2 className="h-4 w-4" />
+            </Button>
+          </div>
+        </div>
+
+        <div className="block md:hidden flex flex-row mt-2">
+          <div className="w-[80%]">
+            <QuantitySection />
+          </div>
+          <div className="text-right w-24 mr-2 w-[20%]">
+            <p className="font-semibold">₹{subtotal}</p>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };
