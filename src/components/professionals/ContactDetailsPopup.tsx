@@ -15,6 +15,7 @@ interface ContactDetailsPopupProps {
   onOpenChange: (open: boolean) => void;
   professionalId: string;
   professionalName: string;
+  professionalUserId?: string;
 }
 
 interface ContactDetails {
@@ -28,8 +29,11 @@ const ContactDetailsPopup = ({
   onOpenChange,
   professionalId,
   professionalName,
+  professionalUserId,
 }: ContactDetailsPopupProps) => {
-  const [contactDetails, setContactDetails] = useState<ContactDetails | null>(null);
+  const [contactDetails, setContactDetails] = useState<ContactDetails | null>(
+    null
+  );
   const [loading, setLoading] = useState(false);
   const [copiedField, setCopiedField] = useState<string | null>(null);
 
@@ -38,17 +42,26 @@ const ContactDetailsPopup = ({
     try {
       const { data, error } = await supabase
         .from("sports_professionals")
-        .select("contact_number, whatsapp, name")
+        .select("contact_number, whatsapp, name, user_id")
         .eq("id", professionalId)
         .single();
 
       if (error) throw error;
 
+      const { data: userData, error: userError } = await supabase
+        .from("users")
+        .select("email")
+        .eq("id", professionalUserId)
+        .single();
+
+      if (userError) throw error;
+
       // Since we don't have email in sports_professionals table, we'll use a placeholder
       setContactDetails({
         phone: data.contact_number,
         whatsapp: data.whatsapp || data.contact_number,
-        email: `${data.name?.toLowerCase().replace(/\s+/g, '.')}@jokova.com`, // Mock email
+        //email: `${data.name?.toLowerCase().replace(/\s+/g, '.')}@jokova.com`, // Mock email
+        email: userData.email,
       });
     } catch (error) {
       console.error("Error fetching contact details:", error);
@@ -69,7 +82,7 @@ const ContactDetailsPopup = ({
       await navigator.clipboard.writeText(text);
       setCopiedField(field);
       toast.success(`${field} copied to clipboard`);
-      
+
       // Reset copied state after 2 seconds
       setTimeout(() => {
         setCopiedField(null);
@@ -107,7 +120,9 @@ const ContactDetailsPopup = ({
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => copyToClipboard(contactDetails.phone || "", "Phone")}
+                onClick={() =>
+                  copyToClipboard(contactDetails.phone || "", "Phone")
+                }
                 disabled={!contactDetails.phone}
               >
                 {copiedField === "Phone" ? (
@@ -130,7 +145,9 @@ const ContactDetailsPopup = ({
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => copyToClipboard(contactDetails.email || "", "Email")}
+                onClick={() =>
+                  copyToClipboard(contactDetails.email || "", "Email")
+                }
                 disabled={!contactDetails.email}
               >
                 {copiedField === "Email" ? (
@@ -142,28 +159,31 @@ const ContactDetailsPopup = ({
             </div>
 
             {/* WhatsApp (if different from phone) */}
-            {contactDetails.whatsapp && contactDetails.whatsapp !== contactDetails.phone && (
-              <div className="flex items-center justify-between p-3 border rounded-lg bg-gray-50">
-                <div className="flex items-center space-x-3">
-                  <div className="h-5 w-5 text-green-600">📱</div>
-                  <div>
-                    <p className="text-sm text-gray-600">WhatsApp</p>
-                    <p className="font-medium">{contactDetails.whatsapp}</p>
+            {contactDetails.whatsapp &&
+              contactDetails.whatsapp !== contactDetails.phone && (
+                <div className="flex items-center justify-between p-3 border rounded-lg bg-gray-50">
+                  <div className="flex items-center space-x-3">
+                    <div className="h-5 w-5 text-green-600">📱</div>
+                    <div>
+                      <p className="text-sm text-gray-600">WhatsApp</p>
+                      <p className="font-medium">{contactDetails.whatsapp}</p>
+                    </div>
                   </div>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() =>
+                      copyToClipboard(contactDetails.whatsapp || "", "WhatsApp")
+                    }
+                  >
+                    {copiedField === "WhatsApp" ? (
+                      <CheckCircle className="h-4 w-4 text-green-600" />
+                    ) : (
+                      <Copy className="h-4 w-4" />
+                    )}
+                  </Button>
                 </div>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => copyToClipboard(contactDetails.whatsapp || "", "WhatsApp")}
-                >
-                  {copiedField === "WhatsApp" ? (
-                    <CheckCircle className="h-4 w-4 text-green-600" />
-                  ) : (
-                    <Copy className="h-4 w-4" />
-                  )}
-                </Button>
-              </div>
-            )}
+              )}
 
             <div className="text-center pt-2">
               <p className="text-xs text-gray-500">
