@@ -274,6 +274,7 @@ const ProfessionalCard = ({
         open={contactPopupOpen}
         onOpenChange={setContactPopupOpen}
         professionalId={professional.id}
+        professionalUserId={professional?.user_id || ""}
         professionalName={professional.name}
       />
     </Card>
