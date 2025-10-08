@@ -449,7 +449,7 @@ const ProfessionalProfile = () => {
               </div>
 
               {/* Profile Info */}
-              <div className="flex-1 text-center lg:text-left">
+              <div className="flex-1 text-center lg:text-left pl-4">
                 <div className="flex flex-col md:flex-row items-center md:items-end">
                   <h1 className="flex text-4xl lg:text-5xl font-bold mb-1 capitalize text-white">
                     {toTitleCase(professional?.name || "Professional")}
@@ -474,9 +474,12 @@ const ProfessionalProfile = () => {
                   </span>
                 </div>
                 <p className="text-sm lg:text-lg text-white ">
-                  {professional.profession_type.join(" • ")},
-                  {" • Sports Professional"}
-                  {professional.age && ` • Age ${professional.age}`}
+                  {professional.profession_type.join(" • ")}
+                  {professional.profession_type.length === 0 &&
+                    " • Sports Professional"}
+                  {professional.age !== null &&
+                    professional.age !== 0 &&
+                    ` • Age ${professional.age}`}
                   {professional.sex && ` • ${professional.sex}`}
                 </p>
                 <div className="w-full mt-3">
@@ -486,7 +489,7 @@ const ProfessionalProfile = () => {
                         <Badge
                           key={`game-${gameId}-${index}`}
                           variant="secondary"
-                          className="text-sm bg-gray-100 text-gray-700 border-0 m-2"
+                          className="text-sm bg-gray-100 text-gray-700 border-0"
                         >
                           {findNameById(gameData, gameId)}
                         </Badge>
@@ -622,47 +625,52 @@ const ProfessionalProfile = () => {
             {/* Left Column - Main Content */}
             <div className="lg:col-span-2 space-y-8">
               {/* About Me Section */}
-              {professional.about_me && (
-                <Card className="shadow-elegant border-2 border-secondary-900 bg-muted/20">
-                  <CardHeader className="bg-gradient-to-br from-secondary-600 to-secondary-900  text-primary-foreground">
-                    <CardTitle className="flex items-center gap-2">
-                      <Quote className="h-5 w-5" />
-                      About Me
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="p-6">
-                    <div className="relative">
-                      <Quote className="absolute -top-2 -left-2 w-8 h-8 text-gray-500 rotate-180" />
-                      {professional.punch_line && (
-                        <p className="text-lg text-gray-700 ml-8 mb-6 italic text-left leading-relaxed ">
-                          {professional.punch_line}
-                        </p>
-                      )}
-                      <Quote className="absolute -bottom-2 -right-2 w-8 h-8 text-gray-500 " />
+              {professional.about_me !== null &&
+                professional.about_me !== "" && (
+                  <Card className="shadow-elegant border-2 border-secondary-900 bg-muted/20">
+                    <CardHeader className="bg-gradient-to-br from-secondary-600 to-secondary-900  text-primary-foreground">
+                      <CardTitle className="flex items-center gap-2">
+                        <Quote className="h-5 w-5" />
+                        About Me
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="p-6">
+                      <div className="relative">
+                        <Quote className="absolute -top-2 -left-2 w-8 h-8 text-gray-500 rotate-180" />
+                        {professional.punch_line && (
+                          <p className="text-lg text-gray-700 ml-8 mb-6 italic text-left leading-relaxed ">
+                            {professional.punch_line}
+                          </p>
+                        )}
+                        <Quote className="absolute -bottom-2 -right-2 w-8 h-8 text-gray-500 " />
 
-                      <p className="text-foreground text-gray-700 text-justify leading-relaxed">
-                        <span
-                          dangerouslySetInnerHTML={{ __html: getAboutMeText() }}
-                        />
-                        <span>
-                          {professional.about_me.split(" ").length >= 50 && (
-                            <button
-                              className="text-primary hover:underline font-medium"
-                              onClick={() =>
-                                setisAboutReadMoreOpened(!isAboutReadMoreOpened)
-                              }
-                            >
-                              {isAboutReadMoreOpened
-                                ? "Read Less"
-                                : "Read More"}
-                            </button>
-                          )}
-                        </span>
-                      </p>
-                    </div>
-                  </CardContent>
-                </Card>
-              )}
+                        <p className="text-foreground text-gray-700 text-justify leading-relaxed">
+                          <span
+                            dangerouslySetInnerHTML={{
+                              __html: getAboutMeText(),
+                            }}
+                          />
+                          <span>
+                            {professional.about_me.split(" ").length >= 50 && (
+                              <button
+                                className="text-primary hover:underline font-medium"
+                                onClick={() =>
+                                  setisAboutReadMoreOpened(
+                                    !isAboutReadMoreOpened
+                                  )
+                                }
+                              >
+                                {isAboutReadMoreOpened
+                                  ? "Read Less"
+                                  : "Read More"}
+                              </button>
+                            )}
+                          </span>
+                        </p>
+                      </div>
+                    </CardContent>
+                  </Card>
+                )}
 
               {/* Specialties */}
               {professional.specialties &&
@@ -741,10 +749,10 @@ const ProfessionalProfile = () => {
                 )}
 
               {/* Tournament Participation */}
-              {(professional.district_level_tournaments ||
-                professional.state_level_tournaments ||
-                professional.national_level_tournaments ||
-                professional.international_level_tournaments) && (
+              {(professional.district_level_tournaments !== 0 ||
+                professional.state_level_tournaments !== 0 ||
+                professional.national_level_tournaments !== 0 ||
+                professional.international_level_tournaments !== 0) && (
                 <Card className="shadow-elegant">
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2 text-primary">
