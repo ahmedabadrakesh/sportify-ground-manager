@@ -54,5 +54,7 @@ export const clientServedRounndoff = (count) => {
 }
 
 export const addDotsForLongStrring = (str, length) => {
-  return `${str.substring(str,length)}...`
+  if(str.length <= length) {return str }
+  else
+  {return `${str.substring(str,length)}...`}
 }

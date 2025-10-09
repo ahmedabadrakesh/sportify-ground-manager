@@ -178,7 +178,7 @@ const ProfessionalCard = ({
                       >
                         {addDotsForLongStrring(
                           findNameById(gameData, gameId),
-                          10
+                          15
                         )}
                       </Badge>
                     </>
