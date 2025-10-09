@@ -16,7 +16,12 @@ import {
 } from "lucide-react";
 import { getCurrentUserSync } from "@/utils/auth";
 import ContactDetailsPopup from "./ContactDetailsPopup";
-import { findNameById } from "@/lib/utils";
+import {
+  addDotsForLongStrring,
+  clientServedRounndoff,
+  findNameById,
+  toTitleCase,
+} from "@/lib/utils";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -104,14 +109,17 @@ const ProfessionalCard = ({
                 )}
               </>
             </h3>
-            <p className="flex items-center gap-2 mb-2 text-sm text-gray-600">
-              {professional.profession_type.join(" • ")}
+            <p className="flex flex-row items-center font-semibold gap-1 mb-2 text-xs text-gray-600">
+              {addDotsForLongStrring(
+                professional.profession_type.join(" • "),
+                15
+              )}
               {/* Location */}
               {professional.city && (
                 <>
                   <MapPin className="h-4 w-4 text-xs text-gray-500" />
-                  <span className="text-sm text-gray-600">
-                    {professional.city}
+                  <span className="text-xs text-gray-600">
+                    {toTitleCase(professional.city.split(", ")[0])}
                   </span>
                 </>
               )}
@@ -137,7 +145,9 @@ const ProfessionalCard = ({
                   variant="secondary"
                   className="text-xs bg-gray-100 text-gray-700 border-0"
                 >
-                  {`${professional.number_of_clients_served} Clients Served`}
+                  {`${clientServedRounndoff(
+                    professional.number_of_clients_served
+                  )} Clients`}
                 </Badge>
               )}
             {professional.is_certified && (
@@ -166,7 +176,10 @@ const ProfessionalCard = ({
                         variant="secondary"
                         className="text-xs bg-gray-100 text-gray-700 border-0"
                       >
-                        {findNameById(gameData, gameId)}
+                        {addDotsForLongStrring(
+                          findNameById(gameData, gameId),
+                          10
+                        )}
                       </Badge>
                     </>
                   );
@@ -184,39 +197,38 @@ const ProfessionalCard = ({
           )}
 
           {/* Specialties */}
-          <div className="mb-4 mt-4">
-            <div className="flex items-center gap-2 mb-2">
-              <Target className="h-4 w-4 text-gray-500" />
-              <span className="text-xs font-semibold text-gray-700">
-                Specialties
-              </span>
+          {professional.specialties.length !== 0 && (
+            <div className="mb-4 mt-4">
+              <div className="flex items-center gap-2 mb-2">
+                <Target className="h-4 w-4 text-gray-500" />
+                <span className="text-xs font-semibold text-gray-700">
+                  Specialties
+                </span>
+              </div>
+              <div className="text-xs text-left text-gray-600 gap-4">
+                {professional.specialties
+                  .slice(0, 2)
+                  .map((specialty, index) => (
+                    <Badge
+                      variant="secondary"
+                      className="text-xs bg-gray-100 text-gray-700 border-0 mt-1 mr-2"
+                    >
+                      <span className="text-xs">
+                        {toTitleCase(addDotsForLongStrring(specialty, 10))}
+                      </span>
+                    </Badge>
+                  ))}
+                {professional.specialties.length > 2 && (
+                  <Badge
+                    variant="secondary"
+                    className="text-xs   bg-gray-100 text-gray-700 border-0"
+                  >
+                    +
+                  </Badge>
+                )}
+              </div>
             </div>
-
-            {/* <p className="text-xs text-left text-gray-600">
-              {professional.game_ids && professional.game_ids.length > 0
-                ? "Multi-Sport Training"
-                : "Sports Training"}
-              , {professional.profession_type} +2 more
-            </p> */}
-            <div className="text-xs text-left text-gray-600 gap-4">
-              {professional.specialties.slice(0, 2).map((specialty, index) => (
-                <Badge
-                  variant="secondary"
-                  className="text-xs bg-gray-100 text-gray-700 border-0 mt-2"
-                >
-                  <span className="text-sm">{specialty}</span>
-                </Badge>
-              ))}
-              {professional.specialties.length > 2 && (
-                <Badge
-                  variant="secondary"
-                  className="text-xs   bg-gray-100 text-gray-700 border-0"
-                >
-                  +
-                </Badge>
-              )}
-            </div>
-          </div>
+          )}
         </div>
         {/* Bottom Row - Contact Icons and Button */}
         <hr className="m-2" />

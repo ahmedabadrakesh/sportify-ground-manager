@@ -46,3 +46,13 @@ export function addTailwindClassesToUl(htmlString) {
   const modifiedString = htmlString.replace(/<ul/g, '<ul style="list-style-type: disc; list-style-position: inside;"');
   return modifiedString;
 }
+
+export const clientServedRounndoff = (count) => {
+  if(count <= 100) return count 
+  if(count > 101) return "100+"
+  
+}
+
+export const addDotsForLongStrring = (str, length) => {
+  return `${str.substring(str,length)}...`
+}
