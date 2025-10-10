@@ -119,7 +119,7 @@ const ProfessionalsFilters = ({
   };
 
   return (
-    <div className="mb-6">
+    <div className="hidden mb-6">
       {/* Mobile Filter Toggle Button */}
       {isMobile && (
         <Button

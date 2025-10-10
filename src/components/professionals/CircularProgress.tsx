@@ -4,10 +4,12 @@ import { Button } from "@/components/ui/button";
 
 interface CircularProgressProps {
   professional: any;
+  showPercentageOnly?: boolean;
 }
 
 const CircularProgress: React.FC<CircularProgressProps> = ({
   professional,
+  showPercentageOnly = false,
 }) => {
   const calculateCompletionPercentage = () => {
     if (!professional) return 0;
@@ -81,42 +83,62 @@ const CircularProgress: React.FC<CircularProgressProps> = ({
 
   return (
     <div className="flex flex-col items-center justify-center">
-      <div className="relative w-40 h-40">
-        <svg
-          className="transform w-40 h-40 "
-          width={radius * 2}
-          height={radius * 2}
-        >
-          {/* Background circle */}
-          <circle
-            stroke="gray"
-            fill="transparent"
-            strokeWidth={strokeWidth}
-            strokeDasharray={strokeDasharray}
-            r={normalizedRadius}
-            cx={radius}
-            cy={radius}
-            opacity={0.3}
-          />
-          {/* Progress circle */}
-          <circle
-            stroke={getProgressColor()}
-            fill="transparent"
-            strokeWidth={strokeWidth}
-            strokeDasharray={strokeDasharray}
-            style={{ strokeDashoffset }}
-            strokeLinecap="round"
-            r={normalizedRadius}
-            cx={radius}
-            cy={radius}
-            className="transition-all duration-500 ease-in-out"
-          />
-        </svg>
-        {/* Percentage text in center */}
-        <div className="absolute inset-0 flex items-center justify-center">
-          <span className="text-success text-xl font-bold">{percentage}%</span>
+      {showPercentageOnly === false && (
+        <div className="relative w-40 h-40">
+          <svg
+            className="transform w-40 h-40 "
+            width={radius * 2}
+            height={radius * 2}
+          >
+            {/* Background circle */}
+            <circle
+              stroke="gray"
+              fill="transparent"
+              strokeWidth={strokeWidth}
+              strokeDasharray={strokeDasharray}
+              r={normalizedRadius}
+              cx={radius}
+              cy={radius}
+              opacity={0.3}
+            />
+            {/* Progress circle */}
+            <circle
+              stroke={getProgressColor()}
+              fill="transparent"
+              strokeWidth={strokeWidth}
+              strokeDasharray={strokeDasharray}
+              style={{ strokeDashoffset }}
+              strokeLinecap="round"
+              r={normalizedRadius}
+              cx={radius}
+              cy={radius}
+              className="transition-all duration-500 ease-in-out"
+            />
+          </svg>
+          {/* Percentage text in center */}
+          <div className="absolute inset-0 flex items-center justify-center">
+            <span className="text-success text-xl font-bold">
+              {percentage}%
+            </span>
+          </div>
         </div>
-      </div>
+      )}
+      {showPercentageOnly === true && percentage <= 70 && (
+        <div className="w-full bg-gray-200 rounded-full h-2.5 mb-4 dark:bg-gray-700">
+          <div
+            className="bg-blue-600 text-sm/[8px] font-medium h-2.5 text-blue-100 text-center p-0.5 leading-none rounded-full"
+            style={{ width: `${percentage}%` }}
+          ></div>
+        </div>
+      )}
+      {showPercentageOnly === true && percentage >= 70 && (
+        <div className="w-full bg-gray-200 rounded-full h-2.5 mb-4 dark:bg-gray-700">
+          <div
+            className="bg-green-500 text-sm/[8px] font-medium h-2.5 text-blue-100 text-center p-0.5 leading-none rounded-full"
+            style={{ width: `${percentage}%` }}
+          ></div>
+        </div>
+      )}
     </div>
   );
 };

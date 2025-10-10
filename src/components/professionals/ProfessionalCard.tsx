@@ -24,6 +24,7 @@ import {
 } from "@/lib/utils";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import CircularProgress from "./CircularProgress";
 
 const ProfessionalCard = ({
   professional,
@@ -91,23 +92,21 @@ const ProfessionalCard = ({
           <div className="flex-1 min-w-0 text-left">
             {/* Name and Profession */}
             <h3 className="flex flex-row text-lg font-semibold text-gray-900 mb-1">
-              <>
-                {professional.name}
-                {professional.is_certified && (
-                  <div className="relative group">
-                    <Award
-                      size={20}
-                      color="white"
-                      className="ml-2"
-                      fill="#1f2ce0"
-                      type="button"
-                    />
-                    <div className="absolute left-1/2 transform -translate-x-1/2 bottom-full mb-2 hidden group-hover:block bg-gray-800 text-white text-xs rounded py-1 px-2 z-10">
-                      {"Certified"}
-                    </div>
+              {professional.name}
+              {professional.is_certified && (
+                <div className="relative group">
+                  <Award
+                    size={20}
+                    color="white"
+                    className="ml-2"
+                    fill="#1f2ce0"
+                    type="button"
+                  />
+                  <div className="absolute left-1/2 transform -translate-x-1/2 bottom-full mb-2 hidden group-hover:block bg-gray-800 text-white text-xs rounded py-1 px-2 z-10">
+                    {"Certified"}
                   </div>
-                )}
-              </>
+                </div>
+              )}
             </h3>
             <p className="flex flex-row items-center font-semibold gap-1 mb-2 text-xs text-gray-600">
               {addDotsForLongStrring(
@@ -126,7 +125,10 @@ const ProfessionalCard = ({
             </p>
           </div>
         </div>
-
+        <CircularProgress
+          professional={professional}
+          showPercentageOnly={true}
+        />
         <div className="md:h-40">
           {/* Stats Row */}
           <div className="flex items-center gap-2">

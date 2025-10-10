@@ -70,7 +70,7 @@ export const StepperForm = ({
             </div>
           );
         })}
-        <div className="mt-12 p-4 bg-gradient-to-r from-blue/10 to-blue/5 rounded-lg border border-blue/20">
+        <div className="hidden md:block mt-12 p-4 bg-gradient-to-r from-blue/10 to-blue/5 rounded-lg border border-blue/20">
           <h3 className="text-sm text-white font-semibold mb-2 flex items-center gap-2">
             <Sun className="w-4 h-4" />
             Profile Tip
