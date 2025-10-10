@@ -124,19 +124,19 @@ const CircularProgress: React.FC<CircularProgressProps> = ({
         </div>
       )}
       {showPercentageOnly === true && percentage <= 70 && (
-        <div className="w-full bg-gray-200 rounded-full h-2.5 mb-4 dark:bg-gray-700">
+        <div className="w-full bg-gray-200 rounded-full h-3.5 mb-4 dark:bg-gray-700">
           <div
-            className="bg-blue-600 text-sm/[8px] font-medium h-2.5 text-blue-100 text-center p-0.5 leading-none rounded-full"
+            className="bg-blue-600 text-[8px] font-medium h-3.5 text-blue-100 text-center p-0.5 leading-none rounded-full"
             style={{ width: `${percentage}%` }}
-          ></div>
+          >{`${percentage}%`}</div>
         </div>
       )}
       {showPercentageOnly === true && percentage >= 70 && (
-        <div className="w-full bg-gray-200 rounded-full h-2.5 mb-4 dark:bg-gray-700">
+        <div className="w-full bg-gray-200 rounded-full h-3.5 mb-4 dark:bg-gray-700">
           <div
-            className="bg-green-500 text-sm/[8px] font-medium h-2.5 text-blue-100 text-center p-0.5 leading-none rounded-full"
+            className="bg-green-500 text-[8px] font-medium h-3.5 text-blue-100 text-center p-0.5 leading-none rounded-full"
             style={{ width: `${percentage}%` }}
-          ></div>
+          >{`${percentage}%`}</div>
         </div>
       )}
     </div>
