@@ -23,13 +23,8 @@ const CircularProgress: React.FC<CircularProgressProps> = ({
       "photo",
       "phone",
       "city",
-      "state",
-      "country",
-      "pincode",
-      "current_location",
       "website",
       "instagram_link",
-      "facebook_link",
       "linkedin_link",
       "certifications",
       "accomplishments",
@@ -37,14 +32,16 @@ const CircularProgress: React.FC<CircularProgressProps> = ({
       "videos",
       "images",
       "game_ids",
-      "games_played",
       "coaching_availability",
-      "fee_per_hour",
-      "fee_per_session",
+      "one_on_one_price",
+      "group_session_price",
+      "online_price",
       "district_level_tournaments",
       "state_level_tournaments",
       "national_level_tournaments",
       "international_level_tournaments",
+      "number_of_clients_served",
+      "is_certified",
     ];
 
     let filledFields = 0;
@@ -131,7 +128,7 @@ const CircularProgress: React.FC<CircularProgressProps> = ({
           >{`${percentage}%`}</div>
         </div>
       )}
-      {showPercentageOnly === true && percentage >= 70 && (
+      {showPercentageOnly === true && percentage > 70 && (
         <div className="w-full bg-gray-200 rounded-full h-3.5 mb-4 dark:bg-gray-700">
           <div
             className="bg-green-500 text-[8px] font-medium h-3.5 text-blue-100 text-center p-0.5 leading-none rounded-full"

@@ -119,7 +119,7 @@ export const StepOne = ({ form }: StepOneProps) => {
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      {Array.from({ length: 41 }, (_, i) => i + 10).map(
+                      {Array.from({ length: 99 }, (_, i) => i + 10).map(
                         (age) => (
                           <SelectItem key={age} value={age.toString()}>
                             {age}
@@ -217,7 +217,9 @@ export const StepOne = ({ form }: StepOneProps) => {
                         // Clear field if it contains only spaces
                         setSuggestedPunchLine("");
                         field.onChange("");
-                        form.setError("punch_line", { message: "Invalid value" });
+                        form.setError("punch_line", {
+                          message: "Invalid value",
+                        });
                       } else {
                         setSuggestedPunchLine(trimmedValue);
                         field.onChange(trimmedValue);
@@ -252,8 +254,8 @@ export const StepOne = ({ form }: StepOneProps) => {
             <FormItem>
               <FormLabel>Academy Name</FormLabel>
               <FormControl>
-                <Input 
-                  {...field} 
+                <Input
+                  {...field}
                   placeholder="Academy or organization name"
                   onChange={(e) => {
                     const trimmedValue = e.target.value.trim();
@@ -269,7 +271,9 @@ export const StepOne = ({ form }: StepOneProps) => {
                     if (trimmedValue === "" && e.target.value !== "") {
                       // Clear field if it contains only spaces
                       field.onChange("");
-                      form.setError("academy_name", { message: "Invalid value" });
+                      form.setError("academy_name", {
+                        message: "Invalid value",
+                      });
                     } else {
                       field.onChange(trimmedValue);
                       form.clearErrors("academy_name");

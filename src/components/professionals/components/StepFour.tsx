@@ -21,7 +21,10 @@ import {
   Trash2,
   BadgeIndianRupee,
 } from "lucide-react";
-import { GooglePlacesAutocomplete, PlaceDetails } from "@/components/ui/google-places-autocomplete";
+import {
+  GooglePlacesAutocomplete,
+  PlaceDetails,
+} from "@/components/ui/google-places-autocomplete";
 
 interface StepFourProps {
   form: UseFormReturn<ProfessionalFormValues>;
@@ -42,7 +45,14 @@ export const StepFour = ({ form }: StepFourProps) => {
       form.getValues("training_locations_detailed") || [];
     form.setValue("training_locations_detailed", [
       ...currentLocations,
-      { location: "", address: "", timings: "", lat: undefined, lng: undefined, place_id: undefined },
+      {
+        location: "",
+        address: "",
+        timings: "",
+        lat: undefined,
+        lng: undefined,
+        place_id: undefined,
+      },
     ]);
   };
 
@@ -150,7 +160,7 @@ export const StepFour = ({ form }: StepFourProps) => {
               name="free_demo_call"
               control={form.control}
               render={({ field }) => (
-                <FormItem className="flex w-3/5 flex-row items-center align-left gap-4 p-2">
+                <FormItem className="flex w-full flex-row items-center align-left gap-4 p-2">
                   <FormControl>
                     <Switch
                       checked={field.value}
@@ -195,15 +205,19 @@ export const StepFour = ({ form }: StepFourProps) => {
                     onChange={(value, details?: PlaceDetails) => {
                       updateTrainingLocation(index, "address", value);
                       if (details) {
-                        const currentLocations = form.getValues("training_locations_detailed") || [];
+                        const currentLocations =
+                          form.getValues("training_locations_detailed") || [];
                         const newLocations = [...currentLocations];
                         newLocations[index] = {
                           ...newLocations[index],
                           lat: details.lat,
                           lng: details.lng,
-                          place_id: details.place_id
+                          place_id: details.place_id,
                         };
-                        form.setValue("training_locations_detailed", newLocations);
+                        form.setValue(
+                          "training_locations_detailed",
+                          newLocations
+                        );
                       }
                     }}
                     placeholder="Full address"
