@@ -78,11 +78,13 @@ serve(async (req) => {
     )
   } catch (error) {
     console.error('💥 Error creating Razorpay order:', error)
-    console.error('💥 Error details:', error.message, error.stack)
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error'
+    const errorStack = error instanceof Error ? error.stack : undefined
+    console.error('💥 Error details:', errorMessage, errorStack)
     return new Response(
       JSON.stringify({ 
         error: 'Failed to create order',
-        details: error.message,
+        details: errorMessage,
         timestamp: new Date().toISOString()
       }),
       {
