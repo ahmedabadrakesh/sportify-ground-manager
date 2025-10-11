@@ -125,10 +125,7 @@ const ProfessionalCard = ({
             </p>
           </div>
         </div>
-        <CircularProgress
-          professional={professional}
-          showPercentageOnly={true}
-        />
+
         <div className="md:h-40">
           {/* Stats Row */}
           <div className="flex items-center gap-2">
@@ -233,7 +230,10 @@ const ProfessionalCard = ({
           )}
         </div>
         {/* Bottom Row - Contact Icons and Button */}
-        <hr className="m-2" />
+        <CircularProgress
+          professional={professional}
+          showPercentageOnly={true}
+        />
         <div className="flex items-center justify-between align-bottom">
           <div className="flex gap-2">
             <button
