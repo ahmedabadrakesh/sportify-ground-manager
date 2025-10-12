@@ -78,9 +78,9 @@ const ProfessionalListItem = ({
           </div>
 
           {/* Main Content */}
-          <div className="flex-1 min-w-0">
-            <div className="flex items-start justify-between mb-2">
-              <div className="flex-1">
+          <div className="flex-1 flex-row min-w-0">
+            <div className="flex flex-col items-start justify-between">
+              <div className="flex flex-row gap-4">
                 {/* Name and Profession */}
                 <h3 className="flex items-center text-xl font-semibold text-gray-900 mb-1">
                   {professional.name}
@@ -93,9 +93,9 @@ const ProfessionalListItem = ({
                     </div>
                   )}
                 </h3>
-                <p className="flex items-center gap-2 mb-2 text-sm text-gray-600 font-medium">
+                <div className="flex items-center gap-2 text-sm text-gray-600 font-medium">
                   {professional.profession_type.join(" • ")}
-                </p>
+                </div>
                 {professional.city && (
                   <div className="flex items-center gap-1 text-sm text-gray-500">
                     <MapPin className="h-4 w-4" />
@@ -103,148 +103,147 @@ const ProfessionalListItem = ({
                   </div>
                 )}
               </div>
-
-              {/* Right side stats */}
-              <div className="flex flex-col items-end gap-2">
-                <CircularProgress
-                  professional={professional}
-                  showPercentageOnly={true}
-                />
-                <Link
-                  to={`/professional/${professional.id}/${
-                    professional.name
-                      ? professional.name.toLowerCase().replace(/\s+/g, "-")
-                      : "unknown"
-                  }`}
-                >
-                  <Button variant="secondary" size="sm" className="px-6">
-                    View Profile
-                  </Button>
-                </Link>
-              </div>
-            </div>
-
-            {/* Stats and Details */}
-            <div className="space-y-3 mt-4">
-              {/* Stats Badges */}
-              <div className="flex items-center gap-2 flex-wrap">
-                {professional.years_of_experience !== null &&
-                  professional.years_of_experience !== 0 && (
-                    <Badge
-                      variant="secondary"
-                      className="text-xs bg-gray-100 text-gray-700 border-0"
-                    >
-                      {`${professional.years_of_experience} Years`}
-                    </Badge>
-                  )}
-                {professional.number_of_clients_served !== null &&
-                  professional.number_of_clients_served !== 0 && (
-                    <Badge
-                      variant="secondary"
-                      className="text-xs bg-gray-100 text-gray-700 border-0"
-                    >
-                      {`${clientServedRounndoff(
-                        professional.number_of_clients_served
-                      )} Clients`}
-                    </Badge>
-                  )}
-                {professional.is_certified && (
-                  <Badge
-                    variant="secondary"
-                    className="text-xs bg-gray-100 text-gray-700 border-0"
-                  >
-                    Certified
-                  </Badge>
-                )}
-              </div>
-
-              {/* Sports */}
-              {professional.game_ids && professional.game_ids.length > 0 && (
+              {/* Stats and Details */}
+              <div className="space-y-3">
+                {/* Stats Badges */}
                 <div className="flex items-center gap-2 flex-wrap">
-                  <div className="flex items-center gap-1 text-xs font-semibold text-gray-700">
-                    <Volleyball className="h-4 w-4 text-gray-500" />
-                    Sports:
-                  </div>
-                  {professional.game_ids.slice(0, 4).map((gameId) => (
+                  {professional.years_of_experience !== null &&
+                    professional.years_of_experience !== 0 && (
+                      <Badge
+                        variant="secondary"
+                        className="text-xs bg-gray-100 text-gray-700 border-0"
+                      >
+                        {`${professional.years_of_experience} Years`}
+                      </Badge>
+                    )}
+                  {professional.number_of_clients_served !== null &&
+                    professional.number_of_clients_served !== 0 && (
+                      <Badge
+                        variant="secondary"
+                        className="text-xs bg-gray-100 text-gray-700 border-0"
+                      >
+                        {`${clientServedRounndoff(
+                          professional.number_of_clients_served
+                        )} Clients`}
+                      </Badge>
+                    )}
+                  {professional.is_certified && (
                     <Badge
-                      key={gameId}
                       variant="secondary"
                       className="text-xs bg-gray-100 text-gray-700 border-0"
                     >
-                      {findNameById(gameData, gameId)}
-                    </Badge>
-                  ))}
-                  {professional.game_ids.length > 4 && (
-                    <Badge
-                      variant="secondary"
-                      className="text-xs bg-gray-100 text-gray-700 border-0"
-                    >
-                      +{professional.game_ids.length - 4} more
+                      Certified
                     </Badge>
                   )}
                 </div>
-              )}
 
-              {/* Specialties */}
-              {professional.specialties &&
-                professional.specialties.length > 0 && (
+                {/* Sports */}
+                {professional.game_ids && professional.game_ids.length > 0 && (
                   <div className="flex items-center gap-2 flex-wrap">
                     <div className="flex items-center gap-1 text-xs font-semibold text-gray-700">
-                      <Target className="h-4 w-4 text-gray-500" />
-                      Specialties:
+                      <Volleyball className="h-4 w-4 text-gray-500" />
+                      Sports:
                     </div>
-                    {professional.specialties.slice(0, 4).map((specialty, index) => (
+                    {professional.game_ids.slice(0, 4).map((gameId) => (
                       <Badge
-                        key={index}
+                        key={gameId}
                         variant="secondary"
                         className="text-xs bg-gray-100 text-gray-700 border-0"
                       >
-                        {toTitleCase(specialty)}
+                        {findNameById(gameData, gameId)}
                       </Badge>
                     ))}
-                    {professional.specialties.length > 4 && (
+                    {professional.game_ids.length > 4 && (
                       <Badge
                         variant="secondary"
                         className="text-xs bg-gray-100 text-gray-700 border-0"
                       >
-                        +{professional.specialties.length - 4} more
+                        +{professional.game_ids.length - 4} more
                       </Badge>
                     )}
                   </div>
                 )}
 
-              {/* Contact Actions */}
-              <div className="flex gap-2 pt-2">
-                <button
-                  onClick={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    handleContactClick("phone");
-                  }}
-                  className="p-1.5 rounded hover:bg-gray-100 transition-colors"
-                  title={isAuthenticated ? "View Phone" : "Login to view phone"}
-                >
-                  📞
-                </button>
-                <button
-                  onClick={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    handleContactClick("email");
-                  }}
-                  className="p-1.5 rounded hover:bg-gray-100 transition-colors"
-                  title={isAuthenticated ? "View Email" : "Login to view email"}
-                >
-                  ✉️
-                </button>
-                <button
-                  className="p-1.5 rounded hover:bg-gray-100 transition-colors"
-                  title="Gallery"
-                >
-                  📷
-                </button>
+                {/* Specialties */}
+                {professional.specialties &&
+                  professional.specialties.length > 0 && (
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <div className="flex items-center gap-1 text-xs font-semibold text-gray-700">
+                        <Target className="h-4 w-4 text-gray-500" />
+                        Specialties:
+                      </div>
+                      {professional.specialties
+                        .slice(0, 4)
+                        .map((specialty, index) => (
+                          <Badge
+                            key={index}
+                            variant="secondary"
+                            className="text-xs bg-gray-100 text-gray-700 border-0"
+                          >
+                            {toTitleCase(specialty)}
+                          </Badge>
+                        ))}
+                      {professional.specialties.length > 4 && (
+                        <Badge
+                          variant="secondary"
+                          className="text-xs bg-gray-100 text-gray-700 border-0"
+                        >
+                          +{professional.specialties.length - 4} more
+                        </Badge>
+                      )}
+                    </div>
+                  )}
               </div>
             </div>
+          </div>
+          {/* Right side stats */}
+          <div className="h-full flex-col items-center gap-2">
+            {/* Contact Actions */}
+            <div className="flex gap-2">
+              <button
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  handleContactClick("phone");
+                }}
+                className="p-1.5 rounded hover:bg-gray-100 transition-colors"
+                title={isAuthenticated ? "View Phone" : "Login to view phone"}
+              >
+                📞
+              </button>
+              <button
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  handleContactClick("email");
+                }}
+                className="p-1.5 rounded hover:bg-gray-100 transition-colors"
+                title={isAuthenticated ? "View Email" : "Login to view email"}
+              >
+                ✉️
+              </button>
+              <button
+                className="p-1.5 rounded hover:bg-gray-100 transition-colors"
+                title="Gallery"
+              >
+                📷
+              </button>
+            </div>
+            <CircularProgress
+              professional={professional}
+              showPercentageOnly={true}
+            />
+            <Link
+              to={`/professional/${professional.id}/${
+                professional.name
+                  ? professional.name.toLowerCase().replace(/\s+/g, "-")
+                  : "unknown"
+              }`}
+            >
+              <Button variant="secondary" size="sm" className="px-6">
+                View Profile
+              </Button>
+            </Link>
           </div>
         </div>
       </Link>

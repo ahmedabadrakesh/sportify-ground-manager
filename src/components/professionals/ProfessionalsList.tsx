@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import ProfessionalCard from "./ProfessionalCard";
@@ -10,6 +10,7 @@ import VerticalFiltersSection from "./VerticalFiltersSection";
 import { GoogleMapsProvider } from "./components/GoogleMapsProvider";
 import { Grid3x3, List } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface FilterOptions {
   city?: string;
@@ -28,6 +29,13 @@ const ProfessionalsList = ({ sportFilter }: ProfessionalsListProps) => {
   const [filters, setFilters] = useState<FilterOptions>({});
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const { games } = useGames();
+  const isMobile = useIsMobile();
+
+  useEffect(() => {
+    if (isMobile) {
+      setViewMode("grid");
+    }
+  }, [isMobile]);
 
   const {
     data: allProfessionals,
@@ -240,7 +248,7 @@ const ProfessionalsList = ({ sportFilter }: ProfessionalsListProps) => {
 
           <div className="col-span-6">
             {/* View Toggle */}
-            <div className="flex justify-end gap-2 mb-4">
+            <div className="hidden md:flex justify-end gap-2 mb-4">
               <Button
                 variant={viewMode === "grid" ? "default" : "outline"}
                 size="sm"
