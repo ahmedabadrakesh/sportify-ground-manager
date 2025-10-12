@@ -12,6 +12,7 @@ import EventsPagination from "@/components/events/EventsPagination";
 import ExternalRedirectDialog from "@/components/events/ExternalRedirectDialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import SportsEventFeed from "@/components/events/SportsEventFeed";
+import SEOHead from "@/components/SEOHead";
 
 const SportsFeed = () => {
   const { events, isLoading } = useEvents();
@@ -126,9 +127,28 @@ const SportsFeed = () => {
 
   return (
     <MainLayout>
-      <div className="container mx-auto py-8">
-        <SportsEventFeed />
+      <SEOHead
+        title="Sports Professionals & Coaches | Jokova"
+        description="Find certified sports professionals and coaches for cricket, football, tennis, badminton and more. Book training sessions with experienced sports coaches."
+        keywords="sports professionals, coaches, sports training, cricket coach, football coach, tennis coach, badminton coach, personal trainer"
+        canonicalUrl="https://jokova.com/sports-professionals"
+      />
+      {/* Hero Section */}
+      <div className="container bg-background border-b">
+        <div className="grid md:grid-cols-8 mx-auto text-left py-4 mt-4 max-w-7xl">
+          <div className="c mb-6 col-span-6">
+            <h1 className="text-3xl font-bold text-foreground mb-2">
+              Get The Latest Sports News
+            </h1>
+            <p className="text-muted-foreground">
+              Browse through latest sports news and stay updated
+            </p>
+          </div>
+        </div>
       </div>
+
+      {/* Main Content */}
+      <SportsEventFeed />
     </MainLayout>
   );
 };

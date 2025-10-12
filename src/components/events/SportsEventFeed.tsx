@@ -5,6 +5,8 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { RefreshCw, Clock, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
+import MainLayout from "../layouts/MainLayout";
+import SEOHead from "../SEOHead";
 
 interface FeedItem {
   title: string;
@@ -136,14 +138,26 @@ const SportsEventFeed = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="border-b bg-gradient-to-r from-[hsl(var(--sports-primary))] to-[hsl(var(--sports-accent))] text-left">
-        <div className="container mx-auto px-4 py-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-4xl font-bold">Sports News</h1>
-              <p className="mt-1">Explore More About Sports</p>
+    <div>
+      <SEOHead
+        title="Sports Professionals & Coaches | Jokova"
+        description="Find certified sports professionals and coaches for cricket, football, tennis, badminton and more. Book training sessions with experienced sports coaches."
+        keywords="sports news"
+        canonicalUrl="https://jokova.com/sports-news"
+      />
+      {/* Main Content */}
+      <div className="mx-auto max-w-7xl">
+        {/* Last Update Info */}
+        {lastUpdate && (
+          <div className="flex bg-muted/50 border-b">
+            <div className="container mx-auto px-4 py-2">
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <Clock className="h-4 w-4" />
+                <span>Last updated: {lastUpdate.toLocaleString()}</span>
+                <Badge variant="outline" className="ml-2">
+                  Updates twice daily
+                </Badge>
+              </div>
             </div>
             <Button
               variant="secondary"
@@ -158,106 +172,224 @@ const SportsEventFeed = () => {
               Refresh
             </Button>
           </div>
-        </div>
-      </header>
+        )}
 
-      {/* Last Update Info */}
-      {lastUpdate && (
-        <div className="bg-muted/50 border-b">
-          <div className="container mx-auto px-4 py-2">
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <Clock className="h-4 w-4" />
-              <span>Last updated: {lastUpdate.toLocaleString()}</span>
-              <Badge variant="outline" className="ml-2">
-                Updates twice daily
-              </Badge>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Content */}
-      <main className="container mx-auto px-4 py-8 text-left">
-        {loading && articles.length === 0 ? (
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {[...Array(6)].map((_, i) => (
-              <Card key={i}>
-                <CardHeader>
-                  <Skeleton className="h-6 w-3/4" />
-                  <Skeleton className="h-4 w-1/2 mt-2" />
-                </CardHeader>
-                <CardContent>
-                  <Skeleton className="h-20 w-full" />
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        ) : articles.length === 0 ? (
-          <div className="text-center py-12">
-            <p className="text-muted-foreground">No articles found</p>
-          </div>
-        ) : (
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {articles.map((article, index) => {
-              const imageUrl = article.enclosure?.link || article.thumbnail;
-
-              return (
-                <Card
-                  key={index}
-                  className="group hover:shadow-lg transition-all duration-300 hover:border-[hsl(var(--sports-primary))] overflow-hidden"
-                >
-                  {imageUrl && (
-                    <div className="aspect-video w-full overflow-hidden bg-muted">
-                      <img
-                        src={imageUrl}
-                        alt={article.title}
-                        className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-                        loading="lazy"
-                      />
-                    </div>
-                  )}
+        {/* Content */}
+        <main className="container mx-auto px-4 py-8 text-left">
+          {loading && articles.length === 0 ? (
+            <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+              {[...Array(6)].map((_, i) => (
+                <Card key={i}>
                   <CardHeader>
-                    <CardTitle className="line-clamp-2 text-lg group-hover:text-[hsl(var(--sports-primary))] transition-colors">
-                      {article.title}
-                    </CardTitle>
-                    <div className="flex items-center gap-2 text-xs text-muted-foreground mt-2">
-                      <Clock className="h-3 w-3" />
-                      {formatDate(article.pubDate)}
-                    </div>
+                    <Skeleton className="h-6 w-3/4" />
+                    <Skeleton className="h-4 w-1/2 mt-2" />
                   </CardHeader>
                   <CardContent>
-                    <p className="text-sm text-muted-foreground line-clamp-3 mb-4">
-                      {stripHtml(article.description)}
-                    </p>
-                    <a
-                      href={article.link}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-2 text-sm font-medium text-[hsl(var(--sports-primary))] hover:underline"
-                    >
-                      Read more
-                      <ExternalLink className="h-3 w-3" />
-                    </a>
+                    <Skeleton className="h-20 w-full" />
                   </CardContent>
                 </Card>
-              );
-            })}
-          </div>
-        )}
-      </main>
+              ))}
+            </div>
+          ) : articles.length === 0 ? (
+            <div className="text-center py-12">
+              <p className="text-muted-foreground">No articles found</p>
+            </div>
+          ) : (
+            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+              {articles.map((article, index) => {
+                const imageUrl = article.enclosure?.link || article.thumbnail;
 
-      <div className="text-lg font-semibold text-left">Sports Feed Credits</div>
-      <div className="flex flex-row text-left underline gap-4">
-        <a href="https://feeds.feedburner.com/ndtvsports-latest">NDTV Sports</a>
-        |
-        <a href="https://timesofindia.indiatimes.com/rssfeeds/4719148.cms">
-          Times Of India
-        </a>
-        |<a href="https://www.thehansindia.com/sports/feed">The Hans India</a>|
-        <a href="https://www.simplysport.in/blog-feed.xml">Simply Sport</a>
+                return (
+                  <Card
+                    key={index}
+                    className="group hover:shadow-lg transition-all duration-300 hover:border-[hsl(var(--sports-primary))] overflow-hidden"
+                  >
+                    {imageUrl && (
+                      <div className="aspect-video w-full overflow-hidden bg-muted">
+                        <img
+                          src={imageUrl}
+                          alt={article.title}
+                          className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                          loading="lazy"
+                        />
+                      </div>
+                    )}
+                    <CardHeader>
+                      <CardTitle className="line-clamp-2 text-lg group-hover:text-[hsl(var(--sports-primary))] transition-colors">
+                        {article.title}
+                      </CardTitle>
+                      <div className="flex items-center gap-2 text-xs text-muted-foreground mt-2">
+                        <Clock className="h-3 w-3" />
+                        {formatDate(article.pubDate)}
+                      </div>
+                    </CardHeader>
+                    <CardContent>
+                      <p className="text-sm text-muted-foreground line-clamp-3 mb-4">
+                        {stripHtml(article.description)}
+                      </p>
+                      <a
+                        href={article.link}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-2 text-sm font-medium text-[hsl(var(--sports-primary))] hover:underline"
+                      >
+                        Read more
+                        <ExternalLink className="h-3 w-3" />
+                      </a>
+                    </CardContent>
+                  </Card>
+                );
+              })}
+            </div>
+          )}
+        </main>
+
+        <div className="text-lg font-semibold text-left">
+          Sports Feed Credits
+        </div>
+        <div className="flex flex-row text-left underline gap-4">
+          <a href="https://feeds.feedburner.com/ndtvsports-latest">
+            NDTV Sports
+          </a>
+          |
+          <a href="https://timesofindia.indiatimes.com/rssfeeds/4719148.cms">
+            Times Of India
+          </a>
+          |<a href="https://www.thehansindia.com/sports/feed">The Hans India</a>
+          |<a href="https://www.simplysport.in/blog-feed.xml">Simply Sport</a>
+        </div>
       </div>
+      );
     </div>
   );
+  //   return (
+  //     <div className="container min-h-screen bg-background">
+  //       {/* Hero Section */}
+  //       <div className="container bg-background border-b">
+  //         <div className="grid md:grid-cols-8 mx-auto text-left py-4 max-w-7xl">
+  //           <div className="c mb-6 col-span-6">
+  //             <h1 className="text-3xl font-bold text-foreground mb-2">
+  //               Sports News
+  //             </h1>
+  //             <p className="text-muted-foreground">
+  //               Browse through latest abot Sports
+  //             </p>
+  //           </div>
+
+  //           <div className="md:col-span-2 justify-center text-right">
+  //             <Button
+  //               variant="secondary"
+  //               size="sm"
+  //               onClick={fetchFeed}
+  //               disabled={loading}
+  //               className="gap-2"
+  //             >
+  //               <RefreshCw
+  //                 className={`h-4 w-4 ${loading ? "animate-spin" : ""}`}
+  //               />
+  //               Refresh
+  //             </Button>
+  //           </div>
+  //         </div>
+  //       </div>
+
+  //       {/* Last Update Info */}
+  //       {lastUpdate && (
+  //         <div className="bg-muted/50 border-b">
+  //           <div className="container mx-auto px-4 py-2">
+  //             <div className="flex items-center gap-2 text-sm text-muted-foreground">
+  //               <Clock className="h-4 w-4" />
+  //               <span>Last updated: {lastUpdate.toLocaleString()}</span>
+  //               <Badge variant="outline" className="ml-2">
+  //                 Updates twice daily
+  //               </Badge>
+  //             </div>
+  //           </div>
+  //         </div>
+  //       )}
+
+  //     {/* Content */}
+  //     <main className="container mx-auto px-4 py-8 text-left">
+  //       {loading && articles.length === 0 ? (
+  //         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+  //           {[...Array(6)].map((_, i) => (
+  //             <Card key={i}>
+  //               <CardHeader>
+  //                 <Skeleton className="h-6 w-3/4" />
+  //                 <Skeleton className="h-4 w-1/2 mt-2" />
+  //               </CardHeader>
+  //               <CardContent>
+  //                 <Skeleton className="h-20 w-full" />
+  //               </CardContent>
+  //             </Card>
+  //           ))}
+  //         </div>
+  //       ) : articles.length === 0 ? (
+  //         <div className="text-center py-12">
+  //           <p className="text-muted-foreground">No articles found</p>
+  //         </div>
+  //       ) : (
+  //         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+  //           {articles.map((article, index) => {
+  //             const imageUrl = article.enclosure?.link || article.thumbnail;
+
+  //             return (
+  //               <Card
+  //                 key={index}
+  //                 className="group hover:shadow-lg transition-all duration-300 hover:border-[hsl(var(--sports-primary))] overflow-hidden"
+  //               >
+  //                 {imageUrl && (
+  //                   <div className="aspect-video w-full overflow-hidden bg-muted">
+  //                     <img
+  //                       src={imageUrl}
+  //                       alt={article.title}
+  //                       className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+  //                       loading="lazy"
+  //                     />
+  //                   </div>
+  //                 )}
+  //                 <CardHeader>
+  //                   <CardTitle className="line-clamp-2 text-lg group-hover:text-[hsl(var(--sports-primary))] transition-colors">
+  //                     {article.title}
+  //                   </CardTitle>
+  //                   <div className="flex items-center gap-2 text-xs text-muted-foreground mt-2">
+  //                     <Clock className="h-3 w-3" />
+  //                     {formatDate(article.pubDate)}
+  //                   </div>
+  //                 </CardHeader>
+  //                 <CardContent>
+  //                   <p className="text-sm text-muted-foreground line-clamp-3 mb-4">
+  //                     {stripHtml(article.description)}
+  //                   </p>
+  //                   <a
+  //                     href={article.link}
+  //                     target="_blank"
+  //                     rel="noopener noreferrer"
+  //                     className="inline-flex items-center gap-2 text-sm font-medium text-[hsl(var(--sports-primary))] hover:underline"
+  //                   >
+  //                     Read more
+  //                     <ExternalLink className="h-3 w-3" />
+  //                   </a>
+  //                 </CardContent>
+  //               </Card>
+  //             );
+  //           })}
+  //         </div>
+  //       )}
+  //     </main>
+
+  //     <div className="text-lg font-semibold text-left">Sports Feed Credits</div>
+  //     <div className="flex flex-row text-left underline gap-4">
+  //       <a href="https://feeds.feedburner.com/ndtvsports-latest">NDTV Sports</a>
+  //       |
+  //       <a href="https://timesofindia.indiatimes.com/rssfeeds/4719148.cms">
+  //         Times Of India
+  //       </a>
+  //       |<a href="https://www.thehansindia.com/sports/feed">The Hans India</a>|
+  //       <a href="https://www.simplysport.in/blog-feed.xml">Simply Sport</a>
+  //     </div>
+  //   </div>
+  // );
 };
 
 export default SportsEventFeed;
