@@ -2,11 +2,14 @@ import React, { useState, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import ProfessionalCard from "./ProfessionalCard";
+import ProfessionalListItem from "./ProfessionalListItem";
 import AuthRequiredDialog from "@/components/auth/AuthRequiredDialog";
 import ProfessionalsFilters from "./ProfessionalsFilters";
 import { useGames } from "@/hooks/useGames";
 import VerticalFiltersSection from "./VerticalFiltersSection";
 import { GoogleMapsProvider } from "./components/GoogleMapsProvider";
+import { Grid3x3, List } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 interface FilterOptions {
   city?: string;
@@ -23,6 +26,7 @@ interface ProfessionalsListProps {
 const ProfessionalsList = ({ sportFilter }: ProfessionalsListProps) => {
   const [isAuthDialogOpen, setIsAuthDialogOpen] = useState(false);
   const [filters, setFilters] = useState<FilterOptions>({});
+  const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const { games } = useGames();
 
   const {
@@ -234,14 +238,51 @@ const ProfessionalsList = ({ sportFilter }: ProfessionalsListProps) => {
             />
           </div>
 
-          <div className="grid col-span-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {professionals?.map((professional) => (
-              <ProfessionalCard
-                key={professional.id}
-                professional={professional}
-                onLoginClick={handleLoginClick}
-              />
-            ))}
+          <div className="col-span-6">
+            {/* View Toggle */}
+            <div className="flex justify-end gap-2 mb-4">
+              <Button
+                variant={viewMode === "grid" ? "default" : "outline"}
+                size="sm"
+                onClick={() => setViewMode("grid")}
+                className="flex items-center gap-2"
+              >
+                <Grid3x3 className="h-4 w-4" />
+                Grid
+              </Button>
+              <Button
+                variant={viewMode === "list" ? "default" : "outline"}
+                size="sm"
+                onClick={() => setViewMode("list")}
+                className="flex items-center gap-2"
+              >
+                <List className="h-4 w-4" />
+                List
+              </Button>
+            </div>
+
+            {/* Professionals Display */}
+            {viewMode === "grid" ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {professionals?.map((professional) => (
+                  <ProfessionalCard
+                    key={professional.id}
+                    professional={professional}
+                    onLoginClick={handleLoginClick}
+                  />
+                ))}
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {professionals?.map((professional) => (
+                  <ProfessionalListItem
+                    key={professional.id}
+                    professional={professional}
+                    onLoginClick={handleLoginClick}
+                  />
+                ))}
+              </div>
+            )}
           </div>
         </div>
       </div>
