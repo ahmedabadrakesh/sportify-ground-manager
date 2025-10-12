@@ -12,6 +12,7 @@ Allow: /sports-professionals
 Allow: /professional/
 Allow: /search
 Allow: /events
+Allow: /sports-news
 Allow: /shop
 Allow: /bookings
 Allow: /ground/

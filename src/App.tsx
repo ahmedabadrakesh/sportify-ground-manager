@@ -14,6 +14,7 @@ import ProductDetail from "./pages/ProductDetail";
 import SearchGrounds from "./pages/SearchGrounds";
 import GroundDetail from "./pages/GroundDetail";
 import Events from "./pages/Events";
+import SportsFeed from "./pages/SportsFeed";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import SportsProfessionals from "./pages/SportsProfessionals";
@@ -72,6 +73,7 @@ function App() {
         <Route path="/search" element={<SearchGrounds />} />
         <Route path="/ground/:id" element={<GroundDetail />} />
         <Route path="/events" element={<Events />} />
+        <Route path="/sports-news" element={<SportsFeed />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />

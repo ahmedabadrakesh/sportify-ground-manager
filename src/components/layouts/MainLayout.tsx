@@ -82,11 +82,17 @@ const MainLayout = ({ children }: MainLayoutProps) => {
                 Sport Professionals
               </Link>
               <Link
+                to="/sports-news"
+                className="text-secondary-900 font-bold  hover:text-primary"
+              >
+                News
+              </Link>
+              {/* <Link
                 to="/events"
                 className="text-secondary-900 font-bold  hover:text-primary"
               >
                 Events
-              </Link>
+              </Link> */}
               <Link
                 to="/shop"
                 className="text-secondary-900 font-bold  hover:text-primary"

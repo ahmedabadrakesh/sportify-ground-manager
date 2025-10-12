@@ -7,25 +7,25 @@ import CartIcon from "@/components/cart/CartIcon";
 const MobileBottomNav = () => {
   const location = useLocation();
   const [authenticated, setAuthenticated] = useState(false);
-  
+
   useEffect(() => {
     const checkAuth = () => {
       setAuthenticated(!!getCurrentUserSync());
     };
-    
+
     checkAuth();
-    
+
     // Listen for authentication changes
     const handleStorageChange = (e: StorageEvent) => {
-      if (e.key === 'currentUser') {
+      if (e.key === "currentUser") {
         checkAuth();
       }
     };
-    
-    window.addEventListener('storage', handleStorageChange);
-    return () => window.removeEventListener('storage', handleStorageChange);
+
+    window.addEventListener("storage", handleStorageChange);
+    return () => window.removeEventListener("storage", handleStorageChange);
   }, []);
-  
+
   const navItems = [
     {
       name: "Professionals",
@@ -33,10 +33,15 @@ const MobileBottomNav = () => {
       icon: User,
     },
     {
-      name: "Events",
-      href: "/events",
+      name: "News",
+      href: "/sports-news",
       icon: Calendar,
     },
+    // {
+    //   name: "Events",
+    //   href: "/events",
+    //   icon: Calendar,
+    // },
     {
       name: "Shop",
       href: "/shop",
@@ -70,13 +75,13 @@ const MobileBottomNav = () => {
                   ? "text-primary"
                   : "text-gray-500 hover:text-primary"
               }`}
-             >
-               {item.name === "Cart" ? (
-                 <CartIcon className="h-5 w-5 mb-1" />
-               ) : (
-                 <Icon className="h-5 w-5 mb-1" />
-               )}
-               <span className="text-xs font-medium">{item.name}</span>
+            >
+              {item.name === "Cart" ? (
+                <CartIcon className="h-5 w-5 mb-1" />
+              ) : (
+                <Icon className="h-5 w-5 mb-1" />
+              )}
+              <span className="text-xs font-medium">{item.name}</span>
             </Link>
           );
         })}
