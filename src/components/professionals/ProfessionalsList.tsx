@@ -18,6 +18,7 @@ interface FilterOptions {
   isCertified?: boolean;
   experienceRange?: string;
   sex?: string;
+  name?: string;
 }
 
 interface ProfessionalsListProps {
@@ -87,8 +88,13 @@ const ProfessionalsList = ({ sportFilter }: ProfessionalsListProps) => {
     if (!allProfessionals) return [];
     let filterSet = false;
     return allProfessionals.filter((prof) => {
+      // Name filter
+      if (filters.name && !prof.name?.toLowerCase().includes(filters.name.toLowerCase())) {
+        return false;
+      }
+
       // City filter
-      if (filters.city && prof.city !== filters.city) {
+      if (filters.city && !prof.city?.toLowerCase().includes(filters.city.toLowerCase())) {
         return false;
       }
 

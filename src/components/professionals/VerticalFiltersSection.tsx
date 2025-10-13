@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { X, Filter, ChevronUp, ChevronDown } from "lucide-react";
+import { X, Filter, ChevronUp, ChevronDown, MapPin } from "lucide-react";
 import { useGames } from "@/hooks/useGames";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Switch } from "@/components/ui/switch";
@@ -26,6 +26,8 @@ import {
   CommandSeparator,
 } from "@/components/ui/command";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Input } from "@/components/ui/input";
+import { GooglePlacesAutocomplete } from "@/components/ui/google-places-autocomplete";
 
 interface FilterOptions {
   city?: string;
@@ -33,6 +35,7 @@ interface FilterOptions {
   isCertified?: boolean;
   experienceRange?: string;
   sex?: string;
+  name?: string;
 }
 
 interface ProfessionalsFiltersProps {
@@ -113,6 +116,49 @@ const VerticalFiltersSection = ({
         </button>
       </div>
       <div hidden={!filterShow} className="mt-4">
+        {/* Name Search */}
+        <div className="mb-6">
+          <label className="text-sm font-bold text-foreground mb-2 block text-left">
+            Search by Name
+          </label>
+          <Input
+            type="text"
+            placeholder="Enter professional name..."
+            value={filters.name || ""}
+            onChange={(e) => handleFilterChange("name", e.target.value)}
+            className="w-full"
+          />
+        </div>
+
+        {/* City Search with Google Places */}
+        <div className="mb-6">
+          <label className="text-sm font-bold text-foreground mb-2 block text-left">
+            Search by City
+          </label>
+          <div className="relative">
+            <GooglePlacesAutocomplete
+              value={filters.city || ""}
+              onChange={(value, details) => {
+                if (details?.formatted_address) {
+                  // Extract city from formatted address
+                  const addressParts = details.formatted_address.split(",");
+                  const city = addressParts[0]?.trim();
+                  if (city) {
+                    handleFilterChange("city", city);
+                  }
+                } else {
+                  // User is typing, update the filter value
+                  handleFilterChange("city", value);
+                }
+              }}
+              placeholder="Enter city name..."
+              types={["(cities)"]}
+              componentRestrictions={{ country: "in" }}
+            />
+            <MapPin className="absolute right-3 top-3 h-4 w-4 text-muted-foreground pointer-events-none" />
+          </div>
+        </div>
+
         {/* Certification Filter */}
         <div className="flex flex-row items-left">
           <label className="text-sm font-bold text-foreground mb-2 block text-left">
