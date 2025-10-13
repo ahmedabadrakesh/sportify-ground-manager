@@ -22,6 +22,7 @@ import FeaturedSection from "@/components/home/FeaturedSection";
 import HomeCoachingSection from "@/components/home/HomeCoachingSection";
 import CorporateWellness from "@/components/home/CorporateWellness";
 import ExperienceSection from "@/components/home/ExperienceSection";
+import SportsEventFeed from "@/components/events/SportsEventFeed";
 
 const Home: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -98,9 +99,20 @@ const Home: React.FC = () => {
         structuredData={structuredData}
       />
       <HeroSection onSearch={handleSearch} />
-      <StatBanner />
+
       <div>
         <PopularSportsSection />
+        <StatBanner />
+        <>
+          <h2 className="text-3xl font-bold text-gray-900 mt-6 mb-6 md:mb-0">
+            Let's Explore More
+          </h2>
+          <p className="text-xl mb-6 hidden md:block">
+            Sports News & Article From the World
+          </p>
+        </>
+        <SportsEventFeed isHomePage={true} />
+
         <FeaturedSection />
         <HomeCoachingSection />
         <CorporateWellness />

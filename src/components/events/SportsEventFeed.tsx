@@ -20,7 +20,7 @@ interface FeedItem {
   };
 }
 
-const SportsEventFeed = () => {
+const SportsEventFeed = ({ isHomePage }: { isHomePage: boolean }) => {
   const [articles, setArticles] = useState<FeedItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [lastUpdate, setLastUpdate] = useState<Date | null>(null);
@@ -61,12 +61,12 @@ const SportsEventFeed = () => {
       );
 
       const results = await Promise.all(feedPromises);
-
+      const newsCountForEverySite = isHomePage ? 1 : 10;
       // Get first 10 items from each feed and combine
       const allArticles: FeedItem[] = [];
       results.forEach((data) => {
         if (data.status === "ok" && data.items) {
-          allArticles.push(...data.items.slice(0, 10));
+          allArticles.push(...data.items.slice(0, newsCountForEverySite));
         }
       });
 
@@ -148,7 +148,7 @@ const SportsEventFeed = () => {
       {/* Main Content */}
       <div className="mx-auto max-w-7xl">
         {/* Last Update Info */}
-        {lastUpdate && (
+        {lastUpdate && !isHomePage && (
           <div className="flex bg-muted/50 border-b">
             <div className="container mx-auto px-4 py-2">
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
@@ -195,7 +195,7 @@ const SportsEventFeed = () => {
               <p className="text-muted-foreground">No articles found</p>
             </div>
           ) : (
-            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            <div className="grid gap-6 grid-cols-1 md:grid-cols-3 lg:grid-cols-4">
               {articles.map((article, index) => {
                 const imageUrl = article.enclosure?.link || article.thumbnail;
 
@@ -244,22 +244,31 @@ const SportsEventFeed = () => {
           )}
         </main>
 
-        <div className="text-lg font-semibold text-left">
-          Sports Feed Credits
-        </div>
-        <div className="flex flex-row text-left underline gap-4">
-          <a href="https://feeds.feedburner.com/ndtvsports-latest">
-            NDTV Sports
-          </a>
-          |
-          <a href="https://timesofindia.indiatimes.com/rssfeeds/4719148.cms">
-            Times Of India
-          </a>
-          |<a href="https://www.thehansindia.com/sports/feed">The Hans India</a>
-          |<a href="https://www.simplysport.in/blog-feed.xml">Simply Sport</a>
-        </div>
+        {!isHomePage && (
+          <>
+            <div className="text-lg font-semibold text-left">
+              Sports Feed Credits
+            </div>
+            <div className="flex flex-row text-left underline gap-4">
+              <a href="https://feeds.feedburner.com/ndtvsports-latest">
+                NDTV Sports
+              </a>
+              |
+              <a href="https://timesofindia.indiatimes.com/rssfeeds/4719148.cms">
+                Times Of India
+              </a>
+              |
+              <a href="https://www.thehansindia.com/sports/feed">
+                The Hans India
+              </a>
+              |
+              <a href="https://www.simplysport.in/blog-feed.xml">
+                Simply Sport
+              </a>
+            </div>
+          </>
+        )}
       </div>
-      );
     </div>
   );
   //   return (
