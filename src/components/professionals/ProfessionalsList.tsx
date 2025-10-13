@@ -89,12 +89,18 @@ const ProfessionalsList = ({ sportFilter }: ProfessionalsListProps) => {
     let filterSet = false;
     return allProfessionals.filter((prof) => {
       // Name filter
-      if (filters.name && !prof.name?.toLowerCase().includes(filters.name.toLowerCase())) {
+      if (
+        filters.name &&
+        !prof.name?.toLowerCase().includes(filters.name.toLowerCase())
+      ) {
         return false;
       }
 
       // City filter
-      if (filters.city && !prof.city?.toLowerCase().includes(filters.city.toLowerCase())) {
+      if (
+        filters.city &&
+        !prof.city?.toLowerCase().includes(filters.city.toLowerCase())
+      ) {
         return false;
       }
 
@@ -210,27 +216,31 @@ const ProfessionalsList = ({ sportFilter }: ProfessionalsListProps) => {
     );
   }
 
-  if (!professionals || professionals.length === 0) {
-    const noDataMessage = sportFilter
-      ? `No ${sportFilter} professionals found. Be the first to register!`
-      : "No sports professionals found. Be the first to register!";
+  const noDataMessage = sportFilter
+    ? `No ${sportFilter} professionals found. Be the first to register!`
+    : "No sports professionals found. Be the first to register!";
 
-    return (
-      <div className="container text-center max-w-7xl">
-        <GoogleMapsProvider>
-          <ProfessionalsFilters
-            filters={filters}
-            onFiltersChange={setFilters}
-            availableCities={availableCities}
-          />
-        </GoogleMapsProvider>
-        <p className="text-gray-600">{noDataMessage}</p>
-        <p className="text-sm text-gray-500 mt-2">
-          If you expect to see data here, there might be a permissions issue.
-        </p>
-      </div>
-    );
-  }
+  // if (!professionals || professionals.length === 0) {
+  //   const noDataMessage = sportFilter
+  //     ? `No ${sportFilter} professionals found. Be the first to register!`
+  //     : "No sports professionals found. Be the first to register!";
+
+  //   return (
+  //     <div className="container text-center max-w-7xl">
+  //       <GoogleMapsProvider>
+  //         <ProfessionalsFilters
+  //           filters={filters}
+  //           onFiltersChange={setFilters}
+  //           availableCities={availableCities}
+  //         />
+  //       </GoogleMapsProvider>
+  //       <p className="text-gray-600">{noDataMessage}</p>
+  //       <p className="text-sm text-gray-500 mt-2">
+  //         If you expect to see data here, there might be a permissions issue.
+  //       </p>
+  //     </div>
+  //   );
+  // }
 
   return (
     <>
@@ -252,52 +262,61 @@ const ProfessionalsList = ({ sportFilter }: ProfessionalsListProps) => {
             />
           </div>
 
-          <div className="col-span-6">
-            {/* View Toggle */}
-            <div className="hidden md:flex justify-end gap-2 mb-4">
-              <Button
-                variant={viewMode === "grid" ? "default" : "outline"}
-                size="sm"
-                onClick={() => setViewMode("grid")}
-                className="flex items-center gap-2"
-              >
-                <Grid3x3 className="h-4 w-4" />
-                Grid
-              </Button>
-              <Button
-                variant={viewMode === "list" ? "default" : "outline"}
-                size="sm"
-                onClick={() => setViewMode("list")}
-                className="flex items-center gap-2"
-              >
-                <List className="h-4 w-4" />
-                List
-              </Button>
+          {!professionals || professionals.length === 0 ? (
+            <div className="col-span-6">
+              <p className="text-gray-600">{noDataMessage}</p>
+              <p className="text-sm text-gray-500 mt-2">
+                If you expect to see data here, Check Filters
+              </p>
             </div>
+          ) : (
+            <div className="col-span-6">
+              {/* View Toggle */}
+              <div className="hidden md:flex justify-end gap-2 mb-4">
+                <Button
+                  variant={viewMode === "grid" ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => setViewMode("grid")}
+                  className="flex items-center gap-2"
+                >
+                  <Grid3x3 className="h-4 w-4" />
+                  Grid
+                </Button>
+                <Button
+                  variant={viewMode === "list" ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => setViewMode("list")}
+                  className="flex items-center gap-2"
+                >
+                  <List className="h-4 w-4" />
+                  List
+                </Button>
+              </div>
 
-            {/* Professionals Display */}
-            {viewMode === "grid" ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {professionals?.map((professional) => (
-                  <ProfessionalCard
-                    key={professional.id}
-                    professional={professional}
-                    onLoginClick={handleLoginClick}
-                  />
-                ))}
-              </div>
-            ) : (
-              <div className="space-y-4">
-                {professionals?.map((professional) => (
-                  <ProfessionalListItem
-                    key={professional.id}
-                    professional={professional}
-                    onLoginClick={handleLoginClick}
-                  />
-                ))}
-              </div>
-            )}
-          </div>
+              {/* Professionals Display */}
+              {viewMode === "grid" ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {professionals?.map((professional) => (
+                    <ProfessionalCard
+                      key={professional.id}
+                      professional={professional}
+                      onLoginClick={handleLoginClick}
+                    />
+                  ))}
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {professionals?.map((professional) => (
+                    <ProfessionalListItem
+                      key={professional.id}
+                      professional={professional}
+                      onLoginClick={handleLoginClick}
+                    />
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
         </div>
       </div>
 
