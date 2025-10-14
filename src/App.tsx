@@ -43,6 +43,7 @@ import { usePageTracking } from "./hooks/useAnalytics";
 import "./App.css";
 import { useEffect } from "react";
 import { useLocation } from "react-router-dom";
+import ContactUs from "./pages/ContactUs";
 
 function App() {
   usePageTracking();
@@ -87,6 +88,7 @@ function App() {
         <Route path="/generate-sitemap" element={<SitemapGenerator />} />
         <Route path="/terms-of-service" element={<TermsOfService />} />
         <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+        <Route path="/contact-us" element={<ContactUs />} />
 
         {/* Admin routes */}
         <Route path="/admin" element={<Navigate to="/admin/dashboard" />} />

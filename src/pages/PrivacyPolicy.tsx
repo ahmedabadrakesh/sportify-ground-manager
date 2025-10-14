@@ -27,7 +27,15 @@ const PrivacyPolicy = () => {
                 <ul className="list-disc list-inside ml-4 space-y-2">
                   <li>Create an account or profile</li>
                   <li>Make a booking or purchase</li>
-                  <li>Contact us for support</li>
+                  <li>
+                    <a
+                      href="/contact-us"
+                      className="text-sm text-gray-600 hover:text-primary underline"
+                    >
+                      {`Contact Us `}
+                    </a>
+                    for support
+                  </li>
                   <li>Subscribe to our newsletter</li>
                   <li>Participate in surveys or promotions</li>
                 </ul>
@@ -218,7 +226,14 @@ const PrivacyPolicy = () => {
                 <br />
                 Email: hello@jokova.com
                 <br />
-                Or through our contact form on the website.
+                Or through our{" "}
+                <a
+                  href="/contact-us"
+                  className="text-sm text-gray-600 hover:text-primary underline"
+                >
+                  {`Contact Us `}
+                </a>
+                details on the website.
               </p>
             </CardContent>
           </Card>

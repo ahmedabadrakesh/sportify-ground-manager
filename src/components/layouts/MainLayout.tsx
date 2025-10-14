@@ -211,7 +211,7 @@ const MainLayout = ({ children }: MainLayoutProps) => {
                   </li>
                   <li>
                     <a
-                      href="#"
+                      href="/contact-us"
                       className="text-sm text-gray-600 hover:text-primary"
                     >
                       Contact Us

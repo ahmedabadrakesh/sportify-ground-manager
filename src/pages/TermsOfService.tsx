@@ -182,7 +182,14 @@ const TermsOfService = () => {
             <CardContent>
               <p className="text-gray-700">
                 If you have any questions about these Terms of Service, please
-                contact us at legal@JOKOVA.com or through our contact form.
+                contact us at legal@JOKOVA.com or through our{" "}
+                <a
+                  href="/contact-us"
+                  className="text-sm text-gray-600 hover:text-primary underline"
+                >
+                  {`Contact Us `}
+                </a>
+                details.
               </p>
             </CardContent>
           </Card>
