@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { getAllProducts } from "@/utils/ecommerce";
+import { getAllProducts, searchProducts } from "@/utils/ecommerce";
 import { Product } from "@/types/models";
 import { toast } from "@/hooks/use-toast";
 import {
@@ -17,6 +17,8 @@ import ProductItemCard from "./ProductItemCard";
 const RelatedProducts = ({ currrentCatagory, currentGameIds }) => {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
+  const [category, setCategory] = useState<string>(currrentCatagory);
+  const [sortBy, setSortBy] = useState<string>("featured");
   const [products, setProducts] = useState<Product[]>([]);
   const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
@@ -27,9 +29,8 @@ const RelatedProducts = ({ currrentCatagory, currentGameIds }) => {
         setLoading(true);
         const allProducts = await getAllProducts();
         setProducts(allProducts);
-
         // Apply initial filtering
-        applyFilters(allProducts, searchTerm, sortBy);
+        applyFilters(allProducts);
       } catch (error) {
         console.error("Error loading products:", error);
         toast({
@@ -46,47 +47,15 @@ const RelatedProducts = ({ currrentCatagory, currentGameIds }) => {
   }, []);
 
   // Apply filtering and sorting
-  const applyFilters = (
-    productsList: Product[],
-    search: string,
-    sort: string
-  ) => {
+  const applyFilters = (productsList: Product[]) => {
     // Filter products
     let filtered = [...productsList];
-    if (search) {
-      filtered = filtered.filter(
-        (product) =>
-          product.name.toLowerCase().includes(search.toLowerCase()) ||
-          (product.description &&
-            product.description.toLowerCase().includes(search.toLowerCase())) ||
-          product.category.toLowerCase().includes(search.toLowerCase())
-      );
-    }
 
     filtered = filtered.filter((product) =>
       product.gamesId.some((gamesId) => currentGameIds.includes(gamesId))
     );
 
-    // Sort products
-    filtered.sort((a, b) => {
-      if (sort === "featured") {
-        return a.featured === b.featured ? 0 : a.featured ? -1 : 1;
-      } else if (sort === "priceAsc") {
-        return a.price - b.price;
-      } else if (sort === "priceDesc") {
-        return b.price - a.price;
-      }
-      return 0;
-    });
-
     setFilteredProducts(filtered);
-  };
-
-  // Handle search input change
-  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    setSearchTerm(value);
-    applyFilters(products, value, category, sortBy);
   };
 
   return (
