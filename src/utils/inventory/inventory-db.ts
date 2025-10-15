@@ -19,7 +19,7 @@ type InventoryItemDB = {
   color?: string | null;
   weight?: number | null;
   material?: string | null;
-  'age Range'?: string | null;
+  ageRange?: string | null;
   created_at: string;
   updated_at: string;
 };
@@ -69,7 +69,7 @@ export const getAllInventoryItems = async (): Promise<InventoryItem[]> => {
         color: item.color || '',
         weight: item.weight ?? 0,
         material: item.material ?? '',
-        ageRange: item['age Range'] ?? '',
+        ageRange: item.ageRange ?? '',
       });
     }
 
@@ -101,7 +101,7 @@ export const addInventoryItemToDB = async (item: Omit<InventoryItem, 'id'> & { i
         color: item.color || "",
         weight: item.weight ?? 0,
         material: item.material ?? "",
-        "age Range": item.ageRange ?? "",
+        ageRange: item.ageRange ?? "",
       })
       .select()
       .single();
@@ -130,7 +130,7 @@ export const addInventoryItemToDB = async (item: Omit<InventoryItem, 'id'> & { i
       color: responseData.color || "",
       weight: responseData.weight ?? 0,
       material: responseData.material ?? "",
-      ageRange: responseData['age Range'] ?? "",
+      ageRange: responseData.ageRange ?? "",
     };
   } catch (error) {
     console.error('Unexpected error in addInventoryItemToDB:', error);
@@ -158,7 +158,7 @@ export const updateInventoryItemInDB = async (item: InventoryItem): Promise<Inve
         color: item.color || "",
         weight: item.weight ?? 0,
         material: item.material ?? "",
-        "age Range": item.ageRange ?? "",
+        ageRange: item.ageRange ?? "",
       })
       .eq('id', item.id)
       .select()
@@ -202,7 +202,7 @@ export const updateInventoryItemInDB = async (item: InventoryItem): Promise<Inve
       color: responseData.color || "",
       weight: responseData.weight ?? 0,
       material: responseData.material ?? "",
-      ageRange: responseData['age Range'] ?? "",
+      ageRange: responseData.ageRange ?? "",
     };
   } catch (error) {
     console.error('Unexpected error in updateInventoryItemInDB:', error);

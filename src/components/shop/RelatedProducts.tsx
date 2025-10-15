@@ -1,11 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ShoppingCart, Search } from "lucide-react";
-import { getAllProducts, searchProducts } from "@/utils/ecommerce";
+import { getAllProducts } from "@/utils/ecommerce";
 import { Product } from "@/types/models";
-import { addToCart } from "@/utils/cart";
 import { toast } from "@/hooks/use-toast";
 import {
   Carousel,
@@ -17,16 +14,12 @@ import {
 import { motion } from "framer-motion";
 import ProductItemCard from "./ProductItemCard";
 
-const RelatedProducts = ({ currrentCatagory }) => {
+const RelatedProducts = ({ currrentCatagory, currentGameIds }) => {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
-  const [category, setCategory] = useState<string>(currrentCatagory);
-  const [sortBy, setSortBy] = useState<string>("featured");
   const [products, setProducts] = useState<Product[]>([]);
   const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
-  const [categories, setCategories] = useState<string[]>(["all"]);
   const [loading, setLoading] = useState(true);
-
   // Load products on component mount
   useEffect(() => {
     const loadProducts = async () => {
@@ -35,15 +28,8 @@ const RelatedProducts = ({ currrentCatagory }) => {
         const allProducts = await getAllProducts();
         setProducts(allProducts);
 
-        // Extract unique categories
-        const uniqueCategories = new Set<string>();
-        allProducts.forEach((product) =>
-          uniqueCategories.add(product.category)
-        );
-        setCategories(["all", ...Array.from(uniqueCategories)]);
-
         // Apply initial filtering
-        applyFilters(allProducts, searchTerm, category, sortBy);
+        applyFilters(allProducts, searchTerm, sortBy);
       } catch (error) {
         console.error("Error loading products:", error);
         toast({
@@ -63,12 +49,10 @@ const RelatedProducts = ({ currrentCatagory }) => {
   const applyFilters = (
     productsList: Product[],
     search: string,
-    cat: string,
     sort: string
   ) => {
     // Filter products
     let filtered = [...productsList];
-
     if (search) {
       filtered = filtered.filter(
         (product) =>
@@ -79,9 +63,9 @@ const RelatedProducts = ({ currrentCatagory }) => {
       );
     }
 
-    if (cat !== "all") {
-      filtered = filtered.filter((product) => product.category === cat);
-    }
+    filtered = filtered.filter((product) =>
+      product.gamesId.some((gamesId) => currentGameIds.includes(gamesId))
+    );
 
     // Sort products
     filtered.sort((a, b) => {
@@ -103,26 +87,6 @@ const RelatedProducts = ({ currrentCatagory }) => {
     const value = e.target.value;
     setSearchTerm(value);
     applyFilters(products, value, category, sortBy);
-  };
-
-  // Handle category change
-  const handleCategoryChange = (value: string) => {
-    setCategory(value);
-    applyFilters(products, searchTerm, value, sortBy);
-  };
-
-  // Handle sort change
-  const handleSortChange = (value: string) => {
-    setSortBy(value);
-    applyFilters(products, searchTerm, category, value);
-  };
-
-  // Handle add to cart
-  const handleAddToCart = async (product: Product) => {
-    const cartItem = await addToCart(product);
-    if (cartItem) {
-      toast({ title: "Success", description: `${product.name} added to cart` });
-    }
   };
 
   return (
@@ -171,15 +135,8 @@ const RelatedProducts = ({ currrentCatagory }) => {
               <p className="text-gray-500 mb-4">
                 No products found matching your criteria.
               </p>
-              <Button
-                variant="outline"
-                onClick={() => {
-                  setSearchTerm("");
-                  setCategory("all");
-                  applyFilters(products, "", "all", sortBy);
-                }}
-              >
-                Clear Filters
+              <Button variant="outline" onClick={() => navigate("/shop")}>
+                Goto Shop
               </Button>
             </div>
           )}

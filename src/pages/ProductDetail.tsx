@@ -78,15 +78,15 @@ const ProductDetail: React.FC = () => {
       productId: product.id,
       productName: product.name,
       selectedColor,
-      quantity
+      quantity,
     });
 
     // Create product with selected color
     const productWithColor = { ...product, color: selectedColor };
-    
+
     const cartItem = await addToCart(productWithColor, quantity);
     console.log("📦 Product Detail - Cart operation result:", cartItem);
-    
+
     if (cartItem) {
       toast.success(`Added ${quantity} ${product.name}(s) to cart`);
     } else {
@@ -316,8 +316,8 @@ const ProductDetail: React.FC = () => {
                               key={colorCode}
                               onClick={() => setSelectedColor(colorCode)}
                               className={`w-5 h-5 rounded-full ml-2 border-2 hover:scale-110 transition-transform ${
-                                selectedColor === colorCode 
-                                  ? "border-primary border-3 ring-2 ring-primary/30" 
+                                selectedColor === colorCode
+                                  ? "border-primary border-3 ring-2 ring-primary/30"
                                   : "border-gray-400 hover:border-gray-600"
                               }`}
                               style={{ backgroundColor: colorCode }}
@@ -452,7 +452,10 @@ const ProductDetail: React.FC = () => {
         {/* Related Products Section - You can implement this later */}
         <div className="mt-16 text-left">
           <h2 className="text-2xl font-bold mb-6">You Might Also Like</h2>
-          <RelatedProducts currrentCatagory={product.category} />
+          <RelatedProducts
+            currrentCatagory={product.category}
+            currentGameIds={product.gamesId}
+          />
         </div>
       </div>
     </MainLayout>
