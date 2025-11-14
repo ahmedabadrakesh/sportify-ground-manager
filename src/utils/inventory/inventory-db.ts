@@ -13,6 +13,8 @@ type InventoryItemDB = {
   purchase_quantity?: number;
   description?: string | null;
   image?: string | null;
+  images?: string[] | null;
+  show_on_shop?: boolean | null;
   brandId?: string | null;
   gamesId?: string[] | null;
   size?: string | null;
@@ -62,6 +64,8 @@ export const getAllInventoryItems = async (): Promise<InventoryItem[]> => {
         purchaseQuantity: item.purchase_quantity || 0,
         description: item.description || '',
         image: item.image || '',
+        images: item.images || (item.image ? [item.image] : []),
+        showOnShop: item.show_on_shop ?? true,
         availableQuantity: availableQuantity,
         brandId: item.brandId || '',
         gamesId: item.gamesId || [],
@@ -94,7 +98,9 @@ export const addInventoryItemToDB = async (item: Omit<InventoryItem, 'id'> & { i
         purchase_price: item.purchasePrice,
         purchase_quantity: item.initialQuantity || 0,
         description: item.description || null,
-        image: item.image || null,
+        image: (item.images && item.images.length > 0) ? item.images[0] : (item.image || null),
+        images: item.images || [],
+        show_on_shop: item.showOnShop ?? true,
         brandId: item.brandId || null,
         gamesId: item.gamesId || [],
         size: item.size || "",
@@ -123,6 +129,8 @@ export const addInventoryItemToDB = async (item: Omit<InventoryItem, 'id'> & { i
       purchaseQuantity: responseData.purchase_quantity || 0,
       description: responseData.description || '',
       image: responseData.image || '',
+      images: responseData.images || (responseData.image ? [responseData.image] : []),
+      showOnShop: responseData.show_on_shop ?? true,
       availableQuantity: responseData.purchase_quantity || 0,
       brandId: responseData.brandId || null,
       gamesId: responseData.gamesId || [],
@@ -151,7 +159,9 @@ export const updateInventoryItemInDB = async (item: InventoryItem): Promise<Inve
         purchase_price: item.purchasePrice,
         purchase_quantity: item.purchaseQuantity,
         description: item.description || null,
-        image: item.image || null,
+        image: (item.images && item.images.length > 0) ? item.images[0] : (item.image || null),
+        images: item.images || [],
+        show_on_shop: item.showOnShop ?? true,
         brandId: item.brandId || null,
         gamesId: item.gamesId || [],
         size: item.size || "",
@@ -195,6 +205,8 @@ export const updateInventoryItemInDB = async (item: InventoryItem): Promise<Inve
       purchaseQuantity: responseData.purchase_quantity || 0,
       description: responseData.description || '',
       image: responseData.image || '',
+      images: responseData.images || (responseData.image ? [responseData.image] : []),
+      showOnShop: responseData.show_on_shop ?? true,
       availableQuantity: availableQuantity,
       brandId: responseData.brandId || null,
       gamesId: responseData.gamesId || [],

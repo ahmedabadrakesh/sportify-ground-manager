@@ -148,7 +148,7 @@ const SportsFeed = () => {
       </div>
 
       {/* Main Content */}
-      <SportsEventFeed />
+      <SportsEventFeed isHomePage={false} />
     </MainLayout>
   );
 };

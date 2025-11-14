@@ -9,6 +9,8 @@ export interface InventoryItem {
   availableQuantity?: number;
   description?: string;
   image?: string;
+  images?: string[];
+  showOnShop?: boolean;
   brandId?: string;
   gamesId?: string[];
   size?: string;
