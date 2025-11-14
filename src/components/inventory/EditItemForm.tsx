@@ -5,6 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { RichTextEditor } from "@/components/ui/rich-text-editor";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Select,
   SelectContent,
@@ -18,6 +19,7 @@ import { toast } from "sonner";
 import { InventoryItem } from "@/types/models";
 import { useBrands } from "@/hooks/useBrands";
 import { useGames } from "@/hooks/useGames";
+import { X, Plus } from "lucide-react";
 import {
   Form,
   FormControl,
@@ -25,6 +27,7 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
+  FormDescription,
 } from "@/components/ui/form";
 import {
   Dialog,
@@ -60,11 +63,8 @@ const inventoryItemSchema = z.object({
     .trim()
     .optional()
     .refine((val) => !val || val.length > 0, "Invalid value"),
-  image: z
-    .string()
-    .trim()
-    .optional()
-    .refine((val) => !val || val.length > 0, "Invalid value"),
+  images: z.array(z.string()).optional(),
+  showOnShop: z.boolean().default(true),
   brandId: z.string().optional(),
   gameIds: z.array(z.string()).optional(),
   size: z.string().trim().optional(),
@@ -101,7 +101,8 @@ const EditItemForm: React.FC<EditItemFormProps> = ({
       sellPrice: 0,
       purchaseQuantity: 0,
       description: "",
-      image: "",
+      images: [],
+      showOnShop: true,
       brandId: "",
       gameIds: [],
       size: "",
@@ -122,7 +123,8 @@ const EditItemForm: React.FC<EditItemFormProps> = ({
         sellPrice: item.price,
         purchaseQuantity: item.purchaseQuantity || 0,
         description: item.description || "",
-        image: item.image || "",
+        images: item.images || (item.image ? [item.image] : []),
+        showOnShop: item.showOnShop ?? true,
         brandId: item.brandId ? item.brandId.toString() : "",
         gameIds: item.gamesId || [],
         size: item.size || "",
@@ -152,7 +154,8 @@ const EditItemForm: React.FC<EditItemFormProps> = ({
         price: data.sellPrice,
         purchaseQuantity: data.purchaseQuantity,
         description: data.description || "",
-        image: data.image || "",
+        images: data.images || [],
+        showOnShop: data.showOnShop,
         brandId: data.brandId || null,
         gamesId: data.gameIds || [],
         size: data.size || "",
@@ -396,14 +399,93 @@ const EditItemForm: React.FC<EditItemFormProps> = ({
 
                 <FormField
                   control={form.control}
-                  name="image"
+                  name="images"
                   render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Image URL (Optional)</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Enter image URL" {...field} />
-                      </FormControl>
+                    <FormItem className="col-span-2">
+                      <FormLabel>Product Images</FormLabel>
+                      <div className="space-y-2">
+                        {field.value && field.value.length > 0 && (
+                          <div className="grid grid-cols-2 gap-2">
+                            {field.value.map((imageUrl, index) => (
+                              <div key={index} className="relative group">
+                                <img 
+                                  src={imageUrl} 
+                                  alt={`Product ${index + 1}`}
+                                  className="w-full h-24 object-cover rounded border"
+                                />
+                                <Button
+                                  type="button"
+                                  variant="destructive"
+                                  size="icon"
+                                  className="absolute top-1 right-1 h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
+                                  onClick={() => {
+                                    const newImages = field.value?.filter((_, i) => i !== index) || [];
+                                    field.onChange(newImages);
+                                  }}
+                                >
+                                  <X className="h-4 w-4" />
+                                </Button>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                        <div className="flex gap-2">
+                          <Input
+                            placeholder="Enter image URL"
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter') {
+                                e.preventDefault();
+                                const input = e.currentTarget;
+                                if (input.value.trim()) {
+                                  field.onChange([...(field.value || []), input.value.trim()]);
+                                  input.value = '';
+                                }
+                              }
+                            }}
+                          />
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="icon"
+                            onClick={() => {
+                              const input = document.querySelector<HTMLInputElement>('input[placeholder="Enter image URL"]');
+                              if (input && input.value.trim()) {
+                                field.onChange([...(field.value || []), input.value.trim()]);
+                                input.value = '';
+                              }
+                            }}
+                          >
+                            <Plus className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </div>
+                      <FormDescription>
+                        Add image URLs one at a time. Press Enter or click + to add.
+                      </FormDescription>
                       <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="showOnShop"
+                  render={({ field }) => (
+                    <FormItem className="col-span-2 flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+                      <FormControl>
+                        <Checkbox
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                        />
+                      </FormControl>
+                      <div className="space-y-1 leading-none">
+                        <FormLabel>
+                          Show on Website Shop
+                        </FormLabel>
+                        <FormDescription>
+                          Check this to make the product visible on the public shop page
+                        </FormDescription>
+                      </div>
                     </FormItem>
                   )}
                 />

@@ -1,5 +1,5 @@
 
-import React from "react";
+import React, { useState } from "react";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -9,10 +9,12 @@ import { Textarea } from "@/components/ui/textarea";
 import { RichTextEditor } from "@/components/ui/rich-text-editor";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { MultiSelect } from "@/components/ui/multi-select";
+import { Checkbox } from "@/components/ui/checkbox";
 import { addInventoryItem } from "@/utils/inventory";
 import { toast } from "sonner";
 import { useBrands } from "@/hooks/useBrands";
 import { useGames } from "@/hooks/useGames";
+import { X, Plus } from "lucide-react";
 import {
   Form,
   FormControl,
@@ -20,6 +22,7 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
+  FormDescription,
 } from "@/components/ui/form";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 
@@ -31,7 +34,8 @@ const inventoryItemSchema = z.object({
   sellPrice: z.coerce.number().min(0, { message: "Sell price must be a positive number" }),
   initialQuantity: z.coerce.number().min(0, { message: "Quantity must be a positive number" }),
   description: z.string().trim().optional().refine(val => !val || val.length > 0, "Invalid value"),
-  image: z.string().trim().optional().refine(val => !val || val.length > 0, "Invalid value"),
+  images: z.array(z.string()).optional(),
+  showOnShop: z.boolean().default(true),
   brandId: z.string().optional(),
   gameIds: z.array(z.string()).optional(),
   size: z.string().trim().optional(),
@@ -66,7 +70,8 @@ const AddItemForm: React.FC<AddItemFormProps> = ({
       sellPrice: 0,
       initialQuantity: 0,
       description: "",
-      image: "",
+      images: [],
+      showOnShop: true,
       brandId: "",
       gameIds: [],
       size: "",
@@ -89,7 +94,8 @@ const AddItemForm: React.FC<AddItemFormProps> = ({
         price: data.sellPrice,
         initialQuantity: data.initialQuantity,
         description: data.description || "",
-        image: data.image || "",
+        images: data.images || [],
+        showOnShop: data.showOnShop,
         brandId: data.brandId || null,
         gamesId: data.gameIds || [],
         size: data.size || "",
@@ -280,14 +286,93 @@ const AddItemForm: React.FC<AddItemFormProps> = ({
                 
                 <FormField
                   control={form.control}
-                  name="image"
+                  name="images"
                   render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Image URL (Optional)</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Enter image URL" {...field} />
-                      </FormControl>
+                    <FormItem className="col-span-2">
+                      <FormLabel>Product Images</FormLabel>
+                      <div className="space-y-2">
+                        {field.value && field.value.length > 0 && (
+                          <div className="grid grid-cols-2 gap-2">
+                            {field.value.map((imageUrl, index) => (
+                              <div key={index} className="relative group">
+                                <img 
+                                  src={imageUrl} 
+                                  alt={`Product ${index + 1}`}
+                                  className="w-full h-24 object-cover rounded border"
+                                />
+                                <Button
+                                  type="button"
+                                  variant="destructive"
+                                  size="icon"
+                                  className="absolute top-1 right-1 h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
+                                  onClick={() => {
+                                    const newImages = field.value?.filter((_, i) => i !== index) || [];
+                                    field.onChange(newImages);
+                                  }}
+                                >
+                                  <X className="h-4 w-4" />
+                                </Button>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                        <div className="flex gap-2">
+                          <Input
+                            placeholder="Enter image URL"
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter') {
+                                e.preventDefault();
+                                const input = e.currentTarget;
+                                if (input.value.trim()) {
+                                  field.onChange([...(field.value || []), input.value.trim()]);
+                                  input.value = '';
+                                }
+                              }
+                            }}
+                          />
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="icon"
+                            onClick={() => {
+                              const input = document.querySelector<HTMLInputElement>('input[placeholder="Enter image URL"]');
+                              if (input && input.value.trim()) {
+                                field.onChange([...(field.value || []), input.value.trim()]);
+                                input.value = '';
+                              }
+                            }}
+                          >
+                            <Plus className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </div>
+                      <FormDescription>
+                        Add image URLs one at a time. Press Enter or click + to add.
+                      </FormDescription>
                       <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="showOnShop"
+                  render={({ field }) => (
+                    <FormItem className="col-span-2 flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+                      <FormControl>
+                        <Checkbox
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                        />
+                      </FormControl>
+                      <div className="space-y-1 leading-none">
+                        <FormLabel>
+                          Show on Website Shop
+                        </FormLabel>
+                        <FormDescription>
+                          Check this to make the product visible on the public shop page
+                        </FormDescription>
+                      </div>
                     </FormItem>
                   )}
                 />
@@ -524,14 +609,93 @@ const AddItemForm: React.FC<AddItemFormProps> = ({
 
                 <FormField
                   control={form.control}
-                  name="image"
+                  name="images"
                   render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Image URL (Optional)</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Enter image URL" {...field} />
-                      </FormControl>
+                    <FormItem className="col-span-2">
+                      <FormLabel>Product Images</FormLabel>
+                      <div className="space-y-2">
+                        {field.value && field.value.length > 0 && (
+                          <div className="grid grid-cols-2 gap-2">
+                            {field.value.map((imageUrl, index) => (
+                              <div key={index} className="relative group">
+                                <img 
+                                  src={imageUrl} 
+                                  alt={`Product ${index + 1}`}
+                                  className="w-full h-24 object-cover rounded border"
+                                />
+                                <Button
+                                  type="button"
+                                  variant="destructive"
+                                  size="icon"
+                                  className="absolute top-1 right-1 h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
+                                  onClick={() => {
+                                    const newImages = field.value?.filter((_, i) => i !== index) || [];
+                                    field.onChange(newImages);
+                                  }}
+                                >
+                                  <X className="h-4 w-4" />
+                                </Button>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                        <div className="flex gap-2">
+                          <Input
+                            placeholder="Enter image URL"
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter') {
+                                e.preventDefault();
+                                const input = e.currentTarget;
+                                if (input.value.trim()) {
+                                  field.onChange([...(field.value || []), input.value.trim()]);
+                                  input.value = '';
+                                }
+                              }
+                            }}
+                          />
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="icon"
+                            onClick={() => {
+                              const input = document.querySelector<HTMLInputElement>('input[placeholder="Enter image URL"]');
+                              if (input && input.value.trim()) {
+                                field.onChange([...(field.value || []), input.value.trim()]);
+                                input.value = '';
+                              }
+                            }}
+                          >
+                            <Plus className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </div>
+                      <FormDescription>
+                        Add image URLs one at a time. Press Enter or click + to add.
+                      </FormDescription>
                       <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="showOnShop"
+                  render={({ field }) => (
+                    <FormItem className="col-span-2 flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+                      <FormControl>
+                        <Checkbox
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                        />
+                      </FormControl>
+                      <div className="space-y-1 leading-none">
+                        <FormLabel>
+                          Show on Website Shop
+                        </FormLabel>
+                        <FormDescription>
+                          Check this to make the product visible on the public shop page
+                        </FormDescription>
+                      </div>
                     </FormItem>
                   )}
                 />
